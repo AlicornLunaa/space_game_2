@@ -1,0 +1,4 @@
+test/
+target/
+*.jar
+*.code-workspace
