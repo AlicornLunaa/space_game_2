@@ -15,6 +15,10 @@ on the type, the assosciated section will be appended.
 (Power)  
 (Vector cone)
 
+## Structural
+(Fuel capacity)
+(Electric capacity)
+
 ## Aero:
 (Drag)  
 (Lift)  

@@ -85,7 +85,7 @@ public class ShipPart extends Actor {
     public static ShipPart fromFile(Body parent, Vector2 posOffset, float rotOffset, String filename){
         // Part information is in parts_layout.md
         try {
-            String data = Gdx.files.internal("parts/thrusters/test_thruster.txt").readString();
+            String data = Gdx.files.internal(filename).readString();
             Scanner f = new Scanner(data);
             String type = f.nextLine();
             String name = f.nextLine();
@@ -101,6 +101,20 @@ public class ShipPart extends Actor {
                 f.close();
                 
                 return new Thruster(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, power, cone);
+                
+            case "Structural":
+                float fuelCapacity = f.nextFloat();
+                float batteryCapacity = f.nextFloat();
+                f.close();
+                
+                return new Structural(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, fuelCapacity, batteryCapacity);
+            
+            case "Aero":
+                float drag = f.nextFloat();
+                float lift = f.nextFloat();
+                f.close();
+                
+                return new Aero(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, drag, lift);
             }
             
             f.close();

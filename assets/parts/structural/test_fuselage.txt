@@ -1,0 +1,8 @@
+Structural
+Development Fuselage
+Just a simple part for the middle structure of a rocket
+fuselage.png
+64 64
+10
+500
+500

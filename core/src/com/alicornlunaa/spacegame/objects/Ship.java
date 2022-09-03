@@ -3,9 +3,7 @@ package com.alicornlunaa.spacegame.objects;
 import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.parts.ShipPart;
-import com.alicornlunaa.spacegame.parts.Thruster;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -29,11 +27,9 @@ public class Ship extends Actor {
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
         this.parts = new ArrayList<ShipPart>();
-        parts.add(new ShipPart(body, new Texture("tip1.png"), new Vector2(64, 64), new Vector2(0, 64), 0.f));
-        parts.add(new ShipPart(body, new Texture("fuselage.png"), new Vector2(64, 64), new Vector2(0, 0), 0.f));
-
-        Thruster t = (Thruster)ShipPart.fromFile(body, new Vector2(0, -64), 0.f, "parts/thrusters/test_thruster.txt");
-        parts.add(t);
+        parts.add(ShipPart.fromFile(body, new Vector2(0, 64), 0.f, "parts/aero/test_tip.txt"));
+        parts.add(ShipPart.fromFile(body, new Vector2(0, 0), 0.f, "parts/structural/test_fuselage.txt"));
+        parts.add(ShipPart.fromFile(body, new Vector2(0, -64), 0.f, "parts/thrusters/test_thruster.txt"));
     }
 
     @Override
