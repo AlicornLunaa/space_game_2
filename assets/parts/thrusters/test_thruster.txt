@@ -1,0 +1,8 @@
+Thruster
+Development Thruster
+Just a thruster to test with in development!
+rocket.png
+64 64
+15
+10000
+15

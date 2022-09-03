@@ -1,5 +1,8 @@
 package com.alicornlunaa.spacegame.parts;
 
+import java.util.Scanner;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -11,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class ShipPart extends Actor {
     // Variables
-    private Body parent;
+    protected Body parent;
     private PolygonShape shape;
     private TextureRegion region;
 
@@ -79,7 +82,34 @@ public class ShipPart extends Actor {
     }
 
     // Static methods
-    // public static ShipPart fromFile(String filename){
+    public static ShipPart fromFile(Body parent, Vector2 posOffset, float rotOffset, String filename){
+        // Part information is in parts_layout.md
+        try {
+            String data = Gdx.files.internal("parts/thrusters/test_thruster.txt").readString();
+            Scanner f = new Scanner(data);
+            String type = f.nextLine();
+            String name = f.nextLine();
+            String desc = f.nextLine();
+            String texture = f.nextLine();
+            Vector2 size = new Vector2(f.nextFloat(), f.nextFloat());
+            float density = f.nextFloat();
 
-    // }
+            switch(type){
+            case "Thruster":
+                float power = f.nextFloat();
+                float cone = f.nextFloat();
+                f.close();
+                
+                return new Thruster(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, power, cone);
+            }
+            
+            f.close();
+
+            return new ShipPart(parent, new Texture(texture), size, posOffset, rotOffset);
+        } catch(Exception e){
+            System.out.println("Error loading: " + filename);
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
