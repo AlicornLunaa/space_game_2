@@ -12,6 +12,10 @@ public class Thruster extends ShipPart {
     private String description;
     private float power;
     private float coneAngle;
+    private float coneSpeed;
+    private float rotationOffset;
+
+    private float currentAngle;
 
     // Constructor
     public Thruster(Body parent, Texture texture, Vector2 size, Vector2 posOffset, float rotOffset, String name, String description, float density, float power, float coneAngle){
@@ -21,6 +25,10 @@ public class Thruster extends ShipPart {
         this.description = description;
         this.power = power;
         this.coneAngle = coneAngle;
+        this.coneSpeed = 0.5f;
+        this.rotationOffset = rotOffset;
+
+        currentAngle = 0.f;
     }
 
     // Functions
@@ -28,13 +36,20 @@ public class Thruster extends ShipPart {
     public void act(float delta){
         super.act(delta);
 
-        if(Gdx.input.isKeyPressed(Keys.SPACE)){
-            Vector2 mouse = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-            Vector2 curPos = new Vector2(getX(), getY());
-            Vector2 dir = mouse.sub(parent.getPosition()).nor();
-
-            parent.applyForce(dir.scl(power * 10000.f), parent.getWorldPoint(curPos), true);
+        if(Gdx.input.isKeyPressed(Keys.A)){
+            currentAngle += Math.min(Math.max(-coneAngle - currentAngle, -coneSpeed), coneSpeed);
+        } else if(Gdx.input.isKeyPressed(Keys.D)){
+            currentAngle += Math.min(Math.max(coneAngle - currentAngle, -coneSpeed), coneSpeed);
+        } else {
+            currentAngle += Math.min(Math.max(0 - currentAngle, -coneSpeed), coneSpeed);
         }
+
+        if(Gdx.input.isKeyPressed(Keys.SPACE)){
+            Vector2 dir = parent.getLocalVector(new Vector2((float)Math.sin(currentAngle * (Math.PI / 180.f)), (float)Math.cos(currentAngle * (Math.PI / 180.f))));
+            parent.applyForce(dir.scl(power * 100.f), parent.getWorldPoint(new Vector2(getX(), getY())), true);
+        }
+
+        setRotation(rotationOffset + currentAngle);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -63,6 +64,13 @@ public class App extends ApplicationAdapter {
 
 				return false;
 			}
+
+			@Override
+			public boolean scrolled(float x, float y){
+				OrthographicCamera cam = ((OrthographicCamera)gameStage.getCamera());
+				cam.zoom = Math.min(Math.max(cam.zoom + y / 25.f, 0.25f), 2);
+				return cam.zoom != 0.25f || cam.zoom != 2;
+			}
 		});
 		inputs.addProcessor(gameStage);
 		Gdx.input.setInputProcessor(inputs);
@@ -78,7 +86,7 @@ public class App extends ApplicationAdapter {
 		pauseMenu.add(new TextButton("QUIT", skin)).width(100).height(40);
 		gameStage.addActor(pauseMenu);
 
-		gameStage.addActor(new Ship(world, 640/2, 250, 15));
+		gameStage.addActor(new Ship(world, 640/2, 250, 0));
 		gameStage.addActor(new Ground(world, 640/2, 20, 500, 15));
 	}
 

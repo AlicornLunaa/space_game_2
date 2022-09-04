@@ -2,7 +2,7 @@ Aero
 Development Tip
 Just a tip for testing
 tip1.png
-64 64
+16 16
 10
 1
 0
