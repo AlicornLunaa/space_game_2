@@ -1,7 +1,10 @@
 package com.alicornlunaa.spacegame;
 
+import java.util.ArrayList;
+
 import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.panels.ShipEditor;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.ApplicationAdapter;
@@ -27,6 +30,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class App extends ApplicationAdapter {
 	private World world;
 	private Stage gameStage;
+	private ArrayList<Stage> stages;
 	private Box2DDebugRenderer debugRenderer;
 	private InputMultiplexer inputs;
 	private float accumulator;
@@ -48,6 +52,8 @@ public class App extends ApplicationAdapter {
 	public void create(){
 		world = new World(new Vector2(0, 0), true);
 		gameStage = new Stage(new ScreenViewport());
+		stages = new ArrayList<Stage>();
+		stages.add(gameStage);
 		debugRenderer = new Box2DDebugRenderer();
 		accumulator = 0.f;
 		
@@ -131,6 +137,8 @@ public class App extends ApplicationAdapter {
 
 		gameStage.addActor(new Ship(world, 640/2, 250, 0));
 		gameStage.addActor(new Ground(world, 640/2, 20, 500, 15));
+		
+		// stages.add(new ShipEditor(inputs));
 	}
 
 	@Override
@@ -146,8 +154,9 @@ public class App extends ApplicationAdapter {
 
 		pauseMenu.setVisible(paused);
 
-		gameStage.act(delta);
-		gameStage.draw();
+		Stage curStage = stages.get(stages.size() - 1);
+		curStage.act(delta);
+		curStage.draw();
 
 		if(rcs){
 
