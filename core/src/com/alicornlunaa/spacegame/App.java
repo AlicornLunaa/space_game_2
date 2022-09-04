@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -46,6 +47,8 @@ public class App extends ApplicationAdapter {
 		world = new World(new Vector2(0, 0), true);
 		gameStage = new Stage(new ScreenViewport());
 		debugRenderer = new Box2DDebugRenderer();
+		
+		ControlSchema.fromFile("spacegame_controls.json");
 
 		skin = new Skin(Gdx.files.internal("skins/default/skin/uiskin.json"));
 		ui = new Table();
