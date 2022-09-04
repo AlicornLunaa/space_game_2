@@ -25,7 +25,7 @@ public class Thruster extends ShipPart {
         this.description = description;
         this.power = power;
         this.coneAngle = coneAngle;
-        this.coneSpeed = 0.5f;
+        this.coneSpeed = 1.5f;
         this.rotationOffset = rotOffset;
 
         currentAngle = 0.f;
@@ -45,8 +45,11 @@ public class Thruster extends ShipPart {
         }
 
         if(Gdx.input.isKeyPressed(Keys.SPACE)){
-            Vector2 dir = parent.getLocalVector(new Vector2((float)Math.sin(currentAngle * (Math.PI / 180.f)), (float)Math.cos(currentAngle * (Math.PI / 180.f))));
-            parent.applyForce(dir.scl(power * 100.f), parent.getWorldPoint(new Vector2(getX(), getY())), true);
+            Vector2 dir = new Vector2(
+                (float)Math.cos((currentAngle - 90) * (Math.PI / 180.f) + parent.getAngle()),
+                (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getAngle())
+            );
+            parent.applyForce(dir.scl(power * -2.f).add(parent.getPosition()), parent.getWorldPoint(new Vector2(getX(), getY())), true);
         }
 
         setRotation(rotationOffset + currentAngle);

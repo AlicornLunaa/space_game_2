@@ -11,11 +11,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -35,7 +37,7 @@ public class App extends ApplicationAdapter {
 	
 	@Override
 	public void create(){
-		world = new World(new Vector2(0, -600.f), true);
+		world = new World(new Vector2(0, 0), true);
 		gameStage = new Stage(new ScreenViewport());
 		debugRenderer = new Box2DDebugRenderer();
 
@@ -83,7 +85,14 @@ public class App extends ApplicationAdapter {
 		pauseMenu.setDebug(true);
 		pauseMenu.add(new Label("PAUSED", skin));
 		pauseMenu.row();
-		pauseMenu.add(new TextButton("QUIT", skin)).width(100).height(40);
+		TextButton button = new TextButton("QUIT", skin);
+		button.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor){
+				Gdx.app.exit();
+			}
+		});
+		pauseMenu.add(button).width(100).height(40);
 		gameStage.addActor(pauseMenu);
 
 		gameStage.addActor(new Ship(world, 640/2, 250, 0));

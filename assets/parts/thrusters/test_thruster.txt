@@ -3,6 +3,6 @@ Development Thruster
 Just a thruster to test with in development!
 rocket.png
 16 16
-15
+1
 10000
-15
+5

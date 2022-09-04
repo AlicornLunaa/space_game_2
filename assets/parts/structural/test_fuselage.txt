@@ -3,6 +3,6 @@ Development Fuselage
 Just a simple part for the middle structure of a rocket
 fuselage.png
 16 16
-10
+1
 500
 500
