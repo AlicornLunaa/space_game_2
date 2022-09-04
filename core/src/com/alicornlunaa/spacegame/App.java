@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -28,6 +29,7 @@ public class App extends ApplicationAdapter {
 	private Stage gameStage;
 	private Box2DDebugRenderer debugRenderer;
 	private InputMultiplexer inputs;
+	private float accumulator;
 
 	// https://libgdx.com/wiki/graphics/2d/scene2d/table
 	private Skin skin;
@@ -47,6 +49,7 @@ public class App extends ApplicationAdapter {
 		world = new World(new Vector2(0, 0), true);
 		gameStage = new Stage(new ScreenViewport());
 		debugRenderer = new Box2DDebugRenderer();
+		accumulator = 0.f;
 		
 		ControlSchema.fromFile("spacegame_controls.json");
 
@@ -159,7 +162,12 @@ public class App extends ApplicationAdapter {
 		}
 
 		if(!paused){
-			world.step(1/60.f, 6, 2);
+			// Physics fixed timestep
+			accumulator += Math.min(delta, 0.25f);;
+			while(accumulator >= Constants.TIME_STEP){
+				world.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+				accumulator -= Constants.TIME_STEP;
+			}
 		}
 	}
 	
