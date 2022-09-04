@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.panels;
 
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -10,21 +11,20 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
  */
 public class ShipEditor extends Stage {
     // Variables
-    private InputMultiplexer inputs;
+    private InputProcessor oldProcessor;
 
     // Constructor
-    public ShipEditor(InputMultiplexer inputs){
+    public ShipEditor(){
         super(new ScreenViewport());
 
-        this.inputs = inputs;
-
-        inputs.addProcessor(this);
+        oldProcessor = Gdx.input.getInputProcessor();
+        Gdx.input.setInputProcessor(this);
     }
 
     // Functions
     @Override
     public void dispose(){
         super.dispose();
-        inputs.removeProcessor(this);
+        Gdx.input.setInputProcessor(oldProcessor);
     }
 }
