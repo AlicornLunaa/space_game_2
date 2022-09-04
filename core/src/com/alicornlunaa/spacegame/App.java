@@ -39,7 +39,7 @@ public class App extends ApplicationAdapter {
 		pauseMenu = new Table();
 
 		stages = new ArrayList<Stage>();
-		gameStage = new GameStage(stages, inputs, skin);
+		gameStage = new GameStage(stages, skin);
 		stages.add(gameStage);
 
 		paused = false;

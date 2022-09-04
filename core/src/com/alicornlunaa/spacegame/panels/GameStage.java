@@ -6,7 +6,6 @@ import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -35,14 +34,14 @@ public class GameStage extends Stage {
 	public boolean rcs;
 	public boolean sas;
     
-    private Skin skin;
+    private final Skin skin;
 	private Table ui;
 	private TextButton rcsButton;
 	private TextButton sasButton;
     private TextButton editorButton;
 
     // Constructor
-    public GameStage(final ArrayList<Stage> stages, final InputMultiplexer inputs, Skin skin){
+    public GameStage(final ArrayList<Stage> stages, final Skin skin){
         super(new ScreenViewport());
 
         world = new World(new Vector2(), true);
@@ -62,17 +61,17 @@ public class GameStage extends Stage {
 		ui.setDebug(true);
 		this.addActor(ui);
 		
-		rcsButton = new TextButton("RCS", skin);
+		rcsButton = new TextButton("RCS", this.skin);
 		rcsButton.setPosition(640 - 128, 480 - 32);
 		rcsButton.setSize(64, 32);
 		rcsButton.setColor(Color.RED);
 		this.addActor(rcsButton);
-		sasButton = new TextButton("SAS", skin);
+		sasButton = new TextButton("SAS", this.skin);
 		sasButton.setPosition(640 - 64, 480 - 32);
 		sasButton.setSize(64, 32);
 		sasButton.setColor(Color.RED);
 		this.addActor(sasButton);
-		editorButton = new TextButton("Editor", skin);
+		editorButton = new TextButton("Editor", this.skin);
 		editorButton.setPosition(640 - 192, 480 - 32);
 		editorButton.setSize(64, 32);
 		this.addActor(editorButton);
@@ -80,7 +79,7 @@ public class GameStage extends Stage {
         editorButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                stages.add(new ShipEditor());
+                stages.add(new ShipEditor(stages, skin));
             }
         });
 
