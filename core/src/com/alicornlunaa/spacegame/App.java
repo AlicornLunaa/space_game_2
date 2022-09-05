@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame;
 import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.panels.GameStage;
+import com.alicornlunaa.spacegame.panels.OptionsPanel;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -85,14 +86,23 @@ public class App extends ApplicationAdapter {
 		pauseMenu.setDebug(true);
 		pauseMenu.add(new Label("PAUSED", skin));
 		pauseMenu.row();
-		TextButton button = new TextButton("QUIT", skin);
-		button.addListener(new ChangeListener() {
+		TextButton quitButton = new TextButton("QUIT", skin);
+		quitButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor){
 				Gdx.app.exit();
 			}
 		});
-		pauseMenu.add(button).width(100).height(40);
+		pauseMenu.add(quitButton).width(100).height(40);
+		pauseMenu.row();
+		TextButton optionsButton = new TextButton("OPTIONS", skin);
+		optionsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor){
+				stages.add(new OptionsPanel(stages, skin));
+			}
+		});
+		pauseMenu.add(optionsButton).width(100).height(40);
 		gameStage.addActor(pauseMenu);
 	}
 
