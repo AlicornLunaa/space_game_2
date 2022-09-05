@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.panels.GameStage;
 import com.alicornlunaa.spacegame.panels.OptionsPanel;
+import com.alicornlunaa.spacegame.panels.ShipEditor;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -104,6 +105,9 @@ public class App extends ApplicationAdapter {
 		});
 		pauseMenu.add(optionsButton).width(100).height(40);
 		gameStage.addActor(pauseMenu);
+
+		//! TEMP
+		stages.add(new ShipEditor(stages, skin));
 	}
 
 	@Override
