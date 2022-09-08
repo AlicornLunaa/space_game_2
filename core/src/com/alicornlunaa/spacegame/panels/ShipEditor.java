@@ -1,6 +1,8 @@
 package com.alicornlunaa.spacegame.panels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -9,14 +11,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -36,9 +36,9 @@ public class ShipEditor extends Stage {
     private TextButton saveButton;
     private TextField nameBar;
     private ScrollPane categoriesScroll;
-    private VerticalGroup categoriesList;
-    private ScrollPane partsScroll;
-    private ArrayList<VerticalGroup> partsLists;
+    private Table categoriesList;
+    private Stack partsStack;
+    private Map<String, Table> partsLists;
 
     // Constructor
     public ShipEditor(final ArrayList<Stage> stages, final Skin skin){
@@ -58,17 +58,17 @@ public class ShipEditor extends Stage {
         this.addActor(ui);
 
         nameBar = new TextField("NAME", skin);
-        ui.add(nameBar).expandX().fillX().pad(10);
+        ui.add(nameBar).expandX().width(200 * scale).height(32 * scale).pad(10).left();
 
         saveButton = new TextButton("Save", this.skin);
         saveButton.setColor(Color.CYAN);
         saveButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                
+                //! Create ship saver
             }
         });
-        ui.add(saveButton).width(64 * scale).right();
+        ui.add(saveButton).width(64 * scale).height(32 * scale).right();
 
         closeButton = new TextButton("Close", this.skin);
         closeButton.setColor(Color.RED);
@@ -79,23 +79,55 @@ public class ShipEditor extends Stage {
                 stages.remove(stages.size() - 1);
             }
         });
-        ui.add(closeButton).width(64 * scale).right();
+        ui.add(closeButton).width(64 * scale).height(32 * scale).right();
 
         ui.row();
-        categoriesList = new VerticalGroup();
+        categoriesList = new Table().pad(8);
+        categoriesList.setFillParent(true);
         for(final String c : Constants.PART_CATEGORIES){
-            Button btn = new Button(skin);
-            btn.setSize(64, 64);
+            TextButton btn = new TextButton(c, skin);
             btn.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor){
+                    partsLists.get(((ShipEditor)event.getStage()).selectedCategory).setVisible(false);
+                    partsLists.get(c).setVisible(true);
+
                     ((ShipEditor)event.getStage()).selectedCategory = c;
                 }
             });
-            categoriesList.addActor(btn);
+            categoriesList.add(btn).expand().fill().uniform();
+            categoriesList.row();
         }
         categoriesScroll = new ScrollPane(categoriesList);
-        ui.add(categoriesScroll).expandY().fillY().left().width(64);
+        categoriesScroll.setScrollingDisabled(false, true);
+        ui.add(categoriesScroll).left().expand().fill();
+
+        partsStack = new Stack();
+        partsLists = new HashMap<String, Table>();
+        for(final String c : Constants.PART_CATEGORIES){
+            Table t = new Table();
+
+            for(int x = 0; x < 8; x++) {
+                for(int y = 0; y < 3; y++){
+                    TextButton btn = new TextButton(String.valueOf(y) + "," + String.valueOf(x), skin);
+                    btn.addListener(new ChangeListener(){
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor){
+                            System.out.println("A");
+                        }
+                    });
+
+                    t.add(btn).expand().fill();
+                }
+
+                t.row();
+            }
+
+            t.setVisible(c.equals(selectedCategory));
+            partsStack.add(t);
+            partsLists.put(c, t);
+        }
+        ui.add(partsStack).expandX().width(128 * scale).fill();
     }
 
     // Functions
