@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.panels.GameStage;
 import com.alicornlunaa.spacegame.panels.OptionsPanel;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class App extends ApplicationAdapter {
 	private Assets manager;
+	private PartManager partManager;
 	private ArrayList<Stage> stages;
 	private GameStage gameStage;
 	private InputMultiplexer inputs;
@@ -36,19 +38,28 @@ public class App extends ApplicationAdapter {
 	private boolean loaded;
 	private boolean paused;
 	private boolean debug;
+
+	public void init(){
+		// Called after the manager has loaded
+		gameStage = new GameStage(manager, stages, skin, partManager);
+		gameStage.addActor(pauseMenu);
+		stages.add(gameStage);
+		inputs.addProcessor(gameStage);
+	}
 	
 	@Override
 	public void create(){
 		ControlSchema.fromFile("spacegame_controls.json");
 		manager = new Assets();
+		partManager = new PartManager();
+		partManager.load("parts/aero.json");
+		partManager.load("parts/structural.json");
+		partManager.load("parts/thrusters.json");
+		stages = new ArrayList<Stage>();
 
 		skin = new Skin(Gdx.files.internal("skins/default/uiskin.json"));
 		pauseMenu = new Table();
 		loadScreen = new Table();
-
-		stages = new ArrayList<Stage>();
-		gameStage = new GameStage(manager, stages, skin);
-		stages.add(gameStage);
 
 		loaded = false;
 		paused = false;
@@ -87,7 +98,6 @@ public class App extends ApplicationAdapter {
 				return cam.zoom != 0.25f || cam.zoom != 2;
 			}
 		});
-		inputs.addProcessor(gameStage);
 		Gdx.input.setInputProcessor(inputs);
 
 		Stage load = new Stage();
@@ -122,13 +132,12 @@ public class App extends ApplicationAdapter {
 			}
 		});
 		pauseMenu.add(optionsButton).width(100).height(40);
-		gameStage.addActor(pauseMenu);
 	}
 
 	@Override
 	public void resize(int width, int height){
 		for(Stage s : stages){
-			s.getViewport().update(width, height, true);
+			// s.getViewport().update(width, height, true);
 		}
 	}
 
@@ -144,6 +153,8 @@ public class App extends ApplicationAdapter {
 				loaded = true;
 				stages.get(0).dispose();
 				stages.remove(0);
+				
+				this.init();
 			}
 
 			pauseMenu.setVisible(paused);

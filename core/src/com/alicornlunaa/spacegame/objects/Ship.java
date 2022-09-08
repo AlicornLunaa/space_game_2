@@ -3,6 +3,8 @@ package com.alicornlunaa.spacegame.objects;
 import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.parts.ShipPart;
+import com.alicornlunaa.spacegame.util.Assets;
+import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -16,7 +18,7 @@ public class Ship extends Actor {
     private Body body;
     private ArrayList<ShipPart> parts;
 
-    public Ship(World world, float x, float y, float rotation){
+    public Ship(Assets manager, PartManager partManager, World world, float x, float y, float rotation){
         BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.position.set(x, y);
@@ -26,10 +28,10 @@ public class Ship extends Actor {
         setPosition(body.getPosition().x, body.getPosition().y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
-        this.parts = new ArrayList<ShipPart>();
-        // parts.add(ShipPart.fromFile(body, new Vector2(0, 16), 0.f, "parts/aero/test_tip.txt"));
-        // parts.add(ShipPart.fromFile(body, new Vector2(0, 0), 0.f, "parts/structural/test_fuselage.txt"));
-        // parts.add(ShipPart.fromFile(body, new Vector2(0, -16), 0.f, "parts/thrusters/test_thruster.txt"));
+        parts = new ArrayList<ShipPart>();
+        parts.add(ShipPart.fromJSON(manager, partManager.get("AERO", "MED_CMD_POD"), body, new Vector2(0, 16), 0.f));
+        parts.add(ShipPart.fromJSON(manager, partManager.get("STRUCTURAL", "BSC_FUSELAGE"), body, new Vector2(0, 0), 0.f));
+        parts.add(ShipPart.fromJSON(manager, partManager.get("THRUSTER", "BSC_THRUSTER"), body, new Vector2(0, -16), 0.f));
     }
 
     @Override

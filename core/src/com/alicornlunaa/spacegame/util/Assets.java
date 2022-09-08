@@ -12,8 +12,8 @@ public class Assets extends AssetManager {
 
         // Texture loading
         load("textures/editor_ui_mockup.png", Texture.class);
-        load("textures/fuselage.png", Texture.class);
-        load("textures/rocket.png", Texture.class);
-        load("textures/tip1.png", Texture.class);
+        load("textures/aero_atlas.png", Texture.class);
+        load("textures/structural_atlas.png", Texture.class);
+        load("textures/thruster_atlas.png", Texture.class);
     }
 }

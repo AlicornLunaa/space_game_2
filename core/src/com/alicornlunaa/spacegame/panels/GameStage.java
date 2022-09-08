@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
@@ -41,8 +42,10 @@ public class GameStage extends Stage {
 	private TextButton sasButton;
     private TextButton editorButton;
 
+    private final PartManager partManager;
+    
     // Constructor
-    public GameStage(final Assets manager, final ArrayList<Stage> stages, final Skin skin){
+    public GameStage(final Assets manager, final ArrayList<Stage> stages, final Skin skin, final PartManager partManager){
         super(new ScreenViewport());
 
         world = new World(new Vector2(), true);
@@ -53,6 +56,7 @@ public class GameStage extends Stage {
         paused = false;
 		rcs = false;
 		sas = false;
+        this.partManager = partManager;
 
         Gdx.input.setInputProcessor(this);
 
@@ -84,7 +88,7 @@ public class GameStage extends Stage {
             }
         });
 
-		this.addActor(new Ship(world, 640/2, 250, 0));
+		this.addActor(new Ship(manager, partManager, world, 640/2, 250, 0));
 		this.addActor(new Ground(world, 640/2, 20, 500, 15));
     }
 

@@ -1,8 +1,12 @@
 package com.alicornlunaa.spacegame.parts;
 
-import java.util.Scanner;
+import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.alicornlunaa.spacegame.util.Assets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -11,18 +15,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class ShipPart extends Actor {
     // Variables
     protected Body parent;
     private PolygonShape shape;
     private TextureRegion region;
+    private ArrayList<Vector2> attachmentPoints;
 
     // Constructor
-    public ShipPart(Body parent, Texture texture, Vector2 size, Vector2 posOffset, float rotOffset){
+    public ShipPart(Body parent, TextureRegion texture, Vector2 size, Vector2 posOffset, float rotOffset){
         this.parent = parent;
-        region = new TextureRegion(texture);
+        region = texture;
         shape = new PolygonShape();
+        attachmentPoints = new ArrayList<Vector2>();
 
         setSize(size.x, size.y);
         setOrigin(size.x / 2.f - posOffset.x, size.y / 2.f - posOffset.y);
@@ -82,48 +89,58 @@ public class ShipPart extends Actor {
     }
 
     // Static methods
-    public static ShipPart fromFile(Body parent, Vector2 posOffset, float rotOffset, String filename){
+    public static ShipPart fromJSON(Assets manager, JSONObject data, Body parent, Vector2 posOffset, float rotOffset){
         // Part information is in parts_layout.md
         try {
-            String data = Gdx.files.internal(filename).readString();
-            Scanner f = new Scanner(data);
-            String type = f.nextLine();
-            String name = f.nextLine();
-            String desc = f.nextLine();
-            String texture = f.nextLine();
-            Vector2 size = new Vector2(f.nextFloat(), f.nextFloat());
-            float density = f.nextFloat();
+            // Load part information from the json object
+            String type = data.getString("type");
+            String name = data.getString("name");
+            String desc = data.getString("desc");
+            String texture = data.getString("texture");
+            TextureRegion region = new TextureRegion(
+                manager.get(texture, Texture.class),
+                data.getJSONObject("uv").getInt("x"),
+                data.getJSONObject("uv").getInt("y"),
+                data.getJSONObject("uv").getInt("width"),
+                data.getJSONObject("uv").getInt("height")
+            );
+            Vector2 size = new Vector2(
+                data.getJSONObject("scale").getFloat("width") * data.getJSONObject("scale").getFloat("scale"),
+                data.getJSONObject("scale").getFloat("height") * data.getJSONObject("scale").getFloat("scale")
+            );
+            float density = data.getFloat("density");
+            ArrayList<Vector2> attachmentPoints = new ArrayList<Vector2>();
+            
+            JSONArray points = data.getJSONArray("attachmentPoints");
+            for(int i = 0; i < points.length(); i++){
+                JSONObject o = points.getJSONObject(i);
+                attachmentPoints.add(new Vector2(o.getFloat("x"), o.getFloat("y")));
+            }
+
+            JSONObject metadata = data.getJSONObject("metadata");
 
             switch(type){
-            case "Thruster":
-                float power = f.nextFloat();
-                float cone = f.nextFloat();
-                f.close();
-                
-                return new Thruster(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, power, cone);
-                
-            case "Structural":
-                float fuelCapacity = f.nextFloat();
-                float batteryCapacity = f.nextFloat();
-                f.close();
-                
-                return new Structural(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, fuelCapacity, batteryCapacity);
-            
-            case "Aero":
-                float drag = f.nextFloat();
-                float lift = f.nextFloat();
-                f.close();
-                
-                return new Aero(parent, new Texture(texture), size, posOffset, rotOffset, name, desc, density, drag, lift);
+                case "AERO":
+                    float drag = metadata.getFloat("drag");
+                    float lift = metadata.getFloat("lift");
+                    return new Aero(parent, region, size, posOffset, rotOffset, name, desc, density, drag, lift);
+                    
+                case "STRUCTURAL":
+                    float fuel = metadata.getFloat("fuelCapacity");
+                    float battery = metadata.getFloat("batteryCapacity");
+                    return new Structural(parent, region, size, posOffset, rotOffset, name, desc, density, fuel, battery);
+                    
+                case "THRUSTER":
+                    float power = metadata.getFloat("power");
+                    float cone = metadata.getFloat("cone");
+                    float usage = metadata.getFloat("fuelUsage");
+                    return new Thruster(parent, region, size, posOffset, rotOffset, name, desc, density, power, cone);
             }
-            
-            f.close();
-
-            return new ShipPart(parent, new Texture(texture), size, posOffset, rotOffset);
-        } catch(Exception e){
-            System.out.println("Error loading: " + filename);
+        } catch(GdxRuntimeException|JSONException e){
+            System.out.println("Error reading the part data");
             e.printStackTrace();
-            return null;
         }
+
+        return null;
     }
 }

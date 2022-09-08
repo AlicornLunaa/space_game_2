@@ -1,0 +1,28 @@
+[
+    {
+        "id": "BSC_FUSELAGE",
+        "type": "STRUCTURAL",
+        "name": "Basic Fuselage",
+        "desc": "Ol' reliable with its 1000 fuel and battery!",
+        "texture": "textures/structural_atlas.png",
+        "uv": {
+            "x": 0,
+            "y": 0,
+            "width": 14,
+            "height": 15
+        },
+        "scale": {
+            "width": 14,
+            "height": 15,
+            "scale": 1
+        },
+        "density": 0.1,
+        "attachmentPoints": [
+            {"x": 8, "y": 0}
+        ],
+        "metadata": {
+            "fuelCapacity": 1000,
+            "batteryCapacity": 1000
+        }
+    }
+]
