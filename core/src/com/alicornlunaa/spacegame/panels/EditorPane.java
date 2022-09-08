@@ -27,18 +27,18 @@ public class EditorPane extends Actor {
         
         Color c = getColor();
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
-        batch.draw(
-            texture,
-            getX(),
-            getY(),
-            getOriginX(),
-            getOriginY(),
-            getWidth(),
-            getHeight(),
-            getScaleX(),
-            getScaleY(),
-            getRotation()
-        );
+        // batch.draw(
+        //     texture,
+        //     getX(),
+        //     getY(),
+        //     getOriginX(),
+        //     getOriginY(),
+        //     getWidth(),
+        //     getHeight(),
+        //     getScaleX(),
+        //     getScaleY(),
+        //     getRotation()
+        // );
     }
     
     @Override

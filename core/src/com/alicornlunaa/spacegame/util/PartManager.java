@@ -58,4 +58,8 @@ public class PartManager {
         if(category == null) return null;
         return category.get(id);
     }
+
+    public HashMap<String, HashMap<String, JSONObject>> getPartsList(){
+        return parts;
+    }
 }

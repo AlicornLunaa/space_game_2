@@ -84,7 +84,7 @@ public class GameStage extends Stage {
         editorButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                stages.add(new ShipEditor(manager, stages, skin));
+                stages.add(new ShipEditor(manager, stages, skin, partManager));
             }
         });
 
