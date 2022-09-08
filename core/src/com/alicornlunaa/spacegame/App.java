@@ -137,7 +137,7 @@ public class App extends ApplicationAdapter {
 	@Override
 	public void resize(int width, int height){
 		for(Stage s : stages){
-			// s.getViewport().update(width, height, true);
+			s.getViewport().update(width, height, true);
 		}
 	}
 
