@@ -10,11 +10,10 @@ public class Assets extends AssetManager {
     public Assets(){
         super();
 
-        // Textures
+        // Texture loading
         load("textures/editor_ui_mockup.png", Texture.class);
         load("textures/fuselage.png", Texture.class);
         load("textures/rocket.png", Texture.class);
         load("textures/tip1.png", Texture.class);
-        load("textures/BIG_FILE.png", Texture.class);
     }
 }

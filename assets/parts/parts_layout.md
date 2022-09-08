@@ -1,43 +1,97 @@
 # Parts layout guide
-This file will teach you how each part text file is made.  
-Every part will have everything under all, however depending  
-on the type, the assosciated section will be appended.
+This file shows the layout for a part with JSON.  
+The metadata field depends on the type of part it is.
 
 ## All:
-(Thruster/Structural/Aero/RCSPort/ReactionWheel/SolarPanel/NuclearReactor/EnvironmentControl/DataUtilities/Cargo)  
-(Name)  
-(Description)  
-(Texture)  
-(SizeX) (SizeY)  
-(Density)
+```json
+{
+    "type": "PART_TYPE",
+    "name": "PART_NAME",
+    "desc": "PART_DESCRIPTION",
+    "texture": "PART_TEXTURE_ATLAS",
+    "uv": {
+        "startx": 0,
+        "starty": 0,
+        "endx": 16,
+        "endy": 16,
+    },
+    "scale": {
+        "width": 16,
+        "height": 16
+    },
+    "density": 0.1,
+    "metadata": {}
+}
+```
 
 ## Thrusters:
-(Power)  
-(Vector cone)
+```json
+"metadata": {
+    "power": 1000,
+    "cone": 10,
+    "fuelusage": 1
+}
+```
 
 ## Structural
-(Fuel capacity)
-(Electric capacity)
+```json
+"metadata": {
+    "fuelCapacity": 1000,
+    "batteryCapacity": 1000
+}
+```
 
 ## Aero:
-(Drag)  
-(Lift)  
+```json
+"metadata": {
+    "drag": 1,
+    "lift": 1
+}
+```
 
 ## RCSPort:
-(Power) (Fuel usage)
+```json
+"metadata": {
+    "power": 100,
+    "fuelUsage": 0.1
+}
+```
 
 ## ReactionWheel:
-(Power) (Electricity usage)
+```json
+"metadata": {
+    "power": 100,
+    "batteryUsage": 1
+}
+```
 
 ## SolarPanel:
-(Power generation)
+```json
+"metadata": {
+    "chargeRate": 100
+}
+```
 
 ## NuclearReactor:
-(Power generation) (Fuel usage)
+```json
+"metadata": {
+    "chargeRate": 1000,
+    "fuelUsage": 1
+}
+```
 
 ## EnvironmentControl
-(Oxygen rate) (Heating rate)
+```json
+"metadata": {
+    "oxygenRate": 100,
+    "heatRate": 100
+}
+```
 
 ## Cargo
-(Solid/Liquid/Gas)  
-(Size)
+```json
+"metadata": {
+    "cargoType": "CARGO_TYPE",
+    "size": 16
+}
+```
