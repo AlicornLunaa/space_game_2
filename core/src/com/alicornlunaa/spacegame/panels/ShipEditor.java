@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.panels;
 
 import java.util.ArrayList;
 
+import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -33,7 +34,7 @@ public class ShipEditor extends Stage {
     private EditorPane editor;
 
     // Constructor
-    public ShipEditor(final ArrayList<Stage> stages, final Skin skin){
+    public ShipEditor(final Assets manager, final ArrayList<Stage> stages, final Skin skin){
         super(new ScreenViewport());
         float scale = ControlSchema.GUI_SCALE;
 
@@ -59,7 +60,7 @@ public class ShipEditor extends Stage {
         TextButton testBtn3 = new TextButton("3", skin);
         TextButton testBtn4 = new TextButton("4", skin);
         Table partsTable = new Table(skin);
-        editor = new EditorPane(skin);
+        editor = new EditorPane(manager, skin);
         
         // Interface layout
         ui.row().expandX().fillX().pad(20);

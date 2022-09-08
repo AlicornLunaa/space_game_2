@@ -1,8 +1,0 @@
-Aero
-Development Tip
-Just a tip for testing
-tip1.png
-16 16
-1
-1
-0

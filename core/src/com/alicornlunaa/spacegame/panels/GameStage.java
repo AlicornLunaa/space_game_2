@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -41,7 +42,7 @@ public class GameStage extends Stage {
     private TextButton editorButton;
 
     // Constructor
-    public GameStage(final ArrayList<Stage> stages, final Skin skin){
+    public GameStage(final Assets manager, final ArrayList<Stage> stages, final Skin skin){
         super(new ScreenViewport());
 
         world = new World(new Vector2(), true);
@@ -79,7 +80,7 @@ public class GameStage extends Stage {
         editorButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                stages.add(new ShipEditor(stages, skin));
+                stages.add(new ShipEditor(manager, stages, skin));
             }
         });
 

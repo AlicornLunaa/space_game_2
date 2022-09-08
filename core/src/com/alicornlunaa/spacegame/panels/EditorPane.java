@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.panels;
 
-import com.badlogic.gdx.Gdx;
+import com.alicornlunaa.spacegame.util.Assets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -16,8 +16,8 @@ public class EditorPane extends Actor {
     private TextureRegion texture;
     
     // Constructor
-    public EditorPane(Skin skin){
-        texture = new TextureRegion(new Texture(Gdx.files.internal("editor_ui_mockup.png")));
+    public EditorPane(final Assets manager, Skin skin){
+        texture = new TextureRegion(manager.get("textures/editor_ui_mockup.png", Texture.class));
     }
 
     // Methods

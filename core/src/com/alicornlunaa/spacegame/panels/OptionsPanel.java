@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.panels;
 
 import java.util.ArrayList;
 
+import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -20,7 +21,7 @@ public class OptionsPanel extends Stage {
     private TextButton saveButton;
     private TextButton cancelButton;
 
-    public OptionsPanel(final ArrayList<Stage> stages, final Skin skin){
+    public OptionsPanel(final Assets manager, final ArrayList<Stage> stages, final Skin skin){
         super(new ScreenViewport());
         oldProcessor = Gdx.input.getInputProcessor();
         Gdx.input.setInputProcessor(this);

@@ -27,9 +27,9 @@ public class Ship extends Actor {
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
         this.parts = new ArrayList<ShipPart>();
-        parts.add(ShipPart.fromFile(body, new Vector2(0, 16), 0.f, "parts/aero/test_tip.txt"));
-        parts.add(ShipPart.fromFile(body, new Vector2(0, 0), 0.f, "parts/structural/test_fuselage.txt"));
-        parts.add(ShipPart.fromFile(body, new Vector2(0, -16), 0.f, "parts/thrusters/test_thruster.txt"));
+        // parts.add(ShipPart.fromFile(body, new Vector2(0, 16), 0.f, "parts/aero/test_tip.txt"));
+        // parts.add(ShipPart.fromFile(body, new Vector2(0, 0), 0.f, "parts/structural/test_fuselage.txt"));
+        // parts.add(ShipPart.fromFile(body, new Vector2(0, -16), 0.f, "parts/thrusters/test_thruster.txt"));
     }
 
     @Override
