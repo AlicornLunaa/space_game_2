@@ -19,6 +19,7 @@ public class ControlSchema {
     public static int MOVE_RIGHT = Keys.D;
     public static int ROLL_LEFT = Keys.Q;
     public static int ROLL_RIGHT = Keys.E;
+    public static float GUI_SCALE = 1.f;
 
     public static void save(String filename){
         FileHandle file = Gdx.files.local(filename);
@@ -30,6 +31,7 @@ public class ControlSchema {
         obj.put("MOVE_RIGHT", MOVE_RIGHT);
         obj.put("ROLL_LEFT", ROLL_LEFT);
         obj.put("ROLL_RIGHT", ROLL_RIGHT);
+        obj.put("GUI_SCALE", GUI_SCALE);
 
         try {
             file.writeString(obj.toString(2), false);
@@ -54,9 +56,12 @@ public class ControlSchema {
             MOVE_RIGHT = obj.getInt("MOVE_RIGHT");
             ROLL_LEFT = obj.getInt("ROLL_LEFT");
             ROLL_RIGHT = obj.getInt("ROLL_RIGHT");
+            GUI_SCALE = obj.getInt("GUI_SCALE");
         } catch(GdxRuntimeException|JSONException e){
             System.out.println("Error reading the control schema");
             e.printStackTrace();
+
+            save(filename);
         }
     }
 }
