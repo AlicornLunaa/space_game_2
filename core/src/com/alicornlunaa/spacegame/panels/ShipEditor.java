@@ -29,8 +29,8 @@ public class ShipEditor extends Stage {
 
     private String selectedCategory;
 
-    private final Skin skin;
     private Table ui;
+    private EditorPane editor;
 
     // Constructor
     public ShipEditor(final ArrayList<Stage> stages, final Skin skin){
@@ -42,7 +42,6 @@ public class ShipEditor extends Stage {
 
         selectedCategory = Constants.PART_CATEGORIES.get(0);
 
-        this.skin = skin;
         ui = new Table(skin);
         ui.setFillParent(true);
         this.addActor(ui);
@@ -60,7 +59,7 @@ public class ShipEditor extends Stage {
         TextButton testBtn3 = new TextButton("3", skin);
         TextButton testBtn4 = new TextButton("4", skin);
         Table partsTable = new Table(skin);
-        EditorPane editorView = new EditorPane();
+        editor = new EditorPane(skin);
         
         // Interface layout
         ui.row().expandX().fillX().pad(20);
@@ -84,7 +83,7 @@ public class ShipEditor extends Stage {
         partsTable.add(new Label("A", skin));
         
         editorTable.add(partsTable).prefWidth(128 * scale);
-        editorTable.add(editorView).expandX().fillX();
+        editorTable.add(editor).expandX().fillX().center();
 
         // Interface functions
         saveButton.setColor(Color.CYAN);
