@@ -51,7 +51,7 @@ public class Thruster extends ShipPart {
             );
             parent.applyForce(dir.scl(power * -2.f).add(parent.getPosition()), parent.getWorldPoint(new Vector2(getX(), getY())), true);
         }
-
+ 
         setRotation(rotationOffset + currentAngle);
     }
 

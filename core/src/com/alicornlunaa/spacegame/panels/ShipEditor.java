@@ -9,14 +9,18 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -32,13 +36,13 @@ public class ShipEditor extends Stage {
 
     private final Skin skin;
     private Table ui;
-    private TextButton closeButton;
-    private TextButton saveButton;
-    private TextField nameBar;
-    private ScrollPane categoriesScroll;
-    private Table categoriesList;
-    private Stack partsStack;
-    private Map<String, Table> partsLists;
+    // private TextButton closeButton;
+    // private TextButton saveButton;
+    // private TextField nameBar;
+    // private ScrollPane categoriesScroll;
+    // private Table categoriesList;
+    // private Stack partsStack;
+    // private Map<String, Table> partsLists;
 
     // Constructor
     public ShipEditor(final ArrayList<Stage> stages, final Skin skin){
@@ -51,16 +55,50 @@ public class ShipEditor extends Stage {
         selectedCategory = Constants.PART_CATEGORIES.get(0);
 
         this.skin = skin;
-        ui = new Table();
+        ui = new Table(skin);
         ui.setFillParent(true);
-        ui.setDebug(true);
-        ui.top();
         this.addActor(ui);
 
-        nameBar = new TextField("NAME", skin);
-        ui.add(nameBar).expandX().width(200 * scale).height(32 * scale).pad(10).left();
+        // Interface members
+        TextField nameBar = new TextField("NAME", skin);
+        TextButton saveButton = new TextButton("Save", skin);
+        TextButton closeButton = new TextButton("Close", skin);
 
-        saveButton = new TextButton("Save", this.skin);
+        Table editorTable = new Table(skin);
+        VerticalGroup categoryGroup = new VerticalGroup();
+        ScrollPane categoryScroll = new ScrollPane(categoryGroup);
+        TextButton testBtn1 = new TextButton("1", skin);
+        TextButton testBtn2 = new TextButton("2", skin);
+        TextButton testBtn3 = new TextButton("3", skin);
+        TextButton testBtn4 = new TextButton("4", skin);
+        Table partsTable = new Table(skin);
+        EditorPane editorView = new EditorPane();
+        
+        // Interface layout
+        ui.row().expandX().fillX().pad(20);
+        ui.add(nameBar).width(300 * scale).left();
+        ui.add(saveButton).right().maxWidth(64 * scale);
+        ui.add(closeButton).right().maxWidth(64 * scale);
+
+        ui.row().expand().fill().colspan(3);
+        ui.add(editorTable);
+        editorTable.row().expandY().fillY().left();
+        editorTable.add(categoryScroll).prefWidth(64 * scale);
+        categoryGroup.addActor(testBtn1);
+        categoryGroup.addActor(testBtn2);
+        categoryGroup.addActor(testBtn3);
+        categoryGroup.addActor(testBtn4);
+        categoryGroup.expand().fill();
+
+        partsTable.row().expand().fill().top().maxHeight(64 * scale);
+        partsTable.add(new Label("A", skin));
+        partsTable.add(new Label("A", skin));
+        partsTable.add(new Label("A", skin));
+        
+        editorTable.add(partsTable).prefWidth(128 * scale);
+        editorTable.add(editorView).expandX().fillX();
+
+        // Interface functions
         saveButton.setColor(Color.CYAN);
         saveButton.addListener(new ChangeListener(){
             @Override
@@ -68,9 +106,7 @@ public class ShipEditor extends Stage {
                 //! Create ship saver
             }
         });
-        ui.add(saveButton).width(64 * scale).height(32 * scale).right();
 
-        closeButton = new TextButton("Close", this.skin);
         closeButton.setColor(Color.RED);
         closeButton.addListener(new ChangeListener(){
             @Override
@@ -79,55 +115,8 @@ public class ShipEditor extends Stage {
                 stages.remove(stages.size() - 1);
             }
         });
-        ui.add(closeButton).width(64 * scale).height(32 * scale).right();
 
-        ui.row();
-        categoriesList = new Table().pad(8);
-        categoriesList.setFillParent(true);
-        for(final String c : Constants.PART_CATEGORIES){
-            TextButton btn = new TextButton(c, skin);
-            btn.addListener(new ChangeListener(){
-                @Override
-                public void changed(ChangeEvent event, Actor actor){
-                    partsLists.get(((ShipEditor)event.getStage()).selectedCategory).setVisible(false);
-                    partsLists.get(c).setVisible(true);
-
-                    ((ShipEditor)event.getStage()).selectedCategory = c;
-                }
-            });
-            categoriesList.add(btn).expand().fill().uniform();
-            categoriesList.row();
-        }
-        categoriesScroll = new ScrollPane(categoriesList);
-        categoriesScroll.setScrollingDisabled(false, true);
-        ui.add(categoriesScroll).left().expand().fill();
-
-        partsStack = new Stack();
-        partsLists = new HashMap<String, Table>();
-        for(final String c : Constants.PART_CATEGORIES){
-            Table t = new Table();
-
-            for(int x = 0; x < 8; x++) {
-                for(int y = 0; y < 3; y++){
-                    TextButton btn = new TextButton(String.valueOf(y) + "," + String.valueOf(x), skin);
-                    btn.addListener(new ChangeListener(){
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor){
-                            System.out.println("A");
-                        }
-                    });
-
-                    t.add(btn).expand().fill();
-                }
-
-                t.row();
-            }
-
-            t.setVisible(c.equals(selectedCategory));
-            partsStack.add(t);
-            partsLists.put(c, t);
-        }
-        ui.add(partsStack).expandX().width(128 * scale).fill();
+        this.setDebugAll(true);
     }
 
     // Functions
