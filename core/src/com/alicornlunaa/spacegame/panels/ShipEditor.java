@@ -1,12 +1,8 @@
 package com.alicornlunaa.spacegame.panels;
 
 import java.util.ArrayList;
-import java.util.Map;
-
-import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.util.Assets;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Gdx;
@@ -14,7 +10,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -59,7 +55,8 @@ public class ShipEditor extends Stage {
         Table editorTable = new Table(skin);
         VerticalGroup categoryGroup = new VerticalGroup();
         ScrollPane categoryScroll = new ScrollPane(categoryGroup);
-        Table partsTable = new Table(skin);
+        VerticalGroup partsVertical = new VerticalGroup();
+        ScrollPane partsScroll = new ScrollPane(partsVertical);
         editor = new EditorPane(manager, skin);
         
         // Interface layout
@@ -87,25 +84,29 @@ public class ShipEditor extends Stage {
         }
         categoryGroup.expand().fill();
 
-        partsTable.row().expand().fill().top().maxHeight(64 * scale);
-        // for(final String objKey : partManager.getPartsList().get(selectedCategory).keySet()) {
-        //     // Each entry is a category
-        //     TextButton btn = new TextButton(objKey, skin);
+        int count = 0;
+        for(final String objKey : partManager.getPartsList().get(selectedCategory).keySet()) {
+            if(count % 3 == 0){
+                partsVertical.addActor(new HorizontalGroup());
+                ((HorizontalGroup)partsVertical.getChild(count / 3)).expand().fill();
+            }
 
-        //     btn.addListener(new ChangeListener(){
-        //         @Override
-        //         public void changed(ChangeEvent event, Actor actor){
-        //             //! SPAWN PART HERE
-        //         }
-        //     });
-            
-        //     partsTable.addActor(btn);
-        // }
-        partsTable.add(new Label("A", skin));
-        partsTable.add(new Label("A", skin));
-        partsTable.add(new Label("A", skin));
+            // Each entry is a category
+            TextButton btn = new TextButton(partManager.get(selectedCategory, objKey).getString("name"), skin);
+
+            btn.addListener(new ChangeListener(){
+                @Override
+                public void changed(ChangeEvent event, Actor actor){
+                    //! SPAWN PART HERE
+                }
+            });
+
+            ((HorizontalGroup)partsVertical.getChild(count / 3)).addActor(btn);
+            count++;
+        }
+        partsVertical.expand().fill();
         
-        editorTable.add(partsTable).prefWidth(128 * scale);
+        editorTable.add(partsVertical).prefWidth(128 * scale);
         editorTable.add(editor).expandX().fillX().center();
 
         // Interface functions
