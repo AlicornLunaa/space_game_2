@@ -1,6 +1,10 @@
 package com.alicornlunaa.spacegame.panels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -8,16 +12,21 @@ import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /*
@@ -29,8 +38,10 @@ public class ShipEditor extends Stage {
     private InputProcessor oldProcessor;
 
     private String selectedCategory;
+    private Map<String, Integer> cateogryIndices;
 
     private Table ui;
+    private Stack partsStack;
     private EditorPane editor;
 
     // Constructor
@@ -42,6 +53,7 @@ public class ShipEditor extends Stage {
         Gdx.input.setInputProcessor(this);
 
         selectedCategory = "AERO";
+        cateogryIndices = new HashMap<String, Integer>();
 
         ui = new Table(skin);
         ui.setFillParent(true);
@@ -55,8 +67,7 @@ public class ShipEditor extends Stage {
         Table editorTable = new Table(skin);
         VerticalGroup categoryGroup = new VerticalGroup();
         ScrollPane categoryScroll = new ScrollPane(categoryGroup);
-        VerticalGroup partsVertical = new VerticalGroup();
-        ScrollPane partsScroll = new ScrollPane(partsVertical);
+        partsStack = new Stack();
         editor = new EditorPane(manager, skin);
         
         // Interface layout
@@ -69,6 +80,8 @@ public class ShipEditor extends Stage {
         ui.add(editorTable);
         editorTable.row().expandY().fillY().left();
         editorTable.add(categoryScroll).prefWidth(64 * scale);
+
+        int categoryCount = 0;
         for(final String entry : partManager.getPartsList().keySet()) {
             // Each entry is a category
             TextButton btn = new TextButton(entry, skin);
@@ -76,37 +89,59 @@ public class ShipEditor extends Stage {
             btn.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor){
+                    ((ShipEditor)event.getStage()).partsStack.getChild(cateogryIndices.get(((ShipEditor)event.getStage()).selectedCategory)).setVisible(false);
                     ((ShipEditor)event.getStage()).selectedCategory = entry;
+                    ((ShipEditor)event.getStage()).partsStack.getChild(cateogryIndices.get(entry)).setVisible(true);
                 }
             });
             
             categoryGroup.addActor(btn);
+
+            cateogryIndices.put(entry, categoryCount);
+            categoryCount++;
         }
         categoryGroup.expand().fill();
 
-        int count = 0;
-        for(final String objKey : partManager.getPartsList().get(selectedCategory).keySet()) {
-            if(count % 3 == 0){
-                partsVertical.addActor(new HorizontalGroup());
-                ((HorizontalGroup)partsVertical.getChild(count / 3)).expand().fill();
+        // Add each part to a different stack for each category
+        for(final String entry : partManager.getPartsList().keySet()) {
+            // Each entry is a category
+            VerticalGroup partsVertical = new VerticalGroup();
+            int count = 0;
+
+            for(final String objKey : partManager.getPartsList().get(entry).keySet()) {
+                if(count % 3 == 0){
+                    partsVertical.addActor(new HorizontalGroup().wrap().expand().fill().center());
+                    ((HorizontalGroup)partsVertical.getChild(count / 3)).expand().fill();
+                }
+
+                // Each entry is a category
+                JSONObject btnData = partManager.get(entry, objKey);
+                TextureRegionDrawable texture = new TextureRegionDrawable(new TextureRegion(
+                    manager.get(partManager.get(entry, objKey).getString("texture"), Texture.class),
+                    btnData.getJSONObject("uv").getInt("x"),
+                    btnData.getJSONObject("uv").getInt("y"),
+                    btnData.getJSONObject("uv").getInt("width"),
+                    btnData.getJSONObject("uv").getInt("height")
+                ));
+                ImageButton btn = new ImageButton(texture);
+
+                btn.addListener(new ChangeListener(){
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor){
+                        //! SPAWN PART HERE
+                    }
+                });
+
+                ((HorizontalGroup)partsVertical.getChild(count / 3)).addActor(btn);
+                count++;
             }
 
-            // Each entry is a category
-            TextButton btn = new TextButton(partManager.get(selectedCategory, objKey).getString("name"), skin);
-
-            btn.addListener(new ChangeListener(){
-                @Override
-                public void changed(ChangeEvent event, Actor actor){
-                    //! SPAWN PART HERE
-                }
-            });
-
-            ((HorizontalGroup)partsVertical.getChild(count / 3)).addActor(btn);
-            count++;
+            partsVertical.setVisible(entry == selectedCategory);
+            partsVertical.expand().fill();
+            partsStack.add(partsVertical);
         }
-        partsVertical.expand().fill();
-        
-        editorTable.add(partsVertical).prefWidth(128 * scale);
+
+        editorTable.add(partsStack).prefWidth(128 * scale);
         editorTable.add(editor).expandX().fillX().center();
 
         // Interface functions
