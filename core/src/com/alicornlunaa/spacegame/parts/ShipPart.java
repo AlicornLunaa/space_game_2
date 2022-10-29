@@ -15,15 +15,40 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class ShipPart extends Actor {
+    // Classes
+    public static class Attachment {
+        private Vector2 position = new Vector2(0, 0);
+        private ShipPart parent = null; // The current part with the attachment
+        private ShipPart child = null; // The child part being attached
+        private int childAttachmentPoint = 0; // Which attachment on the child is being used
+        private boolean inUse = false; // True when this part is parented to something using this attachment
+
+        Attachment(ShipPart parent, Vector2 position){
+            this.parent = parent;
+            this.position = position;
+        }
+
+        Attachment(ShipPart parent, Vector2 position, ShipPart child){
+            this(parent, position);
+            this.child = child;
+        }
+
+        public Vector2 getPos(){ return position; }
+        public ShipPart getParent(){ return parent; }
+        public ShipPart getChild(){ return child; }
+    };
+
     // Variables
     protected Body parent;
-    private PolygonShape shape;
     private TextureRegion region;
-    private ArrayList<Vector2> attachmentPoints;
+    private PolygonShape shape = new PolygonShape();
+    private ArrayList<Attachment> attachments = new ArrayList<Attachment>();
+    
     private boolean drawAttachPoints = true;
 
     private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -32,8 +57,10 @@ public class ShipPart extends Actor {
     public ShipPart(Body parent, TextureRegion texture, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints){
         this.parent = parent;
         region = texture;
-        shape = new PolygonShape();
-        this.attachmentPoints = attachmentPoints;
+
+        for(Vector2 p : attachmentPoints){
+            attachments.add(new Attachment(this, p));
+        }
 
         setSize(size.x, size.y);
         setOrigin(size.x / 2.f - posOffset.x, size.y / 2.f - posOffset.y);
@@ -41,33 +68,79 @@ public class ShipPart extends Actor {
         setRotation(rotOffset);
 
         shape.setAsBox(size.x / 2.f, size.y / 2.f, posOffset, rotOffset * (float)(Math.PI / 180.f));
-        parent.createFixture(shape, 0.5f);
     }
 
     // Functions
-    public Vector2 getClosestAttachment(Vector2 point, float radius){
+    public Attachment getClosestAttachment(Vector2 point, float radius){
         // Returns the closest point to the mouse
-        if(attachmentPoints.size() <= 0) return null;
+        if(attachments.size() <= 0) return null;
 
-        Vector2 closestPoint = attachmentPoints.get(0);
-        float minDist = (closestPoint.dst2(point));
-        for(int i = 1; i < attachmentPoints.size(); i++){
-            Vector2 curPoint = attachmentPoints.get(i);
+        Attachment closestAttach = attachments.get(0);
+        float minDist = (closestAttach.position.dst2(point));
+        for(int i = 1; i < attachments.size(); i++){
+            Vector2 curPoint = attachments.get(i).position;
             float curDist = (curPoint.dst2(point));
             
             if(curDist < minDist){
-                closestPoint = curPoint;
+                closestAttach = attachments.get(i);
                 minDist = curDist;
             }
         }
 
-
         if(minDist < (radius * radius)){
-            return closestPoint;
+            return closestAttach;
         }
 
         return null;
     }
+
+    public ShipPart attachPart(ShipPart target, int targetAttachment, int thisAttachment){
+        /** Attaches TARGET to THIS. */
+        Attachment a = attachments.get(thisAttachment);
+        
+        if(a.child == null){
+            a.child = target;
+            a.childAttachmentPoint = targetAttachment;
+            target.attachments.get(targetAttachment).inUse = true;
+
+            target.setPosition(
+                getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
+                getY() + a.position.y - target.attachments.get(targetAttachment).position.y
+            );
+
+            ((PolygonShape)target.getShape()).setAsBox(
+                getWidth() / 2.f,
+                getHeight() / 2.f,
+                new Vector2(
+                    getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
+                    getY() + a.position.y - target.attachments.get(targetAttachment).position.y
+                ),
+                getRotation() * (float)(Math.PI / 180.f)
+            );
+
+            return target;
+        }
+
+        return null;
+    }
+
+    public boolean detachPart(int attachment){
+        Attachment a = attachments.get(attachment);
+
+        if(a.child != null){
+            a.child.attachments.get(a.childAttachmentPoint).inUse = false;
+            a.child = null;
+            return true;
+        }
+
+        return false;
+    }
+
+    public ArrayList<Attachment> getAttachments(){
+        return attachments;
+    }
+
+    public Shape getShape(){ return shape; }
 
     @Override
     public void setRotation(float r){
@@ -90,13 +163,20 @@ public class ShipPart extends Actor {
     @Override
     public void act(float delta){
         super.act(delta);
+
+        for(Attachment attachment : getAttachments()){
+            if(attachment.getChild() != null){
+                attachment.getChild().act(delta);
+            }
+        }
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        float x = parent.getPosition().x + getX() - getWidth() / 2;
-        float y = parent.getPosition().y + getY() - getHeight() / 2;
         float rot = (parent.getAngle() * (float)(180.f / Math.PI)) + getRotation();
+        Vector2 pos = new Vector2(getX(), getY()).rotateDeg(rot);
+        float x = parent.getPosition().x + pos.x - getWidth() / 2;
+        float y = parent.getPosition().y + pos.y - getHeight() / 2;
 
         Color c = getColor();
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
@@ -112,6 +192,12 @@ public class ShipPart extends Actor {
             getScaleY(),
             rot
         );
+        
+        for(Attachment attachment : getAttachments()){
+            if(attachment.getChild() != null){
+                attachment.getChild().draw(batch, parentAlpha);
+            }
+        }
 
         if(drawAttachPoints){
             batch.end();
@@ -119,10 +205,10 @@ public class ShipPart extends Actor {
             shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 
-            for(Vector2 p : attachmentPoints){
-                Vector2 local = new Vector2(p.x, p.y).rotateAroundDeg(new Vector2(getOriginX(), getOriginY()), rot);
+            for(Attachment a : attachments){
+                Vector2 local = new Vector2(a.position.x, a.position.y).rotateDeg(parent.getAngle());
 
-                shapeRenderer.setColor(Color.GREEN);
+                shapeRenderer.setColor(a.child == null && !a.inUse ? Color.GREEN : Color.RED);
                 shapeRenderer.circle(parent.getPosition().x + getX() + local.x, parent.getPosition().y + getY() + local.y, 2);
             }
 
@@ -133,6 +219,12 @@ public class ShipPart extends Actor {
 
     @Override
     public boolean remove(){
+        for(Attachment attachment : getAttachments()){
+            if(attachment.getChild() != null){
+                attachment.getChild().remove();
+            }
+        }
+
         shape.dispose();
         return super.remove();
     }

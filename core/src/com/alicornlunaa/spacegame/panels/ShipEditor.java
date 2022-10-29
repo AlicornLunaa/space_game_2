@@ -131,7 +131,7 @@ public class ShipEditor extends Stage {
                     @Override
                     public void changed(ChangeEvent event, Actor actor){
                         ((ShipEditor)event.getStage()).selectedPart = objKey;
-                        ((ShipEditor)event.getStage()).ghostedPart = rootShip.addPart(selectedCategory, selectedPart, new Vector2(0, 0), 0);
+                        // ((ShipEditor)event.getStage()).ghostedPart = rootShip.addPart(selectedCategory, selectedPart, new Vector2(0, 0), 0);
                     }
                 });
 
@@ -189,10 +189,10 @@ public class ShipEditor extends Stage {
             Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(rootShip.getX() + editor.getX(), rootShip.getY());
 
             // Make part snap with attachment points
-            Vector2 attach = ghostedPart.getClosestAttachment(pos, 8);
-            if(attach != null){
-                pos = editor.localToActorCoordinates(rootShip, new Vector2(attach)).add(0, rootShip.getY());
-            }
+            // Vector2 attach = ghostedPart.getClosestAttachment(pos, 8);
+            // if(attach != null){
+            //     pos = editor.localToActorCoordinates(rootShip, new Vector2(attach)).add(0, rootShip.getY());
+            // }
 
             ghostedPart.setPosition(pos.x, pos.y);
         }

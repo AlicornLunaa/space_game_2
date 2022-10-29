@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.panels.GameStage;
 import com.alicornlunaa.spacegame.panels.OptionsPanel;
+import com.alicornlunaa.spacegame.panels.ShipEditor;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
@@ -45,6 +46,8 @@ public class App extends ApplicationAdapter {
 		gameStage.addActor(pauseMenu);
 		stages.add(gameStage);
 		inputs.addProcessor(gameStage);
+
+		stages.add(new ShipEditor(manager, stages, skin, partManager));
 	}
 	
 	@Override
