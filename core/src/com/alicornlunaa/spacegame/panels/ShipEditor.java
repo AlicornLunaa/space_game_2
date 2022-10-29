@@ -6,30 +6,21 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.alicornlunaa.spacegame.util.Assets;
-import com.alicornlunaa.spacegame.util.ControlSchema;
-import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
+import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.parts.*;
+import com.alicornlunaa.spacegame.util.*;
 
 /*
  * The ShipEditor class is a stage used to render a window used to create
@@ -48,6 +39,8 @@ public class ShipEditor extends Stage {
 
     private SpriteDrawable ghostedPart;
     private String selectedPart;
+    private World world;
+    private Ship rootShip; // Original center part, set to the first one placed
 
     // Constructor
     public ShipEditor(final Assets manager, final ArrayList<Stage> stages, final Skin skin, final PartManager partManager){
@@ -62,6 +55,8 @@ public class ShipEditor extends Stage {
 
         ghostedPart = new SpriteDrawable(new Sprite());
         selectedPart = "";
+        world = new World(new Vector2(0, 0), true);
+        rootShip = new Ship(manager, partManager, world, 300, 300, 0); // The ship to build
 
         ui = new Table(skin);
         ui.setFillParent(true);
@@ -76,7 +71,7 @@ public class ShipEditor extends Stage {
         VerticalGroup categoryGroup = new VerticalGroup();
         ScrollPane categoryScroll = new ScrollPane(categoryGroup);
         partsStack = new Stack();
-        editor = new EditorPane(manager, skin);
+        editor = new EditorPane(manager, skin, rootShip);
         
         // Interface layout
         ui.row().expandX().fillX().pad(20);
@@ -137,7 +132,6 @@ public class ShipEditor extends Stage {
                 btn.addListener(new ChangeListener(){
                     @Override
                     public void changed(ChangeEvent event, Actor actor){
-                        // TODO: SPAWN PART HERE
                         ((ShipEditor)event.getStage()).selectedPart = objKey;
                         ((ShipEditor)event.getStage()).ghostedPart.getSprite().setRegion(region);
                         ((ShipEditor)event.getStage()).ghostedPart.getSprite().setSize(region.getRegionWidth(), region.getRegionHeight());
@@ -173,6 +167,17 @@ public class ShipEditor extends Stage {
                 stages.remove(stages.size() - 1);
             }
         });
+        
+        editor.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent e, float x, float y){
+                if(!selectedPart.equals("")){
+                    // Part is ghosted, spawn one and reset it
+                    rootShip.addPart(selectedCategory, selectedPart, new Vector2(x - rootShip.getX(), y - rootShip.getY()), 0);
+                    selectedPart = "";
+                }
+            }
+        });
 
         this.setDebugAll(true);
     }
@@ -184,7 +189,8 @@ public class ShipEditor extends Stage {
 
         // Set the cursor object to the mouse if an object was selected
         if(!selectedPart.equals("")){
-            ghostedPart.getSprite().setPosition(Gdx.input.getX(), Gdx.input.getY());
+            Sprite s = ghostedPart.getSprite();
+            s.setPosition(Gdx.input.getX() - (s.getWidth() / 2), Gdx.input.getY() + (s.getHeight() / 2));
         }
     }
 

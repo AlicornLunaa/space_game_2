@@ -1,7 +1,5 @@
 package com.alicornlunaa.spacegame.util;
 
-import java.util.ArrayList;
-
 public class Constants {
     public static final float TIME_STEP = 1/60.f;
     public static final int VELOCITY_ITERATIONS = 6;

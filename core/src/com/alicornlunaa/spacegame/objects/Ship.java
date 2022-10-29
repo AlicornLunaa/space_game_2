@@ -15,10 +15,15 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class Ship extends Actor {
+    private Assets manager;
+    private PartManager partManager;
     private Body body;
     private ArrayList<ShipPart> parts;
 
     public Ship(Assets manager, PartManager partManager, World world, float x, float y, float rotation){
+        this.manager = manager;
+        this.partManager = partManager;
+
         BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.position.set(x, y);
@@ -32,6 +37,15 @@ public class Ship extends Actor {
         parts.add(ShipPart.fromJSON(manager, partManager.get("AERO", "MED_CMD_POD"), body, new Vector2(0, 16), 0.f));
         parts.add(ShipPart.fromJSON(manager, partManager.get("STRUCTURAL", "BSC_FUSELAGE"), body, new Vector2(0, 0), 0.f));
         parts.add(ShipPart.fromJSON(manager, partManager.get("THRUSTER", "BSC_THRUSTER"), body, new Vector2(0, -16), 0.f));
+    }
+
+    public boolean addPart(String type, String id, Vector2 pos, float rot){
+        parts.add(ShipPart.fromJSON(manager, partManager.get(type, id), body, pos, rot));
+        return true;
+    }
+
+    public int getPartCount(){
+        return parts.size();
     }
 
     @Override
