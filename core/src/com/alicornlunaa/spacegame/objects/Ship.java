@@ -52,8 +52,6 @@ public class Ship extends Actor {
         def.density = 1;
         body.createFixture(def);
 
-        System.out.println(head);
-
         for(ShipPart.Attachment a : head.getAttachments()){
             if(a.getChild() != null){
                 assemble(a.getChild());

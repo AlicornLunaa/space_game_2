@@ -46,8 +46,6 @@ public class App extends ApplicationAdapter {
 		gameStage.addActor(pauseMenu);
 		stages.add(gameStage);
 		inputs.addProcessor(gameStage);
-
-		stages.add(new ShipEditor(manager, stages, skin, partManager));
 	}
 	
 	@Override
