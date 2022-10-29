@@ -10,7 +10,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -37,7 +36,7 @@ public class ShipEditor extends Stage {
     private Stack partsStack;
     private EditorPane editor;
 
-    private SpriteDrawable ghostedPart;
+    private ShipPart ghostedPart;
     private String selectedPart;
     private World world;
     private Ship rootShip; // Original center part, set to the first one placed
@@ -53,7 +52,6 @@ public class ShipEditor extends Stage {
         selectedCategory = "AERO";
         cateogryIndices = new HashMap<String, Integer>();
 
-        ghostedPart = new SpriteDrawable(new Sprite());
         selectedPart = "";
         world = new World(new Vector2(0, 0), true);
         rootShip = new Ship(manager, partManager, world, 300, 300, 0); // The ship to build
@@ -133,8 +131,7 @@ public class ShipEditor extends Stage {
                     @Override
                     public void changed(ChangeEvent event, Actor actor){
                         ((ShipEditor)event.getStage()).selectedPart = objKey;
-                        ((ShipEditor)event.getStage()).ghostedPart.getSprite().setRegion(region);
-                        ((ShipEditor)event.getStage()).ghostedPart.getSprite().setSize(region.getRegionWidth(), region.getRegionHeight());
+                        ((ShipEditor)event.getStage()).ghostedPart = rootShip.addPart(selectedCategory, selectedPart, new Vector2(0, 0), 0);
                     }
                 });
 
@@ -173,7 +170,7 @@ public class ShipEditor extends Stage {
             public void clicked(InputEvent e, float x, float y){
                 if(!selectedPart.equals("")){
                     // Part is ghosted, spawn one and reset it
-                    rootShip.addPart(selectedCategory, selectedPart, new Vector2(x - rootShip.getX(), y - rootShip.getY()), 0);
+                    ghostedPart = null;
                     selectedPart = "";
                 }
             }
@@ -189,24 +186,21 @@ public class ShipEditor extends Stage {
 
         // Set the cursor object to the mouse if an object was selected
         if(!selectedPart.equals("")){
-            Sprite s = ghostedPart.getSprite();
-            s.setPosition(Gdx.input.getX() - (s.getWidth() / 2), Gdx.input.getY() + (s.getHeight() / 2));
+            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(rootShip.getX() + editor.getX(), rootShip.getY());
+
+            // Make part snap with attachment points
+            Vector2 attach = ghostedPart.getClosestAttachment(pos, 8);
+            if(attach != null){
+                pos = editor.localToActorCoordinates(rootShip, new Vector2(attach)).add(0, rootShip.getY());
+            }
+
+            ghostedPart.setPosition(pos.x, pos.y);
         }
     }
 
     @Override
     public void draw(){
         super.draw();
-
-        // Set the cursor object to the mouse if an object was selected
-        if(!selectedPart.equals("")){
-            Sprite s = ghostedPart.getSprite();
-
-            this.getBatch().setProjectionMatrix(this.getCamera().combined);
-            this.getBatch().begin();
-            ghostedPart.draw(this.getBatch(), s.getX(), this.getHeight() - s.getY(), s.getWidth(), s.getHeight());
-            this.getBatch().end();
-        }
     }
 
     @Override

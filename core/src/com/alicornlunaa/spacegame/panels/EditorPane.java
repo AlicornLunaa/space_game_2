@@ -3,9 +3,7 @@ package com.alicornlunaa.spacegame.panels;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -17,12 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
  */
 public class EditorPane extends Actor {
     // Variables
-    private TextureRegion texture;
     private Ship shipRef;
     
     // Constructor
     public EditorPane(final Assets manager, Skin skin, Ship shipRef){
-        texture = new TextureRegion(manager.get("textures/editor_ui_mockup.png", Texture.class));
         this.shipRef = shipRef;
     }
 

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -23,13 +24,16 @@ public class ShipPart extends Actor {
     private PolygonShape shape;
     private TextureRegion region;
     private ArrayList<Vector2> attachmentPoints;
+    private boolean drawAttachPoints = true;
+
+    private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
-    public ShipPart(Body parent, TextureRegion texture, Vector2 size, Vector2 posOffset, float rotOffset){
+    public ShipPart(Body parent, TextureRegion texture, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints){
         this.parent = parent;
         region = texture;
         shape = new PolygonShape();
-        attachmentPoints = new ArrayList<Vector2>();
+        this.attachmentPoints = attachmentPoints;
 
         setSize(size.x, size.y);
         setOrigin(size.x / 2.f - posOffset.x, size.y / 2.f - posOffset.y);
@@ -41,6 +45,30 @@ public class ShipPart extends Actor {
     }
 
     // Functions
+    public Vector2 getClosestAttachment(Vector2 point, float radius){
+        // Returns the closest point to the mouse
+        if(attachmentPoints.size() <= 0) return null;
+
+        Vector2 closestPoint = attachmentPoints.get(0);
+        float minDist = (closestPoint.dst2(point));
+        for(int i = 1; i < attachmentPoints.size(); i++){
+            Vector2 curPoint = attachmentPoints.get(i);
+            float curDist = (curPoint.dst2(point));
+            
+            if(curDist < minDist){
+                closestPoint = curPoint;
+                minDist = curDist;
+            }
+        }
+
+
+        if(minDist < (radius * radius)){
+            return closestPoint;
+        }
+
+        return null;
+    }
+
     @Override
     public void setRotation(float r){
         super.setRotation(r);
@@ -66,20 +94,41 @@ public class ShipPart extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha){
+        float x = parent.getPosition().x + getX() - getWidth() / 2;
+        float y = parent.getPosition().y + getY() - getHeight() / 2;
+        float rot = (parent.getAngle() * (float)(180.f / Math.PI)) + getRotation();
+
         Color c = getColor();
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
         batch.draw(
             region,
-            parent.getPosition().x + getX() - getWidth() / 2,
-            parent.getPosition().y + getY() - getHeight() / 2,
+            x,
+            y,
             getOriginX(),
             getOriginY(),
             getWidth(),
             getHeight(),
             getScaleX(),
             getScaleY(),
-            (parent.getAngle() * (float)(180.f / Math.PI)) + getRotation()
+            rot
         );
+
+        if(drawAttachPoints){
+            batch.end();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+
+            for(Vector2 p : attachmentPoints){
+                Vector2 local = new Vector2(p.x, p.y).rotateAroundDeg(new Vector2(getOriginX(), getOriginY()), rot);
+
+                shapeRenderer.setColor(Color.GREEN);
+                shapeRenderer.circle(parent.getPosition().x + getX() + local.x, parent.getPosition().y + getY() + local.y, 2);
+            }
+
+            shapeRenderer.end();
+            batch.begin();
+        }
     }
 
     @Override
@@ -123,18 +172,18 @@ public class ShipPart extends Actor {
                 case "AERO":
                     float drag = metadata.getFloat("drag");
                     float lift = metadata.getFloat("lift");
-                    return new Aero(parent, region, size, posOffset, rotOffset, name, desc, density, drag, lift);
+                    return new Aero(parent, region, size, posOffset, rotOffset, attachmentPoints, name, desc, density, drag, lift);
                     
                 case "STRUCTURAL":
                     float fuel = metadata.getFloat("fuelCapacity");
                     float battery = metadata.getFloat("batteryCapacity");
-                    return new Structural(parent, region, size, posOffset, rotOffset, name, desc, density, fuel, battery);
+                    return new Structural(parent, region, size, posOffset, rotOffset, attachmentPoints, name, desc, density, fuel, battery);
                     
                 case "THRUSTER":
                     float power = metadata.getFloat("power");
                     float cone = metadata.getFloat("cone");
                     float usage = metadata.getFloat("fuelUsage");
-                    return new Thruster(parent, region, size, posOffset, rotOffset, name, desc, density, power, cone);
+                    return new Thruster(parent, region, size, posOffset, rotOffset, attachmentPoints, name, desc, density, power, cone, usage);
             }
         } catch(GdxRuntimeException|JSONException e){
             System.out.println("Error reading the part data");

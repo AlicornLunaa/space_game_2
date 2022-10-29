@@ -1,5 +1,7 @@
 package com.alicornlunaa.spacegame.parts;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -12,8 +14,8 @@ public class Aero extends ShipPart {
     private float lift;
 
     // Constructor
-    public Aero(Body parent, TextureRegion region, Vector2 size, Vector2 posOffset, float rotOffset, String name, String description, float density, float drag, float lift){
-        super(parent, region, size, posOffset, rotOffset);
+    public Aero(Body parent, TextureRegion region, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float drag, float lift){
+        super(parent, region, size, posOffset, rotOffset, attachmentPoints);
 
         this.name = name;
         this.description = description;

@@ -39,9 +39,24 @@ public class Ship extends Actor {
         parts.add(ShipPart.fromJSON(manager, partManager.get("THRUSTER", "BSC_THRUSTER"), body, new Vector2(0, -16), 0.f));
     }
 
-    public boolean addPart(String type, String id, Vector2 pos, float rot){
-        parts.add(ShipPart.fromJSON(manager, partManager.get(type, id), body, pos, rot));
-        return true;
+    public ShipPart addPart(String type, String id, Vector2 pos, float rot){
+        ShipPart part = ShipPart.fromJSON(manager, partManager.get(type, id), body, pos, rot);
+        parts.add(part);
+
+        return part;
+    }
+    
+    public boolean delPart(ShipPart part){
+        for(int i = 0; i < parts.size(); i++){
+            if(parts.get(i).equals(part)){
+                parts.remove(i);
+                i--;
+                
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public int getPartCount(){
