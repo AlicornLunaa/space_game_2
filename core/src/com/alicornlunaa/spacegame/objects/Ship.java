@@ -1,6 +1,9 @@
 package com.alicornlunaa.spacegame.objects;
 
+import java.util.ArrayList;
+
 import com.alicornlunaa.spacegame.parts.ShipPart;
+import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.Color;
@@ -16,7 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public class Ship extends Actor {
     // Classes
     protected static class ShipState {
-
+        /** Contains a list of all the ship statistics and variables
+         * such as fuel level, electricity level, thrust level, RCS,
+         * SAS, and other instance based variables
+         */
     }
 
     // Variables
@@ -36,7 +42,7 @@ public class Ship extends Actor {
         def.angle = rotation;
 		body = world.createBody(def);
 
-        setPosition(body.getPosition().x, body.getPosition().y);
+        setPosition(x, y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
         rootPart = ShipPart.fromJSON(manager, partManager.get("AERO", "MED_CMD_POD"), body, new Vector2(0, 0), 0.f);
@@ -67,6 +73,49 @@ public class Ship extends Actor {
 
     public ShipPart getRoot(){
         return rootPart;
+    }
+
+    private void getPositions(ShipPart head, ArrayList<Vector2> list){
+        for(ShipPart.Attachment a : head.getAttachments()){
+            Vector2 pos = new Vector2(a.getParent().getX() + a.getPos().x, a.getParent().getY() + a.getPos().y);
+            list.add(pos);
+
+            if(a.getChild() != null){
+                getPositions(a.getChild(), list);
+            }
+        }
+    }
+    
+    public Vector2 getClosestAttachment(Vector2 point){
+        // Wrapper for recursive function
+        ArrayList<Vector2> positions = new ArrayList<Vector2>();
+        getPositions(rootPart, positions);
+
+        Vector2 localPointer = (new Vector2(point)).sub(getX(), getY());
+        Vector2 closestPoint = positions.get(0);
+        float minDistance = localPointer.dst2(closestPoint);
+
+        for(int i = 1; i < positions.size(); i++){
+            Vector2 curPoint = positions.get(i);
+            float curDist = localPointer.dst2(curPoint);
+
+            if(curDist < minDistance){
+                closestPoint = curPoint;
+                minDistance = curDist;
+            }
+        }
+
+        return closestPoint.add(getX(), getY());
+    }
+
+    public boolean save(String path){
+        // TODO: Finish ship save method
+        return false;
+    }
+
+    public boolean load(String path){
+        // TODO: Finish ship load method
+        return false;
     }
 
     @Override

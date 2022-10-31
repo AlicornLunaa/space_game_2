@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -74,12 +75,19 @@ public class ShipPart extends Actor {
     public Attachment getClosestAttachment(Vector2 point, float radius){
         // Returns the closest point to the mouse
         if(attachments.size() <= 0) return null;
+        
+        float rot = (parent.getAngle() * (float)(180.f / Math.PI)) + getRotation();
 
         Attachment closestAttach = attachments.get(0);
-        float minDist = (closestAttach.position.dst2(point));
-        for(int i = 1; i < attachments.size(); i++){
+        float minDist = (radius * radius) + 1;
+
+        for(int i = 0; i < attachments.size(); i++){
+            Vector2 pos = new Vector2(getX() + attachments.get(i).position.x, getY() + attachments.get(i).position.y).rotateDeg(rot);
+            float x = parent.getPosition().x + pos.x;
+            float y = parent.getPosition().y + pos.y;
+
             Vector2 curPoint = attachments.get(i).position;
-            float curDist = (curPoint.dst2(point));
+            float curDist = (curPoint.dst2(x, y));
             
             if(curDist < minDist){
                 closestAttach = attachments.get(i);

@@ -11,14 +11,20 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.parts.*;
+import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.util.*;
 
 /*
@@ -39,7 +45,10 @@ public class ShipEditor extends Stage {
     private ShipPart ghostedPart;
     private String selectedPart;
     private World world;
+    private Body ghostBody;
     private Ship rootShip; // Original center part, set to the first one placed
+
+    private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
     public ShipEditor(final Assets manager, final ArrayList<Stage> stages, final Skin skin, final PartManager partManager){
@@ -55,6 +64,10 @@ public class ShipEditor extends Stage {
         selectedPart = "";
         world = new World(new Vector2(0, 0), true);
         rootShip = new Ship(manager, partManager, world, 300, 300, 0); // The ship to build
+        
+        BodyDef def = new BodyDef();
+		def.type = BodyType.KinematicBody;
+		ghostBody = world.createBody(def);
 
         ui = new Table(skin);
         ui.setFillParent(true);
@@ -131,7 +144,16 @@ public class ShipEditor extends Stage {
                     @Override
                     public void changed(ChangeEvent event, Actor actor){
                         ((ShipEditor)event.getStage()).selectedPart = objKey;
-                        // ((ShipEditor)event.getStage()).ghostedPart = rootShip.addPart(selectedCategory, selectedPart, new Vector2(0, 0), 0);
+                        ((ShipEditor)event.getStage()).ghostedPart = ShipPart.fromJSON(
+                            manager,
+                            partManager.get(
+                                ((ShipEditor)event.getStage()).selectedCategory,
+                                ((ShipEditor)event.getStage()).selectedPart
+                            ),
+                            ghostBody,
+                            new Vector2(),
+                            0
+                        );
                     }
                 });
 
@@ -186,13 +208,13 @@ public class ShipEditor extends Stage {
 
         // Set the cursor object to the mouse if an object was selected
         if(!selectedPart.equals("")){
-            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(rootShip.getX() + editor.getX(), rootShip.getY());
+            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
 
             // Make part snap with attachment points
-            // Vector2 attach = ghostedPart.getClosestAttachment(pos, 8);
-            // if(attach != null){
-            //     pos = editor.localToActorCoordinates(rootShip, new Vector2(attach)).add(0, rootShip.getY());
-            // }
+            Attachment attach = ghostedPart.getClosestAttachment(pos, 8);
+            if(attach != null){
+                pos = editor.localToActorCoordinates(rootShip, new Vector2(attach.getPos())).add(0, rootShip.getY());
+            }
 
             ghostedPart.setPosition(pos.x, pos.y);
         }
@@ -201,6 +223,20 @@ public class ShipEditor extends Stage {
     @Override
     public void draw(){
         super.draw();
+
+        if(!selectedPart.equals("")){
+            getBatch().begin();
+            ghostedPart.draw(getBatch(), 255);
+            getBatch().end();
+
+            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(editor.getX(), editor.getY());
+            Vector2 closest = rootShip.getClosestAttachment(pos).add(editor.getX(), editor.getY());
+            shapeRenderer.begin(ShapeType.Filled);
+            shapeRenderer.setColor(Color.YELLOW);
+            shapeRenderer.circle(pos.x, pos.y, 4);
+            shapeRenderer.circle(closest.x, closest.y, 4);
+            shapeRenderer.end();
+        }
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.util.Assets;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -26,21 +25,6 @@ public class EditorPane extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
-        
-        Color c = getColor();
-        batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
-        // batch.draw(
-        //     texture,
-        //     getX(),
-        //     getY(),
-        //     getOriginX(),
-        //     getOriginY(),
-        //     getWidth(),
-        //     getHeight(),
-        //     getScaleX(),
-        //     getScaleY(),
-        //     getRotation()
-        // );
 
         batch.setTransformMatrix(new Matrix4(new Vector3(getX(), getY(), 0), new Quaternion(), new Vector3(1, 1, 1)));
         shipRef.draw(batch, parentAlpha);
