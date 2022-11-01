@@ -14,9 +14,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class Ship extends Actor {
+public class Ship extends Entity {
     // Classes
     protected static class ShipState {
         /** Contains a list of all the ship statistics and variables
@@ -75,37 +74,46 @@ public class Ship extends Actor {
         return rootPart;
     }
 
-    private void getPositions(ShipPart head, ArrayList<Vector2> list){
+    private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
         for(ShipPart.Attachment a : head.getAttachments()){
             Vector2 pos = new Vector2(a.getParent().getX() + a.getPos().x, a.getParent().getY() + a.getPos().y);
-            list.add(pos);
+            posList.add(pos);
+            attachList.add(a);
 
             if(a.getChild() != null){
-                getPositions(a.getChild(), list);
+                getPositions(a.getChild(), posList, attachList);
             }
         }
     }
     
-    public Vector2 getClosestAttachment(Vector2 point){
+    public Attachment getClosestAttachment(Vector2 point, float radius){
         // Wrapper for recursive function
         ArrayList<Vector2> positions = new ArrayList<Vector2>();
-        getPositions(rootPart, positions);
+        ArrayList<Attachment> lAttachments = new ArrayList<Attachment>();
+        getPositions(rootPart, positions, lAttachments);
 
         Vector2 localPointer = (new Vector2(point)).sub(getX(), getY());
         Vector2 closestPoint = positions.get(0);
+        Attachment closestAttachment = lAttachments.get(0);
         float minDistance = localPointer.dst2(closestPoint);
 
         for(int i = 1; i < positions.size(); i++){
             Vector2 curPoint = positions.get(i);
+            Attachment curAttachment = lAttachments.get(i);
             float curDist = localPointer.dst2(curPoint);
 
             if(curDist < minDistance){
                 closestPoint = curPoint;
+                closestAttachment = curAttachment;
                 minDistance = curDist;
             }
         }
 
-        return closestPoint.add(getX(), getY());
+        if(minDistance < (radius * radius)){
+            return closestAttachment;
+        }
+
+        return null;
     }
 
     public boolean save(String path){

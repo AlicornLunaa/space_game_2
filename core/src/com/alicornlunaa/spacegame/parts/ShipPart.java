@@ -6,42 +6,50 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-public class ShipPart extends Actor {
+public class ShipPart extends Entity {
     // Classes
     public static class Attachment {
         private Vector2 position = new Vector2(0, 0);
         private ShipPart parent = null; // The current part with the attachment
         private ShipPart child = null; // The child part being attached
+        private int thisAttachmentPoint = 0;
         private int childAttachmentPoint = 0; // Which attachment on the child is being used
         private boolean inUse = false; // True when this part is parented to something using this attachment
 
-        Attachment(ShipPart parent, Vector2 position){
+        Attachment(ShipPart parent, Vector2 position, int thisAttachmentPoint){
             this.parent = parent;
             this.position = position;
+            this.thisAttachmentPoint = thisAttachmentPoint;
         }
 
-        Attachment(ShipPart parent, Vector2 position, ShipPart child){
-            this(parent, position);
+        Attachment(ShipPart parent, Vector2 position, int thisAttachmentPoint, ShipPart child){
+            this(parent, position, thisAttachmentPoint);
             this.child = child;
         }
 
         public Vector2 getPos(){ return position; }
         public ShipPart getParent(){ return parent; }
         public ShipPart getChild(){ return child; }
+        public int getThisId(){ return thisAttachmentPoint; }
+
+        public Vector2 getGlobalPos(){
+            return new Vector2(parent.getX() + position.x, parent.getY() + position.y);
+        }
+
+        // TODO: Add attach method here, abstract away from shippart
     };
 
     // Variables
@@ -60,7 +68,7 @@ public class ShipPart extends Actor {
         region = texture;
 
         for(Vector2 p : attachmentPoints){
-            attachments.add(new Attachment(this, p));
+            attachments.add(new Attachment(this, p, attachments.size()));
         }
 
         setSize(size.x, size.y);
@@ -72,22 +80,16 @@ public class ShipPart extends Actor {
     }
 
     // Functions
-    public Attachment getClosestAttachment(Vector2 point, float radius){
-        // Returns the closest point to the mouse
+    public Attachment getClosestAttachment(Vector2 point){
+        // Returns the closest attachment to the point
         if(attachments.size() <= 0) return null;
         
-        float rot = (parent.getAngle() * (float)(180.f / Math.PI)) + getRotation();
-
         Attachment closestAttach = attachments.get(0);
-        float minDist = (radius * radius) + 1;
+        float minDist = point.dst2(attachments.get(0).getGlobalPos());
 
-        for(int i = 0; i < attachments.size(); i++){
-            Vector2 pos = new Vector2(getX() + attachments.get(i).position.x, getY() + attachments.get(i).position.y).rotateDeg(rot);
-            float x = parent.getPosition().x + pos.x;
-            float y = parent.getPosition().y + pos.y;
-
-            Vector2 curPoint = attachments.get(i).position;
-            float curDist = (curPoint.dst2(x, y));
+        for(int i = 1; i < attachments.size(); i++){
+            Vector2 curPoint = attachments.get(i).getGlobalPos();
+            float curDist = point.dst2(curPoint);
             
             if(curDist < minDist){
                 closestAttach = attachments.get(i);
@@ -95,11 +97,7 @@ public class ShipPart extends Actor {
             }
         }
 
-        if(minDist < (radius * radius)){
-            return closestAttach;
-        }
-
-        return null;
+        return closestAttach;
     }
 
     public ShipPart attachPart(ShipPart target, int targetAttachment, int thisAttachment){
@@ -125,6 +123,8 @@ public class ShipPart extends Actor {
                 ),
                 getRotation() * (float)(Math.PI / 180.f)
             );
+
+            target.parent = parent;
 
             return target;
         }

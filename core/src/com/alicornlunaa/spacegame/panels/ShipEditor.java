@@ -42,6 +42,8 @@ public class ShipEditor extends Stage {
     private Stack partsStack;
     private EditorPane editor;
 
+    private Attachment selectedAttachment;
+    private int targetAttachmentId;
     private ShipPart ghostedPart;
     private String selectedPart;
     private World world;
@@ -192,6 +194,8 @@ public class ShipEditor extends Stage {
             public void clicked(InputEvent e, float x, float y){
                 if(!selectedPart.equals("")){
                     // Part is ghosted, spawn one and reset it
+                    ghostedPart.setPosition(0, 0);
+                    selectedAttachment.getParent().attachPart(ghostedPart, targetAttachmentId, selectedAttachment.getThisId());
                     ghostedPart = null;
                     selectedPart = "";
                 }
@@ -208,15 +212,23 @@ public class ShipEditor extends Stage {
 
         // Set the cursor object to the mouse if an object was selected
         if(!selectedPart.equals("")){
-            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            float radius = 16;
+            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(editor.getX(), editor.getY());
+            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), radius);
 
-            // Make part snap with attachment points
-            Attachment attach = ghostedPart.getClosestAttachment(pos, 8);
-            if(attach != null){
-                pos = editor.localToActorCoordinates(rootShip, new Vector2(attach.getPos())).add(0, rootShip.getY());
+            if(closest != null && ghostedPart != null){
+                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY()).add(editor.getX(), editor.getY());
+
+                Attachment closest2 = ghostedPart.getClosestAttachment(attachmentPos);
+                Vector2 attachmentPos2 = closest2.getPos();
+
+                pos.set(attachmentPos.x + attachmentPos2.x - editor.getX(), attachmentPos.y + attachmentPos2.y);
+
+                targetAttachmentId = closest2.getThisId();
+                selectedAttachment = closest;
             }
 
-            ghostedPart.setPosition(pos.x, pos.y);
+            ghostedPart.setPosition(pos.x + editor.getX(), pos.y + editor.getY());
         }
     }
 
@@ -229,13 +241,23 @@ public class ShipEditor extends Stage {
             ghostedPart.draw(getBatch(), 255);
             getBatch().end();
 
+            float radius = 16;
             Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(editor.getX(), editor.getY());
-            Vector2 closest = rootShip.getClosestAttachment(pos).add(editor.getX(), editor.getY());
-            shapeRenderer.begin(ShapeType.Filled);
-            shapeRenderer.setColor(Color.YELLOW);
-            shapeRenderer.circle(pos.x, pos.y, 4);
-            shapeRenderer.circle(closest.x, closest.y, 4);
-            shapeRenderer.end();
+            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), radius);
+
+            if(closest != null && ghostedPart != null){
+                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY()).add(editor.getX(), editor.getY());
+
+                Attachment closest2 = ghostedPart.getClosestAttachment(attachmentPos);
+                Vector2 attachmentPos2 = closest2.getGlobalPos();
+
+                shapeRenderer.begin(ShapeType.Filled);
+                shapeRenderer.setColor(Color.YELLOW);
+                shapeRenderer.circle(attachmentPos.x, attachmentPos.y, 4);
+                shapeRenderer.setColor(Color.MAGENTA);
+                shapeRenderer.circle(attachmentPos2.x, attachmentPos2.y, 4);
+                shapeRenderer.end();
+            }
         }
     }
 
