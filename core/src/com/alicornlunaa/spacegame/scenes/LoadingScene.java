@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -67,7 +68,9 @@ public class LoadingScene implements Screen {
     public void resume() {}
 
     @Override
-    public void show() {}
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+    }
 
     @Override
     public void hide() {}

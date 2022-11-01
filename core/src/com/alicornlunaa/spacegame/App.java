@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame;
 
+import com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.scenes.GameScene;
 import com.alicornlunaa.spacegame.scenes.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
@@ -7,6 +8,7 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class App extends Game {
@@ -18,8 +20,11 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public GameScene gameScene;
+	public EditorScene editorScene;
 
 	public boolean loaded = false;
+	
+	public ShapeRenderer shapeRenderer;
 	
 	// Functions
 	@Override
@@ -34,6 +39,8 @@ public class App extends Game {
 		partManager.load("parts/thrusters.json");
 
 		skin = new Skin(Gdx.files.internal("skins/default/uiskin.json"));
+
+		shapeRenderer = new ShapeRenderer();
 
 		loadingScene = new LoadingScene(this);
 		this.setScreen(loadingScene);
@@ -53,6 +60,7 @@ public class App extends Game {
 
 				// Start new scene
 				gameScene = new GameScene(this);
+				editorScene = new EditorScene(this);
 				this.setScreen(gameScene);
 			} else {
 				// Loading is not complete, update progress bar

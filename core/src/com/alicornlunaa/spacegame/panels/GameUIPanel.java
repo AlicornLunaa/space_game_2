@@ -47,7 +47,7 @@ public class GameUIPanel extends Stage {
         editBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-
+                game.setScreen(game.editorScene);
             }
         });
         this.addActor(editBtn);

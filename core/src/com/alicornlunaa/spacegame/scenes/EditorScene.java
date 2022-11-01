@@ -1,34 +1,34 @@
 package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.panels.GamePanel;
-import com.alicornlunaa.spacegame.panels.GameUIPanel;
+import com.alicornlunaa.spacegame.panels.ShipEditorPanel;
+import com.alicornlunaa.spacegame.panels.ShipEditorUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class GameScene implements Screen {
+public class EditorScene implements Screen {
 
     // Variables
     final App game;
 
-    public GamePanel gamePanel;
-    public GameUIPanel uiPanel;
+    public ShipEditorPanel editorPanel;
+    public ShipEditorUIPanel uiPanel;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
-    public GameScene(final App game){
+    public EditorScene(final App game){
         this.game = game;
         
-        gamePanel = new GamePanel(game);
-        uiPanel = new GameUIPanel(game);
+        editorPanel = new ShipEditorPanel(game);
+        uiPanel = new ShipEditorUIPanel(game);
 
         inputs.addProcessor(uiPanel);
-        inputs.addProcessor(gamePanel);
+        inputs.addProcessor(editorPanel);
         
-        gamePanel.setDebugAll(true);
+        editorPanel.setDebugAll(true);
         uiPanel.setDebugAll(true);
     }
 
@@ -38,16 +38,16 @@ public class GameScene implements Screen {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
-        gamePanel.act(delta);
+        editorPanel.act(delta);
         uiPanel.act(delta);
 
-        gamePanel.draw();
+        editorPanel.draw();
         uiPanel.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        gamePanel.getViewport().update(width, height, true);
+        editorPanel.getViewport().update(width, height, true);
         uiPanel.getViewport().update(width, height, true);
     }
 
@@ -67,7 +67,7 @@ public class GameScene implements Screen {
 
     @Override
     public void dispose() {
-        gamePanel.dispose();
+        editorPanel.dispose();
         uiPanel.dispose();
     }
     
