@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -181,47 +183,36 @@ public class ShipPart extends Entity {
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        float rot = (parent.getAngle() * (float)(180.f / Math.PI)) + getRotation();
-        Vector2 pos = new Vector2(getX(), getY()).rotateDeg(rot);
-        float x = parent.getPosition().x + pos.x - getWidth() / 2;
-        float y = parent.getPosition().y + pos.y - getHeight() / 2;
+        Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
+        Matrix3 transform = getTransform();
+        
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
 
         Color c = getColor();
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
-        batch.draw(
-            region,
-            x,
-            y,
-            getOriginX(),
-            getOriginY(),
-            getWidth(),
-            getHeight(),
-            getScaleX(),
-            getScaleY(),
-            rot
-        );
+        batch.draw(region, -getOriginX(), -getOriginY());
+
+        if(drawAttachPoints){
+            batch.end();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+
+            for(Attachment a : attachments){
+                shapeRenderer.setColor(a.child == null && !a.inUse ? Color.GREEN : Color.RED);
+                shapeRenderer.circle(a.position.x, a.position.y, 2);
+            }
+
+            shapeRenderer.end();
+            batch.begin();
+        }
+        
+        batch.setTransformMatrix(batchMatrix);
         
         for(Attachment attachment : getAttachments()){
             if(attachment.getChild() != null){
                 attachment.getChild().draw(batch, parentAlpha);
             }
-        }
-
-        if(drawAttachPoints){
-            batch.end();
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-
-            for(Attachment a : attachments){
-                Vector2 local = new Vector2(a.position.x, a.position.y).rotateDeg(parent.getAngle());
-
-                shapeRenderer.setColor(a.child == null && !a.inUse ? Color.GREEN : Color.RED);
-                shapeRenderer.circle(parent.getPosition().x + getX() + local.x, parent.getPosition().y + getY() + local.y, 2);
-            }
-
-            shapeRenderer.end();
-            batch.begin();
         }
     }
 

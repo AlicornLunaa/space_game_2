@@ -5,9 +5,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class Entity extends Actor {
+    /**
+     * @return Transformation matrix to the center of the actor
+     */
     public Matrix3 getTransform(){
         Matrix3 trans = new Matrix3();
-        trans.translate(getX() + getOriginX(), getY() + getOriginY());
+        trans.idt();
+        trans.translate(getX(), getY());
         trans.rotate(getRotation());
         trans.scale(getScaleX(), getScaleY());
         return trans;

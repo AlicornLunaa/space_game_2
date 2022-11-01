@@ -8,6 +8,8 @@ import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -138,8 +140,12 @@ public class Ship extends Entity {
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        Color c = getColor();
-        rootPart.draw(batch, c.a * parentAlpha);
+        Matrix3 transform = getTransform();
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
+
+        rootPart.draw(batch, getColor().a * parentAlpha);
+        
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 
     @Override
