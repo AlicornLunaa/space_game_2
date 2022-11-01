@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.util.Assets;
+import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -51,6 +52,16 @@ public class ShipPart extends Entity {
             return new Vector2(parent.getX() + position.x, parent.getY() + position.y);
         }
 
+        public JSONObject serialize(){
+            JSONObject data = new JSONObject();
+            data.put("x", position.x);
+            data.put("y", position.y);
+            data.put("thisAttachmentPoint", thisAttachmentPoint);
+            data.put("childAttachmentPoint", childAttachmentPoint);
+            data.put("inUse", inUse);
+            return data;
+        }
+
         // TODO: Add attach method here, abstract away from shippart
     };
 
@@ -59,9 +70,11 @@ public class ShipPart extends Entity {
     private TextureRegion region;
     private PolygonShape shape = new PolygonShape();
     private ArrayList<Attachment> attachments = new ArrayList<Attachment>();
-    
-    private boolean drawAttachPoints = true;
 
+    private String partType;
+    private String partId;
+
+    private boolean drawAttachPoints = true;
     private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
@@ -228,8 +241,35 @@ public class ShipPart extends Entity {
         return super.remove();
     }
 
+    public JSONObject serialize(){
+        JSONObject data = new JSONObject();
+        data.put("type", partType);
+        data.put("id", partId);
+        data.put("x", getX());
+        data.put("y", getY());
+        data.put("rotation", getRotation());
+
+        // Recursively serialize every additional part
+        JSONArray attachments = new JSONArray();
+
+        for(Attachment a : this.attachments){
+            if(a.getChild() != null){
+                JSONObject attachment = new JSONObject();
+                JSONObject attachData = a.serialize();
+                JSONObject partData = a.getChild().serialize();
+                attachment.put("attachData", attachData);
+                attachment.put("partData", partData);
+                attachments.put(attachment);
+            }
+        }
+
+        data.put("attachments", attachments);
+
+        return data;
+    }
+
     // Static methods
-    public static ShipPart fromJSON(Assets manager, JSONObject data, Body parent, Vector2 posOffset, float rotOffset){
+    private static ShipPart fromJSON(Assets manager, JSONObject data, Body parent, Vector2 posOffset, float rotOffset){
         // Part information is in parts_layout.md
         try {
             // Load part information from the json object
@@ -282,5 +322,12 @@ public class ShipPart extends Entity {
         }
 
         return null;
+    }
+    
+    public static ShipPart spawn(Assets manager, PartManager partManager, String type, String id, Body parent, Vector2 posOffset, float rotOffset){
+        ShipPart p = ShipPart.fromJSON(manager, partManager.get(type, id), parent, posOffset, rotOffset);
+        p.partType = type;
+        p.partId = id;
+        return p;
     }
 }

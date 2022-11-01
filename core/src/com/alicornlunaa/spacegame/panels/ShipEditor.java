@@ -41,6 +41,7 @@ public class ShipEditor extends Stage {
     private Table ui;
     private Stack partsStack;
     private EditorPane editor;
+    private TextField nameBar;
 
     private Attachment selectedAttachment;
     private int targetAttachmentId;
@@ -76,8 +77,9 @@ public class ShipEditor extends Stage {
         this.addActor(ui);
 
         // Interface members
-        TextField nameBar = new TextField("NAME", skin);
+        nameBar = new TextField("NAME", skin);
         TextButton saveButton = new TextButton("Save", skin);
+        TextButton loadButton = new TextButton("Load", skin);
         TextButton closeButton = new TextButton("Close", skin);
 
         Table editorTable = new Table(skin);
@@ -90,9 +92,10 @@ public class ShipEditor extends Stage {
         ui.row().expandX().fillX().pad(20);
         ui.add(nameBar).width(300 * scale).left();
         ui.add(saveButton).right().maxWidth(64 * scale);
+        ui.add(loadButton).right().maxWidth(64 * scale);
         ui.add(closeButton).right().maxWidth(64 * scale);
 
-        ui.row().expand().fill().colspan(3);
+        ui.row().expand().fill().colspan(4);
         ui.add(editorTable);
         editorTable.row().expandY().fillY().left();
         editorTable.add(categoryScroll).prefWidth(64 * scale);
@@ -146,12 +149,11 @@ public class ShipEditor extends Stage {
                     @Override
                     public void changed(ChangeEvent event, Actor actor){
                         ((ShipEditor)event.getStage()).selectedPart = objKey;
-                        ((ShipEditor)event.getStage()).ghostedPart = ShipPart.fromJSON(
+                        ((ShipEditor)event.getStage()).ghostedPart = ShipPart.spawn(
                             manager,
-                            partManager.get(
-                                ((ShipEditor)event.getStage()).selectedCategory,
-                                ((ShipEditor)event.getStage()).selectedPart
-                            ),
+                            partManager,
+                            ((ShipEditor)event.getStage()).selectedCategory,
+                            ((ShipEditor)event.getStage()).selectedPart,
                             ghostBody,
                             new Vector2(),
                             0
@@ -176,7 +178,19 @@ public class ShipEditor extends Stage {
         saveButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                //! Create ship saver
+                // Save file to ./saves/ships/name.ship
+                String shipName = ((ShipEditor)actor.getStage()).nameBar.getMessageText();
+                rootShip.save("./saves/ships/" + shipName + ".ship");
+            }
+        });
+
+        loadButton.setColor(Color.CYAN);
+        loadButton.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent event, Actor actor){
+                // Load file from ./saves/ships/name.ship
+                String shipName = ((ShipEditor)actor.getStage()).nameBar.getMessageText();
+                rootShip.load("./saves/ships/" + shipName + ".ship");
             }
         });
 

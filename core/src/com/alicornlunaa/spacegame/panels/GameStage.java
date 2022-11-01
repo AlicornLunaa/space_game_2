@@ -42,8 +42,6 @@ public class GameStage extends Stage {
 	private TextButton sasButton;
     private TextButton editorButton;
 
-    private final PartManager partManager;
-    
     // Constructor
     public GameStage(final Assets manager, final ArrayList<Stage> stages, final Skin skin, final PartManager partManager){
         super(new ScreenViewport());
@@ -56,7 +54,6 @@ public class GameStage extends Stage {
         paused = false;
 		rcs = false;
 		sas = false;
-        this.partManager = partManager;
 
         Gdx.input.setInputProcessor(this);
 

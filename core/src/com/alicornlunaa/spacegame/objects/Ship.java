@@ -2,11 +2,15 @@ package com.alicornlunaa.spacegame.objects;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.alicornlunaa.spacegame.parts.ShipPart;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.PartManager;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
@@ -16,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class Ship extends Entity {
     // Classes
@@ -27,16 +32,11 @@ public class Ship extends Entity {
     }
 
     // Variables
-    private Assets manager;
-    private PartManager partManager;
     private Body body;
     private ShipPart rootPart;
 
     // Constructor
     public Ship(Assets manager, PartManager partManager, World world, float x, float y, float rotation){
-        this.manager = manager;
-        this.partManager = partManager;
-
         BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.position.set(x, y);
@@ -46,9 +46,9 @@ public class Ship extends Entity {
         setPosition(x, y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
-        rootPart = ShipPart.fromJSON(manager, partManager.get("AERO", "MED_CMD_POD"), body, new Vector2(0, 0), 0.f);
-        ShipPart fuselage = rootPart.attachPart(ShipPart.fromJSON(manager, partManager.get("STRUCTURAL", "BSC_FUSELAGE"), body, new Vector2(0, 0), 0.f), 1, 0);
-        ShipPart thruster = fuselage.attachPart(ShipPart.fromJSON(manager, partManager.get("THRUSTER", "BSC_THRUSTER"), body, new Vector2(0, 0), 0.f), 0, 0);
+        rootPart = ShipPart.spawn(manager, partManager, "AERO", "MED_CMD_POD", body, new Vector2(0, 0), 0.f);
+        ShipPart fuselage = rootPart.attachPart(ShipPart.spawn(manager, partManager, "STRUCTURAL", "BSC_FUSELAGE", body, new Vector2(0, 0), 0.f), 1, 0);
+        fuselage.attachPart(ShipPart.spawn(manager, partManager, "THRUSTER", "BSC_THRUSTER", body, new Vector2(0, 0), 0.f), 0, 0);
         assemble();
     }
 
@@ -72,13 +72,11 @@ public class Ship extends Entity {
         assemble(rootPart);
     }
 
-    public ShipPart getRoot(){
-        return rootPart;
-    }
+    public ShipPart getRoot(){ return rootPart; }
 
     private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
         for(ShipPart.Attachment a : head.getAttachments()){
-            Vector2 pos = new Vector2(a.getParent().getX() + a.getPos().x, a.getParent().getY() + a.getPos().y);
+            Vector2 pos = new Vector2(a.getPos()).mul(head.getTransform());
             posList.add(pos);
             attachList.add(a);
 
@@ -94,15 +92,15 @@ public class Ship extends Entity {
         ArrayList<Attachment> lAttachments = new ArrayList<Attachment>();
         getPositions(rootPart, positions, lAttachments);
 
-        Vector2 localPointer = (new Vector2(point)).sub(getX(), getY());
+        Vector2 localPointer = this.worldToLocal(point);
         Vector2 closestPoint = positions.get(0);
-        Attachment closestAttachment = lAttachments.get(0);
         float minDistance = localPointer.dst2(closestPoint);
+        Attachment closestAttachment = lAttachments.get(0);
 
         for(int i = 1; i < positions.size(); i++){
             Vector2 curPoint = positions.get(i);
-            Attachment curAttachment = lAttachments.get(i);
             float curDist = localPointer.dst2(curPoint);
+            Attachment curAttachment = lAttachments.get(i);
 
             if(curDist < minDistance){
                 closestPoint = curPoint;
@@ -119,7 +117,22 @@ public class Ship extends Entity {
     }
 
     public boolean save(String path){
-        // TODO: Finish ship save method
+        try {
+            JSONObject data = new JSONObject();
+            data.put("x", getX());
+            data.put("y", getY());
+            data.put("rotation", getRotation());
+            data.put("rootPart", rootPart.serialize());
+
+            FileHandle file = Gdx.files.local(path);
+            file.writeString(data.toString(4), false);
+
+            return true;
+        } catch(GdxRuntimeException|JSONException e){
+            System.out.println("Error saving ship");
+            e.printStackTrace();
+        }
+        
         return false;
     }
 
