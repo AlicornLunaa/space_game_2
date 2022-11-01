@@ -62,6 +62,22 @@ public class ShipPart extends Entity {
             return data;
         }
 
+        public static Attachment unserialize(ShipPart parent, JSONObject data){
+            Attachment a = new Attachment(
+                parent,
+                new Vector2(
+                    data.getFloat("x"),
+                    data.getFloat("y")
+                ),
+                data.getInt("thisAttachmentPoint")
+            );
+
+            a.childAttachmentPoint = data.getInt("childAttachmentPoint");
+            a.inUse = data.getBoolean("inUse");
+
+            return a;
+        }
+
         // TODO: Add attach method here, abstract away from shippart
     };
 
@@ -119,32 +135,29 @@ public class ShipPart extends Entity {
         /** Attaches TARGET to THIS. */
         Attachment a = attachments.get(thisAttachment);
         
-        if(a.child == null){
-            a.child = target;
-            a.childAttachmentPoint = targetAttachment;
-            target.attachments.get(targetAttachment).inUse = true;
+        // TODO: Fix parts attaching relative to their parent, ending in offset parts
+        a.child = target;
+        a.childAttachmentPoint = targetAttachment;
+        target.attachments.get(targetAttachment).inUse = true;
 
-            target.setPosition(
+        target.setPosition(
+            getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
+            getY() + a.position.y - target.attachments.get(targetAttachment).position.y
+        );
+
+        ((PolygonShape)target.getShape()).setAsBox(
+            getWidth() / 2.f,
+            getHeight() / 2.f,
+            new Vector2(
                 getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
                 getY() + a.position.y - target.attachments.get(targetAttachment).position.y
-            );
+            ),
+            getRotation() * (float)(Math.PI / 180.f)
+        );
 
-            ((PolygonShape)target.getShape()).setAsBox(
-                getWidth() / 2.f,
-                getHeight() / 2.f,
-                new Vector2(
-                    getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
-                    getY() + a.position.y - target.attachments.get(targetAttachment).position.y
-                ),
-                getRotation() * (float)(Math.PI / 180.f)
-            );
+        target.parent = parent;
 
-            target.parent = parent;
-
-            return target;
-        }
-
-        return null;
+        return target;
     }
 
     public boolean detachPart(int attachment){
@@ -328,6 +341,35 @@ public class ShipPart extends Entity {
         ShipPart p = ShipPart.fromJSON(manager, partManager.get(type, id), parent, posOffset, rotOffset);
         p.partType = type;
         p.partId = id;
+        return p;
+    }
+
+    public static ShipPart unserialize(Assets manager, PartManager partManager, Body body, JSONObject data){
+        // Recursively builds the object from serialized data
+        ShipPart p = ShipPart.spawn(
+            manager,
+            partManager,
+            data.getString("type"),
+            data.getString("id"),
+            body,
+            new Vector2(
+                data.getFloat("x"),
+                data.getFloat("y")
+            ),
+            data.getFloat("rotation")
+        );
+
+        // Load attachments
+        JSONArray attachments = data.getJSONArray("attachments");
+
+        for(int i = 0; i < attachments.length(); i++){
+            JSONObject partData = attachments.getJSONObject(i).getJSONObject("partData");
+            Attachment a = Attachment.unserialize(p, attachments.getJSONObject(i).getJSONObject("attachData"));
+            a.child = ShipPart.unserialize(manager, partManager, body, partData);
+
+            p.attachPart(a.child, a.childAttachmentPoint, a.thisAttachmentPoint);
+        }
+
         return p;
     }
 }

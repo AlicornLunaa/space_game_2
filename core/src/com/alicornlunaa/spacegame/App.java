@@ -52,7 +52,7 @@ public class App extends ApplicationAdapter {
 	
 	@Override
 	public void create(){
-		ControlSchema.fromFile("spacegame_controls.json");
+		ControlSchema.fromFile("./saves/settings/spacegame_controls.json");
 		manager = new Assets();
 		partManager = new PartManager();
 		partManager.load("parts/aero.json");

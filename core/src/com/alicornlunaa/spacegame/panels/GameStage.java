@@ -85,7 +85,9 @@ public class GameStage extends Stage {
             }
         });
 
-		this.addActor(new Ship(manager, partManager, world, 640/2, 250, 0));
+        Ship ship = new Ship(manager, partManager, world, 640/2, 250, 0);
+        ship.load("./saves/ships/null.ship");
+		this.addActor(ship);
 		this.addActor(new Ground(world, 640/2, 20, 500, 15));
     }
 

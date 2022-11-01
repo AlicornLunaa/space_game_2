@@ -33,10 +33,16 @@ public class Ship extends Entity {
 
     // Variables
     private Body body;
-    private ShipPart rootPart;
+    private ShipPart rootPart = null;
+
+    private Assets manager;
+    private PartManager partManager;
 
     // Constructor
     public Ship(Assets manager, PartManager partManager, World world, float x, float y, float rotation){
+        this.manager = manager;
+        this.partManager = partManager;
+
         BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.position.set(x, y);
@@ -137,7 +143,35 @@ public class Ship extends Entity {
     }
 
     public boolean load(String path){
-        // TODO: Finish ship load method
+        try {
+            // Read filedata
+            FileHandle file = Gdx.files.local(path);
+            JSONObject data = new JSONObject(file.readString());
+
+            // Extract data
+            float x = data.getFloat("x");
+            float y = data.getFloat("y");
+            float rotation = data.getFloat("rotation");
+
+            // Reset body
+            body.setTransform(new Vector2(x, y), (float)(rotation * (Math.PI / 180)));
+            body.setLinearVelocity(0, 0);
+            body.setAngularVelocity(0);
+
+            setPosition(x, y);
+            setRotation(rotation);
+
+            // Load body data
+            JSONObject root = data.getJSONObject("rootPart");
+            rootPart = ShipPart.unserialize(manager, partManager, body, root);
+            assemble();
+
+            return true;
+        } catch (GdxRuntimeException|JSONException e){
+            System.out.println("Error reading ship");
+            e.printStackTrace();
+        }
+
         return false;
     }
 
@@ -148,7 +182,9 @@ public class Ship extends Entity {
         setPosition(body.getPosition().x, body.getPosition().y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
-        rootPart.act(delta);
+        if(rootPart != null){
+            rootPart.act(delta);
+        }
     }
 
     @Override
@@ -156,14 +192,19 @@ public class Ship extends Entity {
         Matrix3 transform = getTransform();
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
 
-        rootPart.draw(batch, getColor().a * parentAlpha);
+        if(rootPart != null){
+            rootPart.draw(batch, getColor().a * parentAlpha);
+        }
         
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 
     @Override
     public boolean remove(){
-        rootPart.remove();
+        if(rootPart != null){
+            rootPart.remove();
+        }
+
         return super.remove();
     }
 }
