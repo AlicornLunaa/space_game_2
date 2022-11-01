@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame;
 
+import com.alicornlunaa.spacegame.scenes.GameScene;
 import com.alicornlunaa.spacegame.scenes.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -14,6 +15,9 @@ public class App extends Game {
 	public Assets manager = new Assets();
 	public PartManager partManager = new PartManager();
 	public Skin skin;
+
+	public LoadingScene loadingScene;
+	public GameScene gameScene;
 
 	public boolean loaded = false;
 	
@@ -31,29 +35,41 @@ public class App extends Game {
 
 		skin = new Skin(Gdx.files.internal("skins/default/uiskin.json"));
 
-		this.setScreen(new LoadingScene(this));
+		loadingScene = new LoadingScene(this);
+		this.setScreen(loadingScene);
 	}
 
 	@Override
 	public void render(){
 		super.render();
 
-		if(manager.update(17)){
-			// Loading completed, start the game
-			if(!loaded){
+		if(!loaded){
+			if(manager.update(17)){
 				// Finish loading by removing the loading screen
-				loaded = true;
 				((LoadingScene)this.getScreen()).progressBar.setValue(1);
+
+				loaded = true;
 				System.out.println("Assets loaded");
+
+				// Start new scene
+				gameScene = new GameScene(this);
+				this.setScreen(gameScene);
+			} else {
+				// Loading is not complete, update progress bar
+				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
 			}
-		} else {
-			// Loading is not complete, update progress bar
-			((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
+
+			return;
 		}
+		
+		// Loading completed
 	}
 	
 	@Override
 	public void dispose(){
+		gameScene.dispose();
+		loadingScene.dispose();
+
 		skin.dispose();
 		manager.dispose();
 	}
