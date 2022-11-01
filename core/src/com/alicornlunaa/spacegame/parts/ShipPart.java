@@ -135,7 +135,6 @@ public class ShipPart extends Entity {
         /** Attaches TARGET to THIS. */
         Attachment a = attachments.get(thisAttachment);
         
-        // TODO: Fix parts attaching relative to their parent, ending in offset parts
         a.child = target;
         a.childAttachmentPoint = targetAttachment;
         target.attachments.get(targetAttachment).inUse = true;
@@ -260,6 +259,8 @@ public class ShipPart extends Entity {
         data.put("id", partId);
         data.put("x", getX());
         data.put("y", getY());
+        data.put("originX", getOriginX());
+        data.put("originY", getOriginY());
         data.put("rotation", getRotation());
 
         // Recursively serialize every additional part
@@ -358,6 +359,8 @@ public class ShipPart extends Entity {
             ),
             data.getFloat("rotation")
         );
+
+        p.setOrigin(data.getFloat("originX"), data.getFloat("originY"));
 
         // Load attachments
         JSONArray attachments = data.getJSONArray("attachments");
