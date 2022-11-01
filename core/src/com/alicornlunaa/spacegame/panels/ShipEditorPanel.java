@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -49,6 +48,7 @@ public class ShipEditorPanel extends Stage {
             this.getHeight() / 2,
             0
         );
+        this.addActor(rootShip);
         
         BodyDef def = new BodyDef();
 		def.type = BodyType.KinematicBody;
@@ -81,27 +81,24 @@ public class ShipEditorPanel extends Stage {
         super.act(delta);
 
         ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
-        OrthographicCamera cam = ((OrthographicCamera)this.getCamera());
 
         // Set the cursor object to the mouse if an object was selected
         if(!ui.selectedPart.equals("")){
-            float radius = 16;
-            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(cam.position.x, cam.position.y);
-            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), radius);
+            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), 16);
 
             if(closest != null && ghostPart != null){
-                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY()).add(cam.position.x, cam.position.y);
+                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY());
 
                 Attachment closest2 = ghostPart.getClosestAttachment(attachmentPos);
                 Vector2 attachmentPos2 = closest2.getPos();
 
-                pos.set(attachmentPos.x + attachmentPos2.x - cam.position.x, attachmentPos.y + attachmentPos2.y);
-
+                pos.set(attachmentPos.x + attachmentPos2.x, attachmentPos.y + attachmentPos2.y);
                 targetAttachmentId = closest2.getThisId();
                 selectedAttachment = closest;
             }
 
-            ghostPart.setPosition(pos.x + cam.position.x, pos.y + cam.position.y);
+            ghostPart.setPosition(pos.x, pos.y);
         }
     }
 
@@ -110,19 +107,19 @@ public class ShipEditorPanel extends Stage {
         super.draw();
 
         ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
-        OrthographicCamera cam = ((OrthographicCamera)this.getCamera());
 
         if(!ui.selectedPart.equals("")){
+            // Render the selected part
             getBatch().begin();
             ghostPart.draw(getBatch(), 255);
             getBatch().end();
 
-            float radius = 16;
-            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY())).sub(cam.position.x, cam.position.y);
-            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), radius);
+            // Make it snap to other parts
+            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), 16);
 
             if(closest != null && ghostPart != null){
-                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY()).add(cam.position.x, cam.position.y);
+                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY());
 
                 Attachment closest2 = ghostPart.getClosestAttachment(attachmentPos);
                 Vector2 attachmentPos2 = closest2.getGlobalPos();

@@ -61,7 +61,8 @@ public class App extends Game {
 				// Start new scene
 				gameScene = new GameScene(this);
 				editorScene = new EditorScene(this);
-				this.setScreen(gameScene);
+				// this.setScreen(gameScene);
+				this.setScreen(editorScene);
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
