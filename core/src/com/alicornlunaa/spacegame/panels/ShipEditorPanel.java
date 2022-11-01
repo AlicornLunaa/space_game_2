@@ -44,8 +44,8 @@ public class ShipEditorPanel extends Stage {
             game.manager,
             game.partManager,
             world,
-            this.getWidth() / 2,
-            this.getHeight() / 2,
+            0,
+            0,
             0
         );
         this.addActor(rootShip);

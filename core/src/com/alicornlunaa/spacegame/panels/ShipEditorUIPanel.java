@@ -35,6 +35,7 @@ public class ShipEditorUIPanel extends Stage {
     private Table ui;
     private Stack partsStack;
     private TextField nameBar;
+    private Table editorPlaceholder;
 
     // Constructor
     public ShipEditorUIPanel(final App game){
@@ -62,6 +63,7 @@ public class ShipEditorUIPanel extends Stage {
         VerticalGroup categoryGroup = new VerticalGroup();
         ScrollPane categoryScroll = new ScrollPane(categoryGroup);
         partsStack = new Stack();
+        editorPlaceholder = new Table();
         
         // Interface layout
         ui.row().expandX().fillX().pad(20);
@@ -151,7 +153,7 @@ public class ShipEditorUIPanel extends Stage {
         }
 
         editorTable.add(partsStack).prefWidth(128 * scale);
-        //! editorTable.add(editor).expandX().fillX().center();
+        editorTable.add(editorPlaceholder).expandX().fillX().center();
 
         // Interface functions
         saveButton.setColor(Color.CYAN);
@@ -199,10 +201,18 @@ public class ShipEditorUIPanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
+        
+        // Resize editor into panel
+        ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
+        editor.getViewport().update((int)editorPlaceholder.getWidth(), (int)editorPlaceholder.getHeight(), false);
+        editor.getCamera().position.set(-editorPlaceholder.getX(), -editorPlaceholder.getY(), 0);
+        editor.getCamera().update();
     }
 
     @Override
     public void draw(){
+        this.getViewport().apply();
+        this.getCamera().update();
         super.draw();
     }
 
