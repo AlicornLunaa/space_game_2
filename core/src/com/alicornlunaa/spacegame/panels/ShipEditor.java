@@ -179,8 +179,11 @@ public class ShipEditor extends Stage {
             @Override
             public void changed(ChangeEvent event, Actor actor){
                 // Save file to ./saves/ships/name.ship
-                String shipName = ((ShipEditor)actor.getStage()).nameBar.getMessageText();
-                rootShip.save("./saves/ships/" + shipName + ".ship");
+                String shipName = ((ShipEditor)actor.getStage()).nameBar.getText();
+
+                if(shipName.length() > 0){
+                    rootShip.save("./saves/ships/" + shipName + ".ship");
+                }
             }
         });
 
@@ -189,8 +192,11 @@ public class ShipEditor extends Stage {
             @Override
             public void changed(ChangeEvent event, Actor actor){
                 // Load file from ./saves/ships/name.ship
-                String shipName = ((ShipEditor)actor.getStage()).nameBar.getMessageText();
-                rootShip.load("./saves/ships/" + shipName + ".ship");
+                String shipName = ((ShipEditor)actor.getStage()).nameBar.getText();
+
+                if(shipName.length() > 0){
+                    rootShip.load("./saves/ships/" + shipName + ".ship");
+                }
             }
         });
 
