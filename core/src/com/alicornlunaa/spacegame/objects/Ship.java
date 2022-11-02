@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -75,6 +76,10 @@ public class Ship extends Entity {
     public void assemble(){
         // Puts all the parts together with their respective physics bodies
         // Recursive wrapper
+        for(Fixture f : body.getFixtureList()){
+            body.destroyFixture(f);
+        }
+
         assemble(rootPart);
     }
 
@@ -134,6 +139,39 @@ public class Ship extends Entity {
     }
 
     public void drawPoints(boolean draw){ drawPoints(rootPart, draw); } // Recursive wrapper
+
+    public ShipPart getPartClicked(Vector2 pos){
+        return rootPart.hit(pos, getTransform());
+    }
+
+    private ShipPart findParent(ShipPart head, ShipPart child){
+        // Loop through the head's attachments
+        for(Attachment a : head.getAttachments()){
+            if(a.getChild() == null) continue; // Nothing attached, skip
+
+            if(a.getChild() != child){
+                // This is not the parent, check it
+                ShipPart t = findParent(a.getChild(), child);
+
+                if(t != null){
+                    // Parent of child found, return it
+                    return a.getChild();
+                }
+            }
+
+            // This is the parent
+            return head;
+        }
+
+        // Nothing
+        return null;
+    }
+    
+    public ShipPart findParent(ShipPart child){
+        // Recursive wrapper
+        if(rootPart == child) return null; // The root will never have a parent
+        return findParent(rootPart, child);
+    }
 
     public boolean save(String path){
         try {

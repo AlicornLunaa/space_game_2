@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -66,9 +68,10 @@ public class ShipEditorPanel extends Stage {
         this.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent e, float x, float y){
-                ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
+                ShipEditorUIPanel ui = game.editorScene.uiPanel;
+                ShipEditorPanel editor = game.editorScene.editorPanel;
 
-                if(!ui.selectedPart.equals("")){
+                if(ghostPart != null){
                     // Part is ghosted, spawn one and reset it
                     if(selectedAttachment != null){
                         ghostPart.setPosition(0, 0);
@@ -82,6 +85,30 @@ public class ShipEditorPanel extends Stage {
                     ghostPart = null;
                     selectedAttachment = null;
                     ui.selectedPart = "";
+                } else {
+                    // No part was in the player's hand, check if theyre picking up an already placed object
+                    Vector2 cursor = editor.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+                    ShipPart part = rootShip.getPartClicked(cursor);
+
+                    if(part != null){
+                        // Pick it up by severing the attachment in use because in use means attached to parent and not a child
+                        ShipPart parent = rootShip.findParent(part);
+
+                        if(parent != null){
+                            // A parent was found, detach the parent and the child
+                            for(Attachment a : parent.getAttachments()){
+                                if(a.getChild() == part){
+                                    // This is the one, detach and break
+                                    parent.detachPart(a.getThisId());
+                                    
+                                    ghostPart = part;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // No parent found, this is the root item.
+                        }
+                    }
                 }
             }
         });
@@ -91,9 +118,7 @@ public class ShipEditorPanel extends Stage {
 
             @Override
             public boolean keyDown(InputEvent event, int keycode){
-                ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
-
-                if(!ui.selectedPart.equals("")){
+                if(ghostPart != null){
                     if(keycode == ControlSchema.EDITOR_ROTATE){
                         ghostPart.rotateBy(45);
                         return true;
@@ -144,10 +169,9 @@ public class ShipEditorPanel extends Stage {
     // Functions
     public Vector2 findSnapAttachment(){
         // Finds the closest snap point, once a point is found dont run anymore
-        ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
         Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
 
-        if(ui.selectedPart.equals("") || ghostPart == null) return null; // Early exit if not part selected
+        if(ghostPart == null) return null; // Early exit if not part selected
 
         if(selectedAttachment == null){
             // No point selected, find snap point closest, only once
@@ -188,9 +212,7 @@ public class ShipEditorPanel extends Stage {
         super.act(delta);
 
         // Find the snap point for attachments
-        ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
-
-        if(!ui.selectedPart.equals("")){
+        if(ghostPart != null){
             Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
             this.findSnapAttachment();
 
@@ -209,16 +231,27 @@ public class ShipEditorPanel extends Stage {
     public void draw(){
         super.draw();
 
-        ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
-
-        if(!ui.selectedPart.equals("")){
+        if(ghostPart != null){
             // Render the selected part
+            Vector2 oldPos = new Vector2(ghostPart.getX(), ghostPart.getY());
+            Vector2 oldScl = new Vector2(ghostPart.getScaleX(), ghostPart.getScaleY());
+            float oldRot = ghostPart.getRotation();
+            Matrix3 trans = ghostPart.getTransform();
+            ghostPart.setPosition(0, 0);
+            ghostPart.setRotation(0);
+            ghostPart.setScale(1, 1);
+
             Batch batch = getBatch();
             Color originalCol = new Color(batch.getColor());
             batch.begin();
+            batch.setTransformMatrix(new Matrix4().set(trans));
             batch.setColor(selectedAttachment == null ? new Color(1, 1, 1, 0.45f) : new Color(0.5f, 1f, 0.5f, 0.95f));
             ghostPart.draw(batch, batch.getColor().a);
             batch.end();
+
+            ghostPart.setPosition(oldPos.x, oldPos.y);
+            ghostPart.setRotation(oldRot);
+            ghostPart.setScale(oldScl.x, oldScl.y);
 
             // Make it snap to other parts
             if(selectedAttachment != null){

@@ -14,6 +14,15 @@ public class Aero extends ShipPart {
     private float lift;
 
     // Constructor
+    protected Aero(String name, String description, float density, float drag, float lift){
+        super();
+
+        this.name = name;
+        this.description = description;
+        this.drag = drag;
+        this.lift = lift;
+    }
+
     public Aero(Body parent, TextureRegion region, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float drag, float lift){
         super(parent, region, size, posOffset, rotOffset, attachmentPoints);
 

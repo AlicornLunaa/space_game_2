@@ -96,21 +96,27 @@ public class ShipPart extends Entity {
     private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
-    public ShipPart(Body parent, TextureRegion texture, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints){
+    protected void create(Body parent, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
         this.parent = parent;
-        region = texture;
+        this.region = region;
 
         for(Vector2 p : attachmentPoints){
             attachments.add(new Attachment(this, p, attachments.size()));
         }
 
         setSize(size.x, size.y);
-        setOrigin(size.x / 2.f - posOffset.x, size.y / 2.f - posOffset.y);
-        setPosition(posOffset.x, posOffset.y);
-        setRotation(rotOffset);
+        setOrigin(size.x / 2.f - pos.x, size.y / 2.f - pos.y);
+        setPosition(pos.x, pos.y);
+        setRotation(rot);
 
-        shape.setAsBox(size.x / 2.f, size.y / 2.f, posOffset, rotOffset * (float)(Math.PI / 180.f));
+        shape.setAsBox(size.x / 2.f, size.y / 2.f, pos, rot * (float)(Math.PI / 180.f));
     }
+
+    public ShipPart(Body parent, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
+        this.create(parent, region, size, pos, rot, attachmentPoints);
+    }
+
+    protected ShipPart(){}
 
     // Functions
     public Attachment getClosestAttachment(Vector2 point){
@@ -198,22 +204,28 @@ public class ShipPart extends Entity {
     
     public boolean getFlipY(){ return partFlipY; }
 
-    @Override
-    public void setRotation(float r){
-        super.setRotation(r);
-        shape.setAsBox(getWidth() / 2.f, getHeight() / 2.f, new Vector2(getX(), getY()), getRotation() * (float)(180.f / Math.PI));
-    }
+    public ShipPart hit(Vector2 pos, Matrix3 transform){
+        transform.mul(getTransform());
 
-    @Override
-    public void setPosition(float x, float y){
-        super.setPosition(x, y);
-        shape.setAsBox(getWidth() / 2.f, getHeight() / 2.f, new Vector2(getX(), getY()), getRotation() * (float)(180.f / Math.PI));
-    }
+        Vector2 local = new Vector2(pos).mul(new Matrix3(transform).inv());
+        ShipPart part = (ShipPart)hit(local.x + getOriginX(), local.y + getOriginY(), false);
 
-    @Override
-    public void setSize(float w, float h){
-        super.setSize(w, h);
-        shape.setAsBox(getWidth() / 2.f, getHeight() / 2.f, new Vector2(getX(), getY()), getRotation() * (float)(180.f / Math.PI));
+        // This part was not hit
+        if(part == null){
+            for(Attachment a : attachments){
+                if(a.getChild() != null){
+                    // Check children for a hit
+                    part = (ShipPart)a.getChild().hit(pos, transform);
+
+                    if(part != null){
+                        // Child was hit, end loop
+                        break;
+                    }
+                }
+            }
+        }
+
+        return part;
     }
 
     @Override
@@ -342,18 +354,24 @@ public class ShipPart extends Entity {
                 case "AERO":
                     float drag = metadata.getFloat("drag");
                     float lift = metadata.getFloat("lift");
-                    return new Aero(parent, region, size, posOffset, rotOffset, attachmentPoints, name, desc, density, drag, lift);
+                    Aero part1 = new Aero(name, desc, density, drag, lift);
+                    part1.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    return part1;
                     
                 case "STRUCTURAL":
                     float fuel = metadata.getFloat("fuelCapacity");
                     float battery = metadata.getFloat("batteryCapacity");
-                    return new Structural(parent, region, size, posOffset, rotOffset, attachmentPoints, name, desc, density, fuel, battery);
+                    Structural part2 = new Structural(name, desc, density, fuel, battery);
+                    part2.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    return part2;
                     
                 case "THRUSTER":
                     float power = metadata.getFloat("power");
                     float cone = metadata.getFloat("cone");
                     float usage = metadata.getFloat("fuelUsage");
-                    return new Thruster(parent, region, size, posOffset, rotOffset, attachmentPoints, name, desc, density, power, cone, usage);
+                    Thruster part3 = new Thruster(name, desc, density, power, cone, usage, rotOffset);
+                    part3.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    return part3;
             }
         } catch(GdxRuntimeException|JSONException e){
             System.out.println("Error reading the part data");
