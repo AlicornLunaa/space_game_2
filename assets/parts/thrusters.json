@@ -22,7 +22,7 @@
         ],
         "metadata": {
             "power": 10000,
-            "cone": 10,
+            "cone": 20,
             "fuelUsage": 1
         }
     }

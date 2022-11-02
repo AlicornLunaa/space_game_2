@@ -102,6 +102,11 @@ public class ShipEditorPanel extends Stage {
                         ghostPart.flipX();
                         return true;
                     }
+
+                    if(keycode == ControlSchema.EDITOR_FLIP_Y){
+                        ghostPart.flipY();
+                        return true;
+                    }
                 }
 
                 return false;

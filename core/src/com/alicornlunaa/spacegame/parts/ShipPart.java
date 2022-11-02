@@ -120,8 +120,6 @@ public class ShipPart extends Entity {
         Attachment closestAttach = attachments.get(0);
         float minDist = point.dst2(closestAttach.getGlobalPos());
 
-        System.out.println(attachments.get(0).getGlobalPos());
-
         for(int i = 1; i < attachments.size(); i++){
             Vector2 curPoint = attachments.get(i).getGlobalPos();
             float curDist = point.dst2(curPoint);
