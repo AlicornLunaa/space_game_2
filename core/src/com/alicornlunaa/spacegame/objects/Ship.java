@@ -83,6 +83,7 @@ public class Ship extends Entity {
     private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
         for(ShipPart.Attachment a : head.getAttachments()){
             Vector2 pos = head.localToWorld(new Vector2(a.getPos()));
+
             posList.add(pos);
             attachList.add(a);
 

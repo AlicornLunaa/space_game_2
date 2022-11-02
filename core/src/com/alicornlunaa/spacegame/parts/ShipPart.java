@@ -51,7 +51,7 @@ public class ShipPart extends Entity {
         public int getThisId(){ return thisAttachmentPoint; }
 
         public Vector2 getGlobalPos(){
-            return parent.localToWorld(new Vector2(position));
+            return parent.localToWorld(new Vector2(position).scl(parent.getFlipX() ? -1 : 1, parent.getFlipY() ? -1 : 1));
         }
 
         public JSONObject serialize(){
@@ -89,6 +89,8 @@ public class ShipPart extends Entity {
 
     private String partType;
     private String partId;
+    private boolean partFlipX = false;
+    private boolean partFlipY = false;
 
     private boolean drawAttachPoints = false;
     private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -116,7 +118,7 @@ public class ShipPart extends Entity {
         if(attachments.size() <= 0) return null;
         
         Attachment closestAttach = attachments.get(0);
-        float minDist = point.dst2(attachments.get(0).getGlobalPos());
+        float minDist = point.dst2(closestAttach.getGlobalPos());
 
         System.out.println(attachments.get(0).getGlobalPos());
 
@@ -137,8 +139,8 @@ public class ShipPart extends Entity {
         /** Attaches TARGET to THIS. */
         Attachment a = attachments.get(thisAttachment);
         Attachment t = target.attachments.get(targetAttachment);
-        Vector2 aPosition = new Vector2(a.position).rotateDeg(a.getParent().getRotation());
-        Vector2 tPosition = new Vector2(t.position).rotateDeg(t.getParent().getRotation());
+        Vector2 aPosition = new Vector2(a.position).scl(a.getParent().getFlipX() ? -1 : 1, a.getParent().getFlipY() ? -1 : 1).rotateDeg(a.getParent().getRotation());
+        Vector2 tPosition = new Vector2(t.position).scl(t.getParent().getFlipX() ? -1 : 1, t.getParent().getFlipY() ? -1 : 1).rotateDeg(t.getParent().getRotation());
         
         a.child = target;
         a.childAttachmentPoint = targetAttachment;
@@ -183,6 +185,20 @@ public class ShipPart extends Entity {
     public Shape getShape(){ return shape; }
 
     public void drawPoints(boolean draw){ this.drawAttachPoints = draw; }
+
+    public void flipX(){
+        this.partFlipX = !this.partFlipX;
+        setScaleX(getScaleX() * -1);
+    }
+
+    public void flipY(){
+        this.partFlipY = !this.partFlipY;
+        setScaleY(getScaleY() * -1);
+    }
+
+    public boolean getFlipX(){ return partFlipX; }
+    
+    public boolean getFlipY(){ return partFlipY; }
 
     @Override
     public void setRotation(float r){
@@ -269,6 +285,8 @@ public class ShipPart extends Entity {
         data.put("originX", getOriginX());
         data.put("originY", getOriginY());
         data.put("rotation", getRotation());
+        data.put("flipX", getFlipX());
+        data.put("flipY", getFlipY());
 
         // Recursively serialize every additional part
         JSONArray attachments = new JSONArray();
@@ -368,6 +386,9 @@ public class ShipPart extends Entity {
         );
 
         p.setOrigin(data.getFloat("originX"), data.getFloat("originY"));
+
+        if(data.getBoolean("flipX")) p.flipX();
+        if(data.getBoolean("flipY")) p.flipY();
 
         // Load attachments
         JSONArray attachments = data.getJSONArray("attachments");

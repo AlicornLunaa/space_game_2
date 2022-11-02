@@ -97,6 +97,11 @@ public class ShipEditorPanel extends Stage {
                         ghostPart.rotateBy(45);
                         return true;
                     }
+
+                    if(keycode == ControlSchema.EDITOR_FLIP_X){
+                        ghostPart.flipX();
+                        return true;
+                    }
                 }
 
                 return false;
@@ -147,7 +152,11 @@ public class ShipEditorPanel extends Stage {
                 Vector2 attachmentPoint1 = shipClosestToCursor.getGlobalPos().add(rootShip.getX(), rootShip.getY());
                 
                 Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1);
-                Vector2 attachmentPoint2 = new Vector2(ghostClosestToAttachment.getPos()).rotateDeg(ghostPart.getRotation());
+                ShipPart p = ghostClosestToAttachment.getParent();
+                Vector2 attachmentPoint2 = new Vector2(ghostClosestToAttachment.getPos());
+                attachmentPoint2.scl(p.getFlipX() ? -1 : 1, p.getFlipY() ? -1 : 1);
+                attachmentPoint2.rotateDeg(ghostPart.getRotation());
+
                 this.attachmentPoint = attachmentPoint1.sub(attachmentPoint2);
 
                 selectedAttachment = shipClosestToCursor;
