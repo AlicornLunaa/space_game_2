@@ -234,9 +234,11 @@ public class ShipPart extends Entity {
         
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
 
-        Color c = getColor();
-        batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
+        Color bc = batch.getColor();
+        Color c = this.getColor();
+        batch.setColor(c.r * bc.r, c.g * bc.g, c.b * bc.b, c.a * parentAlpha);
         batch.draw(region, -getOriginX(), -getOriginY());
+        batch.setColor(bc);
 
         if(drawAttachPoints){
             batch.end();

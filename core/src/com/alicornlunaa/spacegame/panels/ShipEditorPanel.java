@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -212,16 +213,19 @@ public class ShipEditorPanel extends Stage {
 
         if(!ui.selectedPart.equals("")){
             // Render the selected part
-            getBatch().begin();
-            ghostPart.draw(getBatch(), 255);
-            getBatch().end();
+            Batch batch = getBatch();
+            Color originalCol = new Color(batch.getColor());
+            batch.begin();
+            batch.setColor(selectedAttachment == null ? new Color(1, 1, 1, 0.45f) : new Color(0.5f, 1f, 0.5f, 0.95f));
+            ghostPart.draw(batch, batch.getColor().a);
+            batch.end();
 
             // Make it snap to other parts
             if(selectedAttachment != null){
                 game.shapeRenderer.begin(ShapeType.Filled);
-                game.shapeRenderer.setProjectionMatrix(getBatch().getProjectionMatrix());
-                game.shapeRenderer.setTransformMatrix(getBatch().getTransformMatrix());
-                game.shapeRenderer.setColor(Color.YELLOW);
+                game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+                game.shapeRenderer.setColor(new Color(1, 1, 0, batch.getColor().a));
                 game.shapeRenderer.circle(
                     attachmentPoint.x - selectedAttachment.getPos().x,
                     attachmentPoint.y - selectedAttachment.getPos().y,
@@ -229,6 +233,8 @@ public class ShipEditorPanel extends Stage {
                 );
                 game.shapeRenderer.end();
             }
+            
+            batch.setColor(originalCol);
         }
     }
 
