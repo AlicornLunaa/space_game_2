@@ -32,7 +32,10 @@ public class ShipEditorPanel extends Stage {
     public ShipPart ghostPart;
 
     private Attachment selectedAttachment;
+    private Vector2 attachmentPoint;
     private int targetAttachmentId;
+
+    private static final float BREAK_DISTANCE = 24;
 
     // Constructor
     public ShipEditorPanel(final App game){
@@ -61,14 +64,17 @@ public class ShipEditorPanel extends Stage {
 
                 if(!ui.selectedPart.equals("")){
                     // Part is ghosted, spawn one and reset it
-                    ghostPart.setPosition(0, 0);
-                    selectedAttachment.getParent().attachPart(
-                        ghostPart,
-                        targetAttachmentId,
-                        selectedAttachment.getThisId()
-                    );
+                    if(selectedAttachment != null){
+                        ghostPart.setPosition(0, 0);
+                        selectedAttachment.getParent().attachPart(
+                            ghostPart,
+                            targetAttachmentId,
+                            selectedAttachment.getThisId()
+                        );
+                    }
 
                     ghostPart = null;
+                    selectedAttachment = null;
                     ui.selectedPart = "";
                 }
             }
@@ -76,29 +82,59 @@ public class ShipEditorPanel extends Stage {
     }
 
     // Functions
+    public Vector2 findSnapAttachment(){
+        // Finds the closest snap point, once a point is found dont run anymore
+        ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
+        Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+
+        if(ui.selectedPart.equals("") || ghostPart == null) return null; // Early exit if not part selected
+
+        if(selectedAttachment == null){
+            // No point selected, find snap point closest, only once
+            Attachment shipClosestToCursor = rootShip.getClosestAttachment(new Vector2(cursor), 16);
+
+            if(shipClosestToCursor != null){
+                // Find attachment point on the ghostpart closest to the other attachment and snap them
+                Vector2 attachmentPoint1 = shipClosestToCursor.getGlobalPos().add(rootShip.getX(), rootShip.getY());
+                
+                Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1);
+                Vector2 attachmentPoint2 = ghostClosestToAttachment.getPos();
+                this.attachmentPoint = attachmentPoint1.sub(attachmentPoint2);
+
+                selectedAttachment = shipClosestToCursor;
+                targetAttachmentId = ghostClosestToAttachment.getThisId();
+
+                return this.attachmentPoint;
+            }
+        } else {
+            // Snap point already found, check distance between the two points
+            float snapToCursorDist = this.attachmentPoint.dst2(cursor);
+
+            if(snapToCursorDist >= (BREAK_DISTANCE * BREAK_DISTANCE)){
+                selectedAttachment = null;
+                this.attachmentPoint = null;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public void act(float delta){
         super.act(delta);
 
+        // Find the snap point for attachments
         ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
 
-        // Set the cursor object to the mouse if an object was selected
         if(!ui.selectedPart.equals("")){
-            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), 16);
+            Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            this.findSnapAttachment();
 
-            if(closest != null && ghostPart != null){
-                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY());
-
-                Attachment closest2 = ghostPart.getClosestAttachment(attachmentPos);
-                Vector2 attachmentPos2 = closest2.getPos();
-
-                pos.set(attachmentPos.x + attachmentPos2.x, attachmentPos.y + attachmentPos2.y);
-                targetAttachmentId = closest2.getThisId();
-                selectedAttachment = closest;
+            if(selectedAttachment != null){
+                ghostPart.setPosition(attachmentPoint.x, attachmentPoint.y);
+            } else {
+                ghostPart.setPosition(cursor.x, cursor.y);
             }
-
-            ghostPart.setPosition(pos.x, pos.y);
         }
     }
 
@@ -115,20 +151,10 @@ public class ShipEditorPanel extends Stage {
             getBatch().end();
 
             // Make it snap to other parts
-            Vector2 pos = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-            Attachment closest = rootShip.getClosestAttachment(new Vector2(pos), 16);
-
-            if(closest != null && ghostPart != null){
-                Vector2 attachmentPos = closest.getGlobalPos().add(rootShip.getX(), rootShip.getY());
-
-                Attachment closest2 = ghostPart.getClosestAttachment(attachmentPos);
-                Vector2 attachmentPos2 = closest2.getGlobalPos();
-
+            if(selectedAttachment != null){
                 game.shapeRenderer.begin(ShapeType.Filled);
                 game.shapeRenderer.setColor(Color.YELLOW);
-                game.shapeRenderer.circle(attachmentPos.x, attachmentPos.y, 4);
-                game.shapeRenderer.setColor(Color.MAGENTA);
-                game.shapeRenderer.circle(attachmentPos2.x, attachmentPos2.y, 4);
+                game.shapeRenderer.circle(attachmentPoint.x, attachmentPoint.y, 4);
                 game.shapeRenderer.end();
             }
         }
