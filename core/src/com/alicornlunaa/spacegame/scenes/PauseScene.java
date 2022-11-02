@@ -72,7 +72,6 @@ public class PauseScene implements Screen {
         tbl.add(clsBtn);
 
         stage.addActor(tbl);
-        stage.setDebugAll(true);
 
         // Inputs
         stage.addListener(new InputListener(){

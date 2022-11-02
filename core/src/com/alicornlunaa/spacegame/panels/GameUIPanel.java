@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.GameScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -67,6 +68,9 @@ public class GameUIPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
                     game.setScreen(new PauseScene(game, game.gameScene, (int)getWidth(), (int)getHeight()));
+                    return true;
+                } else if(keycode == ControlSchema.CONSOLE_OPEN){
+                    game.setScreen(new ConsoleScene(game, game.gameScene, (int)getWidth(), (int)getHeight()));
                     return true;
                 }
 
