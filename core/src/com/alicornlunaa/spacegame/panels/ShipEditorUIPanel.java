@@ -204,9 +204,14 @@ public class ShipEditorUIPanel extends Stage {
         
         // Resize editor into panel
         ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
-        editor.getViewport().update((int)editorPlaceholder.getWidth(), (int)editorPlaceholder.getHeight(), false);
-        editor.getCamera().position.set(-editorPlaceholder.getX(), -editorPlaceholder.getY(), 0);
-        editor.getCamera().update();
+        editor.getViewport().setWorldSize(editorPlaceholder.getWidth(), editorPlaceholder.getHeight());
+        editor.getViewport().setScreenBounds(
+            (int)editorPlaceholder.getX(),
+            (int)editorPlaceholder.getY(),
+            (int)editorPlaceholder.getWidth(),
+            (int)editorPlaceholder.getHeight()
+        );
+        editor.getViewport().apply(true);
     }
 
     @Override

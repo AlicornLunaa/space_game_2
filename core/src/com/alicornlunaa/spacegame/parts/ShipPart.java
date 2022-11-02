@@ -23,6 +23,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class ShipPart extends Entity {
+
     // Classes
     public static class Attachment {
         private Vector2 position = new Vector2(0, 0);
@@ -46,6 +47,7 @@ public class ShipPart extends Entity {
         public Vector2 getPos(){ return position; }
         public ShipPart getParent(){ return parent; }
         public ShipPart getChild(){ return child; }
+        public boolean getInUse(){ return inUse; }
         public int getThisId(){ return thisAttachmentPoint; }
 
         public Vector2 getGlobalPos(){
@@ -77,8 +79,6 @@ public class ShipPart extends Entity {
 
             return a;
         }
-
-        // TODO: Add attach method here, abstract away from shippart
     };
 
     // Variables
@@ -375,4 +375,5 @@ public class ShipPart extends Entity {
 
         return p;
     }
+
 }

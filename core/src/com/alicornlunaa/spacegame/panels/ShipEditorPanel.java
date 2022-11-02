@@ -2,13 +2,14 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.alicornlunaa.spacegame.App;
@@ -16,6 +17,7 @@ import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.parts.*;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.scenes.EditorScene;
+import com.alicornlunaa.spacegame.util.ControlSchema;
 
 /*
  * The ShipEditor class is a stage used to render a window used to create
@@ -39,7 +41,7 @@ public class ShipEditorPanel extends Stage {
 
     // Constructor
     public ShipEditorPanel(final App game){
-        super(new ScreenViewport());
+        super(new FillViewport(360, 360));
         this.game = game;
 
         world = new World(new Vector2(0, 0), true);
@@ -79,6 +81,32 @@ public class ShipEditorPanel extends Stage {
                 }
             }
         });
+
+        this.addListener(new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, int keycode){
+                ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
+
+                if(!ui.selectedPart.equals("")){
+                    if(keycode == ControlSchema.EDITOR_ROTATE){
+                        ghostPart.rotateBy(45);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
+                OrthographicCamera cam = ((OrthographicCamera)editor.getCamera());
+
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.1f), 2.f);
+
+                return true;
+            }
+        });
     }
 
     // Functions
@@ -93,7 +121,7 @@ public class ShipEditorPanel extends Stage {
             // No point selected, find snap point closest, only once
             Attachment shipClosestToCursor = rootShip.getClosestAttachment(new Vector2(cursor), 16);
 
-            if(shipClosestToCursor != null){
+            if(shipClosestToCursor != null && shipClosestToCursor.getChild() == null && !shipClosestToCursor.getInUse()){
                 // Find attachment point on the ghostpart closest to the other attachment and snap them
                 Vector2 attachmentPoint1 = shipClosestToCursor.getGlobalPos().add(rootShip.getX(), rootShip.getY());
                 
@@ -136,6 +164,9 @@ public class ShipEditorPanel extends Stage {
                 ghostPart.setPosition(cursor.x, cursor.y);
             }
         }
+
+        // Center ship
+        rootShip.setPosition(this.getWidth() / 2.0f, this.getHeight() / 2.0f);
     }
 
     @Override
@@ -153,8 +184,14 @@ public class ShipEditorPanel extends Stage {
             // Make it snap to other parts
             if(selectedAttachment != null){
                 game.shapeRenderer.begin(ShapeType.Filled);
+                game.shapeRenderer.setProjectionMatrix(getBatch().getProjectionMatrix());
+                game.shapeRenderer.setTransformMatrix(getBatch().getTransformMatrix());
                 game.shapeRenderer.setColor(Color.YELLOW);
-                game.shapeRenderer.circle(attachmentPoint.x, attachmentPoint.y, 4);
+                game.shapeRenderer.circle(
+                    attachmentPoint.x - selectedAttachment.getPos().x,
+                    attachmentPoint.y - selectedAttachment.getPos().y,
+                    4
+                );
                 game.shapeRenderer.end();
             }
         }

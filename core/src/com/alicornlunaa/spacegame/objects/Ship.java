@@ -200,6 +200,12 @@ public class Ship extends Entity {
     }
 
     @Override
+    public void setPosition(float x, float y){
+        super.setPosition(x, y);
+        body.setTransform(x, y, body.getAngle());
+    }
+
+    @Override
     public boolean remove(){
         if(rootPart != null){
             rootPart.remove();

@@ -13,12 +13,18 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  * having to think of the keys in code.
  */
 public class ControlSchema {
+
     public static int MOVE_FORWARD = Keys.W;
     public static int MOVE_BACKWARD = Keys.S;
     public static int MOVE_LEFT = Keys.A;
     public static int MOVE_RIGHT = Keys.D;
     public static int ROLL_LEFT = Keys.Q;
     public static int ROLL_RIGHT = Keys.E;
+
+    public static int EDITOR_ROTATE = Keys.R;
+    public static int EDITOR_FLIP_X = Keys.F;
+    public static int EDITOR_FLIP_Y = Keys.C;
+
     public static float GUI_SCALE = 1.f;
 
     public static void save(String filename){
@@ -64,4 +70,5 @@ public class ControlSchema {
             save(filename);
         }
     }
+
 }
