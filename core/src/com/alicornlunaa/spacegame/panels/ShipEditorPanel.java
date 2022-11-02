@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -32,6 +33,7 @@ public class ShipEditorPanel extends Stage {
     public Body ghostBody; // Required for making a part w/o attaching it
     public Ship rootShip; // The ship being built
     public ShipPart ghostPart;
+    public Vector2 camOffset = new Vector2();
 
     private Attachment selectedAttachment;
     private Vector2 attachmentPoint;
@@ -84,6 +86,8 @@ public class ShipEditorPanel extends Stage {
         });
 
         this.addListener(new InputListener(){
+            Vector2 prevDrag = new Vector2();
+
             @Override
             public boolean keyDown(InputEvent event, int keycode){
                 ShipEditorUIPanel ui = ((EditorScene)game.getScreen()).uiPanel;
@@ -106,6 +110,22 @@ public class ShipEditorPanel extends Stage {
                 cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.1f), 2.f);
 
                 return true;
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                prevDrag.set(x, y);
+                return button == Buttons.RIGHT;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer){
+                ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
+                OrthographicCamera cam = ((OrthographicCamera)editor.getCamera());
+                
+                Vector2 vel = new Vector2(x, y).sub(prevDrag).scl(-0.25f * (cam.zoom * 2));
+                prevDrag.set(x, y);
+                camOffset.add(vel);
             }
         });
     }

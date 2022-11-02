@@ -140,6 +140,7 @@ public class ShipEditorUIPanel extends Stage {
                             new Vector2(),
                             0
                         );
+                        editor.ghostPart.drawPoints(true);
                     }
                 });
 
@@ -213,6 +214,11 @@ public class ShipEditorUIPanel extends Stage {
             (int)editorPlaceholder.getHeight()
         );
         editor.getViewport().apply(true);
+        editor.getCamera().position.set(
+            editor.camOffset.x + editorPlaceholder.getWidth() / 2,
+            editor.camOffset.y + editorPlaceholder.getHeight() / 2,
+            0
+        );
     }
 
     @Override

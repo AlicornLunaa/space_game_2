@@ -29,7 +29,7 @@ public class GameUIPanel extends Stage {
         this.addActor(tbl);
 
         // Icon elements
-        tbl.row().expandX().fillX().pad(20).right();
+        tbl.row().expandX().fillX().pad(10).right();
         tbl.add(new Table()).width(300).colspan(6);
 
         sasBtn = new TextButton("SAS", game.skin);
