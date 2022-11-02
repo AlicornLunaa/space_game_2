@@ -82,7 +82,7 @@ public class Ship extends Entity {
 
     private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
         for(ShipPart.Attachment a : head.getAttachments()){
-            Vector2 pos = new Vector2(a.getPos()).mul(head.getTransform());
+            Vector2 pos = head.localToWorld(new Vector2(a.getPos()));
             posList.add(pos);
             attachList.add(a);
 
@@ -121,6 +121,18 @@ public class Ship extends Entity {
 
         return null;
     }
+
+    private void drawPoints(ShipPart head, boolean draw){
+        head.drawPoints(draw);
+
+        for(ShipPart.Attachment a : head.getAttachments()){
+            if(a.getChild() != null){
+                drawPoints(a.getChild(), draw);
+            }
+        }
+    }
+
+    public void drawPoints(boolean draw){ drawPoints(rootPart, draw); } // Recursive wrapper
 
     public boolean save(String path){
         try {

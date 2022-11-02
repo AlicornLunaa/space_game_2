@@ -53,6 +53,7 @@ public class ShipEditorPanel extends Stage {
             0,
             0
         );
+        rootShip.drawPoints(true);
         this.addActor(rootShip);
         
         BodyDef def = new BodyDef();
@@ -126,7 +127,7 @@ public class ShipEditorPanel extends Stage {
                 Vector2 attachmentPoint1 = shipClosestToCursor.getGlobalPos().add(rootShip.getX(), rootShip.getY());
                 
                 Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1);
-                Vector2 attachmentPoint2 = ghostClosestToAttachment.getPos();
+                Vector2 attachmentPoint2 = new Vector2(ghostClosestToAttachment.getPos()).rotateDeg(ghostPart.getRotation());
                 this.attachmentPoint = attachmentPoint1.sub(attachmentPoint2);
 
                 selectedAttachment = shipClosestToCursor;

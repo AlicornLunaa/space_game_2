@@ -51,7 +51,7 @@ public class ShipPart extends Entity {
         public int getThisId(){ return thisAttachmentPoint; }
 
         public Vector2 getGlobalPos(){
-            return new Vector2(parent.getX() + position.x, parent.getY() + position.y);
+            return parent.localToWorld(new Vector2(position));
         }
 
         public JSONObject serialize(){
@@ -90,7 +90,7 @@ public class ShipPart extends Entity {
     private String partType;
     private String partId;
 
-    private boolean drawAttachPoints = true;
+    private boolean drawAttachPoints = false;
     private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
@@ -118,6 +118,8 @@ public class ShipPart extends Entity {
         Attachment closestAttach = attachments.get(0);
         float minDist = point.dst2(attachments.get(0).getGlobalPos());
 
+        System.out.println(attachments.get(0).getGlobalPos());
+
         for(int i = 1; i < attachments.size(); i++){
             Vector2 curPoint = attachments.get(i).getGlobalPos();
             float curDist = point.dst2(curPoint);
@@ -134,24 +136,27 @@ public class ShipPart extends Entity {
     public ShipPart attachPart(ShipPart target, int targetAttachment, int thisAttachment){
         /** Attaches TARGET to THIS. */
         Attachment a = attachments.get(thisAttachment);
+        Attachment t = target.attachments.get(targetAttachment);
+        Vector2 aPosition = new Vector2(a.position).rotateDeg(a.getParent().getRotation());
+        Vector2 tPosition = new Vector2(t.position).rotateDeg(t.getParent().getRotation());
         
         a.child = target;
         a.childAttachmentPoint = targetAttachment;
         target.attachments.get(targetAttachment).inUse = true;
 
         target.setPosition(
-            getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
-            getY() + a.position.y - target.attachments.get(targetAttachment).position.y
+            getX() + aPosition.x - tPosition.x,
+            getY() + aPosition.y - tPosition.y
         );
 
         ((PolygonShape)target.getShape()).setAsBox(
             getWidth() / 2.f,
             getHeight() / 2.f,
             new Vector2(
-                getX() + a.position.x - target.attachments.get(targetAttachment).position.x,
-                getY() + a.position.y - target.attachments.get(targetAttachment).position.y
+                getX() + aPosition.x - tPosition.x,
+                getY() + aPosition.y - tPosition.y
             ),
-            getRotation() * (float)(Math.PI / 180.f)
+            t.getParent().getRotation() * (float)(Math.PI / 180.f)
         );
 
         target.parent = parent;
@@ -176,6 +181,8 @@ public class ShipPart extends Entity {
     }
 
     public Shape getShape(){ return shape; }
+
+    public void drawPoints(boolean draw){ this.drawAttachPoints = draw; }
 
     @Override
     public void setRotation(float r){
