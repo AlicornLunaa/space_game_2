@@ -29,17 +29,20 @@ public class GameUIPanel extends Stage {
         this.addActor(tbl);
 
         // Icon elements
+        tbl.row().expandX().fillX().pad(20).right();
+        tbl.add(new Table()).width(300).colspan(6);
+
         sasBtn = new TextButton("SAS", game.skin);
         sasBtn.setPosition(640 - 64, 480 - 32);
         sasBtn.setSize(64, 32);
         sasBtn.setColor(Color.RED);
-        this.addActor(sasBtn);
+        tbl.add(sasBtn).right().maxWidth(64);
 
         rcsBtn = new TextButton("RCS", game.skin);
         rcsBtn.setPosition(640 - 128, 480 - 32);
         rcsBtn.setSize(64, 32);
         rcsBtn.setColor(Color.RED);
-        this.addActor(rcsBtn);
+        tbl.add(rcsBtn).right().maxWidth(64);
 
         TextButton editBtn = new TextButton("Editor", game.skin);
         editBtn.setPosition(640 - 192, 480 - 32);
@@ -50,7 +53,10 @@ public class GameUIPanel extends Stage {
                 game.setScreen(game.editorScene);
             }
         });
-        this.addActor(editBtn);
+        tbl.add(editBtn).right().maxWidth(64);
+
+        tbl.row().expand().fill();
+        tbl.add(new Table()).colspan(9);
     }
 
     // Functions

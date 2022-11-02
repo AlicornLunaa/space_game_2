@@ -34,7 +34,7 @@ public class GamePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 
 		this.addActor(ship);
-		this.addActor(new Ground(world, 640/2, 20, 500, 15));
+		this.addActor(new Ground(game, world, 640/2, 20, 500, 15));
     }
 
     // Functions

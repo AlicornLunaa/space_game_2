@@ -1,22 +1,25 @@
 package com.alicornlunaa.spacegame.objects;
 
+import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class Ground extends Actor {
+public class Ground extends Entity {
+
+    private final App game;
+
     private Body body;
     private PolygonShape shape;
-    private ShapeRenderer renderer;
 
-    public Ground(World world, float x, float y, float w, float h){
+    public Ground(App game, World world, float x, float y, float w, float h){
+        this.game = game;
+
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
 		def.position.set(x, y);
@@ -30,30 +33,24 @@ public class Ground extends Actor {
         setOrigin(w / 2, h / 2);
         setPosition(body.getPosition().x, body.getPosition().y);
         setRotation(body.getAngle());
-
-        renderer = new ShapeRenderer();
     }
 
     @Override
     public void act(float delta){
         super.act(delta);
-
-        setPosition(body.getPosition().x, body.getPosition().y);
+        setPosition(body.getPosition().x - getOriginX(), body.getPosition().y - getOriginY());
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha){
         batch.end();
-        
-        renderer.setProjectionMatrix(batch.getProjectionMatrix());
-        renderer.setTransformMatrix(batch.getTransformMatrix());
-        renderer.translate(getX() - getWidth() / 2.f, getY() - getHeight() / 2.f, 0);
-
-        renderer.begin(ShapeType.Filled);
-        renderer.setColor(Color.BLUE);
-        renderer.rect(0, 0, getWidth(), getHeight());
-        renderer.end();
-
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+        game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+        game.shapeRenderer.translate(getX(), getY(), 0);
+        game.shapeRenderer.setColor(Color.BLUE);
+        game.shapeRenderer.rect(0, 0, getWidth(), getHeight());
+        game.shapeRenderer.end();
         batch.begin();
     }
 
@@ -62,4 +59,5 @@ public class Ground extends Actor {
         shape.dispose();
         return super.remove();
     }
+
 }
