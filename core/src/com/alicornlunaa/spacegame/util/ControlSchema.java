@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  */
 public class ControlSchema {
 
+    public static int PAUSE_GAME = Keys.ESCAPE;
+
     public static int MOVE_FORWARD = Keys.W;
     public static int MOVE_BACKWARD = Keys.S;
     public static int MOVE_LEFT = Keys.A;

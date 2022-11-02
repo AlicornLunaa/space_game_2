@@ -2,8 +2,12 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.GameScene;
+import com.alicornlunaa.spacegame.scenes.PauseScene;
+import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -57,6 +61,18 @@ public class GameUIPanel extends Stage {
 
         tbl.row().expand().fill();
         tbl.add(new Table()).colspan(9);
+
+        // Controls
+        this.addListener(new InputListener(){
+            public boolean keyDown(InputEvent event, int keycode){
+                if(keycode == ControlSchema.PAUSE_GAME){
+                    game.setScreen(new PauseScene(game, game.gameScene, (int)getWidth(), (int)getHeight()));
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     // Functions
@@ -64,7 +80,7 @@ public class GameUIPanel extends Stage {
     public void draw(){
         super.draw();
 
-        GamePanel gamePanel = ((GameScene)game.getScreen()).gamePanel;
+        GamePanel gamePanel = ((GameScene)game.gameScene).gamePanel;
         sasBtn.setColor(gamePanel.sas ? Color.GREEN : Color.RED);
         rcsBtn.setColor(gamePanel.rcs ? Color.GREEN : Color.RED);
     }
