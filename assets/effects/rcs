@@ -1,12 +1,12 @@
-Untitled
+rcs
 - Delay -
 active: false
 - Duration - 
-lowMin: 50000.0
-lowMax: 50000.0
+lowMin: 3000.0
+lowMax: 3000.0
 - Count - 
 min: 0
-max: 300
+max: 200
 - Emission - 
 lowMin: 0.0
 lowMax: 0.0
@@ -20,8 +20,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 500.0
-highMax: 1000.0
+highMin: 300.0
+highMax: 300.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -64,8 +64,8 @@ timeline0: 0.0
 - X Scale - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 32.0
-highMax: 32.0
+highMin: 8.0
+highMax: 8.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -77,7 +77,7 @@ active: false
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 30.0
+highMin: 50.0
 highMax: 300.0
 relative: false
 scalingCount: 1
@@ -88,8 +88,8 @@ timeline0: 0.0
 active: true
 lowMin: 90.0
 lowMax: 90.0
-highMin: 45.0
-highMax: 135.0
+highMin: 80.0
+highMax: 100.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -107,9 +107,9 @@ active: false
 active: false
 - Tint - 
 colorsCount: 3
-colors0: 1.0
-colors1: 0.12156863
-colors2: 0.047058824
+colors0: 0.6666667
+colors1: 0.6666667
+colors2: 0.6666667
 timelineCount: 1
 timeline0: 0.0
 - Transparency - 

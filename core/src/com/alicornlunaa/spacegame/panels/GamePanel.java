@@ -41,7 +41,7 @@ public class GamePanel extends Stage {
 		this.addActor(ship);
 		this.addActor(new Ground(game, world, getWidth() / 2, 30, getWidth() - 30, 25));
 
-        effect.load(Gdx.files.internal("effects/flame"), game.particleAtlas);
+        effect.load(Gdx.files.internal("effects/rcs"), game.particleAtlas);
         effect.setPosition(540, 250);
         effect.scaleEffect(0.15f);
         effect.start();
