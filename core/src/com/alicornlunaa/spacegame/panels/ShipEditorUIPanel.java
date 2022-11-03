@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.parts.*;
+import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.*;
@@ -218,6 +219,9 @@ public class ShipEditorUIPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
                     game.setScreen(new PauseScene(game, game.editorScene, (int)getWidth(), (int)getHeight()));
+                    return true;
+                } else if(keycode == ControlSchema.CONSOLE_OPEN){
+                    game.setScreen(new ConsoleScene(game, game.editorScene, (int)getWidth(), (int)getHeight()));
                     return true;
                 }
 

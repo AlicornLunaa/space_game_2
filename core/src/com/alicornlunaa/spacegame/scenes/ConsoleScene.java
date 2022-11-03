@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -62,11 +63,13 @@ public class ConsoleScene implements Screen {
 
         Table tbl = new Table(game.skin);
         tbl.setFillParent(true);
-        tbl.row().expand().fillX().bottom().maxHeight(640);
+        tbl.row().expandX().fillX();
 
-        // TODO: Add console history here with text area
+        // TextArea text = new TextArea("CONSOLE LOG HERE", game.skin);
+        // text.setDisabled(true);
+        // tbl.add(text).colspan(15).bottom().minHeight(320).expand();
 
-        tbl.row().expand().fillX().bottom().maxHeight(640);
+        tbl.row().expand().fillX().maxHeight(32);
         TextField cmdLine = new TextField("COMMAND", game.skin);
         tbl.add(cmdLine).bottom().colspan(14);
 
