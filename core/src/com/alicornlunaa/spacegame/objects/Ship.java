@@ -143,22 +143,21 @@ public class Ship extends Entity {
         // Loop through the head's attachments
         for(Attachment a : head.getAttachments()){
             if(a.getChild() == null) continue; // Nothing attached, skip
-
             if(a.getChild() != child){
-                // This is not the parent, check it
+                // This is not the parent, check the child part
                 ShipPart t = findParent(a.getChild(), child);
 
                 if(t != null){
                     // Parent of child found, return it
-                    return a.getChild();
+                    return t;
                 }
+            } else {
+                // This is the parent
+                return head;
             }
-
-            // This is the parent
-            return head;
         }
 
-        // Nothing
+        // Everything looped through, none is the child
         return null;
     }
     

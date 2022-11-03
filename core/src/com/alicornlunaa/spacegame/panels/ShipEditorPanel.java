@@ -40,12 +40,10 @@ public class ShipEditorPanel extends Stage {
     public ShipState ghostState = new ShipState();
     public Vector2 camOffset = new Vector2();
 
+    private Vector2 partOffset = new Vector2();
     private Attachment selectedAttachment;
     private Vector2 attachmentPoint;
     private int targetAttachmentId;
-
-    private static final float SNAP_DISTANCE = 8;
-    private static final float BREAK_DISTANCE = 16;
 
     // Constructor
     public ShipEditorPanel(final App game){
@@ -85,6 +83,7 @@ public class ShipEditorPanel extends Stage {
                         );
                     }
 
+                    partOffset.set(0, 0);
                     ghostPart = null;
                     selectedAttachment = null;
                     ui.selectedPart = "";
@@ -102,8 +101,8 @@ public class ShipEditorPanel extends Stage {
                             for(Attachment a : parent.getAttachments()){
                                 if(a.getChild() == part){
                                     // This is the one, detach and break
+                                    partOffset.set(part.getX(), part.getY());
                                     parent.detachPart(a.getThisId());
-                                    
                                     ghostPart = part;
                                     break;
                                 }
@@ -172,9 +171,11 @@ public class ShipEditorPanel extends Stage {
 
         if(ghostPart == null) return null; // Early exit if not part selected
 
+        float snapDistance = Math.max(ghostPart.getWidth(), ghostPart.getHeight());
+
         if(selectedAttachment == null){
             // No point selected, find snap point closest, only once
-            Attachment shipClosestToCursor = rootShip.getClosestAttachment(new Vector2(cursor), SNAP_DISTANCE);
+            Attachment shipClosestToCursor = rootShip.getClosestAttachment(new Vector2(cursor), snapDistance);
 
             if(shipClosestToCursor != null && shipClosestToCursor.getChild() == null && !shipClosestToCursor.getInUse()){
                 // Find attachment point on the ghostpart closest to the other attachment and snap them
@@ -196,8 +197,9 @@ public class ShipEditorPanel extends Stage {
         } else {
             // Snap point already found, check distance between the two points
             float snapToCursorDist = this.attachmentPoint.dst2(cursor);
+            float breakDistance = (float)Math.pow(snapDistance * 1.1, 2);
 
-            if(snapToCursorDist >= (BREAK_DISTANCE * BREAK_DISTANCE)){
+            if(snapToCursorDist >= breakDistance){
                 selectedAttachment = null;
                 this.attachmentPoint = null;
             }
@@ -236,7 +238,8 @@ public class ShipEditorPanel extends Stage {
             Vector2 oldScl = new Vector2(ghostPart.getScaleX(), ghostPart.getScaleY());
             float oldRot = ghostPart.getRotation();
             Matrix3 trans = ghostPart.getTransform();
-            ghostPart.setPosition(0, 0);
+            trans.translate(-partOffset.x, -partOffset.y);
+            ghostPart.setPosition(partOffset.x, partOffset.y);
             ghostPart.setRotation(0);
             ghostPart.setScale(1, 1);
 
