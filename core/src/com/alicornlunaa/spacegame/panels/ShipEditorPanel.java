@@ -21,6 +21,7 @@ import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.parts.*;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.scenes.EditorScene;
+import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 
 /*
@@ -36,6 +37,7 @@ public class ShipEditorPanel extends Stage {
     public Body ghostBody; // Required for making a part w/o attaching it
     public Ship rootShip; // The ship being built
     public ShipPart ghostPart;
+    public ShipState ghostState = new ShipState();
     public Vector2 camOffset = new Vector2();
 
     private Attachment selectedAttachment;

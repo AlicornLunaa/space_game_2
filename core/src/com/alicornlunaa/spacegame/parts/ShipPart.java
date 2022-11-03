@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.Color;
@@ -83,6 +84,7 @@ public class ShipPart extends Entity {
 
     // Variables
     protected Body parent;
+    protected ShipState stateRef;
     private TextureRegion region;
     private PolygonShape shape = new PolygonShape();
     private ArrayList<Attachment> attachments = new ArrayList<Attachment>();
@@ -96,8 +98,9 @@ public class ShipPart extends Entity {
     private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
-    protected void create(Body parent, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
+    protected void create(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
         this.parent = parent;
+        this.stateRef = stateRef;
         this.region = region;
 
         for(Vector2 p : attachmentPoints){
@@ -112,8 +115,8 @@ public class ShipPart extends Entity {
         shape.setAsBox(size.x / 2.f, size.y / 2.f, pos, rot * (float)(Math.PI / 180.f));
     }
 
-    public ShipPart(Body parent, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
-        this.create(parent, region, size, pos, rot, attachmentPoints);
+    public ShipPart(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
+        this.create(parent, stateRef, region, size, pos, rot, attachmentPoints);
     }
 
     protected ShipPart(){}
@@ -320,7 +323,7 @@ public class ShipPart extends Entity {
     }
 
     // Static methods
-    private static ShipPart fromJSON(Assets manager, JSONObject data, Body parent, Vector2 posOffset, float rotOffset){
+    private static ShipPart fromJSON(Assets manager, JSONObject data, Body parent, ShipState stateRef, Vector2 posOffset, float rotOffset){
         // Part information is in parts_layout.md
         try {
             // Load part information from the json object
@@ -355,14 +358,14 @@ public class ShipPart extends Entity {
                     float drag = metadata.getFloat("drag");
                     float lift = metadata.getFloat("lift");
                     Aero part1 = new Aero(name, desc, density, drag, lift);
-                    part1.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    part1.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
                     return part1;
                     
                 case "STRUCTURAL":
                     float fuel = metadata.getFloat("fuelCapacity");
                     float battery = metadata.getFloat("batteryCapacity");
                     Structural part2 = new Structural(name, desc, density, fuel, battery);
-                    part2.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    part2.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
                     return part2;
                     
                 case "THRUSTER":
@@ -370,14 +373,14 @@ public class ShipPart extends Entity {
                     float cone = metadata.getFloat("cone");
                     float usage = metadata.getFloat("fuelUsage");
                     Thruster part3 = new Thruster(name, desc, density, power, cone, usage, rotOffset);
-                    part3.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    part3.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
                     return part3;
                     
                 case "RCSPORT":
                     float rcspower = metadata.getFloat("power");
                     float rcsusage = metadata.getFloat("fuelUsage");
                     RCSPort part4 = new RCSPort(name, desc, density, rcspower, rcsusage);
-                    part4.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    part4.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
                     return part4;
             }
         } catch(GdxRuntimeException|JSONException e){
@@ -388,14 +391,14 @@ public class ShipPart extends Entity {
         return null;
     }
     
-    public static ShipPart spawn(Assets manager, PartManager partManager, String type, String id, Body parent, Vector2 posOffset, float rotOffset){
-        ShipPart p = ShipPart.fromJSON(manager, partManager.get(type, id), parent, posOffset, rotOffset);
+    public static ShipPart spawn(Assets manager, PartManager partManager, String type, String id, Body parent, ShipState stateRef, Vector2 posOffset, float rotOffset){
+        ShipPart p = ShipPart.fromJSON(manager, partManager.get(type, id), parent, stateRef, posOffset, rotOffset);
         p.partType = type;
         p.partId = id;
         return p;
     }
 
-    public static ShipPart unserialize(Assets manager, PartManager partManager, Body body, JSONObject data){
+    public static ShipPart unserialize(Assets manager, PartManager partManager, Body body, ShipState stateRef, JSONObject data){
         // Recursively builds the object from serialized data
         ShipPart p = ShipPart.spawn(
             manager,
@@ -403,6 +406,7 @@ public class ShipPart extends Entity {
             data.getString("type"),
             data.getString("id"),
             body,
+            stateRef,
             new Vector2(
                 data.getFloat("x"),
                 data.getFloat("y")
@@ -421,7 +425,7 @@ public class ShipPart extends Entity {
         for(int i = 0; i < attachments.length(); i++){
             JSONObject partData = attachments.getJSONObject(i).getJSONObject("partData");
             Attachment a = Attachment.unserialize(p, attachments.getJSONObject(i).getJSONObject("attachData"));
-            a.child = ShipPart.unserialize(manager, partManager, body, partData);
+            a.child = ShipPart.unserialize(manager, partManager, body, stateRef, partData);
 
             p.attachPart(a.child, a.childAttachmentPoint, a.thisAttachmentPoint);
         }

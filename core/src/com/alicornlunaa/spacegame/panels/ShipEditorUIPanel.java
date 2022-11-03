@@ -139,6 +139,7 @@ public class ShipEditorUIPanel extends Stage {
                             ui.selectedCategory,
                             ui.selectedPart,
                             editor.ghostBody,
+                            editor.ghostState,
                             new Vector2(),
                             0
                         );

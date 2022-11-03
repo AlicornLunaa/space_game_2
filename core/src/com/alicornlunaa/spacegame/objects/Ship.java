@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.parts.ShipPart;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
+import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Gdx;
@@ -24,17 +25,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class Ship extends Entity {
-    // Classes
-    protected static class ShipState {
-        /** Contains a list of all the ship statistics and variables
-         * such as fuel level, electricity level, thrust level, RCS,
-         * SAS, and other instance based variables
-         */
-    }
-
+    
     // Variables
     private Body body;
     private ShipPart rootPart = null;
+    public ShipState state = new ShipState(); // Ship controls and stuff
 
     private Assets manager;
     private PartManager partManager;
@@ -53,9 +48,9 @@ public class Ship extends Entity {
         setPosition(x, y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
-        rootPart = ShipPart.spawn(manager, partManager, "AERO", "MED_CMD_POD", body, new Vector2(0, 0), 0.f);
-        ShipPart fuselage = rootPart.attachPart(ShipPart.spawn(manager, partManager, "STRUCTURAL", "BSC_FUSELAGE", body, new Vector2(0, 0), 0.f), 1, 0);
-        fuselage.attachPart(ShipPart.spawn(manager, partManager, "THRUSTER", "BSC_THRUSTER", body, new Vector2(0, 0), 0.f), 0, 0);
+        rootPart = ShipPart.spawn(manager, partManager, "AERO", "MED_CMD_POD", body, state, new Vector2(0, 0), 0.f);
+        ShipPart fuselage = rootPart.attachPart(ShipPart.spawn(manager, partManager, "STRUCTURAL", "BSC_FUSELAGE", body, state, new Vector2(0, 0), 0.f), 1, 0);
+        fuselage.attachPart(ShipPart.spawn(manager, partManager, "THRUSTER", "BSC_THRUSTER", body, state, new Vector2(0, 0), 0.f), 0, 0);
         assemble();
     }
 
@@ -214,7 +209,7 @@ public class Ship extends Entity {
 
             // Load body data
             JSONObject root = data.getJSONObject("rootPart");
-            rootPart = ShipPart.unserialize(manager, partManager, body, root);
+            rootPart = ShipPart.unserialize(manager, partManager, body, state, root);
             assemble();
 
             return true;

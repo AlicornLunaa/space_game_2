@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -22,6 +23,7 @@ public class GameUIPanel extends Stage {
     
     private TextButton sasBtn;
     private TextButton rcsBtn;
+    private ProgressBar throttleBar;
 
     // Constructor
     public GameUIPanel(final App game){
@@ -59,9 +61,15 @@ public class GameUIPanel extends Stage {
             }
         });
         tbl.add(editBtn).right().maxWidth(64);
+        tbl.row().expand().fill().left();
 
-        tbl.row().expand().fill();
-        tbl.add(new Table()).colspan(9);
+        Table hud = new Table(game.skin);
+        hud.setFillParent(true);
+        hud.row().maxWidth(32);
+        throttleBar = new ProgressBar(0, 1, 0.01f, true, game.skin);
+        hud.add(throttleBar).expand().right().bottom().pad(20).minHeight(256);
+
+        tbl.add(hud).colspan(9);
 
         // Controls
         this.addListener(new InputListener(){
@@ -85,8 +93,9 @@ public class GameUIPanel extends Stage {
         super.draw();
 
         GamePanel gamePanel = ((GameScene)game.gameScene).gamePanel;
-        sasBtn.setColor(gamePanel.sas ? Color.GREEN : Color.RED);
-        rcsBtn.setColor(gamePanel.rcs ? Color.GREEN : Color.RED);
+        sasBtn.setColor(gamePanel.ship.state.sas ? Color.GREEN : Color.RED);
+        rcsBtn.setColor(gamePanel.ship.state.rcs ? Color.GREEN : Color.RED);
+        throttleBar.setValue(gamePanel.ship.state.throttle);
     }
 
     @Override

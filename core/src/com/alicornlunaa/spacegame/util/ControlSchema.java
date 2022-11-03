@@ -20,8 +20,11 @@ public class ControlSchema {
     public static int MOVE_BACKWARD = Keys.S;
     public static int MOVE_LEFT = Keys.A;
     public static int MOVE_RIGHT = Keys.D;
-    public static int ROLL_LEFT = Keys.Q;
-    public static int ROLL_RIGHT = Keys.E;
+
+    public static int SHIP_ROLL_LEFT = Keys.Q;
+    public static int SHIP_ROLL_RIGHT = Keys.E;
+    public static int SHIP_INCREASE_THROTTLE = Keys.SHIFT_LEFT;
+    public static int SHIP_DECREASE_THROTTLE = Keys.CONTROL_LEFT;
 
     public static int EDITOR_ROTATE = Keys.R;
     public static int EDITOR_FLIP_X = Keys.F;
@@ -39,8 +42,10 @@ public class ControlSchema {
         obj.put("MOVE_BACKWARD", MOVE_BACKWARD);
         obj.put("MOVE_LEFT", MOVE_LEFT);
         obj.put("MOVE_RIGHT", MOVE_RIGHT);
-        obj.put("ROLL_LEFT", ROLL_LEFT);
-        obj.put("ROLL_RIGHT", ROLL_RIGHT);
+
+        obj.put("ROLL_LEFT", SHIP_ROLL_LEFT);
+        obj.put("ROLL_RIGHT", SHIP_ROLL_RIGHT);
+
         obj.put("GUI_SCALE", GUI_SCALE);
 
         try {
@@ -64,8 +69,10 @@ public class ControlSchema {
             MOVE_BACKWARD = obj.getInt("MOVE_BACKWARD");
             MOVE_LEFT = obj.getInt("MOVE_LEFT");
             MOVE_RIGHT = obj.getInt("MOVE_RIGHT");
-            ROLL_LEFT = obj.getInt("ROLL_LEFT");
-            ROLL_RIGHT = obj.getInt("ROLL_RIGHT");
+
+            SHIP_ROLL_LEFT = obj.getInt("ROLL_LEFT");
+            SHIP_ROLL_RIGHT = obj.getInt("ROLL_RIGHT");
+            
             GUI_SCALE = obj.getInt("GUI_SCALE");
         } catch(GdxRuntimeException|JSONException e){
             System.out.println("Error reading the control schema");

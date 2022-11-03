@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.parts;
 
 import java.util.ArrayList;
 
+import com.alicornlunaa.spacegame.states.ShipState;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -32,8 +33,8 @@ public class RCSPort extends ShipPart {
         this.fuelUsage = fuelUsage;
     }
 
-    public RCSPort(Body parent, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float power, float fuelUsage){
-        super(parent, region, size, pos, rot, attachmentPoints);
+    public RCSPort(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float power, float fuelUsage){
+        super(parent, stateRef, region, size, pos, rot, attachmentPoints);
 
         this.name = name;
         this.description = description;
