@@ -80,6 +80,9 @@ public class GameUIPanel extends Stage {
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
                     game.setScreen(new ConsoleScene(game, game.gameScene, (int)getWidth(), (int)getHeight()));
                     return true;
+                } else if(keycode == ControlSchema.DEBUG_TOGGLE){
+                    game.gameScene.gamePanel.ship.state.debug = !game.gameScene.gamePanel.ship.state.debug;
+                    return true;
                 }
 
                 return false;

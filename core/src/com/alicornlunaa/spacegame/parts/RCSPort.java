@@ -3,10 +3,8 @@ package com.alicornlunaa.spacegame.parts;
 import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.states.ShipState;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -25,8 +23,6 @@ public class RCSPort extends ShipPart {
     private String description;
     private float power;
     private float fuelUsage;
-
-    private ShapeRenderer s = new ShapeRenderer();
 
     // Constructors
     public RCSPort(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float denstiy, float power, float fuelUsage){
@@ -51,7 +47,7 @@ public class RCSPort extends ShipPart {
         float adj = portDir.dot(parentVert);
         if(adj <= 0) return;
 
-        parent.applyForce(new Vector2(portDir).scl(power * 2.f * adj).add(portPos), portPos, true);
+        parent.applyForceToCenter(new Vector2(portDir).scl(power * 2.f * adj).add(parent.getPosition()), true);
     }
 
     private void horizontalThrust(float delta, float direction, Vector2 portPos, Vector2 portDir){
@@ -59,7 +55,7 @@ public class RCSPort extends ShipPart {
         float adj = portDir.dot(parentHori);
         if(adj <= 0) return;
 
-        parent.applyForce(new Vector2(portDir).scl(power * 2.f * adj).add(portPos), portPos, true);
+        parent.applyForceToCenter(new Vector2(portDir).scl(power * 2.f * adj).add(parent.getPosition()), true);
     }
 
     private void rollThrust(float delta, float direction, Vector2 portPos, Vector2 portDir){
@@ -76,21 +72,23 @@ public class RCSPort extends ShipPart {
         if(!stateRef.debug) return;
 
         batch.end();
-        s.begin(ShapeRenderer.ShapeType.Filled);
+        // s.begin(ShapeRenderer.ShapeType.Filled);
+        // s.setProjectionMatrix(batch.getProjectionMatrix());
+        // s.setTransformMatrix(batch.getTransformMatrix());
 
-        Vector2 portPos = new Vector2(getX(), getY()).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
-        Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getScaleX()).scl(-getScaleX(), -getScaleY());
-        Vector2 parentUp = new Vector2(0, stateRef.vertical).rotateRad(parent.getAngle());
-        float adj = portDir.dot(parentUp);
+        // Vector2 portPos = new Vector2(getX(), getY()).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
+        // Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getScaleX()).scl(-getScaleX(), -getScaleY());
+        // Vector2 parentUp = new Vector2(stateRef.horizontal, stateRef.vertical).rotateRad(parent.getAngle());
+        // float adj = portDir.dot(parentUp);
 
-        s.setColor(adj <= 0 ? Color.MAGENTA : Color.GREEN);
-        s.line(portPos, new Vector2(portDir).scl(50).add(portPos));
-        s.circle(portPos.x, portPos.y, 3);
+        // s.setColor(adj <= 0 ? Color.MAGENTA : Color.GREEN);
+        // s.line(portPos, new Vector2(portDir).scl(50).add(portPos));
+        // s.circle(portPos.x, portPos.y, 3);
 
-        s.setColor(Color.CORAL);
-        s.line(parent.getWorldCenter(), new Vector2(parentUp).scl(150).add(parent.getWorldCenter()));
+        // s.setColor(Color.CORAL);
+        // s.line(parent.getWorldCenter(), new Vector2(parentUp).scl(150).add(parent.getWorldCenter()));
 
-        s.end();
+        // s.end();
         batch.begin();
     }
 
@@ -102,7 +100,9 @@ public class RCSPort extends ShipPart {
             Vector2 portPos = new Vector2(getX(), getY()).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
             Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getScaleX()).scl(-getScaleX(), -getScaleY());
 
-            rollThrust(delta, getSignAtPos() * stateRef.roll, portPos, portDir);
+            float compRoll = Math.min(Math.max(stateRef.roll + stateRef.artifRoll, -1), 1);
+
+            rollThrust(delta, getSignAtPos() * compRoll, portPos, portDir);
             verticalThrust(delta, stateRef.vertical, portPos, portDir);
             horizontalThrust(delta, stateRef.horizontal, portPos, portDir);
         }

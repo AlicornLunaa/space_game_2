@@ -64,7 +64,9 @@ public class Thruster extends ShipPart {
     public void act(float delta){
         super.act(delta);
 
-        this.setTargetAngle(stateRef.roll);
+        float compRoll = Math.min(Math.max(stateRef.roll + stateRef.artifRoll, -1), 1);
+
+        this.setTargetAngle(compRoll);
         this.thrust(delta, stateRef.throttle);
     }
 

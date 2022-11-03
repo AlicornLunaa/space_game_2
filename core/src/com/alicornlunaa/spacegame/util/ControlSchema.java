@@ -32,6 +32,7 @@ public class ControlSchema {
     public static int EDITOR_FLIP_Y = Keys.C;
 
     public static int CONSOLE_OPEN = Keys.F1;
+    public static int DEBUG_TOGGLE = Keys.F3;
 
     public static float GUI_SCALE = 1.f;
 

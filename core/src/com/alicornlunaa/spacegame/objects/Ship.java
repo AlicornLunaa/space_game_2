@@ -221,12 +221,26 @@ public class Ship extends Entity {
         return false;
     }
 
+    private void computeSAS(){
+        // Reduce angular velocity with controls
+        float angVel = body.getAngularVelocity();
+        angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
+
+        state.artifRoll = angVel;
+    }
+
     @Override
     public void act(float delta){
         super.act(delta);
 
         setPosition(body.getPosition().x, body.getPosition().y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
+
+        if(state.sas){
+            computeSAS();
+        } else {
+            state.artifRoll = 0;
+        }
 
         if(rootPart != null){
             rootPart.act(delta);
