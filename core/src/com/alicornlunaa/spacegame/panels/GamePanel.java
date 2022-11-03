@@ -83,6 +83,22 @@ public class GamePanel extends Stage {
         } else {
             ship.state.roll = 0;
         }
+        
+        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)){
+            ship.state.vertical = 1;
+        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)){
+            ship.state.vertical = -1;
+        } else {
+            ship.state.vertical = 0;
+        }
+        
+        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)){
+            ship.state.horizontal = -1;
+        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)){
+            ship.state.horizontal = 1;
+        } else {
+            ship.state.horizontal = 0;
+        }
     }
 
     @Override

@@ -379,9 +379,20 @@ public class ShipPart extends Entity {
                 case "RCSPORT":
                     float rcspower = metadata.getFloat("power");
                     float rcsusage = metadata.getFloat("fuelUsage");
-                    RCSPort part4 = new RCSPort(name, desc, density, rcspower, rcsusage);
-                    part4.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
-                    return part4;
+                    return new RCSPort(
+                        parent,
+                        stateRef,
+                        region,
+                        size,
+                        posOffset,
+                        rotOffset,
+                        attachmentPoints,
+                        name,
+                        desc,
+                        density,
+                        rcspower,
+                        rcsusage
+                    );
             }
         } catch(GdxRuntimeException|JSONException e){
             System.out.println("Error reading the part data");

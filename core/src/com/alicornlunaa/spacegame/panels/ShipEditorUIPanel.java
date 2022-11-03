@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -202,6 +203,17 @@ public class ShipEditorUIPanel extends Stage {
 
         // Controls
         this.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                if(button == Buttons.LEFT && nameBar.hasKeyboardFocus() && event.getTarget() != nameBar){
+                    game.editorScene.uiPanel.setKeyboardFocus(null);
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
                     game.setScreen(new PauseScene(game, game.editorScene, (int)getWidth(), (int)getHeight()));
