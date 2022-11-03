@@ -77,7 +77,7 @@ public class ShipEditorUIPanel extends Stage {
         ui.row().expand().fill().colspan(4);
         ui.add(editorTable);
         editorTable.row().expandY().fillY().left();
-        editorTable.add(categoryScroll).prefWidth(64 * scale);
+        editorTable.add(categoryScroll).minWidth(64 * scale);
 
         int categoryCount = 0;
         for(final String entry : game.partManager.getPartsList().keySet()) {
@@ -147,6 +147,7 @@ public class ShipEditorUIPanel extends Stage {
                         editor.ghostPart.drawPoints(true);
                     }
                 });
+                btn.pad(10);
                 ((HorizontalGroup)partsVertical.getChild(count / 3)).addActor(btn);
                 count++;
             }

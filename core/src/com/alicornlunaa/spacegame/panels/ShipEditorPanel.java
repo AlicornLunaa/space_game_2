@@ -145,7 +145,7 @@ public class ShipEditorPanel extends Stage {
                 ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
                 OrthographicCamera cam = ((OrthographicCamera)editor.getCamera());
 
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.1f), 2.f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 1.5f);
 
                 return true;
             }
@@ -158,12 +158,8 @@ public class ShipEditorPanel extends Stage {
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
-                ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
-                OrthographicCamera cam = ((OrthographicCamera)editor.getCamera());
-                
-                Vector2 vel = new Vector2(x, y).sub(prevDrag).scl(-0.25f * (cam.zoom * 2));
-                prevDrag.set(x, y);
-                camOffset.add(vel);
+                Vector2 vel = new Vector2(x, y).sub(prevDrag).scl(-0.4f);
+                camOffset.set(vel);
             }
         });
     }
