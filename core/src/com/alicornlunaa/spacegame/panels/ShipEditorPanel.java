@@ -159,7 +159,7 @@ public class ShipEditorPanel extends Stage {
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
                 Vector2 vel = new Vector2(x, y).sub(prevDrag).scl(-0.4f);
-                camOffset.set(vel);
+                camOffset.add(vel);
             }
         });
     }
