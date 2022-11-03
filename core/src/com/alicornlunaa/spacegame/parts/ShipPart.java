@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.states.ShipState;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -221,6 +222,8 @@ public class ShipPart extends Entity {
         return part;
     }
 
+    protected void drawEffects(Batch batch, float deltaTime){}
+
     @Override
     public void act(float delta){
         super.act(delta);
@@ -243,6 +246,7 @@ public class ShipPart extends Entity {
         Color c = this.getColor();
         batch.setColor(c.r * bc.r, c.g * bc.g, c.b * bc.b, c.a * parentAlpha);
         batch.draw(region, -getOriginX(), -getOriginY());
+        drawEffects(batch, Gdx.graphics.getDeltaTime());
         batch.setColor(bc);
 
         if(drawAttachPoints){
@@ -394,6 +398,7 @@ public class ShipPart extends Entity {
                     float rcspower = metadata.getFloat("power");
                     float rcsusage = metadata.getFloat("fuelUsage");
                     return new RCSPort(
+                        game,
                         parent,
                         stateRef,
                         region,

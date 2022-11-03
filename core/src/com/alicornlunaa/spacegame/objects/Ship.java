@@ -221,6 +221,8 @@ public class Ship extends Entity {
         float angVel = body.getAngularVelocity();
         angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
 
+        if(Math.abs(angVel) <= 0.005f) angVel = 0;
+
         state.artifRoll = angVel;
     }
 

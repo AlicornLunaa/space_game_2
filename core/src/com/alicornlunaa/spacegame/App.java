@@ -67,6 +67,9 @@ public class App extends Game {
 				loaded = true;
 				System.out.println("Assets loaded");
 
+				// Get all the particle effects
+				manager.initEffects(this);
+
 				// Start new scene
 				gameScene = new GameScene(this);
 				editorScene = new EditorScene(this);
