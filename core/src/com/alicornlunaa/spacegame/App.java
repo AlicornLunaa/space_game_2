@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -24,6 +25,7 @@ public class App extends Game {
 
 	public boolean loaded = false;
 	
+	public SpriteBatch spriteBatch;
 	public ShapeRenderer shapeRenderer;
 	
 	// Functions
@@ -41,6 +43,7 @@ public class App extends Game {
 
 		skin = new Skin(Gdx.files.internal("skins/default/uiskin.json"));
 
+		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 
 		loadingScene = new LoadingScene(this);

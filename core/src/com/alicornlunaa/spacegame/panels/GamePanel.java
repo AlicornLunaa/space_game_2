@@ -6,6 +6,8 @@ import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -23,6 +25,7 @@ public class GamePanel extends Stage {
     private float physAccumulator = 0.0f;
 
     public Ship ship;
+    public ParticleEffect effect = new ParticleEffect();
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -37,6 +40,11 @@ public class GamePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
 		this.addActor(new Ground(game, world, getWidth() / 2, 30, getWidth() - 30, 25));
+
+        effect.load(Gdx.files.internal("./assets/particles/flame"), Gdx.files.internal("./assets/textures/"));
+        effect.setPosition(540, 250);
+        effect.scaleEffect(0.15f);
+        effect.start();
 
         // Controls
         this.addListener(new InputListener(){
@@ -105,6 +113,14 @@ public class GamePanel extends Stage {
     public void draw(){
         super.draw();
 
+        Batch batch = getBatch();
+        game.spriteBatch.begin();
+        game.spriteBatch.setProjectionMatrix(batch.getProjectionMatrix());
+        game.spriteBatch.setTransformMatrix(batch.getTransformMatrix());
+        effect.update(Gdx.graphics.getDeltaTime());
+        effect.draw(game.spriteBatch, Gdx.graphics.getDeltaTime());
+        game.spriteBatch.end();
+
         if(this.isDebugAll()){
             debug.render(world, this.getCamera().combined);
         }
@@ -112,6 +128,7 @@ public class GamePanel extends Stage {
     
     @Override
     public void dispose(){
+        effect.dispose();
         super.dispose();
     }
 
