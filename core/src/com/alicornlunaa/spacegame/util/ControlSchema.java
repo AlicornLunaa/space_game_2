@@ -16,15 +16,16 @@ public class ControlSchema {
 
     public static int PAUSE_GAME = Keys.ESCAPE;
 
-    public static int MOVE_FORWARD = Keys.W;
-    public static int MOVE_BACKWARD = Keys.S;
-    public static int MOVE_LEFT = Keys.A;
-    public static int MOVE_RIGHT = Keys.D;
-
+    public static int SHIP_TRANSLATE_UP = Keys.W;
+    public static int SHIP_TRANSLATE_DOWN = Keys.S;
+    public static int SHIP_TRANSLATE_LEFT = Keys.A;
+    public static int SHIP_TRANSLATE_RIGHT = Keys.D;
     public static int SHIP_ROLL_LEFT = Keys.Q;
     public static int SHIP_ROLL_RIGHT = Keys.E;
     public static int SHIP_INCREASE_THROTTLE = Keys.SHIFT_LEFT;
     public static int SHIP_DECREASE_THROTTLE = Keys.CONTROL_LEFT;
+    public static int SHIP_TOGGLE_RCS = Keys.R;
+    public static int SHIP_TOGGLE_SAS = Keys.T;
 
     public static int EDITOR_ROTATE = Keys.R;
     public static int EDITOR_FLIP_X = Keys.F;
@@ -38,13 +39,12 @@ public class ControlSchema {
         FileHandle file = Gdx.files.local(filename);
 
         JSONObject obj = new JSONObject();
-        obj.put("MOVE_FORWARD", MOVE_FORWARD);
-        obj.put("MOVE_BACKWARD", MOVE_BACKWARD);
-        obj.put("MOVE_LEFT", MOVE_LEFT);
-        obj.put("MOVE_RIGHT", MOVE_RIGHT);
-
-        obj.put("ROLL_LEFT", SHIP_ROLL_LEFT);
-        obj.put("ROLL_RIGHT", SHIP_ROLL_RIGHT);
+        obj.put("SHIP_TRANSLATE_UP", SHIP_TRANSLATE_UP);
+        obj.put("SHIP_TRANSLATE_DOWN", SHIP_TRANSLATE_DOWN);
+        obj.put("SHIP_TRANSLATE_LEFT", SHIP_TRANSLATE_LEFT);
+        obj.put("SHIP_TRANSLATE_RIGHT", SHIP_TRANSLATE_RIGHT);
+        obj.put("SHIP_ROLL_LEFT", SHIP_ROLL_LEFT);
+        obj.put("SHIP_ROLL_RIGHT", SHIP_ROLL_RIGHT);
 
         obj.put("GUI_SCALE", GUI_SCALE);
 
@@ -65,10 +65,10 @@ public class ControlSchema {
 
         try {
             JSONObject obj = new JSONObject(file.readString());
-            MOVE_FORWARD = obj.getInt("MOVE_FORWARD");
-            MOVE_BACKWARD = obj.getInt("MOVE_BACKWARD");
-            MOVE_LEFT = obj.getInt("MOVE_LEFT");
-            MOVE_RIGHT = obj.getInt("MOVE_RIGHT");
+            SHIP_TRANSLATE_UP = obj.getInt("MOVE_FORWARD");
+            SHIP_TRANSLATE_DOWN = obj.getInt("MOVE_BACKWARD");
+            SHIP_TRANSLATE_LEFT = obj.getInt("MOVE_LEFT");
+            SHIP_TRANSLATE_RIGHT = obj.getInt("MOVE_RIGHT");
 
             SHIP_ROLL_LEFT = obj.getInt("ROLL_LEFT");
             SHIP_ROLL_RIGHT = obj.getInt("ROLL_RIGHT");

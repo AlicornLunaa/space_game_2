@@ -9,6 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -34,8 +36,23 @@ public class GamePanel extends Stage {
         ship = new Ship(game.manager, game.partManager, world, 640/2, 250, 0);
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
-
 		this.addActor(new Ground(game, world, getWidth() / 2, 30, getWidth() - 30, 25));
+
+        // Controls
+        this.addListener(new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, int keycode){
+                if(keycode == ControlSchema.SHIP_TOGGLE_RCS){
+                    ship.state.rcs = !ship.state.rcs;
+                    return true;
+                } else if(keycode == ControlSchema.SHIP_TOGGLE_SAS){
+                    ship.state.sas = !ship.state.sas;
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     // Functions
