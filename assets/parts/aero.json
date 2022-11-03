@@ -4,18 +4,7 @@
         "type": "AERO",
         "name": "Medium Command Pod",
         "desc": "Mid-sized command pod",
-        "texture": "textures/aero_atlas.png",
-        "uv": {
-            "x": 0,
-            "y": 0,
-            "width": 16,
-            "height": 14
-        },
-        "scale": {
-            "width": 16,
-            "height": 14,
-            "scale": 1
-        },
+        "scale": 1,
         "density": 0.1,
         "attachmentPoints": [
             {"x": 0, "y": -7}
@@ -30,18 +19,7 @@
         "type": "AERO",
         "name": "Small Command Pod",
         "desc": "Skinnier command pod",
-        "texture": "textures/aero_atlas.png",
-        "uv": {
-            "x": 17,
-            "y": 0,
-            "width": 8,
-            "height": 14
-        },
-        "scale": {
-            "width": 8,
-            "height": 15,
-            "scale": 1
-        },
+        "scale": 1,
         "density": 0.1,
         "attachmentPoints": [
             {"x": 0, "y": -7}
@@ -56,18 +34,7 @@
         "type": "AERO",
         "name": "Basic fin",
         "desc": "Aerodynamic stabilization",
-        "texture": "textures/aero_atlas.png",
-        "uv": {
-            "x": 0,
-            "y": 16,
-            "width": 11,
-            "height": 15
-        },
-        "scale": {
-            "width": 11,
-            "height": 15,
-            "scale": 1
-        },
+        "scale": 1,
         "density": 0.1,
         "attachmentPoints": [
             {"x": -5.5, "y": 0}

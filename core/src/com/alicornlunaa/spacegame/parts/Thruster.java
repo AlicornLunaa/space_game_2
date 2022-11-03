@@ -20,18 +20,8 @@ public class Thruster extends ShipPart {
     private float currentAngle;
 
     // Constructor
-    protected Thruster(String name, String desc, float density, float power, float coneAngle, float fuelUsage, float rotOffset){
-        this.name = name;
-        this.description = desc;
-        this.power = power;
-        this.coneAngle = coneAngle;
-        this.coneSpeed = 1.5f;
-        this.fuelUsage = fuelUsage;
-        this.rotationOffset = rotOffset;
-    }
-
-    public Thruster(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float power, float coneAngle, float fuelUsage){
-        super(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
+    public Thruster(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float power, float coneAngle, float fuelUsage){
+        super(parent, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
 
         this.name = name;
         this.description = description;

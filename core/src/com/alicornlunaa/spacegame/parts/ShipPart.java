@@ -6,12 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.states.ShipState;
-import com.alicornlunaa.spacegame.util.Assets;
-import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -95,10 +93,10 @@ public class ShipPart extends Entity {
     private boolean partFlipY = false;
 
     private boolean drawAttachPoints = false;
-    private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    protected static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
-    protected void create(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
+    public ShipPart(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
         this.parent = parent;
         this.stateRef = stateRef;
         this.region = region;
@@ -107,19 +105,13 @@ public class ShipPart extends Entity {
             attachments.add(new Attachment(this, p, attachments.size()));
         }
 
-        setSize(size.x, size.y);
-        setOrigin(size.x / 2.f - pos.x, size.y / 2.f - pos.y);
+        setSize(region.getRegionWidth() * scale, region.getRegionHeight() * scale);
+        setOrigin(getWidth() / 2.f - pos.x, getHeight() / 2.f - pos.y);
         setPosition(pos.x, pos.y);
         setRotation(rot);
 
-        shape.setAsBox(size.x / 2.f, size.y / 2.f, pos, rot * (float)(Math.PI / 180.f));
+        shape.setAsBox(getWidth() / 2.f, getHeight() / 2.f, pos, rot * (float)(Math.PI / 180.f));
     }
-
-    public ShipPart(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
-        this.create(parent, stateRef, region, size, pos, rot, attachmentPoints);
-    }
-
-    protected ShipPart(){}
 
     // Functions
     public Attachment getClosestAttachment(Vector2 point){
@@ -321,28 +313,19 @@ public class ShipPart extends Entity {
     }
 
     // Static methods
-    private static ShipPart fromJSON(Assets manager, JSONObject data, Body parent, ShipState stateRef, Vector2 posOffset, float rotOffset){
+    private static ShipPart fromJSON(final App game, JSONObject data, Body parent, ShipState stateRef, Vector2 posOffset, float rotOffset){
         // Part information is in parts_layout.md
         try {
             // Load part information from the json object
             String type = data.getString("type");
+            String id = data.getString("id");
             String name = data.getString("name");
             String desc = data.getString("desc");
-            String texture = data.getString("texture");
-            TextureRegion region = new TextureRegion(
-                manager.get(texture, Texture.class),
-                data.getJSONObject("uv").getInt("x"),
-                data.getJSONObject("uv").getInt("y"),
-                data.getJSONObject("uv").getInt("width"),
-                data.getJSONObject("uv").getInt("height")
-            );
-            Vector2 size = new Vector2(
-                data.getJSONObject("scale").getFloat("width") * data.getJSONObject("scale").getFloat("scale"),
-                data.getJSONObject("scale").getFloat("height") * data.getJSONObject("scale").getFloat("scale")
-            );
+            float scale = data.getFloat("scale");
             float density = data.getFloat("density");
+            TextureRegion region = game.atlas.findRegion(String.format("parts/%s/%s", type.toLowerCase(), id.toLowerCase()));
+
             ArrayList<Vector2> attachmentPoints = new ArrayList<Vector2>();
-            
             JSONArray points = data.getJSONArray("attachmentPoints");
             for(int i = 0; i < points.length(); i++){
                 JSONObject o = points.getJSONObject(i);
@@ -350,29 +333,62 @@ public class ShipPart extends Entity {
             }
 
             JSONObject metadata = data.getJSONObject("metadata");
-
             switch(type){
                 case "AERO":
                     float drag = metadata.getFloat("drag");
                     float lift = metadata.getFloat("lift");
-                    Aero part1 = new Aero(name, desc, density, drag, lift);
-                    part1.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
-                    return part1;
+                    return new Aero(
+                        parent,
+                        stateRef,
+                        region,
+                        scale,
+                        posOffset,
+                        rotOffset,
+                        attachmentPoints,
+                        name,
+                        desc,
+                        density,
+                        drag,
+                        lift
+                    );
                     
                 case "STRUCTURAL":
                     float fuel = metadata.getFloat("fuelCapacity");
                     float battery = metadata.getFloat("batteryCapacity");
-                    Structural part2 = new Structural(name, desc, density, fuel, battery);
-                    part2.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
-                    return part2;
+                    return new Structural(
+                        parent,
+                        stateRef,
+                        region,
+                        scale,
+                        posOffset,
+                        rotOffset,
+                        attachmentPoints,
+                        name,
+                        desc,
+                        density,
+                        fuel,
+                        battery
+                    );
                     
                 case "THRUSTER":
                     float power = metadata.getFloat("power");
                     float cone = metadata.getFloat("cone");
                     float usage = metadata.getFloat("fuelUsage");
-                    Thruster part3 = new Thruster(name, desc, density, power, cone, usage, rotOffset);
-                    part3.create(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
-                    return part3;
+                    return new Thruster(
+                        parent,
+                        stateRef,
+                        region,
+                        scale,
+                        posOffset,
+                        rotOffset,
+                        attachmentPoints,
+                        name,
+                        desc,
+                        density,
+                        power,
+                        cone,
+                        usage
+                    );
                     
                 case "RCSPORT":
                     float rcspower = metadata.getFloat("power");
@@ -381,7 +397,7 @@ public class ShipPart extends Entity {
                         parent,
                         stateRef,
                         region,
-                        size,
+                        scale,
                         posOffset,
                         rotOffset,
                         attachmentPoints,
@@ -400,18 +416,17 @@ public class ShipPart extends Entity {
         return null;
     }
     
-    public static ShipPart spawn(Assets manager, PartManager partManager, String type, String id, Body parent, ShipState stateRef, Vector2 posOffset, float rotOffset){
-        ShipPart p = ShipPart.fromJSON(manager, partManager.get(type, id), parent, stateRef, posOffset, rotOffset);
+    public static ShipPart spawn(final App game, String type, String id, Body parent, ShipState stateRef, Vector2 posOffset, float rotOffset){
+        ShipPart p = ShipPart.fromJSON(game, game.partManager.get(type, id), parent, stateRef, posOffset, rotOffset);
         p.partType = type;
         p.partId = id;
         return p;
     }
 
-    public static ShipPart unserialize(Assets manager, PartManager partManager, Body body, ShipState stateRef, JSONObject data){
+    public static ShipPart unserialize(final App game, Body body, ShipState stateRef, JSONObject data){
         // Recursively builds the object from serialized data
         ShipPart p = ShipPart.spawn(
-            manager,
-            partManager,
+            game,
             data.getString("type"),
             data.getString("id"),
             body,
@@ -434,7 +449,7 @@ public class ShipPart extends Entity {
         for(int i = 0; i < attachments.length(); i++){
             JSONObject partData = attachments.getJSONObject(i).getJSONObject("partData");
             Attachment a = Attachment.unserialize(p, attachments.getJSONObject(i).getJSONObject("attachData"));
-            a.child = ShipPart.unserialize(manager, partManager, body, stateRef, partData);
+            a.child = ShipPart.unserialize(game, body, stateRef, partData);
 
             p.attachPart(a.child, a.childAttachmentPoint, a.thisAttachmentPoint);
         }

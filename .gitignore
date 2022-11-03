@@ -1,5 +1,7 @@
 *.code-workspace
 saves/
+textures_packed/
+particles_packed/
 
 ## Java
 

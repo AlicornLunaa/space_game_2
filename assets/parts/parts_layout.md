@@ -11,18 +11,7 @@ The metadata field depends on the type of part it is.
     "type": "PART_TYPE",
     "name": "PART_NAME",
     "desc": "PART_DESCRIPTION",
-    "texture": "PART_TEXTURE_ATLAS",
-    "uv": {
-        "x": 0,
-        "y": 0,
-        "width": 16,
-        "height": 16
-    },
-    "scale": {
-        "width": 16,
-        "height": 16,
-        "scale": 1
-    },
+    "scale": 1,
     "density": 0.1,
     "attachmentPoints": [
         {"x": 8, "y": 0}

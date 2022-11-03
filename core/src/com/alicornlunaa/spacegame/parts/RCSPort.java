@@ -25,8 +25,8 @@ public class RCSPort extends ShipPart {
     private float fuelUsage;
 
     // Constructors
-    public RCSPort(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float denstiy, float power, float fuelUsage){
-        super(parent, stateRef, region, size, pos, rot, attachmentPoints);
+    public RCSPort(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float denstiy, float power, float fuelUsage){
+        super(parent, stateRef, region, scale, pos, rot, attachmentPoints);
 
         this.name = name;
         this.description = description;

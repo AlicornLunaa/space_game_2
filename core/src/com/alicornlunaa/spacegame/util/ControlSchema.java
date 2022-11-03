@@ -66,13 +66,13 @@ public class ControlSchema {
 
         try {
             JSONObject obj = new JSONObject(file.readString());
-            SHIP_TRANSLATE_UP = obj.getInt("MOVE_FORWARD");
-            SHIP_TRANSLATE_DOWN = obj.getInt("MOVE_BACKWARD");
-            SHIP_TRANSLATE_LEFT = obj.getInt("MOVE_LEFT");
-            SHIP_TRANSLATE_RIGHT = obj.getInt("MOVE_RIGHT");
+            SHIP_TRANSLATE_UP = obj.getInt("SHIP_TRANSLATE_UP");
+            SHIP_TRANSLATE_DOWN = obj.getInt("SHIP_TRANSLATE_DOWN");
+            SHIP_TRANSLATE_LEFT = obj.getInt("SHIP_TRANSLATE_LEFT");
+            SHIP_TRANSLATE_RIGHT = obj.getInt("SHIP_TRANSLATE_RIGHT");
 
-            SHIP_ROLL_LEFT = obj.getInt("ROLL_LEFT");
-            SHIP_ROLL_RIGHT = obj.getInt("ROLL_RIGHT");
+            SHIP_ROLL_LEFT = obj.getInt("SHIP_ROLL_LEFT");
+            SHIP_ROLL_RIGHT = obj.getInt("SHIP_ROLL_RIGHT");
             
             GUI_SCALE = obj.getInt("GUI_SCALE");
         } catch(GdxRuntimeException|JSONException e){

@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.parts.ShipPart;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.states.ShipState;
-import com.alicornlunaa.spacegame.util.Assets;
-import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -27,17 +26,14 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 public class Ship extends Entity {
     
     // Variables
+    private final App game;
     private Body body;
     private ShipPart rootPart = null;
     public ShipState state = new ShipState(); // Ship controls and stuff
 
-    private Assets manager;
-    private PartManager partManager;
-
     // Constructor
-    public Ship(Assets manager, PartManager partManager, World world, float x, float y, float rotation){
-        this.manager = manager;
-        this.partManager = partManager;
+    public Ship(final App game, World world, float x, float y, float rotation){
+        this.game = game;
 
         BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
@@ -48,9 +44,9 @@ public class Ship extends Entity {
         setPosition(x, y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
-        rootPart = ShipPart.spawn(manager, partManager, "AERO", "MED_CMD_POD", body, state, new Vector2(0, 0), 0.f);
-        ShipPart fuselage = rootPart.attachPart(ShipPart.spawn(manager, partManager, "STRUCTURAL", "BSC_FUSELAGE", body, state, new Vector2(0, 0), 0.f), 1, 0);
-        fuselage.attachPart(ShipPart.spawn(manager, partManager, "THRUSTER", "BSC_THRUSTER", body, state, new Vector2(0, 0), 0.f), 0, 0);
+        rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(0, 0), 0.f);
+        ShipPart fuselage = rootPart.attachPart(ShipPart.spawn(game, "STRUCTURAL", "BSC_FUSELAGE", body, state, new Vector2(0, 0), 0.f), 1, 0);
+        fuselage.attachPart(ShipPart.spawn(game, "THRUSTER", "BSC_THRUSTER", body, state, new Vector2(0, 0), 0.f), 0, 0);
         assemble();
     }
 
@@ -208,7 +204,7 @@ public class Ship extends Entity {
 
             // Load body data
             JSONObject root = data.getJSONObject("rootPart");
-            rootPart = ShipPart.unserialize(manager, partManager, body, state, root);
+            rootPart = ShipPart.unserialize(game, body, state, root);
             assemble();
 
             return true;

@@ -52,8 +52,7 @@ public class ShipEditorPanel extends Stage {
 
         world = new World(new Vector2(0, 0), true);
         rootShip = new Ship(
-            game.manager,
-            game.partManager,
+            game,
             world,
             0,
             0,

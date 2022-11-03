@@ -15,15 +15,8 @@ public class Structural extends ShipPart {
     private float batteryCapacity;
 
     // Constructor
-    protected Structural(String name, String desc, float density, float fuelCapacity, float batteryCapacity){
-        this.name = name;
-        this.description = desc;
-        this.fuelCapacity = fuelCapacity;
-        this.batteryCapacity = batteryCapacity;
-    }
-
-    public Structural(Body parent, ShipState stateRef, TextureRegion region, Vector2 size, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float fuelCapacity, float batteryCapacity){
-        super(parent, stateRef, region, size, posOffset, rotOffset, attachmentPoints);
+    public Structural(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float fuelCapacity, float batteryCapacity){
+        super(parent, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
 
         this.name = name;
         this.description = description;

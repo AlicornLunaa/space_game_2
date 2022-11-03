@@ -3,19 +3,8 @@
         "id": "BSC_THRUSTER",
         "type": "THRUSTER",
         "name": "Basic Thruster",
-        "desc": "Ol' reliable with its 10 degrees if cone angle!",
-        "texture": "textures/thruster_atlas.png",
-        "uv": {
-            "x": 0,
-            "y": 0,
-            "width": 14,
-            "height": 15
-        },
-        "scale": {
-            "width": 14,
-            "height": 15,
-            "scale": 1
-        },
+        "desc": "Ol' reliable with its 20 degrees if cone angle!",
+        "scale": 1,
         "density": 0.1,
         "attachmentPoints": [
             {"x": 0, "y": 7.5}

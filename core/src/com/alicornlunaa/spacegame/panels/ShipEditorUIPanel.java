@@ -7,7 +7,6 @@ import org.json.JSONObject;
 
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -117,13 +116,9 @@ public class ShipEditorUIPanel extends Stage {
 
                 // Each entry is a category
                 JSONObject btnData = game.partManager.get(entry, objKey);
-                final TextureRegion region = new TextureRegion(
-                    game.manager.get(game.partManager.get(entry, objKey).getString("texture"), Texture.class),
-                    btnData.getJSONObject("uv").getInt("x"),
-                    btnData.getJSONObject("uv").getInt("y"),
-                    btnData.getJSONObject("uv").getInt("width"),
-                    btnData.getJSONObject("uv").getInt("height")
-                );
+                String type = btnData.getString("type");
+                String id = btnData.getString("id");
+                final TextureRegion region = game.atlas.findRegion(String.format("parts/%s/%s",type.toLowerCase(), id.toLowerCase()));
                 TextureRegionDrawable texture = new TextureRegionDrawable(region);
                 texture.setMinSize(32 * ((float)region.getRegionWidth() / (float)region.getRegionHeight()), 32);
                 ImageButton btn = new ImageButton(texture);
@@ -136,8 +131,7 @@ public class ShipEditorUIPanel extends Stage {
 
                         ui.selectedPart = objKey;
                         editor.ghostPart = ShipPart.spawn(
-                            game.manager,
-                            game.partManager,
+                            game,
                             ui.selectedCategory,
                             ui.selectedPart,
                             editor.ghostBody,

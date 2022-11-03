@@ -9,6 +9,7 @@ import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -25,6 +26,8 @@ public class App extends Game {
 
 	public boolean loaded = false;
 	
+	public TextureAtlas atlas;
+	public TextureAtlas particleAtlas;
 	public SpriteBatch spriteBatch;
 	public ShapeRenderer shapeRenderer;
 	
@@ -32,7 +35,7 @@ public class App extends Game {
 	@Override
 	public void create(){
 		// Load files and settings
-		ControlSchema.fromFile("./saves/settings/spacegame_controls.json");
+		ControlSchema.fromFile("./saves/settings/controls.json");
 
 		manager = new Assets();
 
@@ -59,6 +62,8 @@ public class App extends Game {
 				// Finish loading by removing the loading screen
 				((LoadingScene)this.getScreen()).progressBar.setValue(1);
 
+				atlas = manager.get("textures_packed/textures.atlas", TextureAtlas.class);
+				particleAtlas = manager.get("particles_packed/particles.atlas", TextureAtlas.class);
 				loaded = true;
 				System.out.println("Assets loaded");
 
