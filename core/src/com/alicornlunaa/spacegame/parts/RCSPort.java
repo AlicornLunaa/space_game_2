@@ -22,6 +22,7 @@ public class RCSPort extends ShipPart {
     private String description;
     private float power;
     private float fuelUsage;
+    
 
     // Constructors
     protected RCSPort(String name, String description, float density, float power, float fuelUsage){
@@ -43,9 +44,29 @@ public class RCSPort extends ShipPart {
     }
 
     // Functions
+    public int getSignAtPos(){
+        Vector2 center = parent.getLocalCenter();
+        Vector2 posOfCenter = new Vector2(getX() - center.x, getY() - center.y);
+        float tanVal = (float)Math.atan(posOfCenter.y / posOfCenter.x);
+        return Math.round(Math.abs(tanVal) / tanVal);
+    }
+
+    public void thrust(float delta, float direction){
+        if(direction <= 0) return; // Cant thrust negative
+    
+        Vector2 portPos = new Vector2(getX(), getY()).rotateDeg((float)Math.toDegrees(parent.getAngle()) + getRotation()).add(parent.getPosition());
+        Vector2 dir = new Vector2(1, 0).rotateDeg((float)Math.toDegrees((parent.getAngle()) + getRotation()) * getScaleX()).scl(-getScaleX(), -getScaleY());
+        
+        parent.applyForce(dir.scl(power * 2.f).add(portPos), portPos, true);
+    }
+
     @Override
     public void act(float delta){
         super.act(delta);
+
+        if(stateRef.rcs){
+            thrust(delta, getSignAtPos() * stateRef.roll);
+        }
     }
 
     @Override

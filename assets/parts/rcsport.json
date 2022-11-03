@@ -21,7 +21,7 @@
             {"x": 1, "y": 0}
         ],
         "metadata": {
-            "power": 100,
+            "power": 5000,
             "fuelUsage": 0.1
         }
     }
