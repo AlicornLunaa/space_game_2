@@ -18,7 +18,7 @@
         },
         "density": 0.1,
         "attachmentPoints": [
-            {"x": 0, "y": -8}
+            {"x": 0, "y": -7}
         ],
         "metadata": {
             "drag": 1,
@@ -44,7 +44,7 @@
         },
         "density": 0.1,
         "attachmentPoints": [
-            {"x": 8, "y": 0}
+            {"x": 0, "y": -7}
         ],
         "metadata": {
             "drag": 1,
@@ -70,7 +70,7 @@
         },
         "density": 0.1,
         "attachmentPoints": [
-            {"x": -8, "y": 0}
+            {"x": -5.5, "y": 0}
         ],
         "metadata": {
             "drag": 0.4,

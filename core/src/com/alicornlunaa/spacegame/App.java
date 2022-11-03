@@ -37,6 +37,7 @@ public class App extends Game {
 		partManager.load("parts/aero.json");
 		partManager.load("parts/structural.json");
 		partManager.load("parts/thrusters.json");
+		partManager.load("parts/rcsport.json");
 
 		skin = new Skin(Gdx.files.internal("skins/default/uiskin.json"));
 

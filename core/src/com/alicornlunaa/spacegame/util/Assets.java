@@ -15,5 +15,6 @@ public class Assets extends AssetManager {
         load("textures/aero_atlas.png", Texture.class);
         load("textures/structural_atlas.png", Texture.class);
         load("textures/thruster_atlas.png", Texture.class);
+        load("textures/rcsport_atlas.png", Texture.class);
     }
 }

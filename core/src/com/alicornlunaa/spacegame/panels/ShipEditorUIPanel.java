@@ -123,6 +123,7 @@ public class ShipEditorUIPanel extends Stage {
                     btnData.getJSONObject("uv").getInt("height")
                 );
                 TextureRegionDrawable texture = new TextureRegionDrawable(region);
+                texture.setMinSize(32 * ((float)region.getRegionWidth() / (float)region.getRegionHeight()), 32);
                 ImageButton btn = new ImageButton(texture);
 
                 btn.addListener(new ChangeListener(){
@@ -144,7 +145,6 @@ public class ShipEditorUIPanel extends Stage {
                         editor.ghostPart.drawPoints(true);
                     }
                 });
-
                 ((HorizontalGroup)partsVertical.getChild(count / 3)).addActor(btn);
                 count++;
             }

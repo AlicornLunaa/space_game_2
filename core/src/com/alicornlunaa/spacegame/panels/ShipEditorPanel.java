@@ -262,7 +262,7 @@ public class ShipEditorPanel extends Stage {
                 game.shapeRenderer.circle(
                     attachmentPoint.x - selectedAttachment.getPos().x,
                     attachmentPoint.y - selectedAttachment.getPos().y,
-                    4
+                    2
                 );
                 game.shapeRenderer.end();
             }

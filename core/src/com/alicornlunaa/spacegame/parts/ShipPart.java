@@ -156,8 +156,8 @@ public class ShipPart extends Entity {
         );
 
         ((PolygonShape)target.getShape()).setAsBox(
-            getWidth() / 2.f,
-            getHeight() / 2.f,
+            target.getWidth() / 2.f,
+            target.getHeight() / 2.f,
             new Vector2(
                 getX() + aPosition.x - tPosition.x,
                 getY() + aPosition.y - tPosition.y
@@ -260,7 +260,7 @@ public class ShipPart extends Entity {
 
             for(Attachment a : attachments){
                 shapeRenderer.setColor(a.child == null && !a.inUse ? Color.GREEN : Color.RED);
-                shapeRenderer.circle(a.position.x, a.position.y, 2);
+                shapeRenderer.circle(a.position.x, a.position.y, 1);
             }
 
             shapeRenderer.end();
@@ -372,6 +372,13 @@ public class ShipPart extends Entity {
                     Thruster part3 = new Thruster(name, desc, density, power, cone, usage, rotOffset);
                     part3.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
                     return part3;
+                    
+                case "RCSPORT":
+                    float rcspower = metadata.getFloat("power");
+                    float rcsusage = metadata.getFloat("fuelUsage");
+                    RCSPort part4 = new RCSPort(name, desc, density, rcspower, rcsusage);
+                    part4.create(parent, region, size, posOffset, rotOffset, attachmentPoints);
+                    return part4;
             }
         } catch(GdxRuntimeException|JSONException e){
             System.out.println("Error reading the part data");

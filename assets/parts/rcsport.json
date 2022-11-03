@@ -1,0 +1,28 @@
+[
+    {
+        "id": "BSC_RCS_PORT",
+        "type": "RCSPORT",
+        "name": "Basic RCS Port",
+        "desc": "Run-of-the-mill RCS port for all your locomotive needs",
+        "texture": "textures/rcsport_atlas.png",
+        "uv": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 5
+        },
+        "scale": {
+            "width": 2,
+            "height": 5,
+            "scale": 1
+        },
+        "density": 0.01,
+        "attachmentPoints": [
+            {"x": 1, "y": 0}
+        ],
+        "metadata": {
+            "power": 100,
+            "fuelUsage": 0.1
+        }
+    }
+]
