@@ -208,9 +208,7 @@ public class ShipPart extends Entity {
     public boolean getFlipY(){ return partFlipY; }
 
     public ShipPart hit(Vector2 pos, Matrix3 transform){
-        transform.mul(getTransform());
-
-        Vector2 local = new Vector2(pos).mul(new Matrix3(transform).inv());
+        Vector2 local = new Vector2(pos).mul(new Matrix3(transform).mul(getTransform()).inv());
         ShipPart part = (ShipPart)hit(local.x + getOriginX(), local.y + getOriginY(), false);
 
         // This part was not hit
