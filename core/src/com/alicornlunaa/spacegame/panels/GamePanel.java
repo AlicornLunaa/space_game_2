@@ -48,6 +48,10 @@ public class GamePanel extends Stage {
                 } else if(keycode == ControlSchema.SHIP_TOGGLE_SAS){
                     ship.state.sas = !ship.state.sas;
                     return true;
+                } else if(keycode == ControlSchema.SHIP_FULL_THROTTLE){
+                    ship.state.throttle = 1;
+                } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
+                    ship.state.throttle = 0;
                 }
 
                 return false;

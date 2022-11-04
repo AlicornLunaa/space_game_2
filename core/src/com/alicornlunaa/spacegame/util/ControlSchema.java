@@ -24,6 +24,8 @@ public class ControlSchema {
     public static int SHIP_ROLL_RIGHT = Keys.E;
     public static int SHIP_INCREASE_THROTTLE = Keys.SHIFT_LEFT;
     public static int SHIP_DECREASE_THROTTLE = Keys.CONTROL_LEFT;
+    public static int SHIP_FULL_THROTTLE = Keys.Z;
+    public static int SHIP_NO_THROTTLE = Keys.X;
     public static int SHIP_TOGGLE_RCS = Keys.R;
     public static int SHIP_TOGGLE_SAS = Keys.T;
 
