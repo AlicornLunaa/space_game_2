@@ -44,10 +44,7 @@ public class Ship extends Entity {
         setPosition(x, y);
         setRotation(body.getAngle() * (float)(180.f / Math.PI));
 
-        rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(0, 0), 0.f);
-        ShipPart fuselage = rootPart.attachPart(ShipPart.spawn(game, "STRUCTURAL", "BSC_FUSELAGE", body, state, new Vector2(0, 0), 0.f), 1, 0);
-        fuselage.attachPart(ShipPart.spawn(game, "THRUSTER", "BSC_THRUSTER", body, state, new Vector2(0, 0), 0.f), 0, 0);
-        assemble();
+        rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(), 0.0f);
     }
 
     // Functions
@@ -71,12 +68,16 @@ public class Ship extends Entity {
             body.destroyFixture(f);
         }
 
+        if(rootPart == null) return;
+
         assemble(rootPart);
     }
 
     public ShipPart getRoot(){ return rootPart; }
 
     private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
+        if(head == null) return;
+
         for(ShipPart.Attachment a : head.getAttachments()){
             Vector2 pos = head.localToWorld(new Vector2(a.getPos()));
 
@@ -91,6 +92,8 @@ public class Ship extends Entity {
     
     public Attachment getClosestAttachment(Vector2 point, float radius){
         // Wrapper for recursive function
+        if(rootPart == null) return null;
+
         ArrayList<Vector2> positions = new ArrayList<Vector2>();
         ArrayList<Attachment> lAttachments = new ArrayList<Attachment>();
         getPositions(rootPart, positions, lAttachments);
@@ -129,7 +132,11 @@ public class Ship extends Entity {
         }
     }
 
-    public void drawPoints(boolean draw){ drawPoints(rootPart, draw); } // Recursive wrapper
+    public void drawPoints(boolean draw){
+        // Recursive wrapper
+        if(rootPart == null) return;
+        drawPoints(rootPart, draw);
+    }
 
     public ShipPart getPartClicked(Vector2 pos){
         return rootPart.hit(pos, getTransform());
@@ -206,6 +213,8 @@ public class Ship extends Entity {
             JSONObject root = data.getJSONObject("rootPart");
             rootPart = ShipPart.unserialize(game, body, state, root);
             assemble();
+
+            System.out.printf("Ship %s loaded\n", path);
 
             return true;
         } catch (GdxRuntimeException|JSONException e){

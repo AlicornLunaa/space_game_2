@@ -43,6 +43,10 @@ public class RCSPort extends ShipPart {
         effect.setPosition(0, 0);
         effect.scaleEffect(initial_scale);
         effect.start();
+        
+        effect.scaleEffect(1 / this.scale);
+        this.scale = 0.001f;
+        effect.scaleEffect(this.scale);
     }
 
     // Functions

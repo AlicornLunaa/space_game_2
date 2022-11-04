@@ -4,17 +4,20 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -28,20 +31,16 @@ public class ConsoleScene implements Screen {
     private TextureRegion region;
 
     public Stage stage;
-
-    // private static Label[] console_log = new Label[12]; // Circular buffer
-    // private static int console_log_length = 0;
-
-    // // Static functions
-    // static private void addLog(App game, Table tbl, String txt){
-    //     if(console_log_length < console_log.length){
-    //         // Append like normal
-    //         console_log[console_log_length] = new Label(txt, game.skin);
-    //         tbl.add(console_log[console_log_length]);
-    //         console_log_length++;
-    //         return;
-    //     }
-    // }
+    public TextField cmdLine;
+    
+    // Private functions
+    private void handleCmd(String cmd){
+        String[] args = cmd.split("\\s+");
+        
+        if(args[0].equals("load_ship")){
+            game.gameScene.gamePanel.ship.load(args[1]);
+        }
+    }
 
     // Constructor
     public ConsoleScene(final App game, final Screen previousScreen, int width, int height){
@@ -69,20 +68,35 @@ public class ConsoleScene implements Screen {
         // tbl.add(text).colspan(15).bottom().minHeight(320).expand();
 
         tbl.row().expand().fillX().maxHeight(32);
-        TextField cmdLine = new TextField("COMMAND", game.skin);
+        cmdLine = new TextField("COMMAND", game.skin);
         tbl.add(cmdLine).bottom().colspan(14);
 
         TextButton sendCmdBtn = new TextButton("Execute", game.skin);
         tbl.add(sendCmdBtn).bottom().colspan(1);
-
         stage.addActor(tbl);
 
+        stage.setKeyboardFocus(cmdLine);
+
         // Inputs
+        sendCmdBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor){
+                TextField field = ((ConsoleScene)game.getScreen()).cmdLine;
+                handleCmd(field.getText());
+                field.setText("");
+            }
+        });
+
         stage.addListener(new InputListener(){
             @Override
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.CONSOLE_OPEN){
                     game.setScreen(previousScreen);
+                    return true;
+                } else if(keycode == Keys.ENTER){
+                    TextField field = ((ConsoleScene)game.getScreen()).cmdLine;
+                    handleCmd(field.getText());
+                    field.setText("");
                     return true;
                 }
 
