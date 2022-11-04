@@ -8,7 +8,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class GameScene implements Screen {
+public class SpaceScene implements Screen {
 
     // Variables
     final App game;
@@ -19,7 +19,7 @@ public class GameScene implements Screen {
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
-    public GameScene(final App game){
+    public SpaceScene(final App game){
         this.game = game;
         
         gamePanel = new GamePanel(game);

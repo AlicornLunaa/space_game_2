@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.ConsoleScene;
-import com.alicornlunaa.spacegame.scenes.GameScene;
+import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.Color;
@@ -95,7 +95,7 @@ public class GameUIPanel extends Stage {
     public void draw(){
         super.draw();
 
-        GamePanel gamePanel = ((GameScene)game.gameScene).gamePanel;
+        GamePanel gamePanel = ((SpaceScene)game.gameScene).gamePanel;
         sasBtn.setColor(gamePanel.ship.state.sas ? Color.GREEN : Color.RED);
         rcsBtn.setColor(gamePanel.ship.state.rcs ? Color.GREEN : Color.RED);
         throttleBar.setValue(gamePanel.ship.state.throttle);
