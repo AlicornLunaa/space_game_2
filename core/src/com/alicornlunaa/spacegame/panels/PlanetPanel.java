@@ -72,7 +72,14 @@ public class PlanetPanel extends Stage {
 
         for(int x = -activationRange; x <= activationRange; x++){
             for(int y = -activationRange; y <= activationRange; y++){
-                planet.getChunk(chunkX + x, chunkY + y).setActive(true);
+                Chunk chunk = planet.getChunk(chunkX + x, chunkY + y);
+
+                if(chunk == null){
+                    // Make a set chunk here
+                    chunk = planet.createChunk(chunkX + x, chunkY + y);
+                }
+                
+                chunk.setActive(true);
             }
         }
     }

@@ -16,6 +16,9 @@ import com.badlogic.gdx.physics.box2d.World;
 public class Planet extends Entity {
 
     // Variables
+    private final App game;
+    private final World world;
+
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private Vector2 cursor = new Vector2();
     private final OpenSimplexNoise noise;
@@ -23,6 +26,10 @@ public class Planet extends Entity {
 
     // Constructor
     public Planet(final App game, final World world){
+        super();
+        this.game = game;
+        this.world = world;
+
         // Create noise function
         noise = new OpenSimplexNoise(seed);
 
@@ -36,6 +43,14 @@ public class Planet extends Entity {
     }
 
     // Functions
+    public Chunk createChunk(int x, int y){
+        Chunk c = new Chunk(game, world, noise, x, y);
+        cursor.set(x, y);
+        map.put(new Vector2(x, y), c);
+
+        return c;
+    }
+
     public Chunk getChunk(int x, int y){
         cursor.set(x, y);
         return map.get(cursor);
