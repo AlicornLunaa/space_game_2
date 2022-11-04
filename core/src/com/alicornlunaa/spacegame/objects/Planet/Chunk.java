@@ -6,6 +6,9 @@ import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 /**
  * Memory management helper class, break the world into chunks
@@ -23,8 +26,10 @@ public class Chunk {
     private boolean active = false; // If the chunk should get updates
     private Tile[][] map;
 
+    private Body body;
+
     // Private functions
-    private void generate(final App game, final Body worldBody, final OpenSimplexNoise noise){
+    private void generate(final App game, final OpenSimplexNoise noise){
         // Generate a tile for each chunk
         for(int x = 0; x < CHUNK_SIZE; x++){
             for(int y = 0; y < CHUNK_SIZE; y++){
@@ -33,20 +38,30 @@ public class Chunk {
                 int blockY = y + (chunkY * CHUNK_SIZE);
 
                 if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) type = TileType.DIRT;
-                if(blockY > 0) continue;
+                if(blockY > 3) continue;
 
-                map[x][y] = new Tile(game, worldBody, blockX, blockY, chunkX, chunkY, type);
+                map[x][y] = new Tile(game, body, blockX, blockY, chunkX, chunkY, type);
             }
         }
     }
 
     // Constructor
-    public Chunk(final App game, final Body worldBody, final OpenSimplexNoise noise, int chunkX, int chunkY){
+    public Chunk(final App game, final World world, final OpenSimplexNoise noise, int chunkX, int chunkY){
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
+        // Create chunk body
+        float wSize = Tile.TILE_SIZE * CHUNK_SIZE;
+
+        BodyDef def = new BodyDef();
+        def.type = BodyType.StaticBody;
+        def.position.set(wSize - wSize, wSize - wSize);
+        body = world.createBody(def);
+        body.setActive(active);
+
+        // Generate tile map
         map = new Tile[CHUNK_SIZE][CHUNK_SIZE];
-        generate(game, worldBody, noise);
+        generate(game, noise);
     }
 
     // Functions

@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.panels.PlanetPanel;
+import com.alicornlunaa.spacegame.panels.PlanetUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -19,6 +20,7 @@ public class PlanetScene implements Screen {
     final App game;
 
     public PlanetPanel planetPanel;
+    public PlanetUIPanel uiPanel;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
@@ -27,10 +29,13 @@ public class PlanetScene implements Screen {
         this.game = game;
 
         planetPanel = new PlanetPanel(game);
+        uiPanel = new PlanetUIPanel(game);
 
         inputs.addProcessor(planetPanel);
+        inputs.addProcessor(uiPanel);
 
         planetPanel.setDebugAll(true);
+        uiPanel.setDebugAll(true);
     }
 
     // Functions
@@ -40,16 +45,16 @@ public class PlanetScene implements Screen {
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
         planetPanel.act(delta);
-        // uiPanel.act(delta);
+        uiPanel.act(delta);
 
         planetPanel.draw();
-        // uiPanel.draw();
+        uiPanel.draw();
     }
 
     @Override
     public void resize(int width, int height) {
         planetPanel.getViewport().update(width, height, true);
-        // uiPanel.getViewport().update(width, height, true);
+        uiPanel.getViewport().update(width, height, true);
     }
 
     @Override
@@ -69,7 +74,7 @@ public class PlanetScene implements Screen {
     @Override
     public void dispose() {
         planetPanel.dispose();
-        // uiPanel.dispose();
+        uiPanel.dispose();
     }
     
 }
