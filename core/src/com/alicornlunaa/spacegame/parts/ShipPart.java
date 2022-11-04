@@ -223,6 +223,7 @@ public class ShipPart extends Entity {
     }
 
     protected void drawEffects(Batch batch, float deltaTime){}
+    protected void drawEffectsUnder(Batch batch, float deltaTime){}
 
     @Override
     public void act(float delta){
@@ -245,6 +246,7 @@ public class ShipPart extends Entity {
         Color bc = batch.getColor();
         Color c = this.getColor();
         batch.setColor(c.r * bc.r, c.g * bc.g, c.b * bc.b, c.a * parentAlpha);
+        drawEffectsUnder(batch, Gdx.graphics.getDeltaTime());
         batch.draw(region, -getOriginX(), -getOriginY());
         drawEffects(batch, Gdx.graphics.getDeltaTime());
         batch.setColor(bc);

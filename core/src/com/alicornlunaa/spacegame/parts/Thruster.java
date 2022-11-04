@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter.ScaledNumericValue;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Thruster extends ShipPart {
@@ -67,15 +67,23 @@ public class Thruster extends ShipPart {
     }
     
     @Override
-    protected void drawEffects(Batch batch, float deltaTime){
-        if(scale <= 0.01f) return;
-        
+    protected void drawEffectsUnder(Batch batch, float deltaTime){
         // Reset angle to draw
         Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
-        
-        Quaternion quat = batchMatrix.getRotation(new Quaternion());
-        Matrix4 rotationMatrix = new Matrix4().rotate(quat);
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(rotationMatrix.inv()));
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(batchMatrix.inv()));
+
+        // Set emitter positions and angles
+        for(ParticleEmitter emitter : effect.getEmitters()){
+            ScaledNumericValue emitterAngle = emitter.getAngle();
+            float a = (rotationOffset + currentAngle + (float)Math.toDegrees(parent.getAngle())) - 90;
+
+            emitterAngle.setHigh(a - 15, a + 15);
+            emitterAngle.setLow(a);
+        }
+
+        // Draw effects
+        Vector3 pos = new Vector3().mul(batchMatrix.inv());
+        effect.setPosition(pos.x, pos.y);
 
         effect.update(deltaTime);
         effect.draw(batch, deltaTime);
@@ -95,14 +103,6 @@ public class Thruster extends ShipPart {
         effect.scaleEffect(1 / scale);
         scale = (stateRef.throttle + 0.01f);
         effect.scaleEffect(scale);
-
-        for(ParticleEmitter emitter : effect.getEmitters()){
-            ScaledNumericValue emitterAngle = emitter.getAngle();
-            float a = (rotationOffset + currentAngle + (float)Math.toDegrees(parent.getAngle())) - 90;
-
-            emitterAngle.setHigh(a - 15, a + 15);
-            emitterAngle.setLow(a);
-        }
     }
 
     @Override
