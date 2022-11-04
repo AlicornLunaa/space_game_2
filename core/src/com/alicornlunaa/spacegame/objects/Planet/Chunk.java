@@ -37,7 +37,7 @@ public class Chunk {
                 int blockX = x + (chunkX * CHUNK_SIZE);
                 int blockY = y + (chunkY * CHUNK_SIZE);
 
-                if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) type = TileType.DIRT;
+                if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) continue;
                 if(blockY > 3) continue;
 
                 map[x][y] = new Tile(game, body, blockX, blockY, chunkX, chunkY, type);
@@ -65,8 +65,8 @@ public class Chunk {
     }
 
     // Functions
-    public Vector2 worldToChunk(Vector2 v){ return new Vector2(v.x % CHUNK_SIZE, v.y % CHUNK_SIZE); }
-    public Vector2 chunkToWorld(Vector2 v){ return new Vector2(v.x + (chunkX * CHUNK_SIZE), v.y + (chunkY * CHUNK_SIZE)); }
+    public Vector2 blockToChunk(Vector2 v){ return new Vector2(v.x % CHUNK_SIZE, v.y % CHUNK_SIZE); }
+    public Vector2 chunkToBlock(Vector2 v){ return new Vector2(v.x + (chunkX * CHUNK_SIZE), v.y + (chunkY * CHUNK_SIZE)); }
     public Tile getTileLocal(int x, int y){ return map[x][y]; }
     public Tile getTile(int x, int y){ return map[x % CHUNK_SIZE][y % CHUNK_SIZE]; }
     public Vector2 getChunkPos(){ return new Vector2(chunkX, chunkY); }
@@ -74,6 +74,8 @@ public class Chunk {
     public void setActive(boolean a){ active = a; }
 
     public void update(float delta){
+        body.setActive(active);
+        
         if(!active) return;
 
         for(Tile[] ySlice : map){
@@ -83,6 +85,8 @@ public class Chunk {
                 tile.update(delta);
             }
         }
+
+        active = false;
     }
 
     public void draw(Batch batch){

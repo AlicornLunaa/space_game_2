@@ -60,6 +60,23 @@ public class PlanetPanel extends Stage {
         });
     }
 
+    // Private functions
+    private void setActiveChunks(){
+        // Get player position, convert it to chunk coordinates
+        Vector2 playerPos = new Vector2(player.getBody().getWorldCenter());
+        float chunkWorldSize = (Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
+
+        int chunkX = (int)Math.ceil(playerPos.x / chunkWorldSize) - 1;
+        int chunkY = (int)Math.ceil(playerPos.y / chunkWorldSize) - 1;
+        int activationRange = 1;
+
+        for(int x = -activationRange; x <= activationRange; x++){
+            for(int y = -activationRange; y <= activationRange; y++){
+                planet.getChunk(chunkX + x, chunkY + y).setActive(true);
+            }
+        }
+    }
+
     // Functions
     public World getWorld(){ return world; }
 
@@ -74,6 +91,7 @@ public class PlanetPanel extends Stage {
             physAccumulator -= Constants.TIME_STEP;
         }
 
+        setActiveChunks();
         for(Chunk chunk : planet.getMap().values()){
             chunk.update(delta);
         }
