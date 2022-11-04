@@ -1,7 +1,9 @@
 package com.alicornlunaa.spacegame;
 
+import com.alicornlunaa.spacegame.objects.Planet;
 import com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene;
+import com.alicornlunaa.spacegame.scenes.PlanetScene;
 import com.alicornlunaa.spacegame.scenes.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -73,7 +75,8 @@ public class App extends Game {
 				// Start new scene
 				gameScene = new SpaceScene(this);
 				editorScene = new EditorScene(this);
-				this.setScreen(gameScene);
+				//! this.setScreen(gameScene);
+				this.setScreen(new PlanetScene(this, new Planet(this)));
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
