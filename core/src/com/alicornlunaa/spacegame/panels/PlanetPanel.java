@@ -1,8 +1,8 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Planet.Chunk;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
-import com.alicornlunaa.spacegame.objects.Planet.Tile;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -21,6 +21,13 @@ public class PlanetPanel extends Stage {
 
     // Functions
     @Override
+    public void act(float delta){
+        for(Chunk chunk : planetRef.getMap().values()){
+            chunk.update(delta);
+        }
+    }
+
+    @Override
     public void draw(){
         super.draw();
 
@@ -30,8 +37,8 @@ public class PlanetPanel extends Stage {
         batch.setProjectionMatrix(getCamera().combined);
         batch.setTransformMatrix(new Matrix4().translate(getWidth() / 2, getHeight() / 2, 0));
 
-        for(Tile tile : planetRef.getMap().values()){
-            tile.draw(batch);
+        for(Chunk chunk : planetRef.getMap().values()){
+            chunk.draw(batch);
         }
 
         batch.end();
