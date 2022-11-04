@@ -6,6 +6,9 @@ import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -46,8 +49,10 @@ public class Tile implements Disposable {
     private int chunkY;
     private TileType type;
 
+    private PolygonShape shape = new PolygonShape();
+
     // Constructor
-    public Tile(App game, int blockX, int blockY, int chunkX, int chunkY, TileType type){
+    public Tile(final App game, final Body worldBody, int blockX, int blockY, int chunkX, int chunkY, TileType type){
         this.blockX = blockX;
         this.blockY = blockY;
         this.chunkX = chunkX;
@@ -55,6 +60,17 @@ public class Tile implements Disposable {
         this.type = type;
 
         sprite = new TextureRegionDrawable(Tile.getTexture(game.atlas, type));
+        
+        shape.setAsBox(
+            TILE_SIZE / 2,
+            TILE_SIZE / 2,
+            new Vector2(
+                blockX * TILE_SIZE + TILE_SIZE / 2,
+                blockY * TILE_SIZE + TILE_SIZE / 2
+            ),
+            0
+        );
+        worldBody.createFixture(shape, 0.0f);
     }
 
     // Functoins

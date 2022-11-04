@@ -3,6 +3,8 @@ package com.alicornlunaa.spacegame.objects;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.states.PlayerState;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -48,6 +50,8 @@ public class Player extends Entity {
     }
 
     // Functions
+    public Body getBody(){ return body; }
+
     @Override
     public void act(float delta){
         super.act(delta);
@@ -63,7 +67,12 @@ public class Player extends Entity {
         setPosition(body.getPosition().x, body.getPosition().y);
         setRotation((float)Math.toDegrees(body.getAngle()));
 
-        idleTexture.draw(batch, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
+        Matrix3 transform = getTransform();
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
+
+        idleTexture.draw(batch, 0, 0, 0, 0, getWidth(), getHeight(), 1, 1, 0);
+        
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 
     @Override

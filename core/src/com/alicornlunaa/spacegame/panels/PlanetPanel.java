@@ -4,38 +4,60 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Chunk;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
+import com.alicornlunaa.spacegame.objects.Planet.Tile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class PlanetPanel extends Stage {
     
     // Variables
-    private final Planet planetRef;
+    private final App game;
 
     private World world;
     private float physAccumulator;
 
+    private Planet planet;
     private Player player;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Constructor
-    public PlanetPanel(final App game, final Planet planetRef){
+    public PlanetPanel(final App game){
         super(new ScreenViewport());
-        this.planetRef = planetRef;
+        this.game = game;
 
         world = new World(new Vector2(), true);
 
-        player = new Player(game, world, getWidth() / 2, getHeight() / 2);
-        this.addActor(player);
+        planet = new Planet(game, world);
+        player = new Player(game, world, 0, 150);
+
+        // Controls
+        this.addListener(new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, int keycode){
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                OrthographicCamera cam = (OrthographicCamera)getCamera();
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 1.5f);
+
+                return true;
+            }
+        });
     }
 
     // Functions
@@ -52,9 +74,16 @@ public class PlanetPanel extends Stage {
             physAccumulator -= Constants.TIME_STEP;
         }
 
-        for(Chunk chunk : planetRef.getMap().values()){
+        for(Chunk chunk : planet.getMap().values()){
             chunk.update(delta);
         }
+
+        player.act(delta);
+
+        // Parent camera to player
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        cam.position.set(player.getBody().getWorldCenter(), 0);
+        cam.update();
 
         // Controls for player
         if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
@@ -81,18 +110,31 @@ public class PlanetPanel extends Stage {
         // Draw every map tile
         Batch batch = getBatch();
         batch.begin();
-        batch.setProjectionMatrix(getCamera().combined);
-        batch.setTransformMatrix(new Matrix4().translate(getWidth() / 2, getHeight() / 2, 0));
 
-        for(Chunk chunk : planetRef.getMap().values()){
+        for(Chunk chunk : planet.getMap().values()){
             chunk.draw(batch);
         }
+
+        player.draw(batch, batch.getColor().a);
 
         batch.end();
 
         // Debug rendering
         if(this.isDebugAll()){
             debug.render(world, this.getCamera().combined);
+
+            // Draw chunk borders
+            game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+            for(Chunk chunk : planet.getMap().values()){
+                Vector2 pos = chunk.getChunkPos();
+                float size = Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+
+                game.shapeRenderer.setColor(chunk.isActive() ? Color.GREEN : Color.GRAY);
+                game.shapeRenderer.rect(pos.x * size, pos.y * size, size, size);
+            }
+            game.shapeRenderer.end();
         }
     }
 

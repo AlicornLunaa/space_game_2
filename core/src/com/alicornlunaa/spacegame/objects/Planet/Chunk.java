@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Planet.Tile.TileType;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 /**
  * Memory management helper class, break the world into chunks
@@ -19,11 +20,11 @@ public class Chunk {
     // Variables
     private int chunkX;
     private int chunkY;
-    private boolean active = true; // If the chunk should get updates
+    private boolean active = false; // If the chunk should get updates
     private Tile[][] map;
 
     // Private functions
-    private void generate(final App game, final OpenSimplexNoise noise){
+    private void generate(final App game, final Body worldBody, final OpenSimplexNoise noise){
         // Generate a tile for each chunk
         for(int x = 0; x < CHUNK_SIZE; x++){
             for(int y = 0; y < CHUNK_SIZE; y++){
@@ -34,26 +35,28 @@ public class Chunk {
                 if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) type = TileType.DIRT;
                 if(blockY > 0) continue;
 
-                map[x][y] = new Tile(game, blockX, blockY, chunkX, chunkY, type);
+                map[x][y] = new Tile(game, worldBody, blockX, blockY, chunkX, chunkY, type);
             }
         }
     }
 
     // Constructor
-    public Chunk(final App game, final OpenSimplexNoise noise, int chunkX, int chunkY){
+    public Chunk(final App game, final Body worldBody, final OpenSimplexNoise noise, int chunkX, int chunkY){
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
         map = new Tile[CHUNK_SIZE][CHUNK_SIZE];
-        generate(game, noise);
+        generate(game, worldBody, noise);
     }
 
     // Functions
     public Vector2 worldToChunk(Vector2 v){ return new Vector2(v.x % CHUNK_SIZE, v.y % CHUNK_SIZE); }
     public Vector2 chunkToWorld(Vector2 v){ return new Vector2(v.x + (chunkX * CHUNK_SIZE), v.y + (chunkY * CHUNK_SIZE)); }
     public Tile getTileLocal(int x, int y){ return map[x][y]; }
-    
     public Tile getTile(int x, int y){ return map[x % CHUNK_SIZE][y % CHUNK_SIZE]; }
+    public Vector2 getChunkPos(){ return new Vector2(chunkX, chunkY); }
+    public boolean isActive(){ return active; }
+    public void setActive(boolean a){ active = a; }
 
     public void update(float delta){
         if(!active) return;
