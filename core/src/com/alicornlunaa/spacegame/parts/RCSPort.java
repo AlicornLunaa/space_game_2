@@ -26,8 +26,8 @@ public class RCSPort extends ShipPart {
     private float power;
     private float fuelUsage;
 
+    private final float initial_scale = 0.14f;
     private float scale = 0.2f;
-
     private PooledEffect effect;
 
     // Constructors
@@ -41,7 +41,7 @@ public class RCSPort extends ShipPart {
         
         effect = game.manager.getEffect("effects/rcs");
         effect.setPosition(0, 0);
-        effect.scaleEffect(0.1f);
+        effect.scaleEffect(initial_scale);
         effect.start();
     }
 
@@ -108,7 +108,7 @@ public class RCSPort extends ShipPart {
             thrust = Math.min(Math.max(thrust, -1), 1);
 
             effect.scaleEffect(1 / scale);
-            scale = -0.2f * (thrust + 0.01f);
+            scale = -initial_scale * (thrust + 0.01f);
             effect.scaleEffect(scale);
         } else {
             effect.scaleEffect(1 / scale);

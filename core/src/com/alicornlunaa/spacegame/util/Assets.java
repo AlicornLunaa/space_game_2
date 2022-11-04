@@ -30,13 +30,14 @@ public class Assets extends AssetManager {
     // Functions
     private void addEffect(App game, String name){
         ParticleEffect effect = new ParticleEffect();
-        effect.load(Gdx.files.internal("effects/rcs"), game.particleAtlas);
+        effect.load(Gdx.files.internal(name), game.particleAtlas);
         effects.put(name, new ParticleEffectPool(effect, 1, 32));
     }
 
     public void initEffects(App game){
         // Load effects
         addEffect(game, "effects/rcs");
+        addEffect(game, "effects/rocket");
     }
 
     public PooledEffect getEffect(String name){

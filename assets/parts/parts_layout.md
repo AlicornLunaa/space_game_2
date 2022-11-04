@@ -25,7 +25,8 @@ The metadata field depends on the type of part it is.
 "metadata": {
     "power": 1000,
     "cone": 10,
-    "fuelUsage": 1
+    "fuelUsage": 1,
+    "effect": "effects/rocket"
 }
 ```
 

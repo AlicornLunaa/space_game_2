@@ -378,7 +378,9 @@ public class ShipPart extends Entity {
                     float power = metadata.getFloat("power");
                     float cone = metadata.getFloat("cone");
                     float usage = metadata.getFloat("fuelUsage");
+                    String effect = metadata.getString("effect");
                     return new Thruster(
+                        game,
                         parent,
                         stateRef,
                         region,
@@ -391,7 +393,8 @@ public class ShipPart extends Entity {
                         density,
                         power,
                         cone,
-                        usage
+                        usage,
+                        effect
                     );
                     
                 case "RCSPORT":
