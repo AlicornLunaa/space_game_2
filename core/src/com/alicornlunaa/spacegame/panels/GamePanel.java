@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -56,6 +57,14 @@ public class GamePanel extends Stage {
 
                 return false;
             }
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                OrthographicCamera cam = (OrthographicCamera)getCamera();
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 1.5f);
+
+                return true;
+            }
         });
     }
 
@@ -72,6 +81,11 @@ public class GamePanel extends Stage {
             world.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
         }
+
+        // Parent camera to the ship
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        cam.position.set(ship.getBody().getWorldCenter(), 0);
+        cam.update();
 
         // Controls for the ship
         if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){

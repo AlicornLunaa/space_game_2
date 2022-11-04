@@ -75,6 +75,8 @@ public class Ship extends Entity {
 
     public ShipPart getRoot(){ return rootPart; }
 
+    public Body getBody(){ return body; }
+
     private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
         if(head == null) return;
 
