@@ -108,7 +108,7 @@ public class RCSPort extends ShipPart {
             thrust = Math.min(Math.max(thrust, -1), 1);
 
             effect.scaleEffect(1 / scale);
-            scale = -initial_scale * (thrust + 0.01f);
+            scale = -initial_scale * (thrust + 0.001f);
             effect.scaleEffect(scale);
         } else {
             effect.scaleEffect(1 / scale);

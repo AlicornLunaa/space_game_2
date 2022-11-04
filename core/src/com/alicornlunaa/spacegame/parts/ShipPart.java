@@ -240,15 +240,16 @@ public class ShipPart extends Entity {
     public void draw(Batch batch, float parentAlpha){
         Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
         Matrix3 transform = getTransform();
-        
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
 
         Color bc = batch.getColor();
         Color c = this.getColor();
         batch.setColor(c.r * bc.r, c.g * bc.g, c.b * bc.b, c.a * parentAlpha);
+
         drawEffectsUnder(batch, Gdx.graphics.getDeltaTime());
         batch.draw(region, -getOriginX(), -getOriginY());
         drawEffects(batch, Gdx.graphics.getDeltaTime());
+
         batch.setColor(bc);
 
         if(drawAttachPoints){

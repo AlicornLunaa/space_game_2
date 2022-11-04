@@ -53,7 +53,6 @@ public class Thruster extends ShipPart {
     // Functions
     public void setTargetAngle(float angle){
         currentAngle += Math.min(Math.max((angle * coneAngle) - currentAngle, -coneSpeed), coneSpeed);
-        setRotation(rotationOffset + currentAngle);
     }
 
     public void thrust(float delta, float throttle){
@@ -88,7 +87,8 @@ public class Thruster extends ShipPart {
         effect.update(deltaTime);
         effect.draw(batch, deltaTime);
         
-        batch.setTransformMatrix(batchMatrix);
+        // Adjust thruster angle
+        batch.setTransformMatrix(batchMatrix.rotate(0, 0, 1, currentAngle));
     }
 
     @Override
@@ -101,8 +101,14 @@ public class Thruster extends ShipPart {
         this.thrust(delta, stateRef.throttle);
 
         effect.scaleEffect(1 / scale);
-        scale = (stateRef.throttle + 0.01f);
+        scale = (stateRef.throttle + 0.001f);
         effect.scaleEffect(scale);
+    }
+
+    @Override
+    public boolean remove(){
+        effect.free();
+        return super.remove();
     }
 
     @Override
