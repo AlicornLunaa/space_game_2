@@ -18,7 +18,7 @@ public class Tile implements Disposable {
     enum TileType { DIRT, STONE };
 
     // Static
-    public static final float TILE_SIZE = 16;
+    public static final float TILE_SIZE = 4;
     
     private static HashMap<TileType, TextureRegion> blockTextures = new HashMap<>();
     
@@ -45,8 +45,12 @@ public class Tile implements Disposable {
     private TextureRegionDrawable sprite;
     private int blockX;
     private int blockY;
+    
+    @SuppressWarnings("unused")
     private int chunkX;
+    @SuppressWarnings("unused")
     private int chunkY;
+    @SuppressWarnings("unused")
     private TileType type;
 
     private PolygonShape shape = new PolygonShape();

@@ -40,6 +40,7 @@ public class Player extends Entity {
 
         shape.setAsBox(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, new Vector2(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2), 0);
         body.createFixture(shape, 1.0f);
+        body.setFixedRotation(true);
 
         setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
         setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);

@@ -38,9 +38,9 @@ public class PlanetPanel extends Stage {
         super(new ScreenViewport());
         this.game = game;
 
-        world = new World(new Vector2(), true);
+        world = new World(new Vector2(0, -600), true);
 
-        planet = new Planet(game, world);
+        planet = new Planet(game, world, 1000.0f);
         player = new Player(game, world, 0, 150);
 
         // Controls
@@ -61,17 +61,35 @@ public class PlanetPanel extends Stage {
     }
 
     // Private functions
+    private boolean isChunkVisible(Chunk chunk){
+        // Used to cull the chunks not on screen
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        Vector2 chunkPosition = chunk.getChunkPos();
+        float chunkWorldSize = (Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
+
+        int chunkX = (int)Math.ceil(cam.position.x / chunkWorldSize) - 1;
+        int chunkY = (int)Math.ceil(cam.position.y / chunkWorldSize) - 1;
+        int chunksVisible = ((int)Math.ceil((cam.viewportWidth * cam.zoom) / chunkWorldSize) + 1) / 2;
+
+        boolean xMatch = chunkPosition.x > chunkX - chunksVisible - 1 && chunkPosition.x < chunkX + chunksVisible + 1;
+        boolean yMatch = chunkPosition.y > chunkY - chunksVisible - 1 && chunkPosition.y < chunkY + chunksVisible + 1;
+
+        return xMatch && yMatch;
+    }
+
     private void setActiveChunks(){
         // Get player position, convert it to chunk coordinates
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
         Vector2 playerPos = new Vector2(player.getBody().getWorldCenter());
         float chunkWorldSize = (Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
 
         int chunkX = (int)Math.ceil(playerPos.x / chunkWorldSize) - 1;
         int chunkY = (int)Math.ceil(playerPos.y / chunkWorldSize) - 1;
-        int activationRange = 1;
+        int chunksVisible = (int)Math.ceil((cam.viewportWidth * cam.zoom) / chunkWorldSize) + 1;
+        int renderRange = Math.max(chunksVisible, Chunk.RENDER_DISTANCE);
 
-        for(int x = -activationRange; x <= activationRange; x++){
-            for(int y = -activationRange; y <= activationRange; y++){
+        for(int x = -renderRange; x <= renderRange; x++){
+            for(int y = -renderRange; y <= renderRange; y++){
                 Chunk chunk = planet.getChunk(chunkX + x, chunkY + y);
 
                 if(chunk == null){
@@ -79,7 +97,7 @@ public class PlanetPanel extends Stage {
                     chunk = planet.createChunk(chunkX + x, chunkY + y);
                 }
                 
-                chunk.setActive(true);
+                chunk.setActive(Math.abs(x) <= Chunk.ACTIVE_DISTANCE && Math.abs(y) <= Chunk.ACTIVE_DISTANCE);
             }
         }
     }
@@ -137,6 +155,7 @@ public class PlanetPanel extends Stage {
         batch.begin();
 
         for(Chunk chunk : planet.getMap().values()){
+            if(!isChunkVisible(chunk)) continue;
             chunk.draw(batch);
         }
 
@@ -153,6 +172,8 @@ public class PlanetPanel extends Stage {
             game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
             game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
             for(Chunk chunk : planet.getMap().values()){
+                if(!isChunkVisible(chunk)) continue;
+
                 Vector2 pos = chunk.getChunkPos();
                 float size = Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 

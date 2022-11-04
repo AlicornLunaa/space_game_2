@@ -19,16 +19,23 @@ public class Planet extends Entity {
     private final App game;
     private final World world;
 
+    private float size;
+
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private Vector2 cursor = new Vector2();
     private final OpenSimplexNoise noise;
     private final long seed = 123;
 
     // Constructor
-    public Planet(final App game, final World world){
+    public Planet(final App game, final World world, float size){
         super();
         this.game = game;
         this.world = world;
+
+        this.size = size;
+
+        // Update world
+        world.setGravity(new Vector2(0, 600 * getGravityScale()));
 
         // Create noise function
         noise = new OpenSimplexNoise(seed);
@@ -43,6 +50,9 @@ public class Planet extends Entity {
     }
 
     // Functions
+    public float getGravityScale(){ return size / -1000.0f; }
+
+    // Chunking functions
     public Chunk createChunk(int x, int y){
         Chunk c = new Chunk(game, world, noise, x, y);
         cursor.set(x, y);

@@ -19,6 +19,8 @@ public class Chunk {
 
     // Static
     public static final int CHUNK_SIZE = 16; // Block count in a square for a chunk
+    public static final int ACTIVE_DISTANCE = 1; // Chunks to render and generate
+    public static final int RENDER_DISTANCE = 4; // Chunks to render and generate
 
     // Variables
     private int chunkX;
