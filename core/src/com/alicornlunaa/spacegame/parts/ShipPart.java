@@ -244,7 +244,7 @@ public class ShipPart extends Entity {
 
         Color bc = batch.getColor();
         Color c = this.getColor();
-        batch.setColor(c.r * bc.r, c.g * bc.g, c.b * bc.b, c.a * parentAlpha);
+        batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
 
         drawEffectsUnder(batch, Gdx.graphics.getDeltaTime());
         batch.draw(region, -getOriginX(), -getOriginY());
@@ -272,6 +272,17 @@ public class ShipPart extends Entity {
         for(Attachment attachment : getAttachments()){
             if(attachment.getChild() != null){
                 attachment.getChild().draw(batch, parentAlpha);
+            }
+        }
+    }
+
+    @Override
+    public void setColor(float r, float g, float b, float a){
+        super.setColor(r, g, b, a);
+
+        for(Attachment attachment : getAttachments()){
+            if(attachment.getChild() != null){
+                attachment.getChild().setColor(r, g, b, a);
             }
         }
     }

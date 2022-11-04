@@ -37,6 +37,7 @@ public class ShipEditorPanel extends Stage {
     public Body ghostBody; // Required for making a part w/o attaching it
     public Ship rootShip; // The ship being built
     public ShipPart ghostPart;
+    public ShipPart hoveredPart;
     public ShipState ghostState = new ShipState();
     public Vector2 camOffset = new Vector2();
 
@@ -211,9 +212,11 @@ public class ShipEditorPanel extends Stage {
     public void act(float delta){
         super.act(delta);
 
+        Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        ShipPart part = rootShip.getPartClicked(cursor);
+
         // Find the snap point for attachments
         if(ghostPart != null){
-            Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
             this.findSnapAttachment();
 
             if(selectedAttachment != null){
@@ -221,6 +224,18 @@ public class ShipEditorPanel extends Stage {
             } else {
                 ghostPart.setPosition(cursor.x, cursor.y);
             }
+        }
+
+        // Highlight selected parts light green
+        if(part != null && part != hoveredPart){
+            if(hoveredPart != null)
+                hoveredPart.setColor(1, 1, 1, 1);
+
+            part.setColor(0.7f, 1, 0.7f, 1);
+            hoveredPart = part;
+        } else if(part == null && hoveredPart != null) {
+            hoveredPart.setColor(1, 1, 1, 1);
+            hoveredPart = null;
         }
 
         // Center ship
