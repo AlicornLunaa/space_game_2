@@ -17,7 +17,7 @@ public class Ground extends Entity {
     private Body body;
     private PolygonShape shape;
 
-    public Ground(App game, World world, float x, float y, float w, float h){
+    public Ground(final App game, World world, float x, float y, float w, float h){
         this.game = game;
 
         BodyDef def = new BodyDef();

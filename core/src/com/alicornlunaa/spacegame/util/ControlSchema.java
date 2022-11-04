@@ -29,6 +29,11 @@ public class ControlSchema {
     public static int SHIP_TOGGLE_RCS = Keys.R;
     public static int SHIP_TOGGLE_SAS = Keys.T;
 
+    public static int PLAYER_UP = Keys.W;
+    public static int PLAYER_DOWN = Keys.S;
+    public static int PLAYER_LEFT = Keys.A;
+    public static int PLAYER_RIGHT = Keys.D;
+
     public static int EDITOR_ROTATE = Keys.R;
     public static int EDITOR_FLIP_X = Keys.F;
     public static int EDITOR_FLIP_Y = Keys.C;

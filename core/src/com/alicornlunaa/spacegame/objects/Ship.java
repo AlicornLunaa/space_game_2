@@ -241,9 +241,6 @@ public class Ship extends Entity {
     public void act(float delta){
         super.act(delta);
 
-        setPosition(body.getPosition().x, body.getPosition().y);
-        setRotation(body.getAngle() * (float)(180.f / Math.PI));
-
         if(state.sas){
             computeSAS();
         } else {
@@ -257,6 +254,9 @@ public class Ship extends Entity {
 
     @Override
     public void draw(Batch batch, float parentAlpha){
+        setPosition(body.getPosition().x, body.getPosition().y);
+        setRotation(body.getAngle() * (float)(180.f / Math.PI));
+        
         Matrix3 transform = getTransform();
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
 
