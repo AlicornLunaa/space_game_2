@@ -46,7 +46,7 @@ public class Entity extends Actor implements Disposable {
         // Get matrix
         Matrix3 trans = new Matrix3();
         trans.idt();
-        trans.translate(getX(), getY());
+        trans.translate(getX() - getOriginX(), getY() - getOriginY());
         trans.rotate(getRotation());
         trans.scale(getScaleX(), getScaleY());
         return trans;
@@ -56,7 +56,7 @@ public class Entity extends Actor implements Disposable {
      * @return A new vector for this position
      */
     public Vector2 getPosition(){ return new Vector2(getX(), getY()); }
-    public void setPosition(Vector2 v){ setX(v.x); setY(v.y); }
+    public void setPosition(Vector2 v){ setPosition(v.x, v.y); }
 
     public Vector2 localToWorld(Vector2 v){ return v.mul(getTransform()); }
     public Vector2 worldToLocal(Vector2 v){ return v.mul(getTransform().inv()); }

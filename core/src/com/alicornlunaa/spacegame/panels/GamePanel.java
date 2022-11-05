@@ -36,12 +36,11 @@ public class GamePanel extends Stage {
 
         world = new World(new Vector2(), true);
         
-
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
 
-        planet = new SpacePlanet(game, new PlanetState(), -2000, 0);
+        planet = new SpacePlanet(game, world, new PlanetState(), -2000, 0);
         this.addActor(planet);
 
         // Controls
@@ -87,7 +86,7 @@ public class GamePanel extends Stage {
             physAccumulator -= Constants.TIME_STEP;
         }
 
-        planet.applyGravity(ship.getBody());
+        planet.applyGravity(delta, ship.getBody());
 
         // Parent camera to the ship
         OrthographicCamera cam = (OrthographicCamera)getCamera();

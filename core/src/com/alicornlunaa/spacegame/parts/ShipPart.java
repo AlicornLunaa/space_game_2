@@ -253,7 +253,7 @@ public class ShipPart extends Entity {
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
 
         drawEffectsUnder(batch, Gdx.graphics.getDeltaTime());
-        batch.draw(region, -getOriginX(), -getOriginY());
+        batch.draw(region, 0, 0);
         drawEffects(batch, Gdx.graphics.getDeltaTime());
 
         batch.setColor(bc);

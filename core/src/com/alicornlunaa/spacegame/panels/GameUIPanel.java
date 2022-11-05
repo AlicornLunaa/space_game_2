@@ -27,6 +27,7 @@ public class GameUIPanel extends Stage {
     private ProgressBar throttleBar;
 
     private Label positionLabel;
+    private Label velocityLabel;
 
     // Constructor
     public GameUIPanel(final App game){
@@ -42,6 +43,9 @@ public class GameUIPanel extends Stage {
         positionLabel = new Label("Pos: N/a", game.skin);
         positionLabel.setPosition(20, getHeight() - 60);
         this.addActor(positionLabel);
+        velocityLabel = new Label("Vel: N/a", game.skin);
+        velocityLabel.setPosition(20, getHeight() - 90);
+        this.addActor(velocityLabel);
 
         // Icon elements
         tbl.row().expandX().fillX().pad(10).right();
@@ -109,6 +113,7 @@ public class GameUIPanel extends Stage {
         throttleBar.setValue(gamePanel.ship.state.throttle);
 
         positionLabel.setText(gamePanel.ship.getBody().getWorldCenter().toString());
+        velocityLabel.setText(gamePanel.ship.getBody().getLinearVelocity().toString());
     }
 
     @Override

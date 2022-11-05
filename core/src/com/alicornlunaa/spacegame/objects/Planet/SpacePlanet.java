@@ -9,17 +9,23 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class SpacePlanet extends Entity {
 
     // Static
-    public final static float GRAVITY_CONSTANT = 1000000.0f;
+    public final static float GRAVITY_CONSTANT = 8000.0f;
 
     // Variables
     private PlanetState stateRef;
+    private CircleShape shape = new CircleShape();
 
     private final OpenSimplexNoise noise;
     
@@ -54,45 +60,50 @@ public class SpacePlanet extends Entity {
     }
 
     // Constructors
-    public SpacePlanet(final App game, PlanetState state, float x, float y){
+    public SpacePlanet(final App game, final World world, PlanetState state, float x, float y){
         stateRef = state;
 
-        setOrigin(state.radius, state.radius);
-        setBounds(x, y, state.radius * 2, state.radius * 2);
+        setSize(state.radius * 2, state.radius * 2);
+        setOrigin(getWidth() / 2, getHeight() / 2);
+
+        BodyDef def = new BodyDef();
+        def.type = BodyType.StaticBody;
+        def.position.set(0, 0);
+        setBody(world.createBody(def));
+        setPosition(x, y);
+
+        shape.setRadius(state.radius / getPhysScale());
+        shape.setPosition(new Vector2(0, 0));
+        body.createFixture(shape, 1.0f);
 
         noise = new OpenSimplexNoise(state.seed);
         generateSprite();
     }
 
     // Functions
-    public void applyGravity(Body body){
+    public void applyGravity(float delta, Body b){
         // Newtons gravitational law: F = G((m1 * m2) / r^2)
-        Vector2 dir = new Vector2(getX() + getOriginX(), getY() + getOriginY()).sub(body.getWorldCenter());
+        Vector2 dir = body.getWorldCenter().cpy().sub(b.getWorldCenter());
         float radSqr = dir.len2();
-        float f = GRAVITY_CONSTANT * ((body.getMass() * stateRef.radius) / radSqr);
+        float f = GRAVITY_CONSTANT * ((b.getMass() * stateRef.radius) / radSqr);
 
-        body.applyForceToCenter(dir.nor().scl(f), true);
+        b.applyForceToCenter(dir.nor().scl(f * (1 / getPhysScale()) * delta), true);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        sprite.draw(
-            batch,
-            getX(),
-            getY(),
-            getOriginX(),
-            getOriginY(),
-            getWidth(),
-            getHeight(),
-            getScaleX(),
-            getScaleY(),
-            getRotation()
-        );
+        super.draw(batch, parentAlpha);
+
+        Matrix4 oldMatrix = batch.getTransformMatrix();
+        batch.setTransformMatrix(new Matrix4().set(getTransform()));
+        sprite.draw(batch, 0, 0, getWidth(), getHeight());
+        batch.setTransformMatrix(oldMatrix);
     }
 
     @Override
     public boolean remove(){
         texture.dispose();
+        shape.dispose();
         return super.remove();
     }
     
