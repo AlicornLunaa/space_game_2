@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -111,7 +112,12 @@ public class ShipPart extends Entity {
         setPosition(pos.x, pos.y);
         setRotation(rot);
 
-        shape.setAsBox(getWidth() / 2.f, getHeight() / 2.f, pos, rot * (float)(Math.PI / 180.f));
+        shape.setAsBox(
+            getWidth() / 2.f / Constants.PPM,
+            getHeight() / 2.f / Constants.PPM,
+            pos.cpy().scl(1 / Constants.PPM),
+            (float)Math.toRadians(rot)
+        );
     }
 
     // Functions
@@ -152,13 +158,13 @@ public class ShipPart extends Entity {
         );
 
         ((PolygonShape)target.getShape()).setAsBox(
-            target.getWidth() / 2.f,
-            target.getHeight() / 2.f,
+            target.getWidth() / 2.f / Constants.PPM,
+            target.getHeight() / 2.f / Constants.PPM,
             new Vector2(
-                (getX() + aPosition.x - tPosition.x),
-                (getY() + aPosition.y - tPosition.y)
+                (getX() + aPosition.x - tPosition.x) / Constants.PPM,
+                (getY() + aPosition.y - tPosition.y) / Constants.PPM
             ),
-            t.getParent().getRotation() * (float)(Math.PI / 180.f)
+            (float)Math.toRadians(t.getParent().getRotation())
         );
 
         target.parent = parent;

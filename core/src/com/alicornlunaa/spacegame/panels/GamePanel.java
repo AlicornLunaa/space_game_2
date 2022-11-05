@@ -91,7 +91,7 @@ public class GamePanel extends Stage {
 
         // Parent camera to the ship
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(ship.getBody().getWorldCenter(), 0);
+        cam.position.set(ship.getBody().getWorldCenter().cpy().scl(Constants.PPM), 0);
         cam.update();
 
         // Controls for the ship
@@ -131,7 +131,7 @@ public class GamePanel extends Stage {
         super.draw();
 
         if(this.isDebugAll()){
-            debug.render(world, this.getCamera().combined);
+            debug.render(world, this.getCamera().combined.cpy().scl(Constants.PPM));
         }
     }
     

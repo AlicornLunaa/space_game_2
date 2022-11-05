@@ -41,6 +41,8 @@ public class ConsoleScene implements Screen {
             game.gameScene.gamePanel.ship.load(args[1]);
         } else if(args[0].equals("set_pos")){
             game.gameScene.gamePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+        } else if(args[0].equals("set_rot")){
+            game.gameScene.gamePanel.ship.setRotation(Integer.parseInt(args[1]));
         }
     }
 

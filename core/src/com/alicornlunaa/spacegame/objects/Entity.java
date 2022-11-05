@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects;
 
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -15,7 +16,7 @@ public class Entity extends Actor implements Disposable {
     // Functions
     public Body setBody(Body b){
         if(b != null){
-            setPosition(b.getPosition());
+            setPosition(b.getPosition().cpy().scl(Constants.PPM));
             setRotation((float)Math.toDegrees(b.getAngle()));
         }
 
@@ -34,7 +35,7 @@ public class Entity extends Actor implements Disposable {
         if(body != null){
             // Get up-to-date body information
             Vector2 p = body.getPosition();
-            setPosition(p.x, p.y);
+            setPosition(p.x * Constants.PPM, p.y * Constants.PPM);
             setRotation((float)Math.toDegrees(body.getAngle()));
         }
 
@@ -61,16 +62,18 @@ public class Entity extends Actor implements Disposable {
     public float getX(){
         if(body == null) return super.getX();
 
-        super.setX(body.getPosition().x);
-        return body.getPosition().x;
+        float newX = body.getPosition().x * Constants.PPM;
+        super.setX(newX);
+        return newX;
     }
 
     @Override
     public float getY(){
         if(body == null) return super.getY();
 
-        super.setX(body.getPosition().y);
-        return body.getPosition().y;
+        float newY = body.getPosition().y * Constants.PPM;
+        super.setY(newY);
+        return newY;
     }
 
     @Override
@@ -84,13 +87,13 @@ public class Entity extends Actor implements Disposable {
     
     @Override
     public void setX(float x){
-        if(body != null) body.getPosition().x = x;
+        if(body != null) body.getPosition().x = x / Constants.PPM;
         super.setX(x);
     }
     
     @Override
     public void setY(float y){
-        if(body != null) body.getPosition().y = y;
+        if(body != null) body.getPosition().y = y / Constants.PPM;
         super.setY(y);
     }
 
@@ -102,7 +105,7 @@ public class Entity extends Actor implements Disposable {
 
     @Override
     public void setPosition(float x, float y){
-        if(body != null) body.setTransform(x, y, body.getAngle());
+        if(body != null) body.setTransform(x / Constants.PPM, y / Constants.PPM, body.getAngle());
         super.setPosition(x, y);
     }
 

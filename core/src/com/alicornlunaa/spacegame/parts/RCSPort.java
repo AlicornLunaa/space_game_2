@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
@@ -52,7 +53,7 @@ public class RCSPort extends ShipPart {
     // Functions
     private int getSignAtPos(){
         Vector2 center = parent.getLocalCenter();
-        Vector2 posOfCenter = new Vector2(getX() - center.x, getY() - center.y);
+        Vector2 posOfCenter = new Vector2(getX() / Constants.PPM - center.x, getY() / Constants.PPM - center.y);
         float tanVal = (float)Math.atan(posOfCenter.y / posOfCenter.x);
         return Math.round(Math.abs(tanVal) / tanVal);
     }
@@ -62,7 +63,7 @@ public class RCSPort extends ShipPart {
         float adj = portDir.dot(parentVert);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(new Vector2(portDir).scl(power * 2.f * adj).add(parent.getPosition()), true);
+        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta), true);
 
         return adj;
     }
@@ -72,7 +73,7 @@ public class RCSPort extends ShipPart {
         float adj = portDir.dot(parentHori);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(new Vector2(portDir).scl(power * 2.f * adj).add(parent.getPosition()), true);
+        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta), true);
 
         return adj;
     }
@@ -83,7 +84,7 @@ public class RCSPort extends ShipPart {
         Vector2 parentRight = new Vector2(1, 0).rotateRad(parent.getAngle());
         float adj = Math.abs(portDir.dot(parentRight)) * -1;
 
-        parent.applyForce(new Vector2(portDir).scl(power * 2.f * adj).add(portPos), portPos, true);
+        parent.applyForce(portDir.cpy().scl(power * adj * delta), portPos, true);
         return adj;
     }
     
@@ -100,7 +101,7 @@ public class RCSPort extends ShipPart {
         super.act(delta);
 
         if(stateRef.rcs){
-            Vector2 portPos = new Vector2(getX(), getY()).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
+            Vector2 portPos = new Vector2(getX() / Constants.PPM, getY() / Constants.PPM).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
             Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getScaleX()).scl(-getScaleX(), -getScaleY());
 
             float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
