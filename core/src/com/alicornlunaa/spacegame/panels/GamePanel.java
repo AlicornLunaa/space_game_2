@@ -35,7 +35,7 @@ public class GamePanel extends Stage {
         this.game = game;
 
         world = new World(new Vector2(), true);
-        World.setVelocityThreshold(100000.0f);
+        
 
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");

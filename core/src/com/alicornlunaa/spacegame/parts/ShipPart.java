@@ -155,8 +155,8 @@ public class ShipPart extends Entity {
             target.getWidth() / 2.f,
             target.getHeight() / 2.f,
             new Vector2(
-                getX() + aPosition.x - tPosition.x,
-                getY() + aPosition.y - tPosition.y
+                (getX() + aPosition.x - tPosition.x),
+                (getY() + aPosition.y - tPosition.y)
             ),
             t.getParent().getRotation() * (float)(Math.PI / 180.f)
         );
@@ -445,13 +445,13 @@ public class ShipPart extends Entity {
         return p;
     }
 
-    public static ShipPart unserialize(final App game, Body body, ShipState stateRef, JSONObject data){
+    public static ShipPart unserialize(final App game, Body b, ShipState stateRef, JSONObject data){
         // Recursively builds the object from serialized data
         ShipPart p = ShipPart.spawn(
             game,
             data.getString("type"),
             data.getString("id"),
-            body,
+            b,
             stateRef,
             new Vector2(
                 data.getFloat("x"),
@@ -471,7 +471,7 @@ public class ShipPart extends Entity {
         for(int i = 0; i < attachments.length(); i++){
             JSONObject partData = attachments.getJSONObject(i).getJSONObject("partData");
             Attachment a = Attachment.unserialize(p, attachments.getJSONObject(i).getJSONObject("attachData"));
-            a.child = ShipPart.unserialize(game, body, stateRef, partData);
+            a.child = ShipPart.unserialize(game, b, stateRef, partData);
 
             p.attachPart(a.child, a.childAttachmentPoint, a.thisAttachmentPoint);
         }

@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene;
-import com.alicornlunaa.spacegame.scenes.PlanetScene;
 import com.alicornlunaa.spacegame.scenes.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;

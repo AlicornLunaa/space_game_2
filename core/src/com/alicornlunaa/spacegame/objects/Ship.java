@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -27,7 +26,6 @@ public class Ship extends Entity {
     
     // Variables
     private final App game;
-    private Body body;
     private ShipPart rootPart = null;
     public ShipState state = new ShipState(); // Ship controls and stuff
 
@@ -38,11 +36,8 @@ public class Ship extends Entity {
         BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.position.set(x, y);
-        def.angle = rotation;
-		body = world.createBody(def);
-
-        setPosition(x, y);
-        setRotation(body.getAngle() * (float)(180.f / Math.PI));
+        def.angle = (float)Math.toRadians(rotation);
+		setBody(world.createBody(def));
 
         rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(), 0.0f);
     }
@@ -74,8 +69,6 @@ public class Ship extends Entity {
     }
 
     public ShipPart getRoot(){ return rootPart; }
-
-    public Body getBody(){ return body; }
 
     private void getPositions(ShipPart head, ArrayList<Vector2> posList, ArrayList<Attachment> attachList){
         if(head == null) return;
@@ -204,7 +197,6 @@ public class Ship extends Entity {
             float rotation = data.getFloat("rotation");
 
             // Reset body
-            body.setTransform(new Vector2(x, y), (float)(rotation * (Math.PI / 180)));
             body.setLinearVelocity(0, 0);
             body.setAngularVelocity(0);
 
@@ -254,9 +246,6 @@ public class Ship extends Entity {
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        setPosition(body.getPosition().x, body.getPosition().y);
-        setRotation(body.getAngle() * (float)(180.f / Math.PI));
-        
         Matrix3 transform = getTransform();
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
 
@@ -268,12 +257,6 @@ public class Ship extends Entity {
     }
 
     @Override
-    public void setPosition(float x, float y){
-        super.setPosition(x, y);
-        body.setTransform(x, y, body.getAngle());
-    }
-
-    @Override
     public boolean remove(){
         if(rootPart != null){
             rootPart.remove();
@@ -281,4 +264,5 @@ public class Ship extends Entity {
 
         return super.remove();
     }
+
 }
