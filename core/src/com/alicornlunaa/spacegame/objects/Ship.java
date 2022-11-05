@@ -74,7 +74,7 @@ public class Ship extends Entity {
         if(head == null) return;
 
         for(ShipPart.Attachment a : head.getAttachments()){
-            Vector2 pos = head.localToWorld(new Vector2(a.getPos()));
+            Vector2 pos = head.localToWorld(a.getPos().cpy().add(head.getOriginX(), head.getOriginY()));
 
             posList.add(pos);
             attachList.add(a);

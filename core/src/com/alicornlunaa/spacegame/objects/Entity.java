@@ -46,9 +46,10 @@ public class Entity extends Actor implements Disposable {
         // Get matrix
         Matrix3 trans = new Matrix3();
         trans.idt();
-        trans.translate(getX() - getOriginX(), getY() - getOriginY());
+        trans.translate(getX(), getY());
         trans.rotate(getRotation());
         trans.scale(getScaleX(), getScaleY());
+        trans.translate(-getOriginX(), -getOriginY());
         return trans;
     }
 

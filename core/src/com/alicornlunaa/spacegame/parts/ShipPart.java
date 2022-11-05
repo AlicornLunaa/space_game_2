@@ -52,7 +52,7 @@ public class ShipPart extends Entity {
         public int getThisId(){ return thisAttachmentPoint; }
 
         public Vector2 getGlobalPos(){
-            return parent.localToWorld(new Vector2(position).scl(parent.getFlipX() ? -1 : 1, parent.getFlipY() ? -1 : 1));
+            return parent.localToWorld(position.cpy().scl(parent.getFlipX() ? -1 : 1, parent.getFlipY() ? -1 : 1));
         }
 
         public JSONObject serialize(){
@@ -108,7 +108,7 @@ public class ShipPart extends Entity {
         }
 
         setSize(region.getRegionWidth() * scale, region.getRegionHeight() * scale);
-        setOrigin(getWidth() / 2.f - pos.x, getHeight() / 2.f - pos.y);
+        setOrigin(getWidth() / 2.f, getHeight() / 2.f);
         setPosition(pos.x, pos.y);
         setRotation(rot);
 
@@ -208,7 +208,7 @@ public class ShipPart extends Entity {
 
     public ShipPart hit(Vector2 pos, Matrix3 transform){
         Vector2 local = new Vector2(pos).mul(new Matrix3(transform).mul(getTransform()).inv());
-        ShipPart part = (ShipPart)hit(local.x + getOriginX(), local.y + getOriginY(), false);
+        ShipPart part = (ShipPart)hit(local.x, local.y, false);
 
         // This part was not hit
         if(part == null){
@@ -266,7 +266,7 @@ public class ShipPart extends Entity {
 
             for(Attachment a : attachments){
                 shapeRenderer.setColor(a.child == null && !a.inUse ? Color.GREEN : Color.RED);
-                shapeRenderer.circle(a.position.x, a.position.y, 1);
+                shapeRenderer.circle(a.position.x + getOriginX(), a.position.y + getOriginY(), 1);
             }
 
             shapeRenderer.end();

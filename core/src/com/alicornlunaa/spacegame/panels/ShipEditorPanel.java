@@ -165,29 +165,32 @@ public class ShipEditorPanel extends Stage {
     }
 
     // Functions
-    public Vector2 findSnapAttachment(){
+    public Vector2 findSnapAttachment(Vector2 cursor){
         // Finds the closest snap point, once a point is found dont run anymore
-        Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-
         if(ghostPart == null) return null; // Early exit if not part selected
 
         float snapDistance = Math.max(ghostPart.getWidth(), ghostPart.getHeight());
 
         if(selectedAttachment == null){
             // No point selected, find snap point closest, only once
-            Attachment shipClosestToCursor = rootShip.getClosestAttachment(new Vector2(cursor), snapDistance);
+            Attachment shipClosestToCursor = rootShip.getClosestAttachment(cursor.cpy(), snapDistance);
 
             if(shipClosestToCursor != null && shipClosestToCursor.getChild() == null && !shipClosestToCursor.getInUse()){
                 // Find attachment point on the ghostpart closest to the other attachment and snap them
-                Vector2 attachmentPoint1 = shipClosestToCursor.getGlobalPos().add(rootShip.getX(), rootShip.getY());
+                ShipPart a = shipClosestToCursor.getParent();
+                Vector2 attachmentPoint1 = shipClosestToCursor.getPos().cpy();
+                attachmentPoint1.scl(a.getFlipX() ? -1 : 1, a.getFlipY() ? -1 : 1);
+                attachmentPoint1.rotateDeg(a.getRotation());
+                attachmentPoint1.add(rootShip.getPosition()).add(a.getPosition()); // A1 is now local to the ship
                 
-                Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1);
+                Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1.cpy());
                 ShipPart p = ghostClosestToAttachment.getParent();
-                Vector2 attachmentPoint2 = new Vector2(ghostClosestToAttachment.getPos());
+                Vector2 attachmentPoint2 = ghostClosestToAttachment.getPos().cpy();
                 attachmentPoint2.scl(p.getFlipX() ? -1 : 1, p.getFlipY() ? -1 : 1);
                 attachmentPoint2.rotateDeg(ghostPart.getRotation());
+                attachmentPoint2.add(rootShip.getPosition()); // A2 is now local to the ship
 
-                this.attachmentPoint = attachmentPoint1.sub(attachmentPoint2);
+                this.attachmentPoint = rootShip.getPosition().cpy().add(attachmentPoint1.sub(attachmentPoint2));
 
                 selectedAttachment = shipClosestToCursor;
                 targetAttachmentId = ghostClosestToAttachment.getThisId();
@@ -217,7 +220,7 @@ public class ShipEditorPanel extends Stage {
 
         // Find the snap point for attachments
         if(ghostPart != null){
-            this.findSnapAttachment();
+            this.findSnapAttachment(cursor);
 
             if(selectedAttachment != null){
                 ghostPart.setPosition(attachmentPoint.x, attachmentPoint.y);
@@ -250,11 +253,11 @@ public class ShipEditorPanel extends Stage {
             // Render the selected part
             Vector2 oldPos = new Vector2(ghostPart.getX(), ghostPart.getY());
             Vector2 oldScl = new Vector2(ghostPart.getScaleX(), ghostPart.getScaleY());
-            float oldRot = ghostPart.getRotation();
             Matrix3 trans = ghostPart.getTransform();
+            trans.translate(ghostPart.getOriginX(), ghostPart.getOriginY());
+            trans.rotate(ghostPart.getRotation() * -1);
             trans.translate(-partOffset.x, -partOffset.y);
             ghostPart.setPosition(partOffset.x, partOffset.y);
-            ghostPart.setRotation(0);
             ghostPart.setScale(1, 1);
 
             Batch batch = getBatch();
@@ -266,18 +269,16 @@ public class ShipEditorPanel extends Stage {
             batch.end();
 
             ghostPart.setPosition(oldPos.x, oldPos.y);
-            ghostPart.setRotation(oldRot);
             ghostPart.setScale(oldScl.x, oldScl.y);
 
-            // Make it snap to other parts
             if(selectedAttachment != null){
                 game.shapeRenderer.begin(ShapeType.Filled);
                 game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-                game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+                game.shapeRenderer.setTransformMatrix(new Matrix4().translate(oldPos.x, oldPos.y, 0));
                 game.shapeRenderer.setColor(new Color(1, 1, 0, batch.getColor().a));
                 game.shapeRenderer.circle(
-                    attachmentPoint.x - selectedAttachment.getPos().x,
-                    attachmentPoint.y - selectedAttachment.getPos().y,
+                    -selectedAttachment.getPos().x,
+                    -selectedAttachment.getPos().y,
                     2
                 );
                 game.shapeRenderer.end();
