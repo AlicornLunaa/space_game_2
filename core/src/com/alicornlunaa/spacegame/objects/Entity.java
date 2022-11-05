@@ -12,11 +12,12 @@ public class Entity extends Actor implements Disposable {
 
     // Variables
     protected @Null Body body = null;
+    protected float physScale = Constants.PPM;
 
     // Functions
     public Body setBody(Body b){
         if(b != null){
-            setPosition(b.getPosition().cpy().scl(Constants.PPM));
+            setPosition(b.getPosition().cpy().scl(physScale));
             setRotation((float)Math.toDegrees(b.getAngle()));
         }
 
@@ -27,6 +28,9 @@ public class Entity extends Actor implements Disposable {
     public Body getBody(){
         return body;
     }
+
+    public void setPhysScale(float s){ physScale = s; }
+    public float getPhysScale(){ return physScale; }
     
     /**
      * @return Transformation matrix to the center of the actor
@@ -35,7 +39,7 @@ public class Entity extends Actor implements Disposable {
         if(body != null){
             // Get up-to-date body information
             Vector2 p = body.getPosition();
-            setPosition(p.x * Constants.PPM, p.y * Constants.PPM);
+            setPosition(p.x * physScale, p.y * physScale);
             setRotation((float)Math.toDegrees(body.getAngle()));
         }
 
@@ -62,7 +66,7 @@ public class Entity extends Actor implements Disposable {
     public float getX(){
         if(body == null) return super.getX();
 
-        float newX = body.getPosition().x * Constants.PPM;
+        float newX = body.getPosition().x * physScale;
         super.setX(newX);
         return newX;
     }
@@ -71,7 +75,7 @@ public class Entity extends Actor implements Disposable {
     public float getY(){
         if(body == null) return super.getY();
 
-        float newY = body.getPosition().y * Constants.PPM;
+        float newY = body.getPosition().y * physScale;
         super.setY(newY);
         return newY;
     }
@@ -87,13 +91,13 @@ public class Entity extends Actor implements Disposable {
     
     @Override
     public void setX(float x){
-        if(body != null) body.getPosition().x = x / Constants.PPM;
+        if(body != null) body.getPosition().x = x / physScale;
         super.setX(x);
     }
     
     @Override
     public void setY(float y){
-        if(body != null) body.getPosition().y = y / Constants.PPM;
+        if(body != null) body.getPosition().y = y / physScale;
         super.setY(y);
     }
 
@@ -105,7 +109,7 @@ public class Entity extends Actor implements Disposable {
 
     @Override
     public void setPosition(float x, float y){
-        if(body != null) body.setTransform(x / Constants.PPM, y / Constants.PPM, body.getAngle());
+        if(body != null) body.setTransform(x / physScale, y / physScale, body.getAngle());
         super.setPosition(x, y);
     }
 

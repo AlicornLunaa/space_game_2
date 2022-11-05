@@ -71,7 +71,7 @@ public class SpacePlanet extends Entity {
         float radSqr = dir.len2();
         float f = GRAVITY_CONSTANT * ((body.getMass() * stateRef.radius) / radSqr);
 
-        // body.applyForceToCenter(dir.nor().scl(f), true);
+        body.applyForceToCenter(dir.nor().scl(f), true);
     }
 
     @Override

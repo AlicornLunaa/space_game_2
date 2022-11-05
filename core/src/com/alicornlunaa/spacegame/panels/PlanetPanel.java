@@ -39,10 +39,10 @@ public class PlanetPanel extends Stage {
         super(new ScreenViewport());
         this.game = game;
 
-        world = new World(new Vector2(0, -600), true);
+        world = new World(new Vector2(), true);
 
-        planet = new Planet(game, world, new PlanetState());
-        player = new Player(game, world, 0, 150);
+        planet = new Planet(game, world, new PlanetState(), Constants.PLANET_PPM);
+        player = new Player(game, world, 0, 50 / Constants.PLANET_PPM, Constants.PLANET_PPM);
 
         // Controls
         this.addListener(new InputListener(){
@@ -81,7 +81,7 @@ public class PlanetPanel extends Stage {
     private void setActiveChunks(){
         // Get player position, convert it to chunk coordinates
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        Vector2 playerPos = new Vector2(player.getBody().getWorldCenter());
+        Vector2 playerPos = new Vector2(player.getPosition());
         float chunkWorldSize = (Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
 
         int chunkX = (int)Math.ceil(playerPos.x / chunkWorldSize) - 1;
@@ -126,7 +126,7 @@ public class PlanetPanel extends Stage {
 
         // Parent camera to player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(player.getBody().getWorldCenter(), 0);
+        cam.position.set(player.getPosition(), 0);
         cam.update();
 
         // Controls for player
@@ -163,10 +163,10 @@ public class PlanetPanel extends Stage {
         player.draw(batch, batch.getColor().a);
 
         batch.end();
+        debug.render(world, getCamera().combined.cpy().scl(Constants.PLANET_PPM));
 
         // Debug rendering
         if(this.isDebugAll()){
-            debug.render(world, this.getCamera().combined);
 
             // Draw chunk borders
             game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);

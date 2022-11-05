@@ -41,7 +41,7 @@ public class Chunk {
                 int blockX = x + (chunkX * CHUNK_SIZE);
                 int blockY = y + (chunkY * CHUNK_SIZE);
 
-                // if(blockX * blockX + blockY * blockY > (float)Math.pow(stateRef.radius, 2)) continue;
+                if(blockX * blockX + blockY * blockY > (float)Math.pow(stateRef.radius, 1)) continue;
                 if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) continue;
                 if(blockY > 3) continue;
 

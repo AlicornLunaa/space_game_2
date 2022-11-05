@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.states.PlanetState;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -28,17 +29,18 @@ public class Planet extends Entity {
     private final OpenSimplexNoise noise;
 
     // Constructor
-    public Planet(final App game, final World world, PlanetState state){
+    public Planet(final App game, final World world, PlanetState state, float physScale){
         super();
         this.game = game;
         this.world = world;
         this.state = state;
+        setPhysScale(physScale);
 
         // Create noise function
         noise = new OpenSimplexNoise(state.seed);
 
         // Update world
-        world.setGravity(new Vector2(0, 600 * getGravityScale()));
+        world.setGravity(new Vector2(0, 600 * getGravityScale() / Constants.PLANET_PPM));
 
         // Initialize a cube for testing
         int initialRad = 3;

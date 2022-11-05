@@ -27,19 +27,29 @@ public class Player extends Entity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 1600.0f;
+    private static final float MOVEMENT_SPEED = 5000.0f;
+    private static final float JUMP_FORCE = 40000.0f;
 
     // Constructor
-    public Player(final App game, World world, float x, float y){
+    public Player(final App game, World world, float x, float y, float physScale){
         setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
         setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
+        setPhysScale(physScale);
 
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(x, y);
         setBody(world.createBody(def));
 
-        shape.setAsBox(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, new Vector2(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2), 0);
+        shape.setAsBox(
+            PLAYER_WIDTH / 2 / getPhysScale(),
+            PLAYER_HEIGHT / 2 / getPhysScale(),
+            new Vector2(
+                PLAYER_WIDTH / 2 / getPhysScale(),
+                PLAYER_HEIGHT / 2 / getPhysScale()
+            ),
+            0
+        );
         body.createFixture(shape, 1.0f);
         body.setFixedRotation(true);
 
@@ -52,7 +62,7 @@ public class Player extends Entity {
         super.act(delta);
 
         if(state.vertical != 0 || state.horizontal != 0){
-            body.applyLinearImpulse(new Vector2(state.horizontal, state.vertical).scl(MOVEMENT_SPEED), body.getWorldCenter(), true);
+            body.applyLinearImpulse(new Vector2(state.horizontal, state.vertical).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta), body.getWorldCenter(), true);
         }
     }
 

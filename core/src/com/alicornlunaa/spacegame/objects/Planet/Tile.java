@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.Planet;
 import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -66,11 +67,11 @@ public class Tile implements Disposable {
         sprite = new TextureRegionDrawable(Tile.getTexture(game.atlas, type));
         
         shape.setAsBox(
-            TILE_SIZE / 2,
-            TILE_SIZE / 2,
+            TILE_SIZE / 2 / Constants.PLANET_PPM,
+            TILE_SIZE / 2 / Constants.PLANET_PPM,
             new Vector2(
-                blockX * TILE_SIZE + TILE_SIZE / 2,
-                blockY * TILE_SIZE + TILE_SIZE / 2
+                (blockX * TILE_SIZE + TILE_SIZE / 2) / Constants.PLANET_PPM,
+                (blockY * TILE_SIZE + TILE_SIZE / 2) / Constants.PLANET_PPM
             ),
             0
         );
