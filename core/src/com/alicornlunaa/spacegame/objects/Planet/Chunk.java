@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.objects.Planet;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Planet.Tile.TileType;
+import com.alicornlunaa.spacegame.states.PlanetState;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -28,6 +29,7 @@ public class Chunk {
     private boolean active = false; // If the chunk should get updates
     private Tile[][] map;
 
+    private PlanetState stateRef;
     private Body body;
 
     // Private functions
@@ -39,8 +41,9 @@ public class Chunk {
                 int blockX = x + (chunkX * CHUNK_SIZE);
                 int blockY = y + (chunkY * CHUNK_SIZE);
 
-                if((blockX * blockX) + (blockY * blockY) > 10000.0f) continue;
+                // if(blockX * blockX + blockY * blockY > (float)Math.pow(stateRef.radius, 2)) continue;
                 if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) continue;
+                if(blockY > 3) continue;
 
                 map[x][y] = new Tile(game, body, blockX, blockY, chunkX, chunkY, type);
             }
@@ -48,9 +51,10 @@ public class Chunk {
     }
 
     // Constructor
-    public Chunk(final App game, final World world, final OpenSimplexNoise noise, int chunkX, int chunkY){
+    public Chunk(final App game, final World world, final OpenSimplexNoise noise, PlanetState stateRef, int chunkX, int chunkY){
         this.chunkX = chunkX;
         this.chunkY = chunkY;
+        this.stateRef = stateRef;
 
         // Create chunk body
         float wSize = Tile.TILE_SIZE * CHUNK_SIZE;
@@ -71,6 +75,7 @@ public class Chunk {
     public Vector2 chunkToBlock(Vector2 v){ return new Vector2(v.x + (chunkX * CHUNK_SIZE), v.y + (chunkY * CHUNK_SIZE)); }
     public Tile getTileLocal(int x, int y){ return map[x][y]; }
     public Tile getTile(int x, int y){ return map[x % CHUNK_SIZE][y % CHUNK_SIZE]; }
+    public Tile[][] getTiles(){ return map; }
     public Vector2 getChunkPos(){ return new Vector2(chunkX, chunkY); }
     public boolean isActive(){ return active; }
     public void setActive(boolean a){ active = a; }

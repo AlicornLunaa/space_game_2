@@ -123,14 +123,10 @@ public class PlanetPanel extends Stage {
         }
 
         player.act(delta);
-        float coreAngle = new Vector2(0, 0).sub(player.getBody().getPosition()).nor().angleRad() + (float)Math.toRadians(90);
-        player.getBody().setTransform(player.getBody().getPosition(), coreAngle);
-        Vector2 playerUp = new Vector2(0, 1).rotateRad(player.getBody().getAngle());
 
         // Parent camera to player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
         cam.position.set(player.getBody().getWorldCenter(), 0);
-        cam.up.set(playerUp, 0);
         cam.update();
 
         // Controls for player

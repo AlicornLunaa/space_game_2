@@ -78,6 +78,10 @@ public class Tile implements Disposable {
     }
 
     // Functoins
+    public float getX(){ return blockX; }
+    public float getY(){ return blockY; }
+    public TextureRegionDrawable getSprite(){ return sprite; }
+
     public void update(float delta){}
 
     public void draw(Batch batch){
