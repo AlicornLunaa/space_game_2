@@ -34,7 +34,7 @@ public class PlanetScene implements Screen {
         inputs.addProcessor(planetPanel);
         inputs.addProcessor(uiPanel);
 
-        planetPanel.setDebugAll(false);
+        planetPanel.setDebugAll(true);
         uiPanel.setDebugAll(true);
     }
 

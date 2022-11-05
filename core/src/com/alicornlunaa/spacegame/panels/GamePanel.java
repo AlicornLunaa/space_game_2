@@ -65,7 +65,7 @@ public class GamePanel extends Stage {
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 OrthographicCamera cam = (OrthographicCamera)getCamera();
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 1.5f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 30), 0.05f), 3.0f);
 
                 return true;
             }

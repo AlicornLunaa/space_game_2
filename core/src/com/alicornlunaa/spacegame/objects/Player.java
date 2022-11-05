@@ -32,7 +32,7 @@ public class Player extends Entity {
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
     private static final float MOVEMENT_SPEED = 5500.0f;
-    private static final float JUMP_FORCE = 30000.0f;
+    private static final float JUMP_FORCE = 700000.0f;
 
     // Constructor
     public Player(final App game, World world, float x, float y, float physScale){
@@ -51,8 +51,8 @@ public class Player extends Entity {
             PLAYER_WIDTH / 2 / getPhysScale(),
             PLAYER_HEIGHT / 2 / getPhysScale(),
             new Vector2(
-                PLAYER_WIDTH / 2 / getPhysScale(),
-                PLAYER_HEIGHT / 2 / getPhysScale()
+                0,
+                0
             ),
             0
         );
@@ -76,7 +76,7 @@ public class Player extends Entity {
         super.act(delta);
 
         state.grounded = false;
-        world.rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (getHeight() / 2) / getPhysScale())));
+        world.rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (getHeight() / 2 + 0.5f) / getPhysScale())));
 
         if(state.vertical != 0 || state.horizontal != 0){
             body.applyLinearImpulse(new Vector2(state.horizontal, state.grounded ? state.vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta), body.getWorldCenter(), true);
