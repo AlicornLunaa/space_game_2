@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -25,6 +26,8 @@ public class GameUIPanel extends Stage {
     private TextButton rcsBtn;
     private ProgressBar throttleBar;
 
+    private Label positionLabel;
+
     // Constructor
     public GameUIPanel(final App game){
         super(new ScreenViewport());
@@ -34,6 +37,11 @@ public class GameUIPanel extends Stage {
         Table tbl = new Table(game.skin);
         tbl.setFillParent(true);
         this.addActor(tbl);
+
+        // Labels
+        positionLabel = new Label("Pos: N/a", game.skin);
+        positionLabel.setPosition(20, getHeight() - 60);
+        this.addActor(positionLabel);
 
         // Icon elements
         tbl.row().expandX().fillX().pad(10).right();
@@ -99,6 +107,8 @@ public class GameUIPanel extends Stage {
         sasBtn.setColor(gamePanel.ship.state.sas ? Color.GREEN : Color.RED);
         rcsBtn.setColor(gamePanel.ship.state.rcs ? Color.GREEN : Color.RED);
         throttleBar.setValue(gamePanel.ship.state.throttle);
+
+        positionLabel.setText(gamePanel.ship.getBody().getWorldCenter().toString());
     }
 
     @Override

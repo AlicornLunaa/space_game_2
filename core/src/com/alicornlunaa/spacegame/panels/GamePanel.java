@@ -1,8 +1,9 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Ground;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Planet.SpacePlanet;
+import com.alicornlunaa.spacegame.states.PlanetState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -24,6 +25,7 @@ public class GamePanel extends Stage {
     private float physAccumulator = 0.0f;
 
     public Ship ship;
+    public SpacePlanet planet;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -33,11 +35,14 @@ public class GamePanel extends Stage {
         this.game = game;
 
         world = new World(new Vector2(), true);
+        World.setVelocityThreshold(100000.0f);
 
-        ship = new Ship(game, world, 550, 250, 0);
+        ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
-		this.addActor(new Ground(game, world, getWidth() / 2, 30, getWidth() - 30, 25));
+
+        planet = new SpacePlanet(game, new PlanetState(), -2000, 0);
+        this.addActor(planet);
 
         // Controls
         this.addListener(new InputListener(){
@@ -81,6 +86,8 @@ public class GamePanel extends Stage {
             world.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
         }
+
+        planet.applyGravity(ship.getBody());
 
         // Parent camera to the ship
         OrthographicCamera cam = (OrthographicCamera)getCamera();

@@ -21,24 +21,24 @@ public class Planet extends Entity {
     private final App game;
     private final World world;
 
-    private PlanetState state = new PlanetState();
+    private PlanetState state;
 
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private Vector2 cursor = new Vector2();
     private final OpenSimplexNoise noise;
-    private final long seed = 123;
 
     // Constructor
-    public Planet(final App game, final World world, float radius){
+    public Planet(final App game, final World world, PlanetState state){
         super();
         this.game = game;
         this.world = world;
+        this.state = state;
+
+        // Create noise function
+        noise = new OpenSimplexNoise(state.seed);
 
         // Update world
         world.setGravity(new Vector2(0, 600 * getGravityScale()));
-
-        // Create noise function
-        noise = new OpenSimplexNoise(seed);
 
         // Initialize a cube for testing
         int initialRad = 3;
