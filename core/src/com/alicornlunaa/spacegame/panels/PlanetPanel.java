@@ -19,7 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 
 public class PlanetPanel extends Stage {
     
@@ -36,7 +36,7 @@ public class PlanetPanel extends Stage {
 
     // Constructor
     public PlanetPanel(final App game){
-        super(new ScreenViewport());
+        super(new FillViewport(1280, 720));
         this.game = game;
 
         world = new World(new Vector2(), true);

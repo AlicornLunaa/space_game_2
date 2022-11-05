@@ -41,7 +41,7 @@ public class RCSPort extends ShipPart {
         this.fuelUsage = fuelUsage;
         
         effect = game.manager.getEffect("effects/rcs");
-        effect.setPosition(0, 0);
+        effect.setPosition(0, getOriginY());
         effect.scaleEffect(initial_scale);
         effect.start();
         

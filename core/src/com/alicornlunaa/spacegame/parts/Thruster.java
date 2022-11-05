@@ -88,7 +88,7 @@ public class Thruster extends ShipPart {
 
         // Draw effects
         Vector3 pos = new Vector3().mul(batchMatrix.inv());
-        effect.setPosition(pos.x, pos.y);
+        effect.setPosition(pos.x + getOriginX(), pos.y);
 
         effect.update(deltaTime);
         effect.draw(batch, deltaTime);
