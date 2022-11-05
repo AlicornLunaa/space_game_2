@@ -39,8 +39,8 @@ public class Chunk {
                 int blockX = x + (chunkX * CHUNK_SIZE);
                 int blockY = y + (chunkY * CHUNK_SIZE);
 
+                if((blockX * blockX) + (blockY * blockY) > 10000.0f) continue;
                 if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) continue;
-                if(blockY > 3) continue;
 
                 map[x][y] = new Tile(game, body, blockX, blockY, chunkX, chunkY, type);
             }

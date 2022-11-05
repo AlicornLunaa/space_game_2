@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -122,10 +123,14 @@ public class PlanetPanel extends Stage {
         }
 
         player.act(delta);
+        float coreAngle = new Vector2(0, 0).sub(player.getBody().getPosition()).nor().angleRad() + (float)Math.toRadians(90);
+        player.getBody().setTransform(player.getBody().getPosition(), coreAngle);
+        Vector2 playerUp = new Vector2(0, 1).rotateRad(player.getBody().getAngle());
 
         // Parent camera to player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
         cam.position.set(player.getBody().getWorldCenter(), 0);
+        cam.up.set(playerUp, 0);
         cam.update();
 
         // Controls for player
