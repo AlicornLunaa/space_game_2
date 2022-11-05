@@ -7,4 +7,5 @@ public class PlayerState {
      */
     public float vertical = 0.0f;
     public float horizontal = 0.0f;
+    public boolean grounded = false;
 }

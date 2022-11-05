@@ -163,10 +163,10 @@ public class PlanetPanel extends Stage {
         player.draw(batch, batch.getColor().a);
 
         batch.end();
-        debug.render(world, getCamera().combined.cpy().scl(Constants.PLANET_PPM));
 
         // Debug rendering
         if(this.isDebugAll()){
+            debug.render(world, getCamera().combined.cpy().scl(Constants.PLANET_PPM));
 
             // Draw chunk borders
             game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
