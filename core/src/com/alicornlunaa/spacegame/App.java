@@ -76,8 +76,8 @@ public class App extends Game {
 				gameScene = new SpaceScene(this);
 				planetScene = new PlanetScene(this);
 				editorScene = new EditorScene(this);
-				// this.setScreen(gameScene);
-				this.setScreen(planetScene);
+				this.setScreen(gameScene);
+				// this.setScreen(planetScene);
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());

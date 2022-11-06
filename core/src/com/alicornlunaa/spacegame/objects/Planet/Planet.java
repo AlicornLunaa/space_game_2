@@ -39,10 +39,10 @@ public class Planet extends Entity {
         setPhysScale(physScale);
 
         // Initialize generator
-        generator = new TerrainGenerator(game, state.seed, (int)(2 * Math.PI * state.radius / Chunk.CHUNK_SIZE), (int)(state.radius / Chunk.CHUNK_SIZE));
+        generator = new TerrainGenerator(game, state.seed, (int)(2 * Math.PI * state.radius / Chunk.CHUNK_SIZE / Tile.TILE_SIZE), (int)(state.radius / Chunk.CHUNK_SIZE / Tile.TILE_SIZE));
 
         // Update world
-        world.setGravity(new Vector2(0, -1 * getGravityScale() / Constants.PLANET_PPM));
+        world.setGravity(new Vector2(0, -1 * getGravityScale() / Constants.PLANET_PPM * 0));
 
         // Initialize a cube for testing
         int initialRad = 3;
@@ -64,9 +64,10 @@ public class Planet extends Entity {
      */
     public void addEntity(Entity e){
         // Formula: x = theta, y = radius
+        Vector2 localPos = e.getPosition().sub(state.position);
         float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
-        float x = (float)((Math.atan(e.getY() / e.getX()) + (Math.PI / 2)) / Math.PI * worldWidthUnits);
-        float y = e.getPosition().dst(this.getPosition());
+        float x = (localPos.angleDeg() / 360 * worldWidthUnits);
+        float y = localPos.len();
 
         e.setPosition(x, y);
         planetEnts.add(e);
@@ -79,15 +80,17 @@ public class Planet extends Entity {
     public void delEntity(Entity e){
         // Formula: theta = x, radius = y
         float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
-        double theta = (e.getX() / worldWidthUnits * Math.PI - (Math.PI / 2));
+        double theta = ((e.getX() / worldWidthUnits) * Math.PI * 2);
         float radius = e.getY();
 
-        float x = (float)(Math.cos(theta) * radius);
-        float y = (float)(Math.sin(theta) * radius);
+        float x = (float)(Math.cos(theta) * radius) + state.position.x;
+        float y = (float)(Math.sin(theta) * radius) + state.position.y;
 
         e.setPosition(x, y);
         planetEnts.remove(e);
     }
+
+    public ArrayList<Entity> getEntities(){ return planetEnts; }
 
     @Override
     public void draw(Batch batch, float parentAlpha){

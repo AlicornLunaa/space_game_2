@@ -60,7 +60,7 @@ public class SpacePlanet extends Entity {
     }
 
     // Constructors
-    public SpacePlanet(final App game, final World world, PlanetState state, float x, float y){
+    public SpacePlanet(final App game, final World world, PlanetState state){
         stateRef = state;
 
         setSize(state.radius * 2, state.radius * 2);
@@ -70,7 +70,7 @@ public class SpacePlanet extends Entity {
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
         setBody(world.createBody(def));
-        setPosition(x, y);
+        setPosition(state.position);
 
         shape.setRadius(state.radius / getPhysScale());
         shape.setPosition(new Vector2(0, 0));
