@@ -116,7 +116,7 @@ public class Planet extends Entity {
     private void initializeWorld(){
         // Create new world for on the planet
         planetWorld = new World(new Vector2(), true);
-        planetWorld.setGravity(new Vector2(0, -5)); // TODO: Calculate planet gravity at surface
+        planetWorld.setGravity(new Vector2(0, -10 * (Constants.GRAVITY_CONSTANT * body.getMass()) / (radius * radius)));
 
         // Initial terrain
         int initialRad = 3;
@@ -188,8 +188,22 @@ public class Planet extends Entity {
         float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
         float x = (localPos.angleDeg() / 360 * worldWidthUnits);
         float y = localPos.len();
-
         e.setPosition(x, y);
+
+        // Load space angle relative to the world
+        float theta = localPos.angleDeg();
+        float omega = e.getRotation();
+        e.setRotation(omega - theta + 90);
+
+        // Orbital velocity formula: v = sqrt((G * planetMass) / orbitRadius)
+        Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
+        float velToPlanet = vel.dot(localPos.cpy().nor());
+        float orbitRadius = localPos.len();
+        float oldVel = e.getBody().getLinearVelocity().len();
+        float tangentVel = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * body.getMass()) / orbitRadius) * -(oldVel / Math.abs(oldVel + 0.00001f));
+        e.getBody().setLinearVelocity(tangentVel, velToPlanet);
+
+        // Add body
         e.loadBodyToWorld(planetWorld, Constants.PLANET_PPM);
         planetEnts.add(e);
     }
@@ -204,10 +218,22 @@ public class Planet extends Entity {
         double theta = ((e.getX() / worldWidthUnits) * Math.PI * 2);
         float radius = e.getY();
 
+        // Convert to space angles, spaceAngle = worldAngle + theta - 90
+        float worldAngle = e.getRotation();
+        e.setRotation(worldAngle + (float)Math.toDegrees(theta) - 90);
+
+        // Convet to space position
         float x = (float)(Math.cos(theta) * radius) + getX();
         float y = (float)(Math.sin(theta) * radius) + getY();
-
         e.setPosition(x, y);
+
+        // Convert to space velocity, tangent = x, planetToEntity = y
+        Vector2 tangent = new Vector2(1, 0).rotateRad((float)theta);
+        Vector2 planetToEnt = e.getPosition().sub(this.getPosition()).nor();
+        Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
+        e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
+
+        // Remove body
         e.loadBodyToWorld(game.gameScene.gamePanel.getWorld(), Constants.PPM);
         planetEnts.remove(e);
     }
@@ -245,6 +271,17 @@ public class Planet extends Entity {
         while(physAccumulator >= Constants.TIME_STEP){
             planetWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
+        }
+        
+        // Constrain entities to the world
+        float worldWidthPixels = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+
+        for(Entity e : planetEnts){
+            if(e.getX() > worldWidthPixels){
+                e.setX(e.getX() - worldWidthPixels);
+            } else if(e.getX() < 0){
+                e.setX(e.getX() + worldWidthPixels);
+            }
         }
     }
 
@@ -286,6 +323,22 @@ public class Planet extends Entity {
         float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
 
         b.applyForceToCenter(velDir.scl(-1 * force * delta), true);
+    }
+
+    public boolean checkTransfer(Entity e){
+        // This function checks if the entity supplied
+        // is within range to change its physics system to the planet's
+        float dist = e.getPosition().dst(getPosition());
+
+        if(dist < atmosRadius){
+            // Move it into this world
+            this.addEntity(e);
+            game.setScreen(game.planetScene);
+
+            return true;
+        }
+
+        return false;
     }
 
     // World functions

@@ -92,6 +92,7 @@ public class GamePanel extends Stage {
 
         planet.applyGravity(delta, ship.getBody());
         planet.applyDrag(delta, ship.getBody());
+        planet.checkTransfer(ship);
 
         // Parent camera to the ship
         OrthographicCamera cam = (OrthographicCamera)getCamera();
