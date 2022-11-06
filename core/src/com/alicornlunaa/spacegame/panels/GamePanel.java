@@ -44,9 +44,9 @@ public class GamePanel extends Stage {
         this.addActor(planet);
 
         // Initialize orbit
-        float R = ship.getPosition().dst(planet.getPosition());
-        float velScl = (float)Math.sqrt((SpacePlanet.GRAVITY_CONSTANT * planet.getBody().getMass()) / R);
-        ship.getBody().setLinearVelocity(0, velScl / Constants.PPM * 80);
+        float radius = ship.getBody().getPosition().dst(planet.getBody().getPosition());
+        float velScl = (float)Math.sqrt((SpacePlanet.GRAVITY_CONSTANT * ship.getBody().getMass() * planet.getBody().getMass()) / radius);
+        ship.getBody().applyForceToCenter(0, velScl * 2.5f, true);
 
         // Controls
         this.addListener(new InputListener(){

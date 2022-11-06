@@ -22,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class SpacePlanet extends Entity {
 
     // Static
-    public final static float GRAVITY_CONSTANT = 8000.0f;
+    public final static float GRAVITY_CONSTANT = 120.0f;
 
     // Variables
     private PlanetState stateRef;
@@ -70,9 +70,15 @@ public class SpacePlanet extends Entity {
                 int mX = x - map.getWidth() / 2;
                 int mY = y - map.getHeight() / 2;
                 int radSqr = mX * mX + mY * mY;
-                float atmosDensity = Math.abs(1 - (radSqr / (stateRef.atmosRadius * stateRef.atmosRadius)));
+
+                float planetRadSqr = stateRef.radius * stateRef.radius;
+                float atmosRadSqr = stateRef.atmosRadius * stateRef.atmosRadius;
+                float pixelRadSqr = mX * mX + mY * mY;
+        
+                float atmosSurface = atmosRadSqr - planetRadSqr; // Atmosphere radius above surface
+                float pixelSurface = pixelRadSqr - planetRadSqr; // Pixel radius above surface
                 
-                Color c = new Color(0.6f, 0.6f, 0.9f, 0.2f * atmosDensity);
+                Color c = new Color(0.6f, 0.6f, 0.9f, 0.2f);
 
                 if(radSqr > (float)Math.pow(map.getWidth() / 2, 2)) c.a = 0;
 
@@ -110,19 +116,19 @@ public class SpacePlanet extends Entity {
 
     // Functions
     public void applyGravity(float delta, Body b){
-        // Newtons gravitational law: F = G((m1 * m2) / r^2)
-        Vector2 dir = body.getWorldCenter().cpy().sub(b.getWorldCenter());
-        float radSqr = dir.len2();
-        float f = GRAVITY_CONSTANT * ((b.getMass() * stateRef.radius) / radSqr); // TODO: Fix mismatched scales
+        // Newtons gravitational law: F = (G(m1 * m2)) / r^2
+        float orbitRadius = body.getPosition().dst(b.getPosition()); // Entity radius in physics scale
+        Vector2 direction = body.getPosition().cpy().sub(b.getPosition()).nor();
+        float force = (GRAVITY_CONSTANT * b.getMass() * body.getMass()) / (orbitRadius * orbitRadius);
 
-        b.applyForceToCenter(dir.nor().scl(f * (1 / getPhysScale()) * delta), true);
+        b.applyForceToCenter(direction.scl(force * delta), true);
     }
 
     public void applyDrag(float delta, Body b){
         // Newtons gravitational law: F = 1/2(density * velocity^2 * dragCoefficient * Area)
         float planetRadPhys = stateRef.radius / physScale; // Planet radius in physics scale
         float atmosRadPhys = stateRef.atmosRadius / physScale; // Atmosphere radius in physics scale
-        float entRadPhys = body.getPosition().dst(b.getPosition()); // Entity radius in physics sclae
+        float entRadPhys = body.getPosition().dst(b.getPosition()); // Entity radius in physics scale
 
         float atmosSurface = atmosRadPhys - planetRadPhys; // Atmosphere radius above surface
         float entSurface = entRadPhys - planetRadPhys; // Entity radius above surface
