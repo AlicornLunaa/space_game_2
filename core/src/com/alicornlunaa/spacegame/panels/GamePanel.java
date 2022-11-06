@@ -2,8 +2,7 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship;
-import com.alicornlunaa.spacegame.objects.Planet.SpacePlanet;
-import com.alicornlunaa.spacegame.states.PlanetState;
+import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -25,7 +24,7 @@ public class GamePanel extends Stage {
     private float physAccumulator = 0.0f;
 
     public Ship ship;
-    public SpacePlanet planet;
+    public Planet planet;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -40,13 +39,13 @@ public class GamePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
 
-        planet = new SpacePlanet(game, world, new PlanetState());
+        planet = new Planet(game, world, -6800, 0);
         this.addActor(planet);
 
         // Initialize orbit
         float radius = ship.getBody().getPosition().dst(planet.getBody().getPosition());
-        float velScl = (float)Math.sqrt((SpacePlanet.GRAVITY_CONSTANT * ship.getBody().getMass() * planet.getBody().getMass()) / radius);
-        ship.getBody().applyForceToCenter(0, velScl * 2.5f, true);
+        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * ship.getBody().getMass() * planet.getBody().getMass()) / radius);
+        ship.getBody().applyForceToCenter(0, velScl * 2.75f, true);
 
         // Controls
         this.addListener(new InputListener(){

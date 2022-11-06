@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Chunk;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Planet.Tile;
-import com.alicornlunaa.spacegame.states.PlanetState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -14,8 +13,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,25 +23,16 @@ public class PlanetPanel extends Stage {
     // Variables
     private final App game;
 
-    private World world;
-    private float physAccumulator;
-
     public Planet planet;
     public Player player;
     private float worldWidthPixels;
-    
-    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Constructor
-    public PlanetPanel(final App game){
+    public PlanetPanel(final App game, final Planet planet){
         super(new FillViewport(1280, 720));
         this.game = game;
 
-        world = new World(new Vector2(), true);
-
-        planet = new Planet(game, world, new PlanetState(), Constants.PLANET_PPM);
-        player = new Player(game, world, 30, (30 + planet.state.radius) / Constants.PLANET_PPM, Constants.PLANET_PPM);
-        
+        player = new Player(game, planet.getPlanetWorld(), 30, (30 + planet.getRadius()) / Constants.PLANET_PPM, Constants.PLANET_PPM);
         worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
@@ -110,20 +98,15 @@ public class PlanetPanel extends Stage {
     }
 
     // Functions
-    public World getWorld(){ return world; }
+    public Planet getPlanet(){ return planet; }
 
     @Override
     public void act(float delta){
         super.act(delta);
 
         // Physics updates
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            world.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        }
-
         setActiveChunks();
+        planet.updateWorld(delta);
         player.act(delta);
 
         // Constrain player to world bounds
@@ -166,20 +149,18 @@ public class PlanetPanel extends Stage {
 
         batch.setProjectionMatrix(getCamera().combined);
         player.draw(batch, batch.getColor().a);
-        planet.draw(batch, batch.getColor().a);
+        planet.drawWorld(batch, batch.getColor().a);
 
         // Wrapping effect
         batch.setProjectionMatrix(getCamera().combined.cpy().translate(worldWidthPixels, 0, 0).scl(1, 1, 1));
-        planet.draw(batch, batch.getColor().a);
+        planet.drawWorld(batch, batch.getColor().a);
         batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
-        planet.draw(batch, batch.getColor().a);
+        planet.drawWorld(batch, batch.getColor().a);
         batch.setProjectionMatrix(getCamera().combined);
         batch.end();
 
         // Debug rendering
         if(this.isDebugAll()){
-            debug.render(world, getCamera().combined.cpy().scl(Constants.PLANET_PPM));
-
             // Draw chunk borders
             game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());

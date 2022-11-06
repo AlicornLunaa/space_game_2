@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.objects.Planet;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.states.PlanetState;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -44,7 +43,7 @@ public class Chunk {
     }
 
     // Constructor
-    public Chunk(final App game, final World world, final TerrainGenerator generator, PlanetState stateRef, int chunkX, int chunkY){
+    public Chunk(final App game, final World world, final TerrainGenerator generator, int chunkX, int chunkY){
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 

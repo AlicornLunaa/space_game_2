@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame.objects.Planet;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Planet.Tile.TileType;
-import com.alicornlunaa.spacegame.states.PlanetState;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -12,18 +11,18 @@ public class TerrainGenerator {
     private final App game;
     private final OpenSimplexNoise noise;
     
-    private PlanetState state;
     private int planetWidth = 10;  // Width in chunks
     private int planetHeight = 10; // Height in chunks
+    private float radius;
 
     // Constructor
-    public TerrainGenerator(final App game, long seed, int w, int h){
+    public TerrainGenerator(final App game, long seed, int w, int h, float radius){
         this.game = game;
         noise = new OpenSimplexNoise(seed);
 
-        state = new PlanetState();
         planetWidth = w;
         planetHeight = h;
+        this.radius = radius;
     }
 
     // Functions
@@ -41,7 +40,7 @@ public class TerrainGenerator {
 
         if(chunkX < 0 || chunkX > planetWidth - 1) return null;
         if(chunkY < 0 || chunkY > planetHeight - 1) return null;
-        if(y > state.radius) return null;
+        if(y > radius) return null;
         if(noise.eval(x / 10.0f, y / 10.0f) < 0) return null;
 
         if(x < 1) type = TileType.DIRT;
