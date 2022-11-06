@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -25,13 +26,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  * The World object will hold the data for the world's tiles
  * as well as the how to render the circular planet in space.
  */
-
 public class Planet extends Entity {
 
     // Variables
     private final App game;
     private final World spaceWorld;
     private final OpenSimplexNoise noise;
+
+    @SuppressWarnings("unused")
+    private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Planet variables
     private float radius = 2500.0f;
@@ -44,7 +47,6 @@ public class Planet extends Entity {
     private float physAccumulator;
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private TerrainGenerator generator;
-    private Vector2 cursor = new Vector2();
     private ArrayList<Entity> planetEnts = new ArrayList<>(); // Entities on the rectangular planet
 
     // Space variables
@@ -114,7 +116,7 @@ public class Planet extends Entity {
     private void initializeWorld(){
         // Create new world for on the planet
         planetWorld = new World(new Vector2(), true);
-        planetWorld.setGravity(new Vector2(0, 0)); // TODO: Calculate planet gravity at surface
+        planetWorld.setGravity(new Vector2(0, -5)); // TODO: Calculate planet gravity at surface
 
         // Initial terrain
         int initialRad = 3;
@@ -188,6 +190,7 @@ public class Planet extends Entity {
         float y = localPos.len();
 
         e.setPosition(x, y);
+        e.loadBodyToWorld(planetWorld, Constants.PLANET_PPM);
         planetEnts.add(e);
     }
 
@@ -232,9 +235,7 @@ public class Planet extends Entity {
         }
 
         // Debug rendering
-        // if(this.getDebug()){
-        //     debug.render(planetWorld, batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
-        // }
+        debug.render(planetWorld, batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
     }
 
     public void updateWorld(float delta){
@@ -289,21 +290,18 @@ public class Planet extends Entity {
     // World functions
     public Chunk createChunk(int x, int y){
         Chunk c = new Chunk(game, planetWorld, generator, x, y);
-        cursor.set(x, y);
         map.put(new Vector2(x, y), c);
 
         return c;
     }
 
     public Chunk getChunk(int x, int y){
-        cursor.set(x, y);
-        return map.get(cursor);
+        return map.get(new Vector2(x, y));
     }
 
     public Tile getTile(int x, int y){
         // Gets the tile from the world position
-        cursor.set(x / Chunk.CHUNK_SIZE, y / Chunk.CHUNK_SIZE); // Get chunk of the block
-        return map.get(cursor).getTile(x, y);
+        return map.get(new Vector2(x / Chunk.CHUNK_SIZE, y / Chunk.CHUNK_SIZE)).getTile(x, y);
     }
 
     public HashMap<Vector2, Chunk> getMap(){
