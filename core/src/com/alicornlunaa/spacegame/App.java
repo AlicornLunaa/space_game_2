@@ -23,6 +23,7 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public SpaceScene gameScene;
+	public PlanetScene planetScene;
 	public EditorScene editorScene;
 
 	public boolean loaded = false;
@@ -73,9 +74,10 @@ public class App extends Game {
 
 				// Start new scene
 				gameScene = new SpaceScene(this);
+				planetScene = new PlanetScene(this);
 				editorScene = new EditorScene(this);
-				this.setScreen(gameScene);
-				// this.setScreen(new PlanetScene(this));
+				// this.setScreen(gameScene);
+				this.setScreen(planetScene);
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());

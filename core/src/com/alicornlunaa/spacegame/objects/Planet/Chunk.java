@@ -25,6 +25,7 @@ public class Chunk {
     private int chunkX;
     private int chunkY;
     private boolean active = true; // If the chunk should get updates
+    private boolean visible = true;
     private Tile[][] map;
 
     private Body body;
@@ -70,6 +71,8 @@ public class Chunk {
     public Vector2 getChunkPos(){ return new Vector2(chunkX, chunkY); }
     public boolean isActive(){ return active; }
     public void setActive(boolean a){ active = a; }
+    public boolean isVisible(){ return visible; }
+    public void setVisible(boolean a){ visible = a; }
 
     public void update(float delta){
         body.setActive(active);
@@ -88,6 +91,8 @@ public class Chunk {
     }
 
     public void draw(Batch batch){
+        if(!visible) return;
+
         for(Tile[] ySlice : map){
             for(Tile tile : ySlice){
                 if(tile == null) continue;

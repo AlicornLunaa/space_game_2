@@ -35,7 +35,7 @@ public class SpacePlanet extends Entity {
 
     // Private functions
     private void generateSprite(){
-        map = new Pixmap((int)stateRef.radius * 2, (int)stateRef.radius * 2, Format.RGBA8888);
+        map = new Pixmap(Math.min((int)stateRef.radius * 2, 2000), Math.min((int)stateRef.radius * 2, 2000), Format.RGBA8888);
 
         for(int x = 0; x < map.getWidth(); x++){
             for(int y = 0; y < map.getHeight(); y++){
@@ -46,7 +46,7 @@ public class SpacePlanet extends Entity {
                 
                 Color c = new Color(0.72f, 0.7f, 0.9f, 1);
 
-                if(radSqr > stateRef.radius * stateRef.radius) c.a = 0;
+                if(radSqr > (float)Math.pow(map.getWidth() / 2, 2)) c.a = 0;
                 if(rand < 0){ c.mul(0.9f); c.a *= 1.1; }
 
                 map.setColor(c);
@@ -67,7 +67,7 @@ public class SpacePlanet extends Entity {
         setOrigin(getWidth() / 2, getHeight() / 2);
 
         BodyDef def = new BodyDef();
-        def.type = BodyType.StaticBody;
+        def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
         setBody(world.createBody(def));
         setPosition(x, y);

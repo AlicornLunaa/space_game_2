@@ -40,8 +40,14 @@ public class GamePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
 
-        planet = new SpacePlanet(game, world, new PlanetState(), -2000, 0);
+        planet = new SpacePlanet(game, world, new PlanetState(), -250000, 0);
         this.addActor(planet);
+
+        // Initialize orbit
+        float R = ship.getPosition().dst(planet.getPosition());
+        float velScl = (float)Math.sqrt((SpacePlanet.GRAVITY_CONSTANT * planet.getBody().getMass()) / R);
+        Vector2 planetToShip = new Vector2(0, 1).scl(velScl * 0.12f);
+        ship.getBody().applyForceToCenter(planetToShip, true);
 
         // Controls
         this.addListener(new InputListener(){

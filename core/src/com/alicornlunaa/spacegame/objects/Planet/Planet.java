@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.Planet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
@@ -21,11 +22,13 @@ public class Planet extends Entity {
     private final App game;
     private final World world;
 
-    private PlanetState state;
+    public PlanetState state;
 
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private TerrainGenerator generator;
     private Vector2 cursor = new Vector2();
+
+    private ArrayList<Entity> planetEnts = new ArrayList<>();
 
     // Constructor
     public Planet(final App game, final World world, PlanetState state, float physScale){
@@ -39,7 +42,7 @@ public class Planet extends Entity {
         generator = new TerrainGenerator(game, state.seed, (int)(2 * Math.PI * state.radius / Chunk.CHUNK_SIZE), (int)(state.radius / Chunk.CHUNK_SIZE));
 
         // Update world
-        world.setGravity(new Vector2(0, 600 * getGravityScale() / Constants.PLANET_PPM));
+        world.setGravity(new Vector2(0, -1 * getGravityScale() / Constants.PLANET_PPM));
 
         // Initialize a cube for testing
         int initialRad = 3;
@@ -51,15 +54,51 @@ public class Planet extends Entity {
     }
 
     // Functions
-    public float getGravityScale(){ return state.radius / -1000.0f; }
+    public float getGravityScale(){ return (SpacePlanet.GRAVITY_CONSTANT * state.mass) / (state.radius * state.radius); }
 
     public TerrainGenerator getGenerator(){ return generator; }
+
+    /**
+     * Converts the entity to 2d planet planar coordinates
+     * @param e Entity to be converted
+     */
+    public void addEntity(Entity e){
+        // Formula: x = theta, y = radius
+        float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+        float x = (float)((Math.atan(e.getY() / e.getX()) + (Math.PI / 2)) / Math.PI * worldWidthUnits);
+        float y = e.getPosition().dst(this.getPosition());
+
+        e.setPosition(x, y);
+        planetEnts.add(e);
+    }
+
+    /**
+     * Convert the entity to the space planet circular coordinates
+     * @param e Entity to be converted
+     */
+    public void delEntity(Entity e){
+        // Formula: theta = x, radius = y
+        float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+        double theta = (e.getX() / worldWidthUnits * Math.PI - (Math.PI / 2));
+        float radius = e.getY();
+
+        float x = (float)(Math.cos(theta) * radius);
+        float y = (float)(Math.sin(theta) * radius);
+
+        e.setPosition(x, y);
+        planetEnts.remove(e);
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha){
         // Draw each chunk rotated around, theta = x, r = y
         for(Chunk chunk : map.values()){
             chunk.draw(batch);
+        }
+
+        // Draw every entity
+        for(Entity e : planetEnts){
+            e.draw(batch, parentAlpha);
         }
     }
 

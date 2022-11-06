@@ -43,7 +43,7 @@ public class PlanetPanel extends Stage {
         world = new World(new Vector2(), true);
 
         planet = new Planet(game, world, new PlanetState(), Constants.PLANET_PPM);
-        player = new Player(game, world, 0, 1.2f * Chunk.CHUNK_SIZE * Tile.TILE_SIZE / Constants.PLANET_PPM, Constants.PLANET_PPM);
+        player = new Player(game, world, 30, Chunk.CHUNK_SIZE * Tile.TILE_SIZE + planet.state.radius / Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * Tile.TILE_SIZE / Constants.PLANET_PPM, Constants.PLANET_PPM);
         
         worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
@@ -101,6 +101,7 @@ public class PlanetPanel extends Stage {
                     chunk = planet.createChunk(chunkX + x, chunkY + y);
                 }
                 
+                chunk.setVisible(isChunkVisible(chunk));
                 chunk.setActive(Math.abs(x) <= Chunk.ACTIVE_DISTANCE && Math.abs(y) <= Chunk.ACTIVE_DISTANCE);
             }
         }
