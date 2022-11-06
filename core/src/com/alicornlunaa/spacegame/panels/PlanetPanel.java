@@ -94,11 +94,13 @@ public class PlanetPanel extends Stage {
 
         for(int x = -renderRange; x <= renderRange; x++){
             for(int y = -renderRange; y <= renderRange; y++){
-                Chunk chunk = planet.getChunk(chunkX + x, chunkY + y);
+                int chunkXWrapped = Math.floorMod((chunkX + x), planet.getGenerator().getWidth());
+                int chunkYWrapped = Math.floorMod((chunkY + y), planet.getGenerator().getHeight());
+                Chunk chunk = planet.getChunk(chunkXWrapped, chunkYWrapped);
 
                 if(chunk == null){
                     // Make a set chunk here
-                    chunk = planet.createChunk(chunkX + x, chunkY + y);
+                    chunk = planet.createChunk(chunkXWrapped, chunkYWrapped);
                 }
                 
                 chunk.setVisible(isChunkVisible(chunk));

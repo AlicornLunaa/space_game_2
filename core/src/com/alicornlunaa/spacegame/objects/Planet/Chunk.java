@@ -100,6 +100,8 @@ public class Chunk {
                 tile.draw(batch);
             }
         }
+
+        visible = false;
     }
 
     public void dispose(){
