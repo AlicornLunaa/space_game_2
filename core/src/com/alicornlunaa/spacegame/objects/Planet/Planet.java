@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -47,7 +46,6 @@ public class Planet extends Entity {
     private TerrainGenerator generator;
     private Vector2 cursor = new Vector2();
     private ArrayList<Entity> planetEnts = new ArrayList<>(); // Entities on the rectangular planet
-    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Space variables
     private CircleShape shape = new CircleShape();
@@ -234,9 +232,9 @@ public class Planet extends Entity {
         }
 
         // Debug rendering
-        if(this.getDebug()){
-            debug.render(planetWorld, batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
-        }
+        // if(this.getDebug()){
+        //     debug.render(planetWorld, batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
+        // }
     }
 
     public void updateWorld(float delta){

@@ -32,6 +32,7 @@ public class PlanetPanel extends Stage {
         super(new FillViewport(1280, 720));
         this.game = game;
 
+        this.planet = planet;
         player = new Player(game, planet.getPlanetWorld(), 30, (30 + planet.getRadius()) / Constants.PLANET_PPM, Constants.PLANET_PPM);
         worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
@@ -116,9 +117,13 @@ public class PlanetPanel extends Stage {
             player.setX(player.getX() + worldWidthPixels);
         }
 
+        if(planet.getEntities().size() > 0){
+            player.setPosition(planet.getEntities().get(0).getPosition().add(0, 50));
+        }
+
         // Parent camera to player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(planet.getEntities().size() > 0 ? planet.getEntities().get(0).getPosition() : player.getPosition(), 0);
+        cam.position.set(player.getPosition(), 0);
         cam.update();
 
         // Controls for player
