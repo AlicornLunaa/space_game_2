@@ -29,8 +29,9 @@ public class PlanetPanel extends Stage {
     private World world;
     private float physAccumulator;
 
-    private Planet planet;
-    private Player player;
+    public Planet planet;
+    public Player player;
+    private float worldWidthPixels;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -42,7 +43,9 @@ public class PlanetPanel extends Stage {
         world = new World(new Vector2(), true);
 
         planet = new Planet(game, world, new PlanetState(), Constants.PLANET_PPM);
-        player = new Player(game, world, 0, 50 / Constants.PLANET_PPM, Constants.PLANET_PPM);
+        player = new Player(game, world, 0, 1.2f * Chunk.CHUNK_SIZE * Tile.TILE_SIZE / Constants.PLANET_PPM, Constants.PLANET_PPM);
+        
+        worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
         this.addListener(new InputListener(){
@@ -118,11 +121,14 @@ public class PlanetPanel extends Stage {
         }
 
         setActiveChunks();
-        for(Chunk chunk : planet.getMap().values()){
-            chunk.update(delta);
-        }
-
         player.act(delta);
+
+        // Constrain player to world bounds
+        if(player.getX() > worldWidthPixels){
+            player.setX(player.getX() - worldWidthPixels);
+        } else if(player.getX() < 0){
+            player.setX(player.getX() + worldWidthPixels);
+        }
 
         // Parent camera to player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
@@ -155,13 +161,16 @@ public class PlanetPanel extends Stage {
         Batch batch = getBatch();
         batch.begin();
 
-        for(Chunk chunk : planet.getMap().values()){
-            if(!isChunkVisible(chunk)) continue;
-            chunk.draw(batch);
-        }
-
+        batch.setProjectionMatrix(getCamera().combined);
         player.draw(batch, batch.getColor().a);
+        planet.draw(batch, batch.getColor().a);
 
+        // Wrapping effect
+        batch.setProjectionMatrix(getCamera().combined.cpy().translate(worldWidthPixels, 0, 0).scl(1, 1, 1));
+        planet.draw(batch, batch.getColor().a);
+        batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
+        planet.draw(batch, batch.getColor().a);
+        batch.setProjectionMatrix(getCamera().combined);
         batch.end();
 
         // Debug rendering

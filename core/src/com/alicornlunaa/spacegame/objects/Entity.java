@@ -92,13 +92,13 @@ public class Entity extends Actor implements Disposable {
     
     @Override
     public void setX(float x){
-        if(body != null) body.getPosition().x = x / physScale;
+        if(body != null) body.setTransform(new Vector2(x / physScale, body.getPosition().y), body.getAngle());
         super.setX(x);
     }
     
     @Override
     public void setY(float y){
-        if(body != null) body.getPosition().y = y / physScale;
+        if(body != null) body.setTransform(new Vector2(body.getPosition().x, y / physScale), body.getAngle());
         super.setY(y);
     }
 

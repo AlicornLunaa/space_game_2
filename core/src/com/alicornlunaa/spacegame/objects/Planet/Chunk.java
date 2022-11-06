@@ -1,9 +1,7 @@
 package com.alicornlunaa.spacegame.objects.Planet;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Planet.Tile.TileType;
 import com.alicornlunaa.spacegame.states.PlanetState;
-import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -26,35 +24,28 @@ public class Chunk {
     // Variables
     private int chunkX;
     private int chunkY;
-    private boolean active = false; // If the chunk should get updates
+    private boolean active = true; // If the chunk should get updates
     private Tile[][] map;
 
-    private PlanetState stateRef;
     private Body body;
 
     // Private functions
-    private void generate(final App game, final OpenSimplexNoise noise){
+    private void generate(final App game, final TerrainGenerator generator){
         // Generate a tile for each chunk
         for(int x = 0; x < CHUNK_SIZE; x++){
             for(int y = 0; y < CHUNK_SIZE; y++){
-                TileType type = TileType.STONE;
                 int blockX = x + (chunkX * CHUNK_SIZE);
                 int blockY = y + (chunkY * CHUNK_SIZE);
 
-                if(blockX * blockX + blockY * blockY > (float)Math.pow(stateRef.radius, 1)) continue;
-                if(noise.eval(blockX / 10.0f, blockY / 10.0f) < 0) continue;
-                if(blockY > 3) continue;
-
-                map[x][y] = new Tile(game, body, blockX, blockY, chunkX, chunkY, type);
+                map[x][y] = generator.createTile(body, blockX, blockY, chunkX, chunkY);
             }
         }
     }
 
     // Constructor
-    public Chunk(final App game, final World world, final OpenSimplexNoise noise, PlanetState stateRef, int chunkX, int chunkY){
+    public Chunk(final App game, final World world, final TerrainGenerator generator, PlanetState stateRef, int chunkX, int chunkY){
         this.chunkX = chunkX;
         this.chunkY = chunkY;
-        this.stateRef = stateRef;
 
         // Create chunk body
         float wSize = Tile.TILE_SIZE * CHUNK_SIZE;
@@ -67,7 +58,7 @@ public class Chunk {
 
         // Generate tile map
         map = new Tile[CHUNK_SIZE][CHUNK_SIZE];
-        generate(game, noise);
+        generate(game, generator);
     }
 
     // Functions
