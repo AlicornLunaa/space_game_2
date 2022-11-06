@@ -208,6 +208,7 @@ public class Planet extends Entity {
         float y = (float)(Math.sin(theta) * radius) + getY();
 
         e.setPosition(x, y);
+        e.loadBodyToWorld(game.gameScene.gamePanel.getWorld(), Constants.PPM);
         planetEnts.remove(e);
     }
 
@@ -235,7 +236,7 @@ public class Planet extends Entity {
         }
 
         // Debug rendering
-        debug.render(planetWorld, batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
+        // debug.render(planetWorld, batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
     }
 
     public void updateWorld(float delta){

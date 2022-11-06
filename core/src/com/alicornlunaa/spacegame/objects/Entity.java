@@ -85,7 +85,6 @@ public class Entity extends Actor implements Disposable {
             }
 
             fixtures.add(fixtureDef);
-            body.destroyFixture(f);
         }
 
         // Save body data
