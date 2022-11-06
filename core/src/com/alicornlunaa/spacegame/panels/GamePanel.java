@@ -46,8 +46,7 @@ public class GamePanel extends Stage {
         // Initialize orbit
         float R = ship.getPosition().dst(planet.getPosition());
         float velScl = (float)Math.sqrt((SpacePlanet.GRAVITY_CONSTANT * planet.getBody().getMass()) / R);
-        Vector2 planetToShip = new Vector2(0, 1).scl(velScl * 0.12f);
-        // ship.getBody().applyForceToCenter(planetToShip, true);
+        ship.getBody().setLinearVelocity(0, velScl / Constants.PPM * 80);
 
         // Controls
         this.addListener(new InputListener(){
@@ -93,6 +92,7 @@ public class GamePanel extends Stage {
         }
 
         planet.applyGravity(delta, ship.getBody());
+        planet.applyDrag(delta, ship.getBody());
 
         // Parent camera to the ship
         OrthographicCamera cam = (OrthographicCamera)getCamera();

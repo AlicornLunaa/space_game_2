@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.Planet;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.states.PlanetState;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -30,11 +31,13 @@ public class SpacePlanet extends Entity {
     private final OpenSimplexNoise noise;
     
     private Pixmap map;
-    private Texture texture;
-    private TextureRegionDrawable sprite;
+    private Texture terrainTexture;
+    private TextureRegionDrawable terrainSprite;
+    private Texture atmosTexture;
+    private TextureRegionDrawable atmosSprite;
 
     // Private functions
-    private void generateSprite(){
+    private void generateTerrainSprite(){
         map = new Pixmap(Math.min((int)stateRef.radius * 2, 2000), Math.min((int)stateRef.radius * 2, 2000), Format.RGBA8888);
 
         for(int x = 0; x < map.getWidth(); x++){
@@ -54,8 +57,32 @@ public class SpacePlanet extends Entity {
             }
         }
 
-        texture = new Texture(map);
-        sprite = new TextureRegionDrawable(texture);
+        terrainTexture = new Texture(map);
+        terrainSprite = new TextureRegionDrawable(terrainTexture);
+        map.dispose();
+    }
+
+    private void generateAtmosphereSprite(){
+        map = new Pixmap(Math.min((int)stateRef.atmosRadius * 2, 2500), Math.min((int)stateRef.atmosRadius * 2, 2500), Format.RGBA8888);
+
+        for(int x = 0; x < map.getWidth(); x++){
+            for(int y = 0; y < map.getHeight(); y++){
+                int mX = x - map.getWidth() / 2;
+                int mY = y - map.getHeight() / 2;
+                int radSqr = mX * mX + mY * mY;
+                float atmosDensity = Math.abs(1 - (radSqr / (stateRef.atmosRadius * stateRef.atmosRadius)));
+                
+                Color c = new Color(0.6f, 0.6f, 0.9f, 0.2f * atmosDensity);
+
+                if(radSqr > (float)Math.pow(map.getWidth() / 2, 2)) c.a = 0;
+
+                map.setColor(c);
+                map.drawPixel(x, y);
+            }
+        }
+
+        atmosTexture = new Texture(map);
+        atmosSprite = new TextureRegionDrawable(atmosTexture);
         map.dispose();
     }
 
@@ -77,7 +104,8 @@ public class SpacePlanet extends Entity {
         body.createFixture(shape, 1.0f);
 
         noise = new OpenSimplexNoise(state.seed);
-        generateSprite();
+        generateTerrainSprite();
+        generateAtmosphereSprite();
     }
 
     // Functions
@@ -85,9 +113,28 @@ public class SpacePlanet extends Entity {
         // Newtons gravitational law: F = G((m1 * m2) / r^2)
         Vector2 dir = body.getWorldCenter().cpy().sub(b.getWorldCenter());
         float radSqr = dir.len2();
-        float f = GRAVITY_CONSTANT * ((b.getMass() * stateRef.radius) / radSqr);
+        float f = GRAVITY_CONSTANT * ((b.getMass() * stateRef.radius) / radSqr); // TODO: Fix mismatched scales
 
         b.applyForceToCenter(dir.nor().scl(f * (1 / getPhysScale()) * delta), true);
+    }
+
+    public void applyDrag(float delta, Body b){
+        // Newtons gravitational law: F = 1/2(density * velocity^2 * dragCoefficient * Area)
+        float planetRadPhys = stateRef.radius / physScale; // Planet radius in physics scale
+        float atmosRadPhys = stateRef.atmosRadius / physScale; // Atmosphere radius in physics scale
+        float entRadPhys = body.getPosition().dst(b.getPosition()); // Entity radius in physics sclae
+
+        float atmosSurface = atmosRadPhys - planetRadPhys; // Atmosphere radius above surface
+        float entSurface = entRadPhys - planetRadPhys; // Entity radius above surface
+        float atmosDepth = Math.max(atmosSurface - entSurface, 0) / atmosSurface; // How far the entity is in the atmosphere, where zero is outside and 1 is submerged
+        float density = stateRef.atmosDensity * atmosDepth;
+
+        Vector2 relVel = body.getLinearVelocity().cpy().sub(b.getLinearVelocity());
+        Vector2 velDir = b.getLinearVelocity().cpy().nor();
+        float velSqr = relVel.len2();
+        float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
+
+        b.applyForceToCenter(velDir.scl(-1 * force * delta), true);
     }
 
     @Override
@@ -96,13 +143,15 @@ public class SpacePlanet extends Entity {
 
         Matrix4 oldMatrix = batch.getTransformMatrix();
         batch.setTransformMatrix(new Matrix4().set(getTransform()));
-        sprite.draw(batch, 0, 0, getWidth(), getHeight());
+        atmosSprite.draw(batch, getOriginX() - stateRef.atmosRadius, getOriginY() - stateRef.atmosRadius, stateRef.atmosRadius * 2, stateRef.atmosRadius * 2);
+        terrainSprite.draw(batch, 0, 0, stateRef.radius * 2, stateRef.radius * 2);
         batch.setTransformMatrix(oldMatrix);
     }
 
     @Override
     public boolean remove(){
-        texture.dispose();
+        terrainTexture.dispose();
+        atmosTexture.dispose();
         shape.dispose();
         return super.remove();
     }
