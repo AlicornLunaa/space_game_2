@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.objects.Planet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
@@ -48,6 +49,7 @@ public class Planet extends Entity {
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private TerrainGenerator generator;
     private ArrayList<Entity> planetEnts = new ArrayList<>(); // Entities on the rectangular planet
+    private Stack<Entity> leavingEnts = new Stack<>(); // Entities leaving the rectangular world
 
     // Space variables
     private CircleShape shape = new CircleShape();
@@ -282,6 +284,14 @@ public class Planet extends Entity {
             } else if(e.getX() < 0){
                 e.setX(e.getX() + worldWidthPixels);
             }
+
+            this.checkLeavePlanet(e);
+        }
+
+        while(leavingEnts.size() > 0){
+            Entity e  = leavingEnts.pop();
+            this.delEntity(e);
+            game.setScreen(game.gameScene);
         }
     }
 
@@ -335,6 +345,18 @@ public class Planet extends Entity {
             this.addEntity(e);
             game.setScreen(game.planetScene);
 
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkLeavePlanet(Entity e){
+        // This function checks if the entity supplied
+        // is far enough to leave the planet's physics world
+        if(e.getY() > atmosRadius){
+            // Move it into this world
+            leavingEnts.push(e);
             return true;
         }
 

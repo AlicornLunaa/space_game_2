@@ -3,7 +3,6 @@ package com.alicornlunaa.spacegame.panels;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
-import com.alicornlunaa.spacegame.scenes.PlanetScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -52,7 +51,7 @@ public class PlanetUIPanel extends Stage {
     // Functions
     @Override
     public void draw(){
-        PlanetPanel planetPanel = ((PlanetScene)game.getScreen()).planetPanel;
+        PlanetPanel planetPanel = game.planetScene.planetPanel;
 
         fpsCounter.setText((int)(1 / Gdx.graphics.getDeltaTime()));
         posLabel.setText(planetPanel.player.getPosition().toString());
