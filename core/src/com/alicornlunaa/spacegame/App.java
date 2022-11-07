@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.ray3k.stripe.FreeTypeSkin;
 
 public class App extends Game {
 
@@ -38,15 +39,12 @@ public class App extends Game {
 	public void create(){
 		// Load files and settings
 		ControlSchema.fromFile("./saves/settings/controls.json");
-
-		manager = new Assets();
+		skin = new FreeTypeSkin(Gdx.files.internal("skins/default/uiskin.json"));
 
 		partManager.load("parts/aero.json");
 		partManager.load("parts/structural.json");
 		partManager.load("parts/thrusters.json");
 		partManager.load("parts/rcsport.json");
-
-		skin = new Skin(Gdx.files.internal("skins/default/uiskin.json"));
 
 		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
@@ -64,6 +62,7 @@ public class App extends Game {
 				// Finish loading by removing the loading screen
 				((LoadingScene)this.getScreen()).progressBar.setValue(1);
 
+				skin = manager.get("skins/spacecadet/spacecadet.json");
 				atlas = manager.get("textures_packed/textures.atlas", TextureAtlas.class);
 				particleAtlas = manager.get("particles_packed/particles.atlas", TextureAtlas.class);
 				loaded = true;

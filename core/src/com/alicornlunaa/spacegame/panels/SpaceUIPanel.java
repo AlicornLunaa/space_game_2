@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class SpaceUIPanel extends Stage {
     
@@ -36,6 +38,10 @@ public class SpaceUIPanel extends Stage {
     public SpaceUIPanel(final App game){
         super(new ScreenViewport());
         this.game = game;
+
+        // Load layout from file
+        SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
+        builder.build(this, game.skin, Gdx.files.internal("layouts/space_ui.json"));
 
         // Initialize UI elements
         Table tbl = new Table(game.skin);

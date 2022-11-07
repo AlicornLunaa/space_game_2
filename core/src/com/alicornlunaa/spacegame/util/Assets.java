@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.ray3k.stripe.FreeTypeSkinLoader;
 
 /*
  * Load all the files for the game here
@@ -21,6 +23,12 @@ public class Assets extends AssetManager {
     // Constructor
     public Assets(){
         super();
+
+        // Create loaders
+        setLoader(Skin.class, new FreeTypeSkinLoader(getFileHandleResolver()));
+
+        // Load skin
+        load("skins/spacecadet/spacecadet.json", Skin.class);
 
         // Load the texture atlases
         load("textures_packed/textures.atlas", TextureAtlas.class);
