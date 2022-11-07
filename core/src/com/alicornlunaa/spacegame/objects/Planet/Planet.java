@@ -245,7 +245,7 @@ public class Planet extends Entity {
         e.setPosition(x, y);
 
         // Convert to space velocity, tangent = x, planetToEntity = y
-        Vector2 tangent = new Vector2(1, 0).rotateRad((float)theta);
+        Vector2 tangent = new Vector2(0, -1).rotateRad((float)theta);
         Vector2 planetToEnt = e.getPosition().sub(this.getPosition()).nor();
         Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
