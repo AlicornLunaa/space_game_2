@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.alicornlunaa.spacegame.widgets.Compass;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -25,6 +26,8 @@ public class GameUIPanel extends Stage {
     private TextButton sasBtn;
     private TextButton rcsBtn;
     private ProgressBar throttleBar;
+    
+    public Compass shipCompass;
 
     private Label positionLabel;
     private Label velocityLabel;
@@ -82,6 +85,12 @@ public class GameUIPanel extends Stage {
         hud.add(throttleBar).expand().right().bottom().pad(20).minHeight(256);
 
         tbl.add(hud).colspan(9);
+
+        // Navigation compass
+        shipCompass = new Compass(game);
+        shipCompass.setX(this.getWidth() / 2, 70);
+        shipCompass.setOrigin(30, 30);
+        this.addActor(shipCompass);
 
         // Controls
         this.addListener(new InputListener(){
