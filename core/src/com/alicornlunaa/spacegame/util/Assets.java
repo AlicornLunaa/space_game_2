@@ -29,6 +29,7 @@ public class Assets extends AssetManager {
 
         // Load skin
         load("skins/spacecadet/spacecadet.json", Skin.class);
+        load("skins/default/uiskin.json", Skin.class);
 
         // Load the texture atlases
         load("textures_packed/textures.atlas", TextureAtlas.class);

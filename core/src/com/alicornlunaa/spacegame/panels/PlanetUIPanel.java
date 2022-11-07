@@ -37,7 +37,7 @@ public class PlanetUIPanel extends Stage {
 
         // Navigation compass
         shipCompass = new Compass(game);
-        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 0);
+        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 15);
         this.addActor(shipCompass);
 
         // Controls

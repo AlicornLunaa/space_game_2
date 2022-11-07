@@ -19,12 +19,16 @@ public class Compass extends Widget {
 
     private TextureRegion ballTexture;
     private TextureRegion arrowTexture;
+    private TextureRegion markerTexture;
 
     // Constructor
     public Compass(App game){
         super();
+
         ballTexture = game.atlas.findRegion("ui/compass");
         arrowTexture = game.atlas.findRegion("ui/compass_arrow");
+        markerTexture = game.atlas.findRegion("ui/compass_markers");
+
         setBounds(0, 0, ballTexture.getRegionWidth(), ballTexture.getRegionHeight());
         setOrigin(ballTexture.getRegionWidth() / 2, ballTexture.getRegionHeight() / 2);
     }
@@ -64,6 +68,24 @@ public class Compass extends Widget {
             arrowTexture.getRegionHeight() / 2,
             arrowTexture.getRegionWidth(),
             arrowTexture.getRegionHeight(),
+            getScaleX(),
+            getScaleY(),
+            theta
+        );
+
+        // Draw the ball with the angle relative to the target velocity
+        theta = 0;
+        if(targetEnt != null){
+            theta = targetEnt.getBody().getLinearVelocity().angleDeg() - 90;
+        }
+        batch.draw(
+            markerTexture,
+            getX() + getOriginX() - markerTexture.getRegionWidth() / 2,
+            getY() + getOriginY() - markerTexture.getRegionHeight() / 2,
+            markerTexture.getRegionWidth() / 2,
+            markerTexture.getRegionHeight() / 2,
+            markerTexture.getRegionWidth(),
+            markerTexture.getRegionHeight(),
             getScaleX(),
             getScaleY(),
             theta

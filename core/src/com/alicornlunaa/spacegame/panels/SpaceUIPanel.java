@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
@@ -36,12 +37,12 @@ public class SpaceUIPanel extends Stage {
 
     // Constructor
     public SpaceUIPanel(final App game){
-        super(new ScreenViewport());
+        super(new ExtendViewport(1280, 720));
         this.game = game;
 
         // Load layout from file
         SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
-        builder.build(this, game.skin, Gdx.files.internal("layouts/space_ui.json"));
+        // builder.build(this, game.skin, Gdx.files.internal("layouts/space_ui.json"));
 
         // Initialize UI elements
         Table tbl = new Table(game.skin);

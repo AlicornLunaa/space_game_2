@@ -62,7 +62,8 @@ public class App extends Game {
 				// Finish loading by removing the loading screen
 				((LoadingScene)this.getScreen()).progressBar.setValue(1);
 
-				skin = manager.get("skins/spacecadet/spacecadet.json");
+				// skin = manager.get("skins/spacecadet/spacecadet.json");
+				skin = manager.get("skins/default/uiskin.json");
 				atlas = manager.get("textures_packed/textures.atlas", TextureAtlas.class);
 				particleAtlas = manager.get("particles_packed/particles.atlas", TextureAtlas.class);
 				loaded = true;
