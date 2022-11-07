@@ -5,9 +5,6 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Chunk;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Planet.Tile;
-import com.alicornlunaa.spacegame.util.Constants;
-import com.alicornlunaa.spacegame.util.ControlSchema;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -28,12 +25,12 @@ public class PlanetPanel extends Stage {
     private float worldWidthPixels;
 
     // Constructor
-    public PlanetPanel(final App game, final Planet planet){
+    public PlanetPanel(final App game, final Planet planet, final Player player){
         super(new FillViewport(1280, 720));
         this.game = game;
 
         this.planet = planet;
-        player = new Player(game, planet.getPlanetWorld(), 30, (30 + planet.getRadius()) / Constants.PLANET_PPM, Constants.PLANET_PPM);
+        this.player = player;
         worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
@@ -108,40 +105,11 @@ public class PlanetPanel extends Stage {
         // Physics updates
         setActiveChunks();
         planet.updateWorld(delta);
-        player.act(delta);
-
-        // Constrain player to world bounds
-        if(player.getX() > worldWidthPixels){
-            player.setX(player.getX() - worldWidthPixels);
-        } else if(player.getX() < 0){
-            player.setX(player.getX() + worldWidthPixels);
-        }
-
-        if(planet.getEntities().size() > 0){
-            player.setPosition(planet.getEntities().get(0).getPosition().add(0, 50));
-        }
 
         // Parent camera to player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
         cam.position.set(player.getPosition(), 0);
         cam.update();
-
-        // Controls for player
-        if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
-            player.state.vertical = 1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
-            player.state.vertical = -1;
-        } else {
-            player.state.vertical = 0;
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
-            player.state.horizontal = 1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
-            player.state.horizontal = -1;
-        } else {
-            player.state.horizontal = 0;
-        }
     }
 
     @Override

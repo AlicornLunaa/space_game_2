@@ -199,10 +199,9 @@ public class Planet extends Entity {
 
         // Orbital velocity formula: v = sqrt((G * planetMass) / orbitRadius)
         Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
+        Vector2 tangent = localPos.cpy().nor().rotateDeg(-90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
-        float orbitRadius = localPos.len();
-        float oldVel = e.getBody().getLinearVelocity().len();
-        float tangentVel = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * body.getMass()) / orbitRadius) * -(oldVel / Math.abs(oldVel + 0.00001f));
+        float tangentVel = vel.dot(tangent);
         e.getBody().setLinearVelocity(tangentVel, velToPlanet);
 
         // Add body
@@ -284,6 +283,8 @@ public class Planet extends Entity {
             } else if(e.getX() < 0){
                 e.setX(e.getX() + worldWidthPixels);
             }
+
+            e.act(delta);
 
             this.checkLeavePlanet(e);
         }

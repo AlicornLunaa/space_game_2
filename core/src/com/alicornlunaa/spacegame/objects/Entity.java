@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Null;
 public class Entity extends Actor implements Disposable {
 
     // Variables
+    protected @Null Entity driver = null;
     protected @Null Body body = null;
     protected float physScale = Constants.PPM;
 
@@ -42,6 +43,7 @@ public class Entity extends Actor implements Disposable {
      * @param e The entity to be loaded
      */
     public void loadBodyToWorld(World world, float newPhysScale){
+        if(driver != null) driver.loadBodyToWorld(world, newPhysScale);
         if(body == null) return;
         
         // Save all the fixture data
@@ -118,8 +120,12 @@ public class Entity extends Actor implements Disposable {
         for(Shape s : shapes){
             s.dispose();
         }
+
+        afterWorldChange();
     }
     
+    protected void afterWorldChange(){}
+
     public void setPhysScale(float s){ physScale = s; }
     public float getPhysScale(){ return physScale; }
     

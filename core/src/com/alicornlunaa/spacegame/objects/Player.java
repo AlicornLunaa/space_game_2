@@ -1,7 +1,8 @@
 package com.alicornlunaa.spacegame.objects;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.states.PlayerState;
+import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Null;
 
 /**
  * Player controller class, will handle inputs and other
@@ -23,7 +25,10 @@ public class Player extends Entity {
     // Variables
     private final World world;
 
-    public PlayerState state = new PlayerState();
+    private float vertical = 0.0f;
+    private float horizontal = 0.0f;
+    private boolean grounded = false;
+    private @Null Entity drivingEnt = null;
 
     private PolygonShape shape = new PolygonShape();
     private RayCastCallback jumpCallback;
@@ -31,7 +36,7 @@ public class Player extends Entity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 5500.0f;
+    private static final float MOVEMENT_SPEED = 25.0f;
     private static final float JUMP_FORCE = 700000.0f;
 
     // Constructor
@@ -62,7 +67,7 @@ public class Player extends Entity {
         jumpCallback = new RayCastCallback(){
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction){
-                state.grounded = true;
+                grounded = true;
                 return fraction;
             }
         };
@@ -71,27 +76,73 @@ public class Player extends Entity {
     }
 
     // Functions
+    public void drive(Entity e){
+        drivingEnt = e;
+        e.driver = this;
+
+        this.body.setActive(false);
+    }
+
+    public void stopDriving(){
+        setPosition(drivingEnt.getPosition());
+        drivingEnt.driver = null;
+        drivingEnt = null;
+        
+        this.body.setActive(true);
+    }
+
+    // Overrides
     @Override
     public void act(float delta){
-        super.act(delta);
-
-        state.grounded = false;
+        // Groundchecking
+        grounded = false;
         world.rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (getHeight() / 2 + 0.5f) / getPhysScale())));
 
-        if(state.vertical != 0 || state.horizontal != 0){
-            body.applyLinearImpulse(new Vector2(state.horizontal, state.grounded ? state.vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta), body.getWorldCenter(), true);
+        // Movement
+        if(vertical != 0 || horizontal != 0){
+            body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta).scl(1 / getPhysScale()), body.getWorldCenter(), true);
         }
+
+        if(drivingEnt == null){
+            // Controls for player
+            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
+                vertical = 1;
+            } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
+                vertical = -1;
+            } else {
+                vertical = 0;
+            }
+            
+            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
+                horizontal = 1;
+            } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
+                horizontal = -1;
+            } else {
+                horizontal = 0;
+            }
+        } else {
+            drivingEnt.act(delta);
+        }
+        
+        super.act(delta);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        super.draw(batch, parentAlpha);
+        if(drivingEnt != null){
+            if(drivingEnt.getBody() == null){
+                this.setPosition(drivingEnt.getPosition());
+            } else {
+                this.setPosition(drivingEnt.getBody().getWorldCenter().cpy().scl(getPhysScale()));
+            }
 
+            return;
+        }
+
+        super.draw(batch, parentAlpha);
         Matrix3 transform = getTransform();
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
-
         idleTexture.draw(batch, 0, 0, 0, 0, getWidth(), getHeight(), 1, 1, 0);
-        
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 

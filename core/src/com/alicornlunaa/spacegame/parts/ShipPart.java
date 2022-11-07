@@ -121,6 +121,17 @@ public class ShipPart extends Entity {
     }
 
     // Functions
+    public void setParent(Body p, float physScale){
+        parent = p;
+        setPhysScale(physScale);
+
+        for(Attachment a : attachments){
+            if(a.getChild() != null){
+                a.getChild().setParent(p, physScale);
+            }
+        }
+    }
+
     public Attachment getClosestAttachment(Vector2 point){
         // Returns the closest attachment to the point
         if(attachments.size() <= 0) return null;

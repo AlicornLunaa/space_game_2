@@ -74,7 +74,7 @@ public class App extends Game {
 
 				// Start new scene
 				gameScene = new SpaceScene(this);
-				planetScene = new PlanetScene(this, gameScene.gamePanel.planet);
+				planetScene = new PlanetScene(this, gameScene.gamePanel.planet, gameScene.gamePanel.player);
 				editorScene = new EditorScene(this);
 				this.setScreen(gameScene);
             	// gameScene.gamePanel.planet.addEntity(gameScene.gamePanel.ship);

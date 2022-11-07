@@ -9,6 +9,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.parts.ShipPart;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -231,17 +232,55 @@ public class Ship extends Entity {
 
     @Override
     public void act(float delta){
-        super.act(delta);
-
         if(state.sas){
             computeSAS();
         } else {
             state.artifRoll = 0;
         }
 
+        if(driver == null) return;
+
         if(rootPart != null){
             rootPart.act(delta);
         }
+
+        // Ship controls
+        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
+            state.throttle = Math.min(state.throttle + 0.01f, 1);
+        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
+            state.throttle = Math.max(state.throttle - 0.01f, 0);
+        }
+        
+        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_LEFT)){
+            state.roll = -1;
+        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_RIGHT)){
+            state.roll = 1;
+        } else {
+            state.roll = 0;
+        }
+        
+        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)){
+            state.vertical = 1;
+        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)){
+            state.vertical = -1;
+        } else {
+            state.vertical = 0;
+        }
+        
+        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)){
+            state.horizontal = -1;
+        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)){
+            state.horizontal = 1;
+        } else {
+            state.horizontal = 0;
+        }
+        
+        super.act(delta);
+    }
+
+    @Override
+    protected void afterWorldChange(){
+        rootPart.setParent(body, getPhysScale());
     }
 
     @Override

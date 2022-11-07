@@ -1,11 +1,11 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -23,6 +23,7 @@ public class GamePanel extends Stage {
     private World world;
     private float physAccumulator = 0.0f;
 
+    public Player player;
     public Ship ship;
     public Planet planet;
     
@@ -34,10 +35,14 @@ public class GamePanel extends Stage {
         this.game = game;
 
         world = new World(new Vector2(), true);
+
+        player = new Player(game, world, 0, 0, Constants.PPM);
+        this.addActor(player);
         
-        ship = new Ship(game, world, 0, 0, 0);
+        ship = new Ship(game, world, 50, 0, 0);
         ship.load("./saves/ships/null.ship");
 		this.addActor(ship);
+        player.drive(ship);
 
         planet = new Planet(game, world, -6800, 0);
         this.addActor(planet);
@@ -96,39 +101,8 @@ public class GamePanel extends Stage {
 
         // Parent camera to the ship
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(ship.getBody().getWorldCenter().cpy().scl(Constants.PPM), 0);
+        cam.position.set(player.getPosition(), 0);
         cam.update();
-
-        // Controls for the ship
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
-            ship.state.throttle = Math.min(ship.state.throttle + 0.01f, 1);
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
-            ship.state.throttle = Math.max(ship.state.throttle - 0.01f, 0);
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_LEFT)){
-            ship.state.roll = -1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_RIGHT)){
-            ship.state.roll = 1;
-        } else {
-            ship.state.roll = 0;
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)){
-            ship.state.vertical = 1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)){
-            ship.state.vertical = -1;
-        } else {
-            ship.state.vertical = 0;
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)){
-            ship.state.horizontal = -1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)){
-            ship.state.horizontal = 1;
-        } else {
-            ship.state.horizontal = 0;
-        }
     }
 
     @Override

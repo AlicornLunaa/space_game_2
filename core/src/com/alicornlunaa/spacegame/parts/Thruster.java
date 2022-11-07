@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.states.ShipState;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -68,7 +67,7 @@ public class Thruster extends ShipPart {
             (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getAngle())
         );
 
-        parent.applyForce(dir.scl(power * -throttle * delta), parent.getWorldPoint(new Vector2(getX() / Constants.PPM, getY() / Constants.PPM)), true);
+        parent.applyForce(dir.scl(power * -throttle * delta / getPhysScale()), parent.getWorldPoint(new Vector2(getX() / getPhysScale(), getY() / getPhysScale())), true);
     }
     
     @Override
@@ -127,4 +126,5 @@ public class Thruster extends ShipPart {
         str += "\n";
         return str;
     }
+
 }
