@@ -48,6 +48,8 @@ public class Planet extends Entity {
     private float physAccumulator;
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private TerrainGenerator generator;
+    private Texture atmosTexturePlanet;
+    private TextureRegionDrawable atmosSpritePlanet;
     private ArrayList<Entity> planetEnts = new ArrayList<>(); // Entities on the rectangular planet
     private Stack<Entity> leavingEnts = new Stack<>(); // Entities leaving the rectangular world
 
@@ -108,6 +110,23 @@ public class Planet extends Entity {
         pixmap.dispose();
     }
 
+    private void generateAtmospherePlanetSprite(){
+        pixmap = new Pixmap((int)atmosRadius, (int)atmosRadius, Format.RGBA8888);
+
+        for(int y = 0; y < pixmap.getHeight(); y++){
+            Color c = new Color(0.6f, 0.6f, 1, 1);
+
+            c.a = y / (float)pixmap.getHeight();
+
+            pixmap.setColor(c);
+            pixmap.drawLine(0, y, pixmap.getWidth(), y);
+        }
+
+        atmosTexturePlanet = new Texture(pixmap);
+        atmosSpritePlanet = new TextureRegionDrawable(atmosTexturePlanet);
+        pixmap.dispose();
+    }
+
     private void initializeWorld(){
         // Create new world for on the planet
         planetWorld = new World(new Vector2(), true);
@@ -139,6 +158,7 @@ public class Planet extends Entity {
         // Create textures
         generateTerrainSprite();
         generateAtmosphereSprite();
+        generateAtmospherePlanetSprite();
     }
 
     // Constructor
@@ -248,6 +268,8 @@ public class Planet extends Entity {
 
     public void drawWorld(Batch batch, float parentAlpha){
         // Draws the flat planar world
+        atmosSpritePlanet.draw(batch, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
+
         // Draw each chunk rotated around, theta = x, r = y
         for(Chunk chunk : map.values()){
             chunk.draw(batch);
