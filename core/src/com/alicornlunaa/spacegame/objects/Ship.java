@@ -193,16 +193,16 @@ public class Ship extends Entity {
             JSONObject data = new JSONObject(file.readString());
 
             // Extract data
-            float x = data.getFloat("x");
-            float y = data.getFloat("y");
-            float rotation = data.getFloat("rotation");
+            // float x = data.getFloat("x");
+            // float y = data.getFloat("y");
+            // float rotation = data.getFloat("rotation");
 
             // Reset body
             body.setLinearVelocity(0, 0);
             body.setAngularVelocity(0);
 
-            setPosition(x, y);
-            setRotation(rotation);
+            // setPosition(x, y);
+            // setRotation(rotation);
 
             // Load body data
             JSONObject root = data.getJSONObject("rootPart");

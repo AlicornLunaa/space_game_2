@@ -213,28 +213,28 @@ public class Entity extends Actor implements Disposable {
     
     @Override
     public void setX(float x){
-        if(drivingEnt != null) drivingEnt.setX(x);
+        if(drivingEnt != null) return;
         if(body != null) body.setTransform(new Vector2(x / physScale, body.getPosition().y), body.getAngle());
         super.setX(x);
     }
     
     @Override
     public void setY(float y){
-        if(drivingEnt != null) drivingEnt.setY(y);
+        if(drivingEnt != null) return;
         if(body != null) body.setTransform(new Vector2(body.getPosition().x, y / physScale), body.getAngle());
         super.setY(y);
     }
 
     @Override
     public void setRotation(float degrees){
-        if(drivingEnt != null) drivingEnt.setRotation(degrees);
+        if(drivingEnt != null) return;
         if(body != null) body.setTransform(body.getPosition(), (float)Math.toRadians(degrees));
         super.setRotation(degrees);
     }
 
     @Override
     public void setPosition(float x, float y){
-        if(drivingEnt != null) drivingEnt.setPosition(x, y);
+        if(drivingEnt != null) return;
         if(body != null) body.setTransform(x / physScale, y / physScale, body.getAngle());
         super.setPosition(x, y);
     }

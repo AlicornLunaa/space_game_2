@@ -38,8 +38,8 @@ public class Planet extends Entity {
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Planet variables
-    private float radius = 250.0f;
-    private float atmosRadius = 650.0f;
+    private float radius = 500.0f;
+    private float atmosRadius = 1000.0f;
     private float atmosDensity = 1.0f;
     private long seed = 123;
 
@@ -213,12 +213,12 @@ public class Planet extends Entity {
         float omega = e.getRotation();
         e.setRotation(omega - theta + 90);
 
-        // Orbital velocity formula: v = sqrt((G * planetMass) / orbitRadius)
+        // Convert orbital velocity to world
         Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
         Vector2 tangent = localPos.cpy().nor().rotateDeg(-90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
-        e.getBody().setLinearVelocity(tangentVel, velToPlanet);
+        e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
         // Add body
         e.loadBodyToWorld(planetWorld, Constants.PLANET_PPM);
@@ -303,7 +303,6 @@ public class Planet extends Entity {
             }
 
             e.act(delta);
-
             this.checkLeavePlanet(e);
         }
 
