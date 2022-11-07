@@ -40,7 +40,7 @@ public class PlanetScene implements Screen {
         uiPanel.shipCompass.setTarget(planetPanel.player);
 
         // planetPanel.setDebugAll(true);
-        uiPanel.setDebugAll(true);
+        // uiPanel.setDebugAll(true);
     }
 
     // Functions

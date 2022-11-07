@@ -32,8 +32,8 @@ public class SpaceScene implements Screen {
         uiPanel.shipCompass.setTarget(spacePanel.ship);
         uiPanel.shipCompass.setGravityParent(spacePanel.planet);
         
-        spacePanel.setDebugAll(true);
-        uiPanel.setDebugAll(true);
+        // spacePanel.setDebugAll(true);
+        // uiPanel.setDebugAll(true);
     }
 
     // Functions
