@@ -26,7 +26,7 @@ public class GameUIPanel extends Stage {
     private TextButton sasBtn;
     private TextButton rcsBtn;
     private ProgressBar throttleBar;
-    
+
     public Compass shipCompass;
 
     private Label positionLabel;
@@ -88,8 +88,7 @@ public class GameUIPanel extends Stage {
 
         // Navigation compass
         shipCompass = new Compass(game);
-        shipCompass.setX(this.getWidth() / 2, 70);
-        shipCompass.setOrigin(30, 30);
+        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 0);
         this.addActor(shipCompass);
 
         // Controls

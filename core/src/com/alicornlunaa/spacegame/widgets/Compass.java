@@ -26,6 +26,7 @@ public class Compass extends Widget {
         ballTexture = game.atlas.findRegion("ui/compass");
         arrowTexture = game.atlas.findRegion("ui/compass_arrow");
         setBounds(0, 0, ballTexture.getRegionWidth(), ballTexture.getRegionHeight());
+        setOrigin(ballTexture.getRegionWidth() / 2, ballTexture.getRegionHeight() / 2);
     }
 
     // Functions
@@ -57,8 +58,8 @@ public class Compass extends Widget {
         }
         batch.draw(
             arrowTexture,
-            getX() + getOriginX(),
-            getY() + getOriginY(),
+            getX() + getOriginX() - arrowTexture.getRegionWidth() / 2,
+            getY() + getOriginY() - arrowTexture.getRegionHeight() / 2,
             arrowTexture.getRegionWidth() / 2,
             arrowTexture.getRegionHeight() / 2,
             arrowTexture.getRegionWidth(),

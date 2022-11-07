@@ -36,6 +36,9 @@ public class PlanetScene implements Screen {
         inputs.addProcessor(planetPanel);
         inputs.addProcessor(uiPanel);
 
+        // Initialize UI
+        uiPanel.shipCompass.setTarget(planetPanel.player);
+
         // planetPanel.setDebugAll(true);
         uiPanel.setDebugAll(true);
     }

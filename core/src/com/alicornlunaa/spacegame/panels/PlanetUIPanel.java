@@ -4,6 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.alicornlunaa.spacegame.widgets.Compass;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -15,6 +16,8 @@ public class PlanetUIPanel extends Stage {
     
     // Variables
     final App game;
+
+    public Compass shipCompass;
     
     private Label fpsCounter;
     private Label posLabel;
@@ -31,6 +34,11 @@ public class PlanetUIPanel extends Stage {
         posLabel = new Label("Pos: N/A", game.skin);
         posLabel.setPosition(20, getHeight() - 90);
         this.addActor(posLabel);
+
+        // Navigation compass
+        shipCompass = new Compass(game);
+        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 0);
+        this.addActor(shipCompass);
 
         // Controls
         this.addListener(new InputListener(){
