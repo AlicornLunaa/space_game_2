@@ -38,8 +38,8 @@ public class Planet extends Entity {
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Planet variables
-    private float radius = 2500.0f;
-    private float atmosRadius = 6500.0f;
+    private float radius = 250.0f;
+    private float atmosRadius = 650.0f;
     private float atmosDensity = 1.0f;
     private long seed = 123;
 
@@ -86,24 +86,17 @@ public class Planet extends Entity {
     }
     
     private void generateAtmosphereSprite(){
-        pixmap = new Pixmap(Math.min((int)atmosRadius * 2, 2500), Math.min((int)atmosRadius * 2, 2500), Format.RGBA8888);
+        int imgRad = Math.min((int)atmosRadius * 2, 2500);
+        pixmap = new Pixmap(imgRad, imgRad, Format.RGBA8888);
 
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
-                int mX = x - pixmap.getWidth() / 2;
-                int mY = y - pixmap.getHeight() / 2;
-                int radSqr = mX * mX + mY * mY;
+                int mX = x - imgRad / 2;
+                int mY = y - imgRad / 2;
+                float rad = (float)Math.sqrt((float)(mX * mX + mY * mY));
+                Color c = new Color(0.6f, 0.6f, 1, 0.5f - (rad / (float)imgRad));
 
-                // float planetRadSqr = stateRef.radius * stateRef.radius;
-                // float atmosRadSqr = stateRef.atmosRadius * stateRef.atmosRadius;
-                // float pixelRadSqr = mX * mX + mY * mY;
-        
-                // float atmosSurface = atmosRadSqr - planetRadSqr; // Atmosphere radius above surface
-                // float pixelSurface = pixelRadSqr - planetRadSqr; // Pixel radius above surface
-                
-                Color c = new Color(0.6f, 0.6f, 0.9f, 0.2f);
-
-                if(radSqr > (float)Math.pow(pixmap.getWidth() / 2, 2)) c.a = 0;
+                if(rad > imgRad / 2) c.a = 0;
 
                 pixmap.setColor(c);
                 pixmap.drawPixel(x, y);
@@ -344,7 +337,7 @@ public class Planet extends Entity {
         // is within range to change its physics system to the planet's
         float dist = e.getPosition().dst(getPosition());
 
-        if(dist < atmosRadius / 2){
+        if(dist < atmosRadius / 1.15f){
             // Move it into this world
             this.addEntity(e);
             game.setScreen(game.planetScene);

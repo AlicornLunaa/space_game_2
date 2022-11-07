@@ -44,13 +44,13 @@ public class GamePanel extends Stage {
 		this.addActor(ship);
         player.drive(ship);
 
-        planet = new Planet(game, world, -6800, 0);
+        planet = new Planet(game, world, -1000, 0);
         this.addActor(planet);
 
         // Initialize orbit
         float radius = ship.getBody().getPosition().dst(planet.getBody().getPosition());
         float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * ship.getBody().getMass() * planet.getBody().getMass()) / radius);
-        ship.getBody().applyForceToCenter(0, velScl * 2.75f, true);
+        ship.getBody().applyForceToCenter(0, velScl * 2.5f, true);
 
         // Controls
         this.addListener(new InputListener(){
@@ -97,7 +97,7 @@ public class GamePanel extends Stage {
 
         planet.applyGravity(delta, ship.getBody());
         planet.applyDrag(delta, ship.getBody());
-        planet.checkTransfer(ship);
+        // planet.checkTransfer(ship);
 
         // Parent camera to the player
         player.updateCamera((OrthographicCamera)getCamera());
