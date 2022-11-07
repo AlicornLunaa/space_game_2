@@ -193,7 +193,7 @@ public class ShipEditorUIPanel extends Stage {
         closeButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                game.setScreen(game.gameScene);
+                game.setScreen(game.spaceScene);
             }
         });
 

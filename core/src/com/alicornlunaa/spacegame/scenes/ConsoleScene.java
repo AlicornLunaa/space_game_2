@@ -38,17 +38,17 @@ public class ConsoleScene implements Screen {
         String[] args = cmd.split("\\s+");
         
         if(args[0].equals("load_ship")){
-            game.gameScene.gamePanel.ship.load(args[1]);
+            game.spaceScene.spacePanel.ship.load(args[1]);
         } else if(args[0].equals("set_pos")){
-            game.gameScene.gamePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         } else if(args[0].equals("set_rot")){
-            game.gameScene.gamePanel.ship.setRotation(Integer.parseInt(args[1]));
+            game.spaceScene.spacePanel.ship.setRotation(Integer.parseInt(args[1]));
         } else if(args[0].equals("load_planet")){
-            game.gameScene.gamePanel.planet.addEntity(game.gameScene.gamePanel.ship);
+            game.spaceScene.spacePanel.planet.addEntity(game.spaceScene.spacePanel.ship);
             game.setScreen(game.planetScene);
         } else if(args[0].equals("load_space")){
-            game.gameScene.gamePanel.planet.delEntity(game.gameScene.gamePanel.ship);
-            game.setScreen(game.gameScene);
+            game.spaceScene.spacePanel.planet.delEntity(game.spaceScene.spacePanel.ship);
+            game.setScreen(game.spaceScene);
         }
     }
 

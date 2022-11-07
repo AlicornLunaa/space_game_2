@@ -119,11 +119,11 @@ public class PlanetPanel extends Stage {
         batch.begin();
         batch.setProjectionMatrix(getCamera().combined);
         planet.drawWorld(batch, batch.getColor().a);
-        batch.setProjectionMatrix(getCamera().combined.cpy().translate(worldWidthPixels, 0, 0).scl(1, 1, 1));
-        planet.drawWorld(batch, batch.getColor().a);
-        batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
-        planet.drawWorld(batch, batch.getColor().a);
-        batch.setProjectionMatrix(getCamera().combined);
+        // batch.setProjectionMatrix(getCamera().combined.cpy().translate(worldWidthPixels, 0, 0).scl(1, 1, 1));
+        // planet.drawWorld(batch, batch.getColor().a);
+        // batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
+        // planet.drawWorld(batch, batch.getColor().a);
+        // batch.setProjectionMatrix(getCamera().combined);
         player.draw(batch, batch.getColor().a);
         batch.end();
 

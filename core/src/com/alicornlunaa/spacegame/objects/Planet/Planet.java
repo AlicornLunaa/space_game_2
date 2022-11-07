@@ -251,7 +251,7 @@ public class Planet extends Entity {
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
-        e.loadBodyToWorld(game.gameScene.gamePanel.getWorld(), Constants.PPM);
+        e.loadBodyToWorld(game.spaceScene.spacePanel.getWorld(), Constants.PPM);
         planetEnts.remove(e);
     }
 
@@ -309,7 +309,7 @@ public class Planet extends Entity {
         while(leavingEnts.size() > 0){
             Entity e  = leavingEnts.pop();
             this.delEntity(e);
-            game.setScreen(game.gameScene);
+            game.setScreen(game.spaceScene);
         }
     }
 

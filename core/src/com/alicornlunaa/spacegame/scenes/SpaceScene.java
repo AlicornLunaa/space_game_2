@@ -1,8 +1,8 @@
 package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.panels.GamePanel;
-import com.alicornlunaa.spacegame.panels.GameUIPanel;
+import com.alicornlunaa.spacegame.panels.SpacePanel;
+import com.alicornlunaa.spacegame.panels.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -13,8 +13,8 @@ public class SpaceScene implements Screen {
     // Variables
     final App game;
 
-    public GamePanel gamePanel;
-    public GameUIPanel uiPanel;
+    public SpacePanel spacePanel;
+    public SpaceUIPanel uiPanel;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
@@ -22,17 +22,17 @@ public class SpaceScene implements Screen {
     public SpaceScene(final App game){
         this.game = game;
         
-        gamePanel = new GamePanel(game);
-        uiPanel = new GameUIPanel(game);
+        spacePanel = new SpacePanel(game);
+        uiPanel = new SpaceUIPanel(game);
 
         inputs.addProcessor(uiPanel);
-        inputs.addProcessor(gamePanel);
+        inputs.addProcessor(spacePanel);
 
         // Initialize UI
-        uiPanel.shipCompass.setTarget(gamePanel.ship);
-        uiPanel.shipCompass.setGravityParent(gamePanel.planet);
+        uiPanel.shipCompass.setTarget(spacePanel.ship);
+        uiPanel.shipCompass.setGravityParent(spacePanel.planet);
         
-        gamePanel.setDebugAll(true);
+        spacePanel.setDebugAll(true);
         uiPanel.setDebugAll(true);
     }
 
@@ -42,16 +42,16 @@ public class SpaceScene implements Screen {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
-        gamePanel.act(delta);
+        spacePanel.act(delta);
         uiPanel.act(delta);
 
-        gamePanel.draw();
+        spacePanel.draw();
         uiPanel.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        gamePanel.getViewport().update(width, height, true);
+        spacePanel.getViewport().update(width, height, true);
         uiPanel.getViewport().update(width, height, true);
     }
 
@@ -71,7 +71,7 @@ public class SpaceScene implements Screen {
 
     @Override
     public void dispose() {
-        gamePanel.dispose();
+        spacePanel.dispose();
         uiPanel.dispose();
     }
     

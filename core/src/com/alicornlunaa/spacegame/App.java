@@ -22,7 +22,7 @@ public class App extends Game {
 	public Skin skin;
 
 	public LoadingScene loadingScene;
-	public SpaceScene gameScene;
+	public SpaceScene spaceScene;
 	public PlanetScene planetScene;
 	public EditorScene editorScene;
 
@@ -73,11 +73,11 @@ public class App extends Game {
 				manager.initEffects(this);
 
 				// Start new scene
-				gameScene = new SpaceScene(this);
-				planetScene = new PlanetScene(this, gameScene.gamePanel.planet, gameScene.gamePanel.player);
+				spaceScene = new SpaceScene(this);
+				planetScene = new PlanetScene(this, spaceScene.spacePanel.planet, spaceScene.spacePanel.player);
 				editorScene = new EditorScene(this);
-				this.setScreen(gameScene);
-            	// gameScene.gamePanel.planet.addEntity(gameScene.gamePanel.ship);
+				this.setScreen(spaceScene);
+            	// spaceScene.spacePanel.planet.addEntity(spaceScene.spacePanel.ship);
 				// this.setScreen(planetScene);
 			} else {
 				// Loading is not complete, update progress bar
@@ -92,7 +92,7 @@ public class App extends Game {
 	
 	@Override
 	public void dispose(){
-		gameScene.dispose();
+		spaceScene.dispose();
 		loadingScene.dispose();
 
 		skin.dispose();

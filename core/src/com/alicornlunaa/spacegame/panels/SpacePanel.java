@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
-public class GamePanel extends Stage {
+public class SpacePanel extends Stage {
 
     // Variables
     final App game;
@@ -30,7 +30,7 @@ public class GamePanel extends Stage {
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Constructor
-    public GamePanel(final App game){
+    public SpacePanel(final App game){
         super(new FillViewport(1280, 720));
         this.game = game;
 

@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class GameUIPanel extends Stage {
+public class SpaceUIPanel extends Stage {
     
     // Variables
     private final App game;
@@ -33,7 +33,7 @@ public class GameUIPanel extends Stage {
     private Label velocityLabel;
 
     // Constructor
-    public GameUIPanel(final App game){
+    public SpaceUIPanel(final App game){
         super(new ScreenViewport());
         this.game = game;
 
@@ -95,13 +95,13 @@ public class GameUIPanel extends Stage {
         this.addListener(new InputListener(){
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
-                    game.setScreen(new PauseScene(game, game.gameScene, (int)getWidth(), (int)getHeight()));
+                    game.setScreen(new PauseScene(game, game.spaceScene, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, game.gameScene, (int)getWidth(), (int)getHeight()));
+                    game.setScreen(new ConsoleScene(game, game.spaceScene, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
-                    game.gameScene.gamePanel.ship.state.debug = !game.gameScene.gamePanel.ship.state.debug;
+                    game.spaceScene.spacePanel.ship.state.debug = !game.spaceScene.spacePanel.ship.state.debug;
                     return true;
                 }
 
@@ -115,13 +115,13 @@ public class GameUIPanel extends Stage {
     public void draw(){
         super.draw();
 
-        GamePanel gamePanel = ((SpaceScene)game.gameScene).gamePanel;
-        sasBtn.setColor(gamePanel.ship.state.sas ? Color.GREEN : Color.RED);
-        rcsBtn.setColor(gamePanel.ship.state.rcs ? Color.GREEN : Color.RED);
-        throttleBar.setValue(gamePanel.ship.state.throttle);
+        SpacePanel spacePanel = ((SpaceScene)game.spaceScene).spacePanel;
+        sasBtn.setColor(spacePanel.ship.state.sas ? Color.GREEN : Color.RED);
+        rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
+        throttleBar.setValue(spacePanel.ship.state.throttle);
 
-        positionLabel.setText(gamePanel.ship.getBody().getWorldCenter().toString());
-        velocityLabel.setText(gamePanel.ship.getBody().getLinearVelocity().toString());
+        positionLabel.setText(spacePanel.ship.getBody().getWorldCenter().toString());
+        velocityLabel.setText(spacePanel.ship.getBody().getLinearVelocity().toString());
     }
 
     @Override
