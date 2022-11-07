@@ -185,6 +185,9 @@ public class Planet extends Entity {
      * @param e Entity to be converted
      */
     public void addEntity(Entity e){
+        if(planetEnts.contains(e)) return;
+        if(e.getDriver() != null) this.addEntity(e.getDriver());
+
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getPosition().sub(getPosition());
         float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
@@ -341,7 +344,7 @@ public class Planet extends Entity {
         // is within range to change its physics system to the planet's
         float dist = e.getPosition().dst(getPosition());
 
-        if(dist < atmosRadius){
+        if(dist < atmosRadius / 2){
             // Move it into this world
             this.addEntity(e);
             game.setScreen(game.planetScene);

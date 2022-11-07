@@ -89,7 +89,7 @@ public class GamePanel extends Stage {
         super.act(delta);
 
         // Physics updates
-        physAccumulator += Math.min(delta, 0.25f);;
+        physAccumulator += Math.min(delta, 0.25f);
         while(physAccumulator >= Constants.TIME_STEP){
             world.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
@@ -99,10 +99,8 @@ public class GamePanel extends Stage {
         planet.applyDrag(delta, ship.getBody());
         planet.checkTransfer(ship);
 
-        // Parent camera to the ship
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(player.getPosition(), 0);
-        cam.update();
+        // Parent camera to the player
+        player.updateCamera((OrthographicCamera)getCamera());
     }
 
     @Override

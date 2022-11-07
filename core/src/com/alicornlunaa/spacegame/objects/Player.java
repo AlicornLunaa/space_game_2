@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
@@ -14,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Null;
 
 /**
  * Player controller class, will handle inputs and other
@@ -28,7 +28,6 @@ public class Player extends Entity {
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
     private boolean grounded = false;
-    private @Null Entity drivingEnt = null;
 
     private PolygonShape shape = new PolygonShape();
     private RayCastCallback jumpCallback;
@@ -76,19 +75,9 @@ public class Player extends Entity {
     }
 
     // Functions
-    public void drive(Entity e){
-        drivingEnt = e;
-        e.driver = this;
-
-        this.body.setActive(false);
-    }
-
-    public void stopDriving(){
-        setPosition(drivingEnt.getPosition());
-        drivingEnt.driver = null;
-        drivingEnt = null;
-        
-        this.body.setActive(true);
+    public void updateCamera(OrthographicCamera cam){
+        cam.position.set((drivingEnt == null) ? this.getPosition() : drivingEnt.getBody().getWorldCenter().cpy().scl(getPhysScale()), 0);
+        cam.update();
     }
 
     // Overrides
@@ -122,6 +111,7 @@ public class Player extends Entity {
             }
         } else {
             drivingEnt.act(delta);
+            setPosition(drivingEnt.getPosition());
         }
         
         super.act(delta);
@@ -129,15 +119,7 @@ public class Player extends Entity {
 
     @Override
     public void draw(Batch batch, float parentAlpha){
-        if(drivingEnt != null){
-            if(drivingEnt.getBody() == null){
-                this.setPosition(drivingEnt.getPosition());
-            } else {
-                this.setPosition(drivingEnt.getBody().getWorldCenter().cpy().scl(getPhysScale()));
-            }
-
-            return;
-        }
+        if(drivingEnt != null) return;
 
         super.draw(batch, parentAlpha);
         Matrix3 transform = getTransform();

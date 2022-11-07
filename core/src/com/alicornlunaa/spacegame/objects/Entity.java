@@ -19,8 +19,9 @@ import com.badlogic.gdx.utils.Null;
 public class Entity extends Actor implements Disposable {
 
     // Variables
-    protected @Null Entity driver = null;
     protected @Null Body body = null;
+    protected @Null Entity driver = null;
+    protected @Null Entity drivingEnt = null;
     protected float physScale = Constants.PPM;
 
     // Functions
@@ -37,6 +38,26 @@ public class Entity extends Actor implements Disposable {
     public Body getBody(){
         return body;
     }
+
+    public void drive(Entity e){
+        drivingEnt = e;
+        e.driver = this;
+
+        if(body != null)
+            body.setActive(false);
+    }
+
+    public void stopDriving(){
+        setPosition(drivingEnt.getPosition());
+        drivingEnt.driver = null;
+        drivingEnt = null;
+
+        if(body != null)
+            body.setActive(true);
+    }
+
+    public Entity getDriving(){ return drivingEnt; }
+    public Entity getDriver(){ return driver; }
 
     /**
      * Loads a new body to the entity for this world
@@ -162,6 +183,7 @@ public class Entity extends Actor implements Disposable {
     // Overrides
     @Override
     public float getX(){
+        if(drivingEnt != null) return drivingEnt.getX();
         if(body == null) return super.getX();
 
         float newX = body.getPosition().x * physScale;
@@ -171,6 +193,7 @@ public class Entity extends Actor implements Disposable {
 
     @Override
     public float getY(){
+        if(drivingEnt != null) return drivingEnt.getY();
         if(body == null) return super.getY();
 
         float newY = body.getPosition().y * physScale;
@@ -180,6 +203,7 @@ public class Entity extends Actor implements Disposable {
 
     @Override
     public float getRotation(){
+        if(drivingEnt != null) return drivingEnt.getRotation();
         if(body == null) return super.getRotation();
 
         float degrees = (float)Math.toDegrees(body.getAngle());
@@ -189,24 +213,28 @@ public class Entity extends Actor implements Disposable {
     
     @Override
     public void setX(float x){
+        if(drivingEnt != null) drivingEnt.setX(x);
         if(body != null) body.setTransform(new Vector2(x / physScale, body.getPosition().y), body.getAngle());
         super.setX(x);
     }
     
     @Override
     public void setY(float y){
+        if(drivingEnt != null) drivingEnt.setY(y);
         if(body != null) body.setTransform(new Vector2(body.getPosition().x, y / physScale), body.getAngle());
         super.setY(y);
     }
 
     @Override
     public void setRotation(float degrees){
+        if(drivingEnt != null) drivingEnt.setRotation(degrees);
         if(body != null) body.setTransform(body.getPosition(), (float)Math.toRadians(degrees));
         super.setRotation(degrees);
     }
 
     @Override
     public void setPosition(float x, float y){
+        if(drivingEnt != null) drivingEnt.setPosition(x, y);
         if(body != null) body.setTransform(x / physScale, y / physScale, body.getAngle());
         super.setPosition(x, y);
     }

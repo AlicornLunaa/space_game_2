@@ -107,9 +107,7 @@ public class PlanetPanel extends Stage {
         planet.updateWorld(delta);
 
         // Parent camera to player
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(player.getPosition(), 0);
-        cam.update();
+        player.updateCamera((OrthographicCamera)getCamera());
     }
 
     @Override
