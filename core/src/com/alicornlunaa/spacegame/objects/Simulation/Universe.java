@@ -45,9 +45,17 @@ public class Universe extends Actor {
 
     // Private functions
     private void parentCelestial(Celestial target, Celestial parent){
+        Celestial curParent = celestialParents.get(target);
+        if(curParent != null){
+            curParent.getChildren().remove(target);
+        }
+
         target.setCelestialParent(parent);
         parent.getChildren().add(target);
         celestialParents.put(target, parent);
+
+        target.setPosition(target.getPosition().sub(parent.getPosition()));
+        target.loadBodyToWorld(parent.getWorld(), Constants.PPM);
     }
 
     private void checkTransfer(Entity e){
@@ -55,11 +63,13 @@ public class Universe extends Actor {
         Celestial parent = entParents.get(e);
 
         if(parent == null){
-            // No parent, check every celestial
+            // No parent, check every celestial that doesnt have a parent
             Celestial closest = null;
             float minDist = Float.MAX_VALUE;
 
             for(Celestial c : celestials){
+                if(c.getCelestialParent() != null) continue;
+
                 float curDist = c.getPosition().dst2(e.getPosition());
                 if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
                     closest = c;
@@ -99,8 +109,8 @@ public class Universe extends Actor {
         this.game = game;
         universalWorld = new World(new Vector2(), true);
 
-        celestials.add(new Celestial(game, 600, 1200));
-        celestials.add(new Celestial(game, 100, 200));
+        celestials.add(new Celestial(game, universalWorld, 600, 1200));
+        celestials.add(new Celestial(game, universalWorld, 100, 200));
         celestials.get(0).setPosition(-1300, 0);
         celestials.get(1).setPosition(-400, 0);
         parentCelestial(celestials.get(1), celestials.get(0));
@@ -125,6 +135,7 @@ public class Universe extends Actor {
     /**
      * This function adds an entity to a celestial and converts their coordinates
      * the celestial's scale
+     * @param c Celestial target
      * @param e Entity to be converted
      */
     public void addToCelestial(Celestial c, Entity e){
@@ -136,7 +147,6 @@ public class Universe extends Actor {
         }
 
         e.setPosition(e.getPosition().sub(c.getPosition()));
-        System.out.println("ENTER");
 
         // Add body
         entParents.put(e, c);
@@ -160,7 +170,6 @@ public class Universe extends Actor {
         if(celestialParent != null) celestialParent.getEntities().add(e);
 
         e.setPosition(e.getPosition().add(parent.getPosition()));
-        System.out.println("EXIT");
 
         // Remove body
         entParents.put(e, celestialParent);
@@ -198,6 +207,7 @@ public class Universe extends Actor {
     public void draw(Batch batch, float a){
         Matrix4 oldMat = batch.getTransformMatrix().cpy();
 
+        batch.setTransformMatrix(oldMat);
         for(Entity e : ents){
             Celestial parent = entParents.get(e);
             if(parent != null){
@@ -209,8 +219,15 @@ public class Universe extends Actor {
         
         batch.setTransformMatrix(oldMat);
         for(Celestial c : celestials){
+            Celestial parent = celestialParents.get(c);
+            if(parent != null){
+                batch.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()));
+            }
+
             c.draw(batch, a);
         }
+
+        batch.setTransformMatrix(oldMat);
     }
     
 }

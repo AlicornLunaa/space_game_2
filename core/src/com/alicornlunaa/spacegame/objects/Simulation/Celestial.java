@@ -9,7 +9,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Null;
 
 /**
@@ -29,17 +35,40 @@ public class Celestial extends Entity {
     // Physics variables
     private final World influenceWorld;
     private float physAccumulator;
+    private Body localBody;
 
     private @Null Celestial parent = null;
     private ArrayList<Celestial> children = new ArrayList<>();
     private ArrayList<Entity> ents = new ArrayList<>();
+
+    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
     
     // Constructor
-    public Celestial(final App game, float radius, float sphereOfInfluence){
+    public Celestial(final App game, final World parentWorld, float radius, float sphereOfInfluence){
         this.game = game;
         this.radius = radius;
         this.sphereOfInfluence = sphereOfInfluence;
         influenceWorld = new World(getPosition(), true);
+
+        setSize(radius * 2, radius * 2);
+        
+        CircleShape shape = new CircleShape();
+        shape.setRadius(radius / getPhysScale());
+        shape.setPosition(Vector2.Zero.cpy());
+
+        BodyDef def = new BodyDef();
+        def.type = BodyType.DynamicBody;
+        def.position.set(0, 0);
+        setBody(parentWorld.createBody(def));
+        body.createFixture(shape, 1.0f);
+
+        def = new BodyDef();
+        def.type = BodyType.StaticBody;
+        def.position.set(0, 0);
+        localBody = influenceWorld.createBody(def);
+        localBody.createFixture(shape, 1.0f);
+
+        shape.dispose();
     }
 
     // Functions

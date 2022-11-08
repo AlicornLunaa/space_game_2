@@ -162,7 +162,7 @@ public class Planet extends Celestial {
 
     // Constructor
     public Planet(final App game, final World world, float x, float y, Color terrain, Color atmos){
-        super(game, 1200, 2000);
+        super(game, world, 1200, 2000);
         this.game = game;
         this.spaceWorld = world;
         
