@@ -31,7 +31,7 @@ public class Celestial extends Entity {
     protected float radius;
 
     // Physics variables
-    private final World influenceWorld;
+    protected final World influenceWorld;
     private float physAccumulator;
     private Body localBody;
 
@@ -86,6 +86,10 @@ public class Celestial extends Entity {
 
     @Override
     public void draw(Batch batch, float a){
+        if(!this.getDebug()) return;
+
+        batch.end();
+
         ShapeRenderer s = game.shapeRenderer;
         s.begin(ShapeRenderer.ShapeType.Line);
         s.setProjectionMatrix(batch.getProjectionMatrix());
@@ -95,6 +99,8 @@ public class Celestial extends Entity {
         s.setColor(Color.YELLOW);
         s.circle(0, 0, getRadius(), 500);
         s.end();
+
+        batch.begin();
     }
 
     public void update(float delta){
@@ -115,5 +121,7 @@ public class Celestial extends Entity {
 
         b.applyForceToCenter(direction.scl(force), true);
     }
+
+    protected void applyPhysics(float delta, Entity e){}
 
 }

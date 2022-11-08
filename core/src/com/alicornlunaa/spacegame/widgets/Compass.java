@@ -65,11 +65,14 @@ public class Compass extends Widget {
         );
 
         // Draw the ball with the angle relative to the target and parent
-        Entity gravityParentEnt = universe.getParentCelestial(targetEnt);
         float theta = 0;
-        if(targetEnt != null && gravityParentEnt != null){
-            Vector2 targetToParent = targetEnt.getPosition().sub(gravityParentEnt.getPosition()).nor();
-            theta = targetToParent.angleDeg() - 90;
+        if(universe != null){
+            Entity gravityParentEnt = universe.getParentCelestial(targetEnt);
+
+            if(targetEnt != null && gravityParentEnt != null){
+                Vector2 targetToParent = targetEnt.getPosition().sub(gravityParentEnt.getPosition()).nor();
+                theta = targetToParent.angleDeg() - 90;
+            }
         }
         batch.draw(ballTexture, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), theta);
 

@@ -3,9 +3,10 @@ package com.alicornlunaa.spacegame.panels;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
-import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -39,15 +40,14 @@ public class SpacePanel extends Stage {
         player = new Player(game, world, 0, 0, Constants.PPM);
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
-        // planet = new Planet(game, world, -2200, 0, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f));
 
         universe = new Universe(game);
         universe.addEntity(ship);
-        universe.addCelestial(new Celestial(game, world, 1000), null);
-        universe.addCelestial(new Celestial(game, world, 100), universe.getCelestial(0));
+        universe.addCelestial(new Planet(game, world, player, -2200, 0, 1200, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
+        // universe.addCelestial(new Celestial(game, world, 100), universe.getCelestial(0));
         universe.getCelestial(0).setPosition(universe.getCelestial(0).getRadius() * -2 - 1000, 0);
-        universe.getCelestial(1).setPosition(1800, 0);
-        universe.createCelestialOrbit(universe.getCelestial(1));
+        // universe.getCelestial(1).setPosition(2400, 0);
+        // universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 
         player.drive(ship);

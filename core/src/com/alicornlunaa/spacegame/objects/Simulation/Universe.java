@@ -9,8 +9,6 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -29,7 +27,6 @@ public class Universe extends Actor {
 
     private final World universalWorld;
     private float physAccumulator;
-    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Private functions
     private void parentCelestial(Celestial target, Celestial parent){
@@ -109,8 +106,6 @@ public class Universe extends Actor {
     public void addEntity(Entity e){
         e.loadBodyToWorld(universalWorld, Constants.PPM);
         ents.add(e);
-        checkTransfer(e);
-        createEntityOrbit(e);
     }
 
     public void addCelestial(Celestial c, Celestial parent){
@@ -212,7 +207,7 @@ public class Universe extends Actor {
             Celestial parent = entParents.get(e);
             if(parent != null){
                 parent.applyGravity(delta, e.getBody());
-                applyPhysics(delta, e.getBody());
+                parent.applyPhysics(delta, e);
             }
         }
 
@@ -222,7 +217,7 @@ public class Universe extends Actor {
             Celestial parent = celestialParents.get(c);
             if(parent != null){
                 parent.applyGravity(delta, c.getBody());
-                applyPhysics(delta, c.getBody());
+                parent.applyPhysics(delta, c);
             }
         }
     }
@@ -250,10 +245,7 @@ public class Universe extends Actor {
             c.draw(batch, a);
         }
 
-        debug.render(universalWorld, batch.getProjectionMatrix().cpy().scl(Constants.PPM));
         batch.setTransformMatrix(oldMat);
     }
- 
-    protected void applyPhysics(float delta, Body b){}
     
 }
