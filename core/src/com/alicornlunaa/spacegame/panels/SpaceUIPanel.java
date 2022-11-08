@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.ConsoleScene;
+import com.alicornlunaa.spacegame.scenes.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -77,7 +78,7 @@ public class SpaceUIPanel extends Stage {
         editBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.setScreen(game.editorScene);
+                game.setScreen(new FadeTransitionScene(game, game.spaceScene, game.editorScene, 0.15f));
             }
         });
         tbl.add(editBtn).right().maxWidth(84);

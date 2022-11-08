@@ -20,6 +20,7 @@ public class Compass extends Widget {
     private TextureRegion ballTexture;
     private TextureRegion arrowTexture;
     private TextureRegion markerTexture;
+    private TextureRegion backgroundTexture;
 
     // Constructor
     public Compass(App game){
@@ -28,6 +29,7 @@ public class Compass extends Widget {
         ballTexture = game.atlas.findRegion("ui/compass");
         arrowTexture = game.atlas.findRegion("ui/compass_arrow");
         markerTexture = game.atlas.findRegion("ui/compass_markers");
+        backgroundTexture = game.atlas.findRegion("ui/compass_background");
 
         setBounds(0, 0, ballTexture.getRegionWidth(), ballTexture.getRegionHeight());
         setOrigin(ballTexture.getRegionWidth() / 2, ballTexture.getRegionHeight() / 2);
@@ -46,6 +48,20 @@ public class Compass extends Widget {
     @Override
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
+
+        // Background
+        batch.draw(
+            backgroundTexture,
+            getX() + getOriginX() - backgroundTexture.getRegionWidth() / 2,
+            getY() + getOriginY() - backgroundTexture.getRegionHeight() / 2,
+            backgroundTexture.getRegionWidth() / 2,
+            backgroundTexture.getRegionHeight() / 2,
+            backgroundTexture.getRegionWidth(),
+            backgroundTexture.getRegionHeight(),
+            getScaleX(),
+            getScaleY(),
+            0
+        );
 
         // Draw the ball with the angle relative to the target and parent
         float theta = 0;

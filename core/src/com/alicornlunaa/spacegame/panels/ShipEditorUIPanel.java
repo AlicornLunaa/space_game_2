@@ -17,6 +17,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.parts.*;
 import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.EditorScene;
+import com.alicornlunaa.spacegame.scenes.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.*;
 
@@ -193,7 +194,7 @@ public class ShipEditorUIPanel extends Stage {
         closeButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                game.setScreen(game.spaceScene);
+                game.setScreen(new FadeTransitionScene(game, game.editorScene, game.spaceScene, 0.15f));
             }
         });
 
@@ -230,7 +231,7 @@ public class ShipEditorUIPanel extends Stage {
         super.act(delta);
         
         // Resize editor into panel
-        ShipEditorPanel editor = ((EditorScene)game.getScreen()).editorPanel;
+        ShipEditorPanel editor = game.editorScene.editorPanel;
         editor.getViewport().setWorldSize(editorPlaceholder.getWidth(), editorPlaceholder.getHeight());
         editor.getViewport().setScreenBounds(
             (int)editorPlaceholder.getX(),

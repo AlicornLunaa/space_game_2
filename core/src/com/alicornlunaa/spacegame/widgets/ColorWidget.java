@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.util;
+package com.alicornlunaa.spacegame.widgets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

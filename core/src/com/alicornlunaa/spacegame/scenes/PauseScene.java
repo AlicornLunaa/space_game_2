@@ -1,9 +1,9 @@
 package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.util.ColorWidget;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.HexColor;
+import com.alicornlunaa.spacegame.widgets.ColorWidget;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
