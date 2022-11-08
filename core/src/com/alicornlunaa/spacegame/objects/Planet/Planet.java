@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
@@ -27,7 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  * The World object will hold the data for the world's tiles
  * as well as the how to render the circular planet in space.
  */
-public class Planet extends Entity {
+public class Planet extends Celestial {
 
     // Variables
     private final App game;
@@ -38,8 +39,8 @@ public class Planet extends Entity {
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Planet variables
-    private float radius = 10000.0f;
-    private float atmosRadius = 12000.0f;
+    private float radius = 1000.0f;
+    private float atmosRadius = 1200.0f;
     private float atmosDensity = 1.0f;
     private long seed = 123;
     private Color terrainColor = new Color(.72f, 0.7f, 0.9f, 1);
@@ -161,7 +162,7 @@ public class Planet extends Entity {
 
     // Constructor
     public Planet(final App game, final World world, float x, float y, Color terrain, Color atmos){
-        super();
+        super(game, 1200, 2000);
         this.game = game;
         this.spaceWorld = world;
         
@@ -198,9 +199,9 @@ public class Planet extends Entity {
      * Converts the entity to 2d planet planar coordinates
      * @param e Entity to be converted
      */
-    public void addEntity(Entity e){
+    public void addEntityWorld(Entity e){
         if(planetEnts.contains(e)) return;
-        if(e.getDriver() != null) this.addEntity(e.getDriver());
+        if(e.getDriver() != null) this.addEntityWorld(e.getDriver());
 
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getPosition().sub(getPosition());
@@ -230,7 +231,7 @@ public class Planet extends Entity {
      * Convert the entity to the space planet circular coordinates
      * @param e Entity to be converted
      */
-    public void delEntity(Entity e){
+    public void delEntityWorld(Entity e){
         // Formula: theta = x, radius = y
         float worldWidthUnits = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
         double theta = ((e.getX() / worldWidthUnits) * Math.PI * 2);
@@ -309,7 +310,7 @@ public class Planet extends Entity {
 
         while(leavingEnts.size() > 0){
             Entity e  = leavingEnts.pop();
-            this.delEntity(e);
+            this.delEntityWorld(e);
             game.setScreen(game.spaceScene);
         }
     }
@@ -354,14 +355,14 @@ public class Planet extends Entity {
         b.applyForceToCenter(velDir.scl(-1 * force * delta), true);
     }
 
-    public boolean checkTransfer(Entity e){
+    public boolean checkTransferPlanet(Entity e){
         // This function checks if the entity supplied
         // is within range to change its physics system to the planet's
         float dist = e.getPosition().dst(getPosition());
 
         if(dist < atmosRadius / 1.15f){
             // Move it into this world
-            this.addEntity(e);
+            this.addEntityWorld(e);
             game.setScreen(game.planetScene);
 
             return true;

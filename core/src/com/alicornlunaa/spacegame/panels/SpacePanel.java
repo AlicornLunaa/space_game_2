@@ -1,11 +1,12 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.PlanetController;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Star;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
+import com.alicornlunaa.spacegame.objects.Simulation.CelestialController;
+import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -25,7 +26,7 @@ public class SpacePanel extends Stage {
     private World world;
     private float physAccumulator = 0.0f;
 
-    public PlanetController planetController;
+    public Universe universe;
     public Player player;
     public Ship ship;
     public Planet planet;
@@ -43,29 +44,29 @@ public class SpacePanel extends Stage {
         player = new Player(game, world, 0, 0, Constants.PPM);
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
-        planet = new Planet(game, world, -18000, 0, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f));
-        star = new Star(game, world, 18000, 0);
+        planet = new Planet(game, world, -2200, 0, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f));
+        star = new Star(game, world, 1800, 0);
 
-        planetController = new PlanetController(game, star);
-        planetController.addPlanet(planet);
-        planetController.addEntity(ship);
+        universe = new Universe(game);
+        universe.addEntity(ship);
+        this.addActor(universe);
 
-        this.addActor(player);
-		this.addActor(ship);
-        this.addActor(planet);
-        this.addActor(star);
+        // this.addActor(player);
+		// this.addActor(ship);
+        // this.addActor(planet);
+        // this.addActor(star);
 
         player.drive(ship);
 
         // Initialize orbit
         float radius = ship.getBody().getPosition().dst(planet.getBody().getPosition());
         float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * ship.getBody().getMass() * planet.getBody().getMass()) / radius);
-        ship.getBody().applyForceToCenter(0, velScl * 2.5f, true);
+        // ship.getBody().applyForceToCenter(0, velScl * 2.5f, true);
         
         radius = planet.getBody().getPosition().dst(star.getBody().getPosition());
         velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * star.getBody().getMass()) / radius);
-        planet.getBody().setLinearVelocity(0, velScl / 7.0f);
-        ship.getBody().setLinearVelocity(0, ship.getBody().getLinearVelocity().y + velScl / 7.0f);
+        // planet.getBody().setLinearVelocity(0, velScl / 7.0f);
+        // ship.getBody().setLinearVelocity(0, ship.getBody().getLinearVelocity().y + velScl / 7.0f);
 
         // Controls
         this.addListener(new InputListener(){
@@ -93,17 +94,19 @@ public class SpacePanel extends Stage {
             physAccumulator -= Constants.TIME_STEP;
         }
         
-        planetController.update(delta);
+        universe.update(delta);
 
         // Parent camera to the player
-        player.updateCamera((OrthographicCamera)getCamera());
+        // player.updateCamera((OrthographicCamera)getCamera());
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        System.out.println(universe.getUniversalPosition(ship));
+        cam.position.set(universe.getUniversalPosition(ship), 0);
+        cam.update();
     }
 
     @Override
     public void draw(){
         super.draw();
-
-        planetController.draw(getBatch().getProjectionMatrix(), getBatch().getTransformMatrix());
 
         if(this.isDebugAll()){
             debug.render(world, this.getCamera().combined.cpy().scl(Constants.PPM));

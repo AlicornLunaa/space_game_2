@@ -23,7 +23,7 @@ public class Star extends Entity {
 
     private CircleShape shape = new CircleShape();
 
-    private float radius = 10000.0f;
+    private float radius = 1000.0f;
     // private float temperature = 0.0f;
 
     private Pixmap pixmap;
@@ -67,7 +67,7 @@ public class Star extends Entity {
 
         shape.setRadius(radius / getPhysScale());
         shape.setPosition(new Vector2(0, 0));
-        body.createFixture(shape, 1.0f);
+        // body.createFixture(shape, 1.0f);
 
         setSize(radius * 2, radius * 2);
         setOrigin(radius, radius);
