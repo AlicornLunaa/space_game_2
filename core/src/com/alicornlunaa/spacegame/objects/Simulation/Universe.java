@@ -21,8 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public class Universe extends Actor {
 
     // Variables
-    private final App game;
-
     private ArrayList<Entity> ents = new ArrayList<>();
     private ArrayList<Celestial> celestials = new ArrayList<>();
 
@@ -93,40 +91,10 @@ public class Universe extends Actor {
         }
     }
 
-    private void createCelestialOrbit(Celestial c){
-        // Creates a stable orbital velocity
-        if(c.getCelestialParent() == null) return;
-
-        float radius = c.getBody().getPosition().len();
-        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * c.getCelestialParent().getBody().getMass()) / radius);
-
-        c.getBody().applyForce(new Vector2(0, velScl * c.getBody().getMass() * 6.0f), c.getBody().getWorldCenter(), true);
-    }
-
-    private void createCelestialOrbit(Entity c){
-        // Creates a stable orbital velocity
-        Celestial parent = entParents.get(c);
-        if(parent == null) return;
-
-        float radius = c.getBody().getPosition().len();
-        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getBody().getMass()) / radius);
-
-        c.getBody().applyForce(new Vector2(0, velScl * 2.5f), c.getBody().getWorldCenter(), true);
-    }
-
     // Constructor
     public Universe(final App game){
         super();
-        this.game = game;
         universalWorld = new World(new Vector2(), true);
-
-        celestials.add(new Celestial(game, universalWorld, 1000));
-        celestials.add(new Celestial(game, universalWorld, 100));
-        celestials.get(0).setPosition(celestials.get(0).getRadius() * -2 - 100, 0);
-        celestials.get(1).setPosition(100, 0);
-        parentCelestial(celestials.get(1), celestials.get(0));
-
-        createCelestialOrbit(celestials.get(1));
     }
 
     // Functions
@@ -144,6 +112,15 @@ public class Universe extends Actor {
         checkTransfer(e);
         createCelestialOrbit(e);
     }
+
+    public void addCelestial(Celestial c, Celestial parent){
+        c.loadBodyToWorld(universalWorld, Constants.PPM);
+        celestials.add(c);
+
+        if(parent != null) parentCelestial(c, parent);
+    }
+
+    public Celestial getCelestial(int i){ return celestials.get(i); }
 
     /**
      * This function adds an entity to a celestial and converts their coordinates
@@ -190,7 +167,26 @@ public class Universe extends Actor {
         parent.getEntities().remove(e);
     }
 
-    protected void applyPhysics(float delta, Body b){}
+    public void createCelestialOrbit(Celestial c){
+        // Creates a stable orbital velocity
+        if(c.getCelestialParent() == null) return;
+
+        float radius = c.getBody().getPosition().len();
+        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * c.getCelestialParent().getBody().getMass()) / radius);
+
+        c.getBody().applyForce(new Vector2(0, velScl * c.getBody().getMass() * 6.0f), c.getBody().getWorldCenter(), true);
+    }
+
+    public void createCelestialOrbit(Entity c){
+        // Creates a stable orbital velocity
+        Celestial parent = entParents.get(c);
+        if(parent == null) return;
+
+        float radius = c.getBody().getPosition().len();
+        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getBody().getMass()) / radius);
+
+        c.getBody().applyForce(new Vector2(0, velScl * 2.5f), c.getBody().getWorldCenter(), true);
+    }
 
     /**
      * Steps the physics worlds
@@ -253,5 +249,7 @@ public class Universe extends Actor {
         debug.render(universalWorld, batch.getProjectionMatrix().cpy().scl(Constants.PPM));
         batch.setTransformMatrix(oldMat);
     }
+ 
+    protected void applyPhysics(float delta, Body b){}
     
 }

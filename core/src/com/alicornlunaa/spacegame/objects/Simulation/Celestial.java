@@ -80,8 +80,8 @@ public class Celestial extends Entity {
     }
 
     public Matrix3 getUniverseTransform(){
-        if(parent == null) return getTransform();
-        return parent.getUniverseTransform().mul(getTransform());
+        if(parent == null) return new Matrix3().translate(getPosition());
+        return parent.getUniverseTransform().mul(new Matrix3().translate(getPosition()));
     }
 
     @Override

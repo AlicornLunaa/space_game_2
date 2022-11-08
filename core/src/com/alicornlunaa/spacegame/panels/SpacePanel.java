@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Star;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
+import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -48,6 +49,11 @@ public class SpacePanel extends Stage {
 
         universe = new Universe(game);
         universe.addEntity(ship);
+        universe.addCelestial(new Celestial(game, world, 1000), null);
+        universe.addCelestial(new Celestial(game, world, 100), universe.getCelestial(0));
+        universe.getCelestial(0).setPosition(universe.getCelestial(0).getRadius() * -2 - 100, 0);
+        universe.getCelestial(1).setPosition(1200, 0);
+        universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 
         // this.addActor(player);
