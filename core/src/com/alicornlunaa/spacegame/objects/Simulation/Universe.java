@@ -6,24 +6,12 @@ import java.util.HashMap;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-
-/**
- * 
-
-            if(e.getPosition().dst2(getPosition()) > sphereOfInfluence * sphereOfInfluence){
-                // Move it to the parent world
-                ents.remove(i);
-                this.delEntity(e);
-                i--;
-            }
- */
 
 /**
  * This is the main class that will hold all the celestial bodies and
@@ -42,6 +30,7 @@ public class Universe extends Actor {
 
     private final World universalWorld;
     private float physAccumulator;
+    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Private functions
     private void parentCelestial(Celestial target, Celestial parent){
@@ -111,8 +100,10 @@ public class Universe extends Actor {
 
         celestials.add(new Celestial(game, universalWorld, 600, 1200));
         celestials.add(new Celestial(game, universalWorld, 100, 200));
+        celestials.add(new Celestial(game, universalWorld, 800, 1200));
         celestials.get(0).setPosition(-1300, 0);
         celestials.get(1).setPosition(-400, 0);
+        celestials.get(2).setPosition(3000, 0);
         parentCelestial(celestials.get(1), celestials.get(0));
     }
 
@@ -129,8 +120,6 @@ public class Universe extends Actor {
         e.loadBodyToWorld(universalWorld, Constants.PPM);
         ents.add(e);
     }
-
-    public Celestial getCelestial(int i){ return celestials.get(i); }
 
     /**
      * This function adds an entity to a celestial and converts their coordinates
@@ -207,8 +196,9 @@ public class Universe extends Actor {
     public void draw(Batch batch, float a){
         Matrix4 oldMat = batch.getTransformMatrix().cpy();
 
-        batch.setTransformMatrix(oldMat);
         for(Entity e : ents){
+            batch.setTransformMatrix(oldMat);
+
             Celestial parent = entParents.get(e);
             if(parent != null){
                 batch.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()));
@@ -217,16 +207,12 @@ public class Universe extends Actor {
             e.draw(batch, a);
         }
         
-        batch.setTransformMatrix(oldMat);
         for(Celestial c : celestials){
-            Celestial parent = celestialParents.get(c);
-            if(parent != null){
-                batch.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()));
-            }
-
+            batch.setTransformMatrix(new Matrix4().set(c.getUniverseTransform()));
             c.draw(batch, a);
         }
 
+        debug.render(universalWorld, batch.getProjectionMatrix().cpy().scl(Constants.PPM));
         batch.setTransformMatrix(oldMat);
     }
     

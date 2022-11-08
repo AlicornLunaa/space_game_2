@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -40,15 +39,13 @@ public class Celestial extends Entity {
     private @Null Celestial parent = null;
     private ArrayList<Celestial> children = new ArrayList<>();
     private ArrayList<Entity> ents = new ArrayList<>();
-
-    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
     
     // Constructor
     public Celestial(final App game, final World parentWorld, float radius, float sphereOfInfluence){
         this.game = game;
         this.radius = radius;
         this.sphereOfInfluence = sphereOfInfluence;
-        influenceWorld = new World(getPosition(), true);
+        influenceWorld = new World(new Vector2(), true);
 
         setSize(radius * 2, radius * 2);
         
@@ -92,9 +89,9 @@ public class Celestial extends Entity {
         s.setProjectionMatrix(batch.getProjectionMatrix());
         s.setTransformMatrix(batch.getTransformMatrix());
         s.setColor(Color.RED);
-        s.circle(getX(), getY(), getSphereOfInfluence());
+        s.circle(0, 0, getSphereOfInfluence());
         s.setColor(Color.YELLOW);
-        s.circle(getX(), getY(), getRadius());
+        s.circle(0, 0, getRadius());
         s.end();
     }
 
