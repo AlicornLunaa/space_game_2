@@ -43,11 +43,9 @@ public class SpacePanel extends Stage {
 
         universe = new Universe(game);
         universe.addEntity(ship);
-        universe.addCelestial(new Planet(game, world, player, -2200, 0, 1200, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
-        // universe.addCelestial(new Celestial(game, world, 100), universe.getCelestial(0));
-        universe.getCelestial(0).setPosition(universe.getCelestial(0).getRadius() * -2 - 1000, 0);
-        // universe.getCelestial(1).setPosition(2400, 0);
-        // universe.createCelestialOrbit(universe.getCelestial(1));
+        universe.addCelestial(new Planet(game, world, player, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
+        universe.addCelestial(new Planet(game, world, player, 1800, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(0));
+        universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 
         player.drive(ship);

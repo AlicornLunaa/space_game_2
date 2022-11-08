@@ -36,7 +36,7 @@ public class Planet extends Celestial {
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Planet variables
-    private float atmosRadius = 3600.0f;
+    private float atmosRadius;
     private float atmosDensity = 1.0f;
     private Color terrainColor = new Color(.72f, 0.7f, 0.9f, 1);
     private Color atmosColor = new Color(0.6f, 0.6f, 1, 0.5f);
@@ -141,10 +141,11 @@ public class Planet extends Celestial {
     }
 
     // Constructor
-    public Planet(final App game, final World world, final Player player, float x, float y, float radius, Color terrain, Color atmos){
+    public Planet(final App game, final World world, final Player player, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
         super(game, world, radius);
         
         this.player = player;
+        atmosRadius = atmosRad;
         terrainColor = terrain;
         atmosColor = atmos;
 
