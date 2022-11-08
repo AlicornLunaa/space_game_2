@@ -38,10 +38,12 @@ public class Planet extends Entity {
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Planet variables
-    private float radius = 500.0f;
-    private float atmosRadius = 1000.0f;
+    private float radius = 10000.0f;
+    private float atmosRadius = 12000.0f;
     private float atmosDensity = 1.0f;
     private long seed = 123;
+    private Color terrainColor = new Color(.72f, 0.7f, 0.9f, 1);
+    private Color atmosColor = new Color(0.6f, 0.6f, 1, 0.5f);
 
     // World variables
     private World planetWorld;
@@ -71,8 +73,7 @@ public class Planet extends Entity {
                 int mY = y - pixmap.getHeight() / 2;
                 int radSqr = mX * mX + mY * mY;
                 float rand = (float)noise.eval(mX * 0.1f, mY * 0.1f);
-                
-                Color c = new Color(0.72f, 0.7f, 0.9f, 1);
+                Color c = terrainColor.cpy();
 
                 if(radSqr > (float)Math.pow(pixmap.getWidth() / 2, 2)) c.a = 0;
                 if(rand < 0){ c.mul(0.9f); c.a *= 1.1; }
@@ -96,7 +97,7 @@ public class Planet extends Entity {
                 int mX = x - imgRad / 2;
                 int mY = y - imgRad / 2;
                 float rad = (float)Math.sqrt((float)(mX * mX + mY * mY));
-                Color c = new Color(0.6f, 0.6f, 1, 0.5f - (rad / (float)imgRad));
+                Color c = new Color(atmosColor.r, atmosColor.g, atmosColor.b, atmosDensity * (0.5f - (rad / (float)imgRad)));
 
                 if(rad > imgRad / 2) c.a = 0;
 
@@ -114,10 +115,7 @@ public class Planet extends Entity {
         pixmap = new Pixmap((int)atmosRadius, (int)atmosRadius, Format.RGBA8888);
 
         for(int y = 0; y < pixmap.getHeight(); y++){
-            Color c = new Color(0.6f, 0.6f, 1, 1);
-
-            c.a = y / (float)pixmap.getHeight();
-
+            Color c = new Color(atmosColor.r, atmosColor.g, atmosColor.b, atmosDensity * (y / (float)pixmap.getHeight()));
             pixmap.setColor(c);
             pixmap.drawLine(0, y, pixmap.getWidth(), y);
         }
@@ -162,10 +160,13 @@ public class Planet extends Entity {
     }
 
     // Constructor
-    public Planet(final App game, final World world, float x, float y){
+    public Planet(final App game, final World world, float x, float y, Color terrain, Color atmos){
         super();
         this.game = game;
         this.spaceWorld = world;
+        
+        terrainColor = terrain;
+        atmosColor = atmos;
 
         // Initialize generators
         noise = new OpenSimplexNoise(seed);

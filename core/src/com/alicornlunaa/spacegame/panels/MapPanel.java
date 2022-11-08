@@ -26,7 +26,7 @@ public class MapPanel extends Stage {
         spacePanel = game.spaceScene.spacePanel;
         cam = (OrthographicCamera)spacePanel.getCamera();
         oldZoom = cam.zoom;
-        cam.zoom = 5.0f;
+        cam.zoom = 25.0f;
         cam.update();
 
         // Controls
@@ -44,7 +44,7 @@ public class MapPanel extends Stage {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 10), 2.0f), 25.0f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY), 20.0f), 150.0f);
                 return true;
             }
         });
@@ -54,6 +54,7 @@ public class MapPanel extends Stage {
     @Override
     public void act(float delta){
         spacePanel.act();
+        // cam.position.set(game.planetScene.planetPanel.planet.getPosition(), 0);
         super.act(delta);
     }
 
