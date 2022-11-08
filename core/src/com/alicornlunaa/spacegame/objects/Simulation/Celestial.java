@@ -111,9 +111,9 @@ public class Celestial extends Entity {
         // Newtons gravitational law: F = (G(m1 * m2)) / r^2
         float orbitRadius = b.getPosition().len(); // Entity radius in physics scale
         Vector2 direction = b.getPosition().cpy().nor().scl(-1);
-        float force = (Constants.GRAVITY_CONSTANT * body.getMass()) / (orbitRadius * orbitRadius);
+        float force = Constants.GRAVITY_CONSTANT * ((b.getMass() * body.getMass()) / (orbitRadius * orbitRadius));
 
-        b.applyForceToCenter(direction.scl(force * delta), true);
+        b.applyForceToCenter(direction.scl(force), true);
     }
 
 }

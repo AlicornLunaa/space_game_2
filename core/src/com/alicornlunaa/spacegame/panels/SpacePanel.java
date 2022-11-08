@@ -46,7 +46,7 @@ public class SpacePanel extends Stage {
         universe.addCelestial(new Celestial(game, world, 1000), null);
         universe.addCelestial(new Celestial(game, world, 100), universe.getCelestial(0));
         universe.getCelestial(0).setPosition(universe.getCelestial(0).getRadius() * -2 - 1000, 0);
-        universe.getCelestial(1).setPosition(1200, 0);
+        universe.getCelestial(1).setPosition(1800, 0);
         universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 

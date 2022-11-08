@@ -110,7 +110,7 @@ public class Universe extends Actor {
         e.loadBodyToWorld(universalWorld, Constants.PPM);
         ents.add(e);
         checkTransfer(e);
-        createCelestialOrbit(e);
+        createEntityOrbit(e);
     }
 
     public void addCelestial(Celestial c, Celestial parent){
@@ -178,18 +178,18 @@ public class Universe extends Actor {
         float radius = c.getBody().getPosition().len();
         float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * c.getCelestialParent().getBody().getMass()) / radius);
 
-        c.getBody().applyForce(new Vector2(0, velScl * c.getBody().getMass() * 6.0f), c.getBody().getWorldCenter(), true);
+        c.getBody().setLinearVelocity(0, velScl);
     }
 
-    public void createCelestialOrbit(Entity c){
+    public void createEntityOrbit(Entity e){
         // Creates a stable orbital velocity
-        Celestial parent = entParents.get(c);
+        Celestial parent = entParents.get(e);
         if(parent == null) return;
 
-        float radius = c.getBody().getPosition().len();
+        float radius = e.getBody().getPosition().len();
         float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getBody().getMass()) / radius);
 
-        c.getBody().applyForce(new Vector2(0, velScl * 2.5f), c.getBody().getWorldCenter(), true);
+        e.getBody().setLinearVelocity(0, velScl);
     }
 
     /**

@@ -43,6 +43,9 @@ public class ConsoleScene implements Screen {
             game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         } else if(args[0].equals("set_rot")){
             game.spaceScene.spacePanel.ship.setRotation(Integer.parseInt(args[1]));
+        } else if(args[0].equals("orbit")){
+            game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
+            game.spaceScene.spacePanel.universe.createEntityOrbit(game.spaceScene.spacePanel.ship);
         }
     }
 
