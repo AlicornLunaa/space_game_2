@@ -76,7 +76,11 @@ public class Compass extends Widget {
         // Draw the ball with the angle relative to the target velocity
         theta = 0;
         if(targetEnt != null){
-            theta = targetEnt.getBody().getLinearVelocity().angleDeg() - 90;
+            if(targetEnt.getDriving() != null){
+                theta = targetEnt.getDriving().getBody().getLinearVelocity().angleDeg() - 90;
+            } else {
+                theta = targetEnt.getBody().getLinearVelocity().angleDeg() - 90;
+            }
         }
         batch.draw(
             markerTexture,

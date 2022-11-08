@@ -1,45 +1,19 @@
 
 spacecadet.png
-size: 64, 64
+size: 256, 256
 format: RGBA8888
 filter: Linear, Linear
 repeat: none
-button
-  rotate: false
-  xy: 1, 31
-  size: 30, 14
-  split: 0, 0, 0, 0
-  orig: 30, 14
-  offset: 0, 0
-  index: -1
-button_down
-  rotate: false
-  xy: 1, 47
-  size: 30, 14
-  split: 3, 5, 3, 5
-  pad: 0, 0, 0, 0
-  orig: 30, 14
-  offset: 0, 0
-  index: -1
-button_hover
-  rotate: false
-  xy: 33, 47
-  size: 30, 14
-  split: 3, 5, 3, 5
-  pad: 0, 0, 0, 0
-  orig: 30, 14
-  offset: 0, 0
-  index: -1
 checkbox
   rotate: false
-  xy: 19, 11
+  xy: 208, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 selection
   rotate: false
-  xy: 19, 11
+  xy: 208, 109
   size: 16, 16
   split: 3, 3, 3, 3
   pad: 0, 0, 0, 0
@@ -48,21 +22,21 @@ selection
   index: -1
 checkbox_hover
   rotate: false
-  xy: 33, 29
+  xy: 187, 49
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 checkbox_on
   rotate: false
-  xy: 1, 13
+  xy: 127, 29
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 corner
   rotate: false
-  xy: 1, 7
+  xy: 127, 23
   size: 4, 4
   split: 1, 1, 1, 1
   pad: 0, 0, 0, 0
@@ -71,10 +45,86 @@ corner
   index: -1
 knob
   rotate: false
-  xy: 51, 37
-  size: 4, 8
-  split: 0, 2, 0, 2
-  pad: 0, 0, 0, 0
-  orig: 4, 8
+  xy: 127, 67
+  size: 59, 58
+  split: 9, 11, 9, 10
+  orig: 59, 58
+  offset: 0, 0
+  index: -1
+knob_small
+  rotate: false
+  xy: 188, 67
+  size: 18, 58
+  split: 5, 5, 8, 10
+  pad: 5, 5, 9, 10
+  orig: 18, 58
+  offset: 0, 0
+  index: -1
+knob_small_flip
+  rotate: false
+  xy: 127, 47
+  size: 58, 18
+  split: 12, 16, 7, 8
+  pad: 9, 10, 5, 5
+  orig: 58, 18
+  offset: 0, 0
+  index: -1
+light_panel
+  rotate: false
+  xy: 1, 127
+  size: 126, 63
+  split: 9, 12, 9, 11
+  pad: 10, 9, 9, 10
+  orig: 126, 63
+  offset: 0, 0
+  index: -1
+light_panel_nopad
+  rotate: false
+  xy: 1, 127
+  size: 126, 63
+  split: 9, 12, 9, 11
+  pad: 10, 10, 0, 0
+  orig: 126, 63
+  offset: 0, 0
+  index: -1
+light_panel_down
+  rotate: false
+  xy: 1, 1
+  size: 124, 61
+  split: 9, 10, 9, 9
+  orig: 124, 61
+  offset: 0, 0
+  index: -1
+light_panel_hover
+  rotate: false
+  xy: 129, 127
+  size: 126, 63
+  split: 10, 13, 10, 12
+  orig: 126, 63
+  offset: 0, 0
+  index: -1
+panel
+  rotate: false
+  xy: 129, 192
+  size: 126, 63
+  split: 9, 12, 9, 11
+  pad: 22, 22, 20, 20
+  orig: 126, 63
+  offset: 0, 0
+  index: -1
+panel_down
+  rotate: false
+  xy: 1, 64
+  size: 124, 61
+  split: 9, 10, 9, 9
+  orig: 124, 61
+  offset: 0, 0
+  index: -1
+panel_hover
+  rotate: false
+  xy: 1, 192
+  size: 126, 63
+  split: 10, 13, 10, 12
+  orig: 126, 63
   offset: 0, 0
   index: -1

@@ -69,15 +69,15 @@ public class ShipEditorUIPanel extends Stage {
         
         // Interface layout
         ui.row().expandX().fillX().pad(20);
-        ui.add(nameBar).width(300 * scale).left();
-        ui.add(saveButton).right().maxWidth(64 * scale);
-        ui.add(loadButton).right().maxWidth(64 * scale);
-        ui.add(closeButton).right().maxWidth(64 * scale);
+        ui.add(nameBar).width(400 * scale).left();
+        ui.add(saveButton).right().maxWidth(84 * scale);
+        ui.add(loadButton).right().maxWidth(84 * scale);
+        ui.add(closeButton).right().maxWidth(84 * scale);
 
         ui.row().expand().fill().colspan(4);
         ui.add(editorTable);
         editorTable.row().expandY().fillY().left();
-        editorTable.add(categoryScroll).minWidth(64 * scale);
+        editorTable.add(categoryScroll).minWidth(150 * scale);
 
         int categoryCount = 0;
         for(final String entry : game.partManager.getPartsList().keySet()) {

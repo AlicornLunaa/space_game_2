@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 
 public class PlanetUIPanel extends Stage {
     
@@ -24,7 +24,7 @@ public class PlanetUIPanel extends Stage {
 
     // Constructor
     public PlanetUIPanel(final App game){
-        super(new ScreenViewport());
+        super(new FillViewport(1280, 720));
         this.game = game;
 
         fpsCounter = new Label("FPS: N/A", game.skin);

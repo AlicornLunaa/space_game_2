@@ -28,8 +28,8 @@ public class EditorScene implements Screen {
         inputs.addProcessor(uiPanel);
         inputs.addProcessor(editorPanel);
         
-        editorPanel.setDebugAll(true);
-        uiPanel.setDebugAll(true);
+        // editorPanel.setDebugAll(true);
+        // uiPanel.setDebugAll(true);
     }
 
     // Functions

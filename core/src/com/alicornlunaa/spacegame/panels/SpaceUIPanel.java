@@ -6,7 +6,6 @@ import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,8 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class SpaceUIPanel extends Stage {
     
@@ -40,14 +37,15 @@ public class SpaceUIPanel extends Stage {
         super(new ExtendViewport(1280, 720));
         this.game = game;
 
-        // Load layout from file
-        SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
-        // builder.build(this, game.skin, Gdx.files.internal("layouts/space_ui.json"));
-
         // Initialize UI elements
         Table tbl = new Table(game.skin);
         tbl.setFillParent(true);
         this.addActor(tbl);
+
+        // Navigation compass
+        shipCompass = new Compass(game);
+        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 0);
+        this.addActor(shipCompass);
 
         // Labels
         positionLabel = new Label("Pos: N/a", game.skin);
@@ -62,27 +60,27 @@ public class SpaceUIPanel extends Stage {
         tbl.add(new Table()).width(300).colspan(6);
 
         sasBtn = new TextButton("SAS", game.skin);
-        sasBtn.setPosition(640 - 64, 480 - 32);
+        sasBtn.setPosition(getWidth() / 2.0f - 128 - 5, 5);
         sasBtn.setSize(64, 32);
         sasBtn.setColor(Color.RED);
-        tbl.add(sasBtn).right().maxWidth(64);
+        this.addActor(sasBtn);
 
         rcsBtn = new TextButton("RCS", game.skin);
-        rcsBtn.setPosition(640 - 128, 480 - 32);
+        rcsBtn.setPosition(getWidth() / 2.0f + shipCompass.getOriginX() + 5, 5);
         rcsBtn.setSize(64, 32);
         rcsBtn.setColor(Color.RED);
-        tbl.add(rcsBtn).right().maxWidth(64);
+        this.addActor(rcsBtn);
 
         TextButton editBtn = new TextButton("Editor", game.skin);
         editBtn.setPosition(640 - 192, 480 - 32);
-        editBtn.setSize(64, 32);
+        editBtn.setSize(128, 32);
         editBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 game.setScreen(game.editorScene);
             }
         });
-        tbl.add(editBtn).right().maxWidth(64);
+        tbl.add(editBtn).right().maxWidth(84);
         tbl.row().expand().fill().left();
 
         Table hud = new Table(game.skin);
@@ -92,11 +90,6 @@ public class SpaceUIPanel extends Stage {
         hud.add(throttleBar).expand().right().bottom().pad(20).minHeight(256);
 
         tbl.add(hud).colspan(9);
-
-        // Navigation compass
-        shipCompass = new Compass(game);
-        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 0);
-        this.addActor(shipCompass);
 
         // Controls
         this.addListener(new InputListener(){
