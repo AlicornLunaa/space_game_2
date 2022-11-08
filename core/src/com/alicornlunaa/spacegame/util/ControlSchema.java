@@ -34,6 +34,8 @@ public class ControlSchema {
     public static int PLAYER_LEFT = Keys.A;
     public static int PLAYER_RIGHT = Keys.D;
 
+    public static int OPEN_ORBITAL_MAP = Keys.M;
+
     public static int EDITOR_ROTATE = Keys.R;
     public static int EDITOR_FLIP_X = Keys.F;
     public static int EDITOR_FLIP_Y = Keys.C;

@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.panels;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.FadeTransitionScene;
+import com.alicornlunaa.spacegame.scenes.MapScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -104,6 +105,18 @@ public class SpaceUIPanel extends Stage {
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
                     game.spaceScene.spacePanel.ship.state.debug = !game.spaceScene.spacePanel.ship.state.debug;
                     return true;
+                } else if(keycode == ControlSchema.SHIP_TOGGLE_RCS){
+                    game.spaceScene.spacePanel.ship.state.rcs = !game.spaceScene.spacePanel.ship.state.rcs;
+                    return true;
+                } else if(keycode == ControlSchema.SHIP_TOGGLE_SAS){
+                    game.spaceScene.spacePanel.ship.state.sas = !game.spaceScene.spacePanel.ship.state.sas;
+                    return true;
+                } else if(keycode == ControlSchema.SHIP_FULL_THROTTLE){
+                    game.spaceScene.spacePanel.ship.state.throttle = 1;
+                } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
+                    game.spaceScene.spacePanel.ship.state.throttle = 0;
+                } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
+                    game.setScreen(new MapScene(game, game.spaceScene.spacePanel.player));
                 }
 
                 return false;

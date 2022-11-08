@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.panels.PlanetPanel;
 import com.alicornlunaa.spacegame.panels.PlanetUIPanel;
+import com.alicornlunaa.spacegame.panels.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -23,6 +24,7 @@ public class PlanetScene implements Screen {
 
     public PlanetPanel planetPanel;
     public PlanetUIPanel uiPanel;
+    public SpaceUIPanel uiShip;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
@@ -32,12 +34,14 @@ public class PlanetScene implements Screen {
 
         planetPanel = new PlanetPanel(game, planet, player);
         uiPanel = new PlanetUIPanel(game);
+        uiShip = new SpaceUIPanel(game);
 
         inputs.addProcessor(planetPanel);
         inputs.addProcessor(uiPanel);
+        inputs.addProcessor(uiShip);
 
         // Initialize UI
-        uiPanel.shipCompass.setTarget(planetPanel.player);
+        uiShip.shipCompass.setTarget(planetPanel.player);
 
         // planetPanel.setDebugAll(true);
         // uiPanel.setDebugAll(true);
@@ -51,15 +55,18 @@ public class PlanetScene implements Screen {
 
         planetPanel.act(delta);
         uiPanel.act(delta);
+        uiShip.act(delta);
 
         planetPanel.draw();
         uiPanel.draw();
+        uiShip.draw();
     }
 
     @Override
     public void resize(int width, int height) {
         planetPanel.getViewport().update(width, height, true);
         uiPanel.getViewport().update(width, height, true);
+        uiShip.getViewport().update(width, height, true);
     }
 
     @Override
@@ -80,6 +87,7 @@ public class PlanetScene implements Screen {
     public void dispose() {
         planetPanel.dispose();
         uiPanel.dispose();
+        uiShip.dispose();
     }
     
 }

@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -54,23 +53,6 @@ public class SpacePanel extends Stage {
 
         // Controls
         this.addListener(new InputListener(){
-            @Override
-            public boolean keyDown(InputEvent event, int keycode){
-                if(keycode == ControlSchema.SHIP_TOGGLE_RCS){
-                    ship.state.rcs = !ship.state.rcs;
-                    return true;
-                } else if(keycode == ControlSchema.SHIP_TOGGLE_SAS){
-                    ship.state.sas = !ship.state.sas;
-                    return true;
-                } else if(keycode == ControlSchema.SHIP_FULL_THROTTLE){
-                    ship.state.throttle = 1;
-                } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
-                    ship.state.throttle = 0;
-                }
-
-                return false;
-            }
-
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 OrthographicCamera cam = (OrthographicCamera)getCamera();

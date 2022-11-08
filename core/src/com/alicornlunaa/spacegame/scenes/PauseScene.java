@@ -11,12 +11,14 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -64,11 +66,23 @@ public class PauseScene implements Screen {
         tbl.row().expandX().fillX().center().maxWidth(240);
         TextButton optBtn = new TextButton("Options", game.skin);
         optBtn.setColor(new HexColor("#D9F0FF"));
+        optBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // game.setScreen(new OptionsScene(app, previousScreen, int width, int height));
+            }
+        });
         tbl.add(optBtn);
         
         tbl.row().expandX().fillX().center().maxWidth(240);
         TextButton clsBtn = new TextButton("Quit", game.skin);
         clsBtn.setColor(new HexColor("#D9F0FF"));
+        clsBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.exit();
+            }
+        });
         tbl.add(clsBtn);
 
         stage.addActor(tbl);
