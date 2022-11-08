@@ -44,7 +44,7 @@ public class MapPanel extends Stage {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY), 20.0f), 150.0f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY * 5), 20.0f), 1500.0f);
                 return true;
             }
         });

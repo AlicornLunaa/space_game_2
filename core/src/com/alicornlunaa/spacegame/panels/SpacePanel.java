@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Star;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
-import com.alicornlunaa.spacegame.objects.Simulation.CelestialController;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;

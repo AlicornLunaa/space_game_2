@@ -29,7 +29,6 @@ public class Celestial extends Entity {
 
     // Planet variables
     protected float radius;
-    protected float sphereOfInfluence;
 
     // Physics variables
     private final World influenceWorld;
@@ -41,10 +40,9 @@ public class Celestial extends Entity {
     private ArrayList<Entity> ents = new ArrayList<>();
     
     // Constructor
-    public Celestial(final App game, final World parentWorld, float radius, float sphereOfInfluence){
+    public Celestial(final App game, final World parentWorld, float radius){
         this.game = game;
         this.radius = radius;
-        this.sphereOfInfluence = sphereOfInfluence;
         influenceWorld = new World(new Vector2(), true);
 
         setSize(radius * 2, radius * 2);
@@ -70,12 +68,16 @@ public class Celestial extends Entity {
 
     // Functions
     public float getRadius(){ return radius; }
-    public float getSphereOfInfluence(){ return sphereOfInfluence; }
     public World getWorld(){ return influenceWorld; }
     public ArrayList<Entity> getEntities(){ return ents; }
     public ArrayList<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }
     public void setCelestialParent(Celestial c){ parent = c; }
+
+    public float getSphereOfInfluence(){
+        if(parent == null) return radius * 8;
+        return radius * 4;
+    }
 
     public Matrix3 getUniverseTransform(){
         if(parent == null) return getTransform();
@@ -89,9 +91,9 @@ public class Celestial extends Entity {
         s.setProjectionMatrix(batch.getProjectionMatrix());
         s.setTransformMatrix(batch.getTransformMatrix());
         s.setColor(Color.RED);
-        s.circle(0, 0, getSphereOfInfluence());
+        s.circle(0, 0, getSphereOfInfluence(), 500);
         s.setColor(Color.YELLOW);
-        s.circle(0, 0, getRadius());
+        s.circle(0, 0, getRadius(), 500);
         s.end();
     }
 
@@ -102,6 +104,16 @@ public class Celestial extends Entity {
             influenceWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
         }
+    }
+
+    // Physics functions
+    public void applyGravity(float delta, Body b){
+        // Newtons gravitational law: F = (G(m1 * m2)) / r^2
+        float orbitRadius = b.getPosition().len(); // Entity radius in physics scale
+        Vector2 direction = b.getPosition().cpy().nor().scl(-1);
+        float force = (Constants.GRAVITY_CONSTANT * body.getMass()) / (orbitRadius * orbitRadius);
+
+        b.applyForceToCenter(direction.scl(force * delta), true);
     }
 
 }
