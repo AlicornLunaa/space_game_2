@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.PlanetController;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
@@ -22,6 +23,7 @@ public class SpacePanel extends Stage {
     private World world;
     private float physAccumulator = 0.0f;
 
+    public PlanetController planetController;
     public Player player;
     public Ship ship;
     public Planet planet;
@@ -34,6 +36,7 @@ public class SpacePanel extends Stage {
         this.game = game;
 
         world = new World(new Vector2(), true);
+        planetController = new PlanetController();
 
         player = new Player(game, world, 0, 0, Constants.PPM);
         this.addActor(player);

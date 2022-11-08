@@ -116,7 +116,7 @@ public class SpaceUIPanel extends Stage {
                 } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
                     game.spaceScene.spacePanel.ship.state.throttle = 0;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    game.setScreen(new MapScene(game, game.spaceScene.spacePanel.player));
+                    game.setScreen(new MapScene(game, game.getScreen(), game.spaceScene.spacePanel.player));
                 }
 
                 return false;

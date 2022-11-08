@@ -2,6 +2,8 @@ package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.panels.MapPanel;
+import com.alicornlunaa.spacegame.panels.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -12,22 +14,24 @@ public class MapScene implements Screen {
     // Variables
     final App game;
 
-    // public MapPanel mapPanel;
+    public MapPanel mapPanel;
     // public MapUIPanel uiPanel;
+    public SpaceUIPanel uiShip;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
-    public MapScene(final App game, final Player player){
+    public MapScene(final App game, final Screen previousScreen, final Player player){
         this.game = game;
 
-        // inputs.addProcessor(mapPanel);
+        mapPanel = new MapPanel(game, previousScreen);
+        uiShip = game.spaceScene.uiPanel;
+
+        inputs.addProcessor(mapPanel);
         // inputs.addProcessor(uiPanel);
+        inputs.addProcessor(uiShip);
 
-        // Initialize UI
-        // uiPanel.shipCompass.setTarget(game.planetScene.planetPanel.player);
-
-        // mapPanel.setDebugAll(true);
+        mapPanel.setDebugAll(true);
         // uiPanel.setDebugAll(true);
     }
 
@@ -37,16 +41,18 @@ public class MapScene implements Screen {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
-        // mapPanel.act(delta);
+        mapPanel.act(delta);
         // uiPanel.act(delta);
+        uiShip.act(delta);
 
-        // mapPanel.draw();
+        mapPanel.draw();
         // uiPanel.draw();
+        uiShip.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        // mapPanel.getViewport().update(width, height, true);
+        mapPanel.getViewport().update(width, height, true);
         // uiPanel.getViewport().update(width, height, true);
     }
 
@@ -66,7 +72,7 @@ public class MapScene implements Screen {
 
     @Override
     public void dispose() {
-        // mapPanel.dispose();
+        mapPanel.dispose();
         // uiPanel.dispose();
     }
 }
