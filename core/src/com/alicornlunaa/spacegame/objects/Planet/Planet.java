@@ -363,7 +363,7 @@ public class Planet extends Celestial {
         if(dist < atmosRadius / 1.15f){
             // Move it into this world
             this.addEntityWorld(e);
-            game.setScreen(game.planetScene);
+            // TODO: game.setScreen(game.planetScene);
 
             return true;
         }

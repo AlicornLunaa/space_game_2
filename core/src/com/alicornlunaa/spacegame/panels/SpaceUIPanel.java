@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class SpaceUIPanel extends Stage {
     
@@ -36,7 +36,7 @@ public class SpaceUIPanel extends Stage {
 
     // Constructor
     public SpaceUIPanel(final App game){
-        super(new ExtendViewport(1280, 720));
+        super(new ScreenViewport());
         this.game = game;
 
         // Initialize UI elements

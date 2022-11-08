@@ -3,7 +3,6 @@ package com.alicornlunaa.spacegame;
 import com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.LoadingScene;
-import com.alicornlunaa.spacegame.scenes.PlanetScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
@@ -24,7 +23,6 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public SpaceScene spaceScene;
-	public PlanetScene planetScene;
 	public EditorScene editorScene;
 
 	public boolean loaded = false;
@@ -73,7 +71,6 @@ public class App extends Game {
 
 				// Start new scene
 				spaceScene = new SpaceScene(this);
-				planetScene = new PlanetScene(this, spaceScene.spacePanel.planet, spaceScene.spacePanel.player);
 				editorScene = new EditorScene(this);
 				this.setScreen(spaceScene);
 			} else {

@@ -22,7 +22,7 @@ public class PlanetPanel extends Stage {
 
     public Planet planet;
     public Player player;
-    private float worldWidthPixels;
+    // private float worldWidthPixels;
 
     // Constructor
     public PlanetPanel(final App game, final Planet planet, final Player player){
@@ -31,7 +31,7 @@ public class PlanetPanel extends Stage {
 
         this.planet = planet;
         this.player = player;
-        worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+        // worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
         this.addListener(new InputListener(){

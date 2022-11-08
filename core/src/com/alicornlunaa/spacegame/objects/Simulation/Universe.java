@@ -122,6 +122,8 @@ public class Universe extends Actor {
 
     public Celestial getCelestial(int i){ return celestials.get(i); }
 
+    public Celestial getParentCelestial(Entity e){ return entParents.get(e); }
+
     /**
      * This function adds an entity to a celestial and converts their coordinates
      * the celestial's scale
@@ -136,6 +138,7 @@ public class Universe extends Actor {
             parent.getEntities().remove(e);
         }
 
+        e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().sub(c.getBody().getLinearVelocity()));
         e.setPosition(e.getPosition().sub(c.getPosition()));
 
         // Add body
@@ -159,6 +162,7 @@ public class Universe extends Actor {
         if(parent == null) return;
         if(celestialParent != null) celestialParent.getEntities().add(e);
 
+        e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().add(parent.getBody().getLinearVelocity()));
         e.setPosition(e.getPosition().add(parent.getPosition()));
 
         // Remove body

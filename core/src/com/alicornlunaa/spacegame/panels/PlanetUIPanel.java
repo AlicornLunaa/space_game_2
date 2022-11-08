@@ -1,8 +1,6 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.ConsoleScene;
-import com.alicornlunaa.spacegame.scenes.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -36,10 +34,10 @@ public class PlanetUIPanel extends Stage {
         this.addListener(new InputListener(){
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
-                    game.setScreen(new PauseScene(game, game.planetScene, (int)getWidth(), (int)getHeight()));
+                    // game.setScreen(new PauseScene(game, game.planetScene, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, game.planetScene, (int)getWidth(), (int)getHeight()));
+                    // game.setScreen(new ConsoleScene(game, game.planetScene, (int)getWidth(), (int)getHeight()));
                     return true;
                 }
 
@@ -51,10 +49,10 @@ public class PlanetUIPanel extends Stage {
     // Functions
     @Override
     public void draw(){
-        PlanetPanel planetPanel = game.planetScene.planetPanel;
+        // PlanetPanel planetPanel = game.planetScene.planetPanel;
 
         fpsCounter.setText((int)(1 / Gdx.graphics.getDeltaTime()));
-        posLabel.setText(planetPanel.player.getPosition().toString());
+        // posLabel.setText(planetPanel.player.getPosition().toString());
 
         super.draw();
     }

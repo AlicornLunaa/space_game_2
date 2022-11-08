@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -14,7 +15,7 @@ import com.badlogic.gdx.utils.Null;
 public class Compass extends Widget {
     
     // Variables
-    private @Null Entity gravityParentEnt = null;
+    private Universe universe;
     private @Null Entity targetEnt = null;
 
     private TextureRegion ballTexture;
@@ -36,8 +37,8 @@ public class Compass extends Widget {
     }
 
     // Functions
-    public void setGravityParent(Entity e){
-        gravityParentEnt = e;
+    public void setUniverse(Universe universe){
+        this.universe = universe;
     }
 
     public void setTarget(Entity e){
@@ -64,6 +65,7 @@ public class Compass extends Widget {
         );
 
         // Draw the ball with the angle relative to the target and parent
+        Entity gravityParentEnt = universe.getParentCelestial(targetEnt);
         float theta = 0;
         if(targetEnt != null && gravityParentEnt != null){
             Vector2 targetToParent = targetEnt.getPosition().sub(gravityParentEnt.getPosition()).nor();
