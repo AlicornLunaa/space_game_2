@@ -54,7 +54,6 @@ public class MapPanel extends Stage {
     @Override
     public void act(float delta){
         spacePanel.act();
-        // cam.position.set(game.planetScene.planetPanel.planet.getPosition(), 0);
         super.act(delta);
     }
 

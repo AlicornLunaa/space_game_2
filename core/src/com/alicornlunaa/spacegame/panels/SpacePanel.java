@@ -3,11 +3,14 @@ package com.alicornlunaa.spacegame.panels;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -23,6 +26,7 @@ public class SpacePanel extends Stage {
 
     private World world;
     private float physAccumulator = 0.0f;
+    private Starfield backgroundTexture;
 
     public Universe universe;
     public Player player;
@@ -36,6 +40,7 @@ public class SpacePanel extends Stage {
         this.game = game;
 
         world = new World(new Vector2(), true);
+        backgroundTexture = new Starfield((int)getWidth(), (int)getHeight());
 
         player = new Player(game, world, 0, 0, Constants.PPM);
         ship = new Ship(game, world, 0, 0, 0);
@@ -87,6 +92,26 @@ public class SpacePanel extends Stage {
 
     @Override
     public void draw(){
+        Batch batch = getBatch();
+        Matrix4 oldProj = batch.getProjectionMatrix();
+        Matrix4 oldTrans = batch.getTransformMatrix();
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        float oldZoom = cam.zoom;
+        cam.zoom = 1;
+        cam.update();
+
+        batch.begin();
+        batch.setProjectionMatrix(new Matrix4());
+        batch.setTransformMatrix(new Matrix4());
+        backgroundTexture.setOffset(cam.position.x / 100000, cam.position.y / 100000);
+        backgroundTexture.draw(batch, -1, -1, 2, 2);
+        batch.setTransformMatrix(oldProj);
+        batch.setTransformMatrix(oldTrans);
+        batch.end();
+
+        cam.zoom = oldZoom;
+        cam.update();
+
         super.draw();
 
         if(this.isDebugAll()){

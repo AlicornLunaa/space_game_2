@@ -105,10 +105,10 @@ public class Celestial extends Entity {
 
     public void update(float delta){
         // Step the physics on the world
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            influenceWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
+        physAccumulator += Math.min(delta, 0.25f) + Constants.TIME_WARP;
+        while(physAccumulator >= Constants.TIME_STEP + Constants.TIME_WARP){
+            influenceWorld.step(Constants.TIME_STEP + Constants.TIME_WARP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+            physAccumulator -= Constants.TIME_STEP + Constants.TIME_WARP;
         }
     }
 

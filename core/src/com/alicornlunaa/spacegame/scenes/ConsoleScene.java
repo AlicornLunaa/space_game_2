@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -46,6 +47,8 @@ public class ConsoleScene implements Screen {
         } else if(args[0].equals("orbit")){
             game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
             game.spaceScene.spacePanel.universe.createEntityOrbit(game.spaceScene.spacePanel.ship);
+        } else if(args[0].equals("set_timescale")){
+            Constants.TIME_WARP = Float.parseFloat(args[1]);
         }
     }
 
