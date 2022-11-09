@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.OrbitPath;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Starfield;
@@ -31,6 +32,7 @@ public class SpacePanel extends Stage {
     public Universe universe;
     public Player player;
     public Ship ship;
+    public OrbitPath orbitPath;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -48,12 +50,14 @@ public class SpacePanel extends Stage {
 
         universe = new Universe(game);
         universe.addEntity(ship);
-        universe.addCelestial(new Planet(game, world, player, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
+        universe.addCelestial(new Planet(game, world, player, -18000, 0, 1200, 1500, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
         universe.addCelestial(new Planet(game, world, player, 1800, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(0));
         universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 
         player.drive(ship);
+
+        orbitPath = new OrbitPath(game, universe.getCelestial(1).getBody().getPosition(), universe.getCelestial(1).getBody().getLinearVelocity(), universe.getCelestial(0).getBody().getMass());
 
         // Controls
         this.addListener(new InputListener(){
@@ -81,7 +85,7 @@ public class SpacePanel extends Stage {
             physAccumulator -= Constants.TIME_STEP;
         }
         
-        universe.update(delta);
+        // universe.update(delta);
 
         // Parent camera to the player
         // player.updateCamera((OrthographicCamera)getCamera());
@@ -93,8 +97,8 @@ public class SpacePanel extends Stage {
     @Override
     public void draw(){
         Batch batch = getBatch();
-        Matrix4 oldProj = batch.getProjectionMatrix();
-        Matrix4 oldTrans = batch.getTransformMatrix();
+        Matrix4 oldProj = batch.getProjectionMatrix().cpy();
+        Matrix4 oldTrans = batch.getTransformMatrix().cpy();
         OrthographicCamera cam = (OrthographicCamera)getCamera();
         float oldZoom = cam.zoom;
         cam.zoom = 1;
@@ -105,8 +109,9 @@ public class SpacePanel extends Stage {
         batch.setTransformMatrix(new Matrix4());
         backgroundTexture.setOffset(cam.position.x / 100000, cam.position.y / 100000);
         backgroundTexture.draw(batch, -1, -1, 2, 2);
-        batch.setTransformMatrix(oldProj);
+        batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
+        orbitPath.draw(batch);
         batch.end();
 
         cam.zoom = oldZoom;
