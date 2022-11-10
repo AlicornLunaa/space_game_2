@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.panels;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.OrbitPath;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.objects.Starfield;
@@ -32,8 +31,6 @@ public class SpacePanel extends Stage {
     public Universe universe;
     public Player player;
     public Ship ship;
-    public OrbitPath orbitPath1;
-    public OrbitPath orbitPath2;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -58,9 +55,7 @@ public class SpacePanel extends Stage {
 
         player.drive(ship);
 
-        universe.getCelestial(1).getBody().applyLinearImpulse(0, 150, universe.getCelestial(1).getBody().getWorldCenter().x, universe.getCelestial(1).getBody().getWorldCenter().y, true);
-        orbitPath1 = new OrbitPath(game, universe.getCelestial(0), universe.getCelestial(1));
-        orbitPath2 = new OrbitPath(game, universe.getCelestial(0), ship);
+        universe.getCelestial(1).getBody().applyLinearImpulse(0, 350, universe.getCelestial(1).getBody().getWorldCenter().x, universe.getCelestial(1).getBody().getWorldCenter().y, true);
 
         // Controls
         this.addListener(new InputListener(){
@@ -114,8 +109,6 @@ public class SpacePanel extends Stage {
         backgroundTexture.draw(batch, -1, -1, 2, 2);
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
-        orbitPath1.draw(batch);
-        orbitPath2.draw(batch);
         batch.end();
 
         cam.zoom = oldZoom;

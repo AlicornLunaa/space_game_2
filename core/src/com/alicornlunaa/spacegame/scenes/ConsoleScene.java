@@ -47,8 +47,6 @@ public class ConsoleScene implements Screen {
         } else if(args[0].equals("orbit")){
             game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
             game.spaceScene.spacePanel.universe.createEntityOrbit(game.spaceScene.spacePanel.ship);
-            if(game.spaceScene.spacePanel.universe.getParentCelestial(game.spaceScene.spacePanel.ship) != null){ game.spaceScene.spacePanel.orbitPath2.setParent(game.spaceScene.spacePanel.universe.getParentCelestial(game.spaceScene.spacePanel.ship)); }
-            game.spaceScene.spacePanel.orbitPath2.recalculate();
         } else if(args[0].equals("set_timescale")){
             Constants.TIME_WARP = Float.parseFloat(args[1]);
         }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,11 +20,13 @@ public class OrbitPath {
     private static final int MAX_TRIES = 8;
     private static final int STEPS = 512;
 
+    private final Universe universe;
     private final ShapeRenderer render;
     private Color color = Color.CYAN;
 
     private Celestial parent;
     private Entity entity;
+    private Vector2 center;
     private float semiMajorAxis;
     private float eccentricity;
     private float argumentOfPeriapsis;
@@ -32,9 +35,10 @@ public class OrbitPath {
     private ArrayList<Vector2> points = new ArrayList<>();
 
     // Constructor
-    public OrbitPath(final App game, Celestial parent, Entity entity){
+    public OrbitPath(final App game, final Universe universe, Celestial parent, Entity entity){
         // Constructor to obtain keplarian elements from position and velocity
         render = game.shapeRenderer;
+        this.universe = universe;
         this.parent = parent;
         this.entity = entity;
         recalculate();
@@ -50,17 +54,18 @@ public class OrbitPath {
     
     public void recalculate(){
         // Recalculate orbital path
-        Vector2 position = entity.getBody().getPosition();
+        center = parent.getPosition();
+
+        Vector2 position = entity.getBody().getWorldCenter();
         Vector2 velocity = entity.getBody().getLinearVelocity();
-        
-        float mu = (float)(Constants.GRAVITY_CONSTANT * parent.getBody().getMass());
+        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
+
         float a = -(mu * position.len()) / (position.len() * velocity.len2() - (2 * mu));
         float T = (float)(2 * Math.PI * Math.sqrt(Math.pow(a, 3) / mu));
         float p = position.x * velocity.y - position.y * velocity.x;
         float epsilon = (velocity.len2() / 2 - (mu / position.len()));
         float e = (float)(Math.sqrt(1 + ((2 * epsilon * p * p) / (mu * mu))));
         Vector2 ev = (position.cpy().scl(((velocity.len2() / mu) - (1 / position.len())))).sub(velocity.cpy().scl((position.dot(velocity) / mu)));
-        e = ev.len();
         float w = (float)(Math.atan2(ev.y, ev.x));
         float n = (float)(2 * Math.PI / T);
 
@@ -90,11 +95,42 @@ public class OrbitPath {
             float y = (float)(Math.sin(w) * pa - Math.cos(w) * qa);
 
             points.add(new Vector2(x, y));
+            if(i == STEPS - 1) points.add(new Vector2(x, y));
         }
     }
 
-    public void simulate(int steps){
+    public void simulate(int maxSteps){
         // Simulates path using newtonian physics
+        center = universe.getUniversalPosition(entity);
+
+        Vector2 p = entity.getBody().getPosition().cpy();
+        Vector2 v = entity.getBody().getLinearVelocity().cpy();
+
+        boolean lookForEnd = false;
+        float minDistance = 10.0f;
+        
+        points.clear();
+        points.add(p.cpy().sub(entity.getBody().getPosition()));
+        for(int i = 0; i < maxSteps; i++){
+            // Newtons gravitational law: F = (G(m1 * m2)) / r^2
+            float orbitRadius = p.len(); // Entity radius in physics scale
+            Vector2 direction = p.cpy().nor().scl(-1);
+            float force = Constants.GRAVITY_CONSTANT * ((entity.getBody().getMass() * parent.getBody().getMass()) / (orbitRadius * orbitRadius));
+
+            v.add(direction.scl(force / entity.getBody().getMass()));
+            p.add(v);
+            points.add(p.cpy().sub(entity.getBody().getPosition()));
+
+            if(p.len() * entity.getPhysScale() < parent.getRadius()) break;
+            if(p.dst(entity.getBody().getPosition()) < minDistance){
+                if(lookForEnd){
+                    // Path ends hear, it's close enough
+                    i = maxSteps - 2;
+                }
+            } else {
+                lookForEnd = true;
+            }
+        }
     }
 
     public void draw(Batch batch){
@@ -104,14 +140,14 @@ public class OrbitPath {
         render.setTransformMatrix(batch.getTransformMatrix());
         render.setColor(color);
 
-        for(int i = 0; i < points.size(); i++){
+        for(int i = 0; i < points.size() - 1; i++){
             Vector2 p1 = points.get(i);
             Vector2 p2 = points.get((i + 1) % points.size());
             render.rectLine(
-                p1.x * Constants.PPM + parent.getPosition().x,
-                p1.y * Constants.PPM + parent.getPosition().y,
-                p2.x * Constants.PPM + parent.getPosition().x,
-                p2.y * Constants.PPM + parent.getPosition().y,
+                p1.x * Constants.PPM + center.x,
+                p1.y * Constants.PPM + center.y,
+                p2.x * Constants.PPM + center.x,
+                p2.y * Constants.PPM + center.y,
                 50
             );
         }

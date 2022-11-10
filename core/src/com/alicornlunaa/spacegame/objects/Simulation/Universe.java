@@ -115,10 +115,31 @@ public class Universe extends Actor {
         if(parent != null) parentCelestial(c, parent);
     }
 
+    public ArrayList<Entity> getEntities(){ return ents; }
+
+    public ArrayList<Celestial> getCelestials(){ return celestials; }
+
     public Celestial getCelestial(int i){ return celestials.get(i); }
 
     public Celestial getParentCelestial(Entity e){ return entParents.get(e); }
+    
+    public Celestial getParentCelestial(Celestial c){ return celestialParents.get(c); }
 
+    public Celestial getCelestialFromUniversalPos(Vector2 pos){
+        Celestial closest = null;
+        float minDist = Float.MAX_VALUE;
+
+        for(Celestial c : celestials){
+            float curDist = c.getPosition().dst2(pos);
+            if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
+                closest = c;
+                minDist = curDist;
+            }
+        }
+        
+        return closest;
+    }
+    
     /**
      * This function adds an entity to a celestial and converts their coordinates
      * the celestial's scale

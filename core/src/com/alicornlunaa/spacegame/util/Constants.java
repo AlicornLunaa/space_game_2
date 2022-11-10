@@ -5,6 +5,7 @@ public class Constants {
     public static final float TIME_STEP = 1/60.f;
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 2;
+    public static final int MAX_PREDICTION_STEPS = 2;
     public static float TIME_WARP = 0;
     
     public static final int ORBIT_RESOLUTION = 128;
