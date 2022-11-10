@@ -49,15 +49,16 @@ public class SpacePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
-        universe.addEntity(ship);
+        // universe.addEntity(ship);
         universe.addCelestial(new Planet(game, world, player, -18000, 0, 1200, 1500, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
-        universe.addCelestial(new Planet(game, world, player, 1800, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(0));
+        universe.addCelestial(new Planet(game, world, player, -6000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(0));
         universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 
         player.drive(ship);
 
-        orbitPath = new OrbitPath(game, universe.getCelestial(1).getBody().getPosition(), universe.getCelestial(1).getBody().getLinearVelocity(), universe.getCelestial(0).getBody().getMass());
+        universe.getCelestial(1).getBody().applyLinearImpulse(0, 50, universe.getCelestial(1).getBody().getWorldCenter().x, universe.getCelestial(1).getBody().getWorldCenter().y, true);
+        orbitPath = new OrbitPath(game, universe.getCelestial(1).getBody().getPosition(), universe.getCelestial(1).getBody().getLinearVelocity(), universe.getCelestial(0).getPosition(), universe.getCelestial(0).getBody().getMass());
 
         // Controls
         this.addListener(new InputListener(){
@@ -85,7 +86,7 @@ public class SpacePanel extends Stage {
             physAccumulator -= Constants.TIME_STEP;
         }
         
-        // universe.update(delta);
+        universe.update(delta);
 
         // Parent camera to the player
         // player.updateCamera((OrthographicCamera)getCamera());

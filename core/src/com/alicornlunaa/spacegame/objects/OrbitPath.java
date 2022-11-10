@@ -22,66 +22,49 @@ public class OrbitPath {
     // Variables
     private final ShapeRenderer render;
     private Color color = Color.CYAN;
-
-    private Vector2 centerOfMass;
-    private float periapsis;
-    private float apoapsis;
+    private Vector2 center;
     
-    private float semiMajorAxis;
-    private float linearEccentricity;
-    private float eccentricity;
-    private float semiMinorAxis;
-    private float ellipseCenterX;
-    private float ellipseCenterY;
+    private static final int MAX_TRIES = 6;
+    private static final int STEPS = 100;
 
     private ArrayList<Vector2> points = new ArrayList<>();
 
-    // Private function
-    private void recalculate(){
-        semiMajorAxis = (periapsis + apoapsis) / 2;
-        linearEccentricity = semiMajorAxis - periapsis;
-        eccentricity = linearEccentricity / semiMajorAxis;
-        semiMinorAxis = (float)Math.sqrt(Math.pow(semiMajorAxis, 2) - Math.pow(linearEccentricity, 2));
-        ellipseCenterX = centerOfMass.x - linearEccentricity;
-        ellipseCenterY = centerOfMass.y;
-    }
-
     // Constructor
-    public OrbitPath(final App game, Vector2 centerOfMass, float periapsis, float apoapsis){
-        // Constructor to obtain keplarian elements from periapsis and apoapsis
-        render = game.shapeRenderer;
-        
-        this.centerOfMass = centerOfMass;
-        this.periapsis = periapsis;
-        this.apoapsis = apoapsis;
-
-        recalculate();
-    }
-
-    public OrbitPath(final App game, Vector2 position, Vector2 velocity, float centralBodyMass){
+    public OrbitPath(final App game, Vector2 position, Vector2 velocity, Vector2 centralBody, float centralBodyMass){
         // Constructor to obtain keplarian elements from position and velocity
         render = game.shapeRenderer;
+        this.center = centralBody;
         
-        Vector3 pos3 = new Vector3().set(position, 0);
-        Vector3 vel3 = new Vector3().set(velocity, 0);
-        Vector3 h = pos3.cpy().crs(vel3);
-        float mu = centralBodyMass / Constants.GRAVITY_CONSTANT;
-        Vector3 e = (vel3.cpy().crs(h).scl(1 / mu)).sub(pos3.cpy().nor());
-        Vector3 n = new Vector3(0, 0, 1).crs(h);
-        float v = 0.0f;
+        float mu = (float)(Constants.GRAVITY_CONSTANT * centralBodyMass);
+        float a = -(mu * position.len()) / (position.len() * velocity.len2() - (2 * mu));
+        float T = (float)(2 * Math.PI * Math.sqrt(Math.pow(Math.abs(a), 3) / mu));
+        float p = position.x * velocity.y - position.y * velocity.x;
+        float epsilon = (velocity.len2() / 2 - (mu / position.len()));
+        float e = (float)(Math.sqrt(1 + ((2 * epsilon * p * p) / (mu * mu))));
+        Vector2 ev = (position.cpy().scl(((velocity.len2() / mu) - (1 / position.len())))).sub(velocity.scl((position.dot(velocity) / mu)));
+        float w = (float)(Math.atan2(ev.y, ev.x));
+        float n = (float)(2 * Math.PI / T);
 
-        if(pos3.x * pos3.y * pos3.z + vel3.x * vel3.y * vel3.z >= 0){
-            v = (float)(Math.acos((e.x * e.y * e.z + pos3.x * pos3.y * pos3.z) / (e.cpy().nor().dot(pos3.cpy().nor()))));
-        } else {
-            v = (float)(2 * Math.PI - Math.acos((e.x * e.y * e.z + pos3.x * pos3.y * pos3.z) / (e.cpy().nor().dot(pos3.cpy().nor()))));
+        for(int i = 0; i < STEPS; i++){
+            float ma = n * (T * ((float)i / STEPS));
+            
+            float ea = ma;
+            for(int tries = 0; tries < MAX_TRIES; tries++){
+                float dx = (float)(ea - e * Math.sin(ea) - ma);
+                float dy = (float)(1 - e * Math.cos(ea));
+                float dt = dx / dy;
+                ea -= dt;   
+                if(Math.abs(dt) < 0.000000001) break;
+            }
+
+            float pa = (float)(a * (Math.cos(ea) - e));
+            float qa = (float)(a * Math.sin(ea) * Math.sqrt(1 - (e * e)));
+
+            float x = (float)(Math.cos(w) * pa - Math.sin(w) * qa);
+            float y = (float)(Math.sin(w) * pa - Math.cos(w) * qa);
+
+            points.add(new Vector2(x, y));
         }
-
-        eccentricity = e.len();
-        semiMajorAxis = (float)(1 / (2 / pos3.len() - Math.pow(vel3.len(), 2) / mu)) * Constants.PPM;
-        
-        semiMinorAxis = 50 * Constants.PPM;
-        ellipseCenterX = position.x;
-        ellipseCenterY = position.y;
     }
 
     // Functions
@@ -92,14 +75,10 @@ public class OrbitPath {
         render.setTransformMatrix(batch.getTransformMatrix());
         render.setColor(color);
 
-        Vector2 p = new Vector2(semiMajorAxis + ellipseCenterX, ellipseCenterX);
-        for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-            float theta = (float)((i / (float)(Constants.ORBIT_RESOLUTION - 1)) * Math.PI * 2); // Current circle angle given resolution
-            float oX = (float)Math.cos(theta) * semiMajorAxis + ellipseCenterX;
-            float oY = (float)Math.sin(theta) * semiMinorAxis + ellipseCenterX;
-
-            render.rectLine(p.x, p.y, oX, oY, 50);
-            p.set(oX, oY);
+        for(int i = 0; i < points.size(); i++){
+            Vector2 p1 = points.get(i);
+            Vector2 p2 = points.get((i + 1) % points.size());
+            render.rectLine(p1.x * Constants.PPM + center.x, p1.y * Constants.PPM + center.y, p2.x * Constants.PPM + center.x, p2.y * Constants.PPM + center.y, 50);
         }
 
         render.end();
