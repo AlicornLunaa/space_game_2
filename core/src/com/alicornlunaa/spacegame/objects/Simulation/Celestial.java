@@ -86,7 +86,7 @@ public class Celestial extends Entity {
 
     @Override
     public void draw(Batch batch, float a){
-        if(!this.getDebug()) return;
+        // if(!this.getDebug()) return;
 
         batch.end();
 

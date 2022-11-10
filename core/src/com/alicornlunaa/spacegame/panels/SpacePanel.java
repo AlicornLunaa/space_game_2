@@ -32,7 +32,8 @@ public class SpacePanel extends Stage {
     public Universe universe;
     public Player player;
     public Ship ship;
-    public OrbitPath orbitPath;
+    public OrbitPath orbitPath1;
+    public OrbitPath orbitPath2;
     
     private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
@@ -49,16 +50,17 @@ public class SpacePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
-        // universe.addEntity(ship);
-        universe.addCelestial(new Planet(game, world, player, -18000, 0, 1200, 1500, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
-        universe.addCelestial(new Planet(game, world, player, -6000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(0));
+        universe.addEntity(ship);
+        universe.addCelestial(new Planet(game, world, player, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), null);
+        universe.addCelestial(new Planet(game, world, player, 15000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(0));
         universe.createCelestialOrbit(universe.getCelestial(1));
         this.addActor(universe);
 
         player.drive(ship);
 
-        universe.getCelestial(1).getBody().applyLinearImpulse(0, 50, universe.getCelestial(1).getBody().getWorldCenter().x, universe.getCelestial(1).getBody().getWorldCenter().y, true);
-        orbitPath = new OrbitPath(game, universe.getCelestial(1).getBody().getPosition(), universe.getCelestial(1).getBody().getLinearVelocity(), universe.getCelestial(0).getPosition(), universe.getCelestial(0).getBody().getMass());
+        universe.getCelestial(1).getBody().applyLinearImpulse(0, 150, universe.getCelestial(1).getBody().getWorldCenter().x, universe.getCelestial(1).getBody().getWorldCenter().y, true);
+        orbitPath1 = new OrbitPath(game, universe.getCelestial(0), universe.getCelestial(1));
+        orbitPath2 = new OrbitPath(game, universe.getCelestial(0), ship);
 
         // Controls
         this.addListener(new InputListener(){
@@ -112,7 +114,8 @@ public class SpacePanel extends Stage {
         backgroundTexture.draw(batch, -1, -1, 2, 2);
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
-        orbitPath.draw(batch);
+        orbitPath1.draw(batch);
+        orbitPath2.draw(batch);
         batch.end();
 
         cam.zoom = oldZoom;
