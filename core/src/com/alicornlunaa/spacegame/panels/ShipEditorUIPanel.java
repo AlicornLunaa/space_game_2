@@ -194,7 +194,7 @@ public class ShipEditorUIPanel extends Stage {
         closeButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                game.setScreen(new FadeTransitionScene(game, game.editorScene, game.spaceScene, 0.15f));
+                game.setScreen(new FadeTransitionScene(game, game.editorScene, game.editorScene.previouScreen, 0.15f));
             }
         });
 
@@ -213,10 +213,10 @@ public class ShipEditorUIPanel extends Stage {
             @Override
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
-                    game.setScreen(new PauseScene(game, game.editorScene, (int)getWidth(), (int)getHeight()));
+                    game.setScreen(new PauseScene(game, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, game.editorScene, (int)getWidth(), (int)getHeight()));
+                    game.setScreen(new ConsoleScene(game, (int)getWidth(), (int)getHeight()));
                     return true;
                 }
 

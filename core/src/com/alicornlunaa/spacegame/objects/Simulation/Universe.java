@@ -101,6 +101,12 @@ public class Universe extends Actor {
         return e.getPosition();
     }
 
+    public Vector2 getUniversalPosition(Entity e, Vector2 pos){
+        Celestial parent = entParents.get(e);
+        if(parent != null) return pos.mul(parent.getUniverseTransform());
+        return pos;
+    }
+
     public Vector2 getUniversalPosition(Celestial c){ return c.getUniverseTransform().getTranslation(new Vector2()); }
 
     public void addEntity(Entity e){

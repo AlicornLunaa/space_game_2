@@ -13,6 +13,7 @@ public class EditorScene implements Screen {
     // Variables
     final App game;
 
+    public Screen previouScreen;
     public ShipEditorPanel editorPanel;
     public ShipEditorUIPanel uiPanel;
 

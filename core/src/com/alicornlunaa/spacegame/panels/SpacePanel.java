@@ -94,7 +94,7 @@ public class SpacePanel extends Stage {
         // Parent camera to the player
         // player.updateCamera((OrthographicCamera)getCamera());
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(universe.getUniversalPosition(ship), 0);
+        cam.position.set(universe.getUniversalPosition(ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
         cam.update();
     }
 

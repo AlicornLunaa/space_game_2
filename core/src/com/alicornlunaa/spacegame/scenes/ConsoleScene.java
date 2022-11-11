@@ -56,8 +56,9 @@ public class ConsoleScene implements Screen {
     }
 
     // Constructor
-    public ConsoleScene(final App game, final Screen previousScreen, int width, int height){
+    public ConsoleScene(final App game, int width, int height){
         this.game = game;
+        final Screen previousScreen = game.getScreen();
 
         // Initialize framebuffer
         fbo = new FrameBuffer(Format.RGBA8888, width, height, false);

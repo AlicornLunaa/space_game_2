@@ -79,6 +79,7 @@ public class SpaceUIPanel extends Stage {
         editBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
+                game.editorScene.previouScreen = game.getScreen();
                 game.setScreen(new FadeTransitionScene(game, game.spaceScene, game.editorScene, 0.15f));
             }
         });
@@ -97,10 +98,10 @@ public class SpaceUIPanel extends Stage {
         this.addListener(new InputListener(){
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == ControlSchema.PAUSE_GAME){
-                    game.setScreen(new PauseScene(game, game.spaceScene, (int)getWidth(), (int)getHeight()));
+                    game.setScreen(new PauseScene(game, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, game.spaceScene, (int)getWidth(), (int)getHeight()));
+                    game.setScreen(new ConsoleScene(game, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
                     game.spaceScene.spacePanel.ship.state.debug = !game.spaceScene.spacePanel.ship.state.debug;

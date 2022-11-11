@@ -39,8 +39,9 @@ public class PauseScene implements Screen {
     public Stage stage;
 
     // Constructor
-    public PauseScene(final App game, final Screen previousScreen, int width, int height){
+    public PauseScene(final App game, int width, int height){
         this.game = game;
+        final Screen previousScreen = game.getScreen();
 
         // Initialize framebuffer
         fbo = new FrameBuffer(Format.RGBA8888, width, height, false);
