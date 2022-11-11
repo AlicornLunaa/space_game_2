@@ -125,12 +125,12 @@ public class Planet extends Celestial {
         planetWorld.setGravity(new Vector2(0, force * -2400));
 
         // Initial terrain
-        int initialRad = 3;
-        for(int x = -initialRad; x <= initialRad; x++){
-            for(int y = -initialRad; y <= initialRad; y++){
-                map.put(new Vector2(x, y), new Chunk(game, planetWorld, generator, x, y));
-            }
-        }
+        // int initialRad = 3;
+        // for(int x = -initialRad; x <= initialRad; x++){
+        //     for(int y = -initialRad; y <= initialRad; y++){
+        //         map.put(new Vector2(x, y), new Chunk(game, planetWorld, generator, x, y));
+        //     }
+        // }
     }
 
     private void initializeSpace(){

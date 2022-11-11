@@ -39,7 +39,7 @@ public class Universe extends Actor {
         parent.getChildren().add(target);
         celestialParents.put(target, parent);
 
-        target.setPosition(target.getPosition().sub(parent.getPosition()));
+        target.setPosition(target.getPosition().mul(parent.getUniverseTransform().inv()));
         target.loadBodyToWorld(parent.getWorld(), Constants.PPM);
     }
 
@@ -191,14 +191,18 @@ public class Universe extends Actor {
         // Creates a stable orbital velocity
         if(c.getCelestialParent() == null) return;
 
+        Vector2 tangent = c.getBody().getPosition().cpy().nor().rotateDeg(90);
         float radius = c.getBody().getPosition().len();
         float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * c.getCelestialParent().getBody().getMass()) / radius);
 
-        c.getBody().setLinearVelocity(0, velScl);
+        c.getBody().setLinearVelocity(tangent.scl(velScl));
     }
 
     public void createEntityOrbit(Entity e){
         // Creates a stable orbital velocity
+        for(int i = 0; i < 10; i++)
+            checkTransfer(e);
+
         Celestial parent = entParents.get(e);
         if(parent == null) return;
 

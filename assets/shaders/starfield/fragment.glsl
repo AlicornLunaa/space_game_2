@@ -6,5 +6,5 @@ uniform float x;
 uniform float y;
 
 void main(){
-    gl_FragColor = v_color * texture2D(u_texture, vec2(v_texCoords.x + x, v_texCoords.y));
+    gl_FragColor = v_color * texture2D(u_texture, vec2(v_texCoords.x + x, v_texCoords.y + y));
 }

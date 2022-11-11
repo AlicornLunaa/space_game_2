@@ -10,6 +10,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.ray3k.stripe.FreeTypeSkin;
@@ -46,6 +47,8 @@ public class App extends Game {
 
 		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
+		
+        ShaderProgram.pedantic = false;
 
 		loadingScene = new LoadingScene(this);
 		this.setScreen(loadingScene);

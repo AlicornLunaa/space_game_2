@@ -41,7 +41,6 @@ public class Starfield implements Drawable {
             Gdx.files.internal("shaders/starfield/vertex.glsl"),
             Gdx.files.internal("shaders/starfield/fragment.glsl")
         );
-        ShaderProgram.pedantic = false;
     }
 
     // Functions
@@ -53,8 +52,6 @@ public class Starfield implements Drawable {
     @Override
     public void draw(Batch batch, float x, float y, float width, float height) {
         batch.setShader(shader);
-        shader.setUniformf("width", texture.getWidth());
-        shader.setUniformf("height", texture.getHeight());
         shader.setUniformf("x", this.x);
         shader.setUniformf("y", this.y);
         batch.draw(texture, x, y, width, height);
