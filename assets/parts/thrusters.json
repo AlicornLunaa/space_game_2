@@ -10,7 +10,7 @@
             {"x": 0, "y": 7.5}
         ],
         "metadata": {
-            "power": 3400,
+            "power": 1000,
             "cone": 5,
             "fuelUsage": 1,
             "effect": "effects/rocket"

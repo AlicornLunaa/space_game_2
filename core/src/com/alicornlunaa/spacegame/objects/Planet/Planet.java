@@ -121,9 +121,6 @@ public class Planet extends Celestial {
         // Create new world for on the planet
         planetWorld = new World(new Vector2(), true);
 
-        float force = Constants.GRAVITY_CONSTANT * (body.getMass() / (radius * radius));
-        planetWorld.setGravity(new Vector2(0, force * -2400));
-
         // Initial terrain
         // int initialRad = 3;
         // for(int x = -initialRad; x <= initialRad; x++){
@@ -277,6 +274,11 @@ public class Planet extends Celestial {
             e.act(delta);
             applyDrag(e.getBody());
             this.checkLeavePlanet(e);
+            
+            // Taken from Celestial.java to correctly apply the right force
+            float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
+            float force = Constants.GRAVITY_CONSTANT * ((e.getBody().getMass() * body.getMass()) / (orbitRadius * orbitRadius));
+            e.getBody().applyForceToCenter(0, -1 * force, true);
         }
 
         while(leavingEnts.size() > 0){
