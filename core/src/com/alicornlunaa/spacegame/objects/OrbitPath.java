@@ -117,10 +117,13 @@ public class OrbitPath {
 
         boolean lookForEnd = false;
         float minDistance = 10.0f;
+        Celestial currentParent = parent;
         
         points.clear();
         points.add(p.cpy().sub(entity.getBody().getPosition()));
         for(int i = 0; i < maxSteps; i++){
+            if(currentParent == null) break;
+
             // Newtons gravitational law: F = (G(m1 * m2)) / r^2
             float orbitRadius = p.len(); // Entity radius in physics scale
             Vector2 direction = p.cpy().nor().scl(-1);
@@ -129,6 +132,11 @@ public class OrbitPath {
             v.add(direction.scl(force / entity.getBody().getMass()));
             p.add(v);
             points.add(p.cpy().sub(entity.getBody().getPosition()));
+
+            if(p.len() * entity.getPhysScale() > parent.getSphereOfInfluence()){
+                // Outside of the sphere of influence, calculate new forces based on new parent
+                break;
+            }
 
             if(p.len() * entity.getPhysScale() < parent.getRadius()) break;
             if(p.dst(entity.getBody().getPosition()) < minDistance){

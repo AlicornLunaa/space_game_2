@@ -304,7 +304,7 @@ public class Planet extends Celestial {
     }
 
     // Physics functions
-    public void applyDrag(Body b){
+    public Vector2 applyDrag(Body b){
         // Newtons gravitational law: F = 1/2(density * velocity^2 * dragCoefficient * Area)
         float planetRadPhys = radius / physScale; // Planet radius in physics scale
         float atmosRadPhys = atmosRadius / physScale; // Atmosphere radius in physics scale
@@ -320,7 +320,7 @@ public class Planet extends Celestial {
         float velSqr = relVel.len2();
         float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
 
-        b.applyForceToCenter(velDir.scl(-1 * force), true);
+        return velDir.scl(-1 * force);
     }
 
     public boolean checkTransferPlanet(Entity e){
@@ -352,9 +352,9 @@ public class Planet extends Celestial {
     }
 
     @Override
-    protected void applyPhysics(float delta, Entity e){
-        applyDrag(e.getBody());
+    protected Vector2 applyPhysics(float delta, Entity e){
         checkTransferPlanet(e);
+        return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
     }
 
     // World functions
