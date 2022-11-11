@@ -43,23 +43,25 @@ public class SpacePanel extends Stage {
         world = new World(new Vector2(), true);
         backgroundTexture = new Starfield((int)getWidth(), (int)getHeight());
 
-        player = new Player(game, world, 0, 0, Constants.PPM);
+        player = new Player(game, world, -50, 0, Constants.PPM);
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
         universe.addEntity(ship);
+        universe.addEntity(player);
         universe.addCelestial(new Star(game, world, 78000, 0, 15000), null);
         universe.addCelestial(new Planet(game, world, player, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), universe.getCelestial(0));
         universe.addCelestial(new Planet(game, world, player, 5000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(1));
         universe.createCelestialOrbit(universe.getCelestial(1));
         universe.createCelestialOrbit(universe.getCelestial(2));
         universe.createEntityOrbit(ship);
+        universe.createEntityOrbit(player);
         this.addActor(universe);
 
         player.drive(ship);
 
-        universe.getCelestial(1).getBody().applyLinearImpulse(0, 350, universe.getCelestial(1).getBody().getWorldCenter().x, universe.getCelestial(1).getBody().getWorldCenter().y, true);
+        universe.getCelestial(2).getBody().applyLinearImpulse(0, 350, universe.getCelestial(2).getBody().getWorldCenter().x, universe.getCelestial(2).getBody().getWorldCenter().y, true);
 
         // Controls
         this.addListener(new InputListener(){

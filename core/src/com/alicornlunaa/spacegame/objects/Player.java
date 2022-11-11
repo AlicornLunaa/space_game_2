@@ -48,8 +48,9 @@ public class Player extends Entity {
 
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        def.position.set(x, y);
+        def.position.set(0, 0);
         setBody(world.createBody(def));
+        setPosition(x, y);
 
         shape.setAsBox(
             PLAYER_WIDTH / 2 / getPhysScale(),

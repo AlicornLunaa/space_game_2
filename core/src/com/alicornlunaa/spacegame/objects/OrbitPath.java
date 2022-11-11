@@ -101,6 +101,8 @@ public class OrbitPath {
     }
 
     public void simulate(int maxSteps){
+        if(entity.getDriving() != null) return;
+        
         // Simulates path using newtonian physics
         if(entity instanceof Celestial){
             center = universe.getUniversalPosition((Celestial)entity);
@@ -141,6 +143,8 @@ public class OrbitPath {
     }
 
     public void draw(Batch batch){
+        if(entity.getDriving() != null) return;
+        
         batch.end();
         render.begin(ShapeRenderer.ShapeType.Filled);
         render.setProjectionMatrix(batch.getProjectionMatrix());
