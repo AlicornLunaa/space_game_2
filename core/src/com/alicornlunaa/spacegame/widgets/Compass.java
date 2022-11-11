@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.widgets;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -51,6 +52,7 @@ public class Compass extends Widget {
         super.draw(batch, parentAlpha);
 
         // Background
+        batch.setColor(Color.WHITE);
         batch.draw(
             backgroundTexture,
             getX() + getOriginX() - backgroundTexture.getRegionWidth() / 2,

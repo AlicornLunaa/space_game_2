@@ -7,17 +7,20 @@ import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class SpaceUIPanel extends Stage {
     
@@ -26,72 +29,59 @@ public class SpaceUIPanel extends Stage {
     
     private TextButton sasBtn;
     private TextButton rcsBtn;
+    private TextButton shipViewButton;
     private ProgressBar throttleBar;
-
+    private Slider warpSlider;
     public Compass shipCompass;
 
     private Label positionLabel;
     private Label velocityLabel;
 
     // Constructor
+    @SuppressWarnings("unchecked")
     public SpaceUIPanel(final App game){
         super(new ScreenViewport());
         this.game = game;
 
-        // Initialize UI elements
-        Table tbl = new Table(game.skin);
-        tbl.setFillParent(true);
-        this.addActor(tbl);
+        // Load UI
+        SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
+        builder.build(this, game.skin, Gdx.files.internal("layouts/space_hud.json"));
 
-        // Navigation compass
-        shipCompass = new Compass(game);
-        shipCompass.setPosition(getWidth() / 2.0f - shipCompass.getOriginX(), 0);
-        this.addActor(shipCompass);
+        // Create UI logic
+        sasBtn = getRoot().findActor("sasbutton");
+        rcsBtn = getRoot().findActor("rcsbutton");
+        shipViewButton = getRoot().findActor("shipbutton");
+        throttleBar = getRoot().findActor("throttlebar");
+        warpSlider = getRoot().findActor("warpslider");
 
-        // Labels
-        positionLabel = new Label("Pos: N/a", game.skin);
-        positionLabel.setPosition(20, getHeight() - 60);
-        this.addActor(positionLabel);
-        velocityLabel = new Label("Vel: N/a", game.skin);
-        velocityLabel.setPosition(20, getHeight() - 90);
-        this.addActor(velocityLabel);
-
-        // Icon elements
-        tbl.row().expandX().fillX().pad(10).right();
-        tbl.add(new Table()).width(300).colspan(6);
-
-        sasBtn = new TextButton("SAS", game.skin);
-        sasBtn.setPosition(getWidth() / 2.0f - 128 - 5, 5);
-        sasBtn.setSize(64, 32);
-        sasBtn.setColor(Color.RED);
-        this.addActor(sasBtn);
-
-        rcsBtn = new TextButton("RCS", game.skin);
-        rcsBtn.setPosition(getWidth() / 2.0f + shipCompass.getOriginX() + 5, 5);
-        rcsBtn.setSize(64, 32);
-        rcsBtn.setColor(Color.RED);
-        this.addActor(rcsBtn);
-
-        TextButton editBtn = new TextButton("Editor", game.skin);
-        editBtn.setPosition(640 - 192, 480 - 32);
-        editBtn.setSize(128, 32);
-        editBtn.addListener(new ChangeListener() {
+        warpSlider.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
+                game.spaceScene.spacePanel.universe.setTimewarp(warpSlider.getValue());
+            }
+        });
+
+        shipViewButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                // TODO: Send player inside the ship
                 game.editorScene.previouScreen = game.getScreen();
                 game.setScreen(new FadeTransitionScene(game, game.spaceScene, game.editorScene, 0.15f));
             }
         });
-        tbl.add(editBtn).right().maxWidth(84);
-        tbl.row().expand().fill().left();
 
-        Table hud = new Table(game.skin);
-        hud.setFillParent(true);
-        hud.row().maxWidth(32);
-        throttleBar = new ProgressBar(0, 1, 0.01f, true, game.skin);
-        hud.add(throttleBar).expand().right().bottom().pad(20).minHeight(256);
+        // Navigation compass
+        shipCompass = new Compass(game);
+        shipCompass.setColor(Color.WHITE);
+        ((Container<Compass>)getRoot().findActor("Compass")).setActor(shipCompass);
 
-        tbl.add(hud).colspan(9);
+        // Labels
+        positionLabel = new Label("Pos: N/a", game.skin);
+        positionLabel.setPosition(20, getHeight() - 65);
+        this.addActor(positionLabel);
+        velocityLabel = new Label("Vel: N/a", game.skin);
+        velocityLabel.setPosition(20, getHeight() - 90);
+        this.addActor(velocityLabel);
 
         // Controls
         this.addListener(new InputListener(){
