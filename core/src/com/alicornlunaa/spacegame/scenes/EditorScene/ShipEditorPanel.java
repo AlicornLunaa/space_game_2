@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.EditorScene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -20,7 +20,6 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.parts.*;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
-import com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 

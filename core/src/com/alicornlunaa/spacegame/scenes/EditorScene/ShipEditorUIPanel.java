@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.EditorScene;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.parts.*;
-import com.alicornlunaa.spacegame.scenes.ConsoleScene;
-import com.alicornlunaa.spacegame.scenes.EditorScene;
-import com.alicornlunaa.spacegame.scenes.FadeTransitionScene;
-import com.alicornlunaa.spacegame.scenes.PauseScene;
+import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
+import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
+import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.*;
 
 /*

@@ -1,8 +1,6 @@
-package com.alicornlunaa.spacegame.scenes;
+package com.alicornlunaa.spacegame.scenes.EditorScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.panels.ShipEditorPanel;
-import com.alicornlunaa.spacegame.panels.ShipEditorUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;

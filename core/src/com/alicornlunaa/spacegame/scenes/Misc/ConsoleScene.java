@@ -1,11 +1,11 @@
-package com.alicornlunaa.spacegame.scenes;
+package com.alicornlunaa.spacegame.scenes.Misc;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.util.ControlSchema;
-import com.alicornlunaa.spacegame.util.HexColor;
-import com.alicornlunaa.spacegame.widgets.ColorWidget;
+import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -15,19 +15,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-/**
- * Pause screen is the window shown when the game gets paused
- */
-
-public class PauseScene implements Screen {
+public class ConsoleScene implements Screen {
 
     // Variables
     final App game;
@@ -37,9 +32,30 @@ public class PauseScene implements Screen {
     private TextureRegion region;
 
     public Stage stage;
+    public TextField cmdLine;
+    
+    // Private functions
+    private void handleCmd(String cmd){
+        String[] args = cmd.split("\\s+");
+        
+        if(args[0].equals("load_ship")){
+            game.spaceScene.spacePanel.ship.load(args[1]);
+        } else if(args[0].equals("set_pos")){
+            game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+        } else if(args[0].equals("set_rot")){
+            game.spaceScene.spacePanel.ship.setRotation(Integer.parseInt(args[1]));
+        } else if(args[0].equals("orbit")){
+            game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
+            game.spaceScene.spacePanel.universe.createEntityOrbit(game.spaceScene.spacePanel.ship);
+        } else if(args[0].equals("set_timewarp")){
+            game.spaceScene.spacePanel.universe.setTimewarp(Float.parseFloat(args[1]));
+        } else if(args[0].equals("reload_shaders")){
+            ((Star)game.spaceScene.spacePanel.universe.getCelestial(0)).reloadShaders();
+        }
+    }
 
     // Constructor
-    public PauseScene(final App game, int width, int height){
+    public ConsoleScene(final App game, int width, int height){
         this.game = game;
         final Screen previousScreen = game.getScreen();
 
@@ -58,42 +74,42 @@ public class PauseScene implements Screen {
 
         Table tbl = new Table(game.skin);
         tbl.setFillParent(true);
-        tbl.row().expandX().fillX().center().maxWidth(240);
+        tbl.row().expandX().fillX();
 
-        Label lbl = new Label("Space Game 2", game.skin);
-        lbl.setAlignment(Align.center);
-        tbl.add(new ColorWidget(lbl, new HexColor("#7681B3")));
-        
-        tbl.row().expandX().fillX().center().maxWidth(240);
-        TextButton optBtn = new TextButton("Options", game.skin);
-        optBtn.setColor(new HexColor("#D9F0FF"));
-        optBtn.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                // game.setScreen(new OptionsScene(app, previousScreen, int width, int height));
-            }
-        });
-        tbl.add(optBtn);
-        
-        tbl.row().expandX().fillX().center().maxWidth(240);
-        TextButton clsBtn = new TextButton("Quit", game.skin);
-        clsBtn.setColor(new HexColor("#D9F0FF"));
-        clsBtn.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
-            }
-        });
-        tbl.add(clsBtn);
+        // TextArea text = new TextArea("CONSOLE LOG HERE", game.skin);
+        // text.setDisabled(true);
+        // tbl.add(text).colspan(15).bottom().minHeight(320).expand();
 
+        tbl.row().expand().fillX().maxHeight(32);
+        cmdLine = new TextField("COMMAND", game.skin);
+        tbl.add(cmdLine).bottom().colspan(14);
+
+        TextButton sendCmdBtn = new TextButton("Execute", game.skin);
+        tbl.add(sendCmdBtn).bottom().colspan(1);
         stage.addActor(tbl);
 
+        stage.setKeyboardFocus(cmdLine);
+
         // Inputs
+        sendCmdBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor){
+                TextField field = ((ConsoleScene)game.getScreen()).cmdLine;
+                handleCmd(field.getText());
+                field.setText("");
+            }
+        });
+
         stage.addListener(new InputListener(){
             @Override
             public boolean keyDown(InputEvent event, int keycode){
-                if(keycode == ControlSchema.PAUSE_GAME){
+                if(keycode == ControlSchema.CONSOLE_OPEN){
                     game.setScreen(previousScreen);
+                    return true;
+                } else if(keycode == Keys.ENTER){
+                    TextField field = ((ConsoleScene)game.getScreen()).cmdLine;
+                    handleCmd(field.getText());
+                    field.setText("");
                     return true;
                 }
 
@@ -140,8 +156,6 @@ public class PauseScene implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        texture.dispose();
-        fbo.dispose();
     }
     
 }

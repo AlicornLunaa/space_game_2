@@ -1,10 +1,11 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.MapScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.OrbitPath;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.Simulation.OrbitPath;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;

@@ -1,8 +1,8 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.ConsoleScene;
-import com.alicornlunaa.spacegame.scenes.PauseScene;
+import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
+import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;

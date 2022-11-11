@@ -1,11 +1,10 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.SpaceScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.ConsoleScene;
-import com.alicornlunaa.spacegame.scenes.FadeTransitionScene;
-import com.alicornlunaa.spacegame.scenes.MapScene;
-import com.alicornlunaa.spacegame.scenes.SpaceScene;
-import com.alicornlunaa.spacegame.scenes.PauseScene;
+import com.alicornlunaa.spacegame.scenes.MapScene.MapScene;
+import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
+import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
+import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
 import com.badlogic.gdx.graphics.Color;

@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.Misc;
 
 import java.util.ArrayList;
 

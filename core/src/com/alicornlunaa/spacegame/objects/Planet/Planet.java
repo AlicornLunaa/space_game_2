@@ -8,7 +8,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
-import com.alicornlunaa.spacegame.scenes.PlanetScene;
+import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;

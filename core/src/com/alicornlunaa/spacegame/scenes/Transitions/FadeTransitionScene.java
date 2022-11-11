@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes;
+package com.alicornlunaa.spacegame.scenes.Transitions;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Screen;

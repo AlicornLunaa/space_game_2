@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.panels;
+package com.alicornlunaa.spacegame.scenes.PlayerEditor;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 

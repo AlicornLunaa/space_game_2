@@ -1,10 +1,9 @@
-package com.alicornlunaa.spacegame.objects;
+package com.alicornlunaa.spacegame.objects.Simulation;
 
 import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
-import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;

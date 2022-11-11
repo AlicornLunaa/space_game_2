@@ -1,9 +1,8 @@
-package com.alicornlunaa.spacegame.scenes;
+package com.alicornlunaa.spacegame.scenes.MapScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.panels.MapPanel;
-import com.alicornlunaa.spacegame.panels.SpaceUIPanel;
+import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;

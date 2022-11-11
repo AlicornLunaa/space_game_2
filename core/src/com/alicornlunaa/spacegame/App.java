@@ -1,8 +1,8 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.spacegame.scenes.EditorScene;
-import com.alicornlunaa.spacegame.scenes.SpaceScene;
-import com.alicornlunaa.spacegame.scenes.LoadingScene;
+import com.alicornlunaa.spacegame.scenes.EditorScene.EditorScene;
+import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
+import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
