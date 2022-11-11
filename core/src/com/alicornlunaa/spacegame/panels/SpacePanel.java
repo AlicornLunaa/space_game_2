@@ -119,6 +119,9 @@ public class SpacePanel extends Stage {
         if(this.isDebugAll()){
             debug.render(world, this.getCamera().combined.cpy().scl(Constants.PPM));
         }
+        
+        batch.setProjectionMatrix(oldProj);
+        batch.setTransformMatrix(oldTrans);
     }
     
     @Override

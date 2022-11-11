@@ -9,6 +9,7 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -82,6 +83,7 @@ public class MapPanel extends Stage {
 
         for(OrbitPath o : orbits){
             o.simulate(2048);
+            // o.recalculate();
         }
 
         super.act(delta);
@@ -93,13 +95,14 @@ public class MapPanel extends Stage {
 
         Batch batch = getBatch();
         batch.begin();
-        batch.setProjectionMatrix(game.spaceScene.spacePanel.getCamera().combined);
+        batch.setProjectionMatrix(cam.combined);
+        batch.setTransformMatrix(new Matrix4());
 
         for(OrbitPath o : orbits){
-            o.draw(getBatch());
+            o.draw(batch);
         }
 
-        getBatch().end();
+        batch.end();
         super.draw();
     }
     

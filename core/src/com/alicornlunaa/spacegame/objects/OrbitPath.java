@@ -56,10 +56,11 @@ public class OrbitPath {
         // Recalculate orbital path
         center = parent.getPosition();
 
-        Vector2 position = entity.getBody().getWorldCenter();
-        Vector2 velocity = entity.getBody().getLinearVelocity();
-        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
+        // Convert to inertial reference frame
+        Vector2 position = entity.getBody().getWorldCenter().cpy();
+        Vector2 velocity = entity.getBody().getLinearVelocity().cpy().rotateDeg(position.angleDeg() + 90);
 
+        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
         float a = -(mu * position.len()) / (position.len() * velocity.len2() - (2 * mu));
         float T = (float)(2 * Math.PI * Math.sqrt(Math.pow(a, 3) / mu));
         float p = position.x * velocity.y - position.y * velocity.x;
@@ -101,7 +102,13 @@ public class OrbitPath {
 
     public void simulate(int maxSteps){
         // Simulates path using newtonian physics
-        center = universe.getUniversalPosition(entity);
+        if(entity instanceof Celestial){
+            center = universe.getUniversalPosition((Celestial)entity);
+            parent = universe.getParentCelestial((Celestial)entity);
+        } else {
+            center = universe.getUniversalPosition(entity);
+            parent = universe.getParentCelestial(entity);
+        }
 
         Vector2 p = entity.getBody().getPosition().cpy();
         Vector2 v = entity.getBody().getLinearVelocity().cpy();
