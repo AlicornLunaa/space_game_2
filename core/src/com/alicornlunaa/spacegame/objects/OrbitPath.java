@@ -32,6 +32,8 @@ public class OrbitPath {
     private float argumentOfPeriapsis;
     private float period;
 
+    private ArrayList<Vector2> absolutePoints = new ArrayList<>();
+    private ArrayList<Vector2> velocities = new ArrayList<>();
     private ArrayList<Vector2> points = new ArrayList<>();
 
     // Constructor
@@ -49,6 +51,11 @@ public class OrbitPath {
     public float getEccentricity(){ return eccentricity; }
     public float getArgumentOfPeriapsis(){ return argumentOfPeriapsis; }
     public float getPeriod(){ return period; }
+    public Vector2 getPoint(int i){ return points.get(i); }
+    public Vector2 getAbsolute(int i){ return absolutePoints.get(i); }
+    public Vector2 getVelocity(int i){ return velocities.get(i); }
+    public ArrayList<Vector2> getPoints(){ return points; }
+    public Entity getEntity(){ return entity; }
 
     public void setParent(Celestial c){ parent = c; }
     
@@ -120,7 +127,12 @@ public class OrbitPath {
         Celestial currentParent = parent;
         
         points.clear();
+        absolutePoints.clear();
+        velocities.clear();
+
         points.add(p.cpy().sub(entity.getBody().getPosition()));
+        absolutePoints.add(p.cpy());
+        velocities.add(v.cpy());
         for(int i = 0; i < maxSteps; i++){
             if(currentParent == null) break;
 
@@ -131,7 +143,10 @@ public class OrbitPath {
 
             v.add(direction.scl(force / entity.getBody().getMass()));
             p.add(v);
+
             points.add(p.cpy().sub(entity.getBody().getPosition()));
+            absolutePoints.add(p.cpy());
+            velocities.add(v.cpy());
 
             if(p.len() * entity.getPhysScale() > parent.getSphereOfInfluence()){
                 // Outside of the sphere of influence, calculate new forces based on new parent

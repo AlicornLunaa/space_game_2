@@ -5,12 +5,14 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.OrbitPath;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * This is the main class that will hold all the celestial bodies and
@@ -19,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public class Universe extends Actor {
 
     // Variables
+    private final App game;
     private ArrayList<Entity> ents = new ArrayList<>();
     private ArrayList<Celestial> celestials = new ArrayList<>();
 
@@ -27,6 +30,11 @@ public class Universe extends Actor {
 
     private final World universalWorld;
     private float physAccumulator;
+
+    private float currentFuture = 0.0f;
+    private float timewarp = 1.0f;
+    private Array<Vector2> initPos = new Array<>();
+    private Array<OrbitPath> paths = new Array<>();
 
     // Private functions
     private void parentCelestial(Celestial target, Celestial parent){
@@ -91,6 +99,7 @@ public class Universe extends Actor {
     // Constructor
     public Universe(final App game){
         super();
+        this.game = game;
         universalWorld = new World(new Vector2(), true);
     }
 
@@ -146,6 +155,35 @@ public class Universe extends Actor {
         return closest;
     }
     
+    public void setTimewarp(float warp){
+        paths.clear();
+        initPos.clear();
+        currentFuture = 0.0f;
+
+        if(warp != 1){
+            for(Entity e : ents){
+                Celestial parent = getParentCelestial(e);
+                if(parent == null) continue;
+
+                OrbitPath path = new OrbitPath(game, this, parent, e);
+                path.simulate(2048);
+                paths.add(path);
+                initPos.add(e.getBody().getPosition());
+            }
+            for(Celestial c : celestials){
+                Celestial parent = getParentCelestial(c);
+                if(parent == null) continue;
+                
+                OrbitPath path = new OrbitPath(game, this, parent, c);
+                path.simulate(2048);
+                paths.add(path);
+                initPos.add(c.getBody().getPosition());
+            }
+        }
+
+        timewarp = warp;
+    }
+
     /**
      * This function adds an entity to a celestial and converts their coordinates
      * the celestial's scale
@@ -223,31 +261,51 @@ public class Universe extends Actor {
      * @param delta
      */
     public void update(float delta){
-        // Step the physics on the world
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            universalWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        }
-
-        for(int i = 0; i < ents.size(); i++){
-            Entity e = ents.get(i);
-            e.act(delta);
-            checkTransfer(e);
-            
-            Celestial parent = entParents.get(e);
-            if(parent != null){
-                e.getBody().applyForceToCenter(parent.applyPhysics(delta, e), true);
+        if(timewarp == 1){
+            // Step the physics on the world
+            physAccumulator += Math.min(delta, 0.25f);
+            while(physAccumulator >= Constants.TIME_STEP){
+                universalWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+                physAccumulator -= Constants.TIME_STEP;
             }
-        }
 
-        for(Celestial c : celestials){
-            c.update(delta);
-            
-            Celestial parent = celestialParents.get(c);
-            if(parent != null){
-                c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
+            for(int i = 0; i < ents.size(); i++){
+                Entity e = ents.get(i);
+                e.act(delta);
+                checkTransfer(e);
+                
+                Celestial parent = entParents.get(e);
+                if(parent != null){
+                    e.getBody().applyForceToCenter(parent.applyPhysics(delta, e), true);
+                }
             }
+
+            for(Celestial c : celestials){
+                c.update(delta);
+                
+                Celestial parent = celestialParents.get(c);
+                if(parent != null){
+                    c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
+                }
+            }
+        } else if(timewarp >= 0){
+            // Freezes everything and starts using the predicted path
+            for(int i = 0; i < paths.size; i++){
+                OrbitPath path = paths.get(i);
+                Entity e = path.getEntity();
+
+                if(e.getDriving() != null) continue;
+
+                Vector2 curPos = path.getAbsolute(((int)currentFuture) % path.getPoints().size());
+                Vector2 curVel = path.getVelocity(((int)currentFuture) % path.getPoints().size());
+                Vector2 nextPos = path.getAbsolute(((int)currentFuture + 1) % path.getPoints().size());
+                Vector2 nextVel = path.getVelocity(((int)currentFuture + 1) % path.getPoints().size());
+
+                e.getBody().setTransform(curPos.cpy().lerp(nextPos, currentFuture % 1.0f), e.getBody().getAngle());
+                e.getBody().setLinearVelocity(curVel.cpy().lerp(nextVel, currentFuture % 1.0f));
+            }
+
+            currentFuture += (timewarp - 1);
         }
     }
 
