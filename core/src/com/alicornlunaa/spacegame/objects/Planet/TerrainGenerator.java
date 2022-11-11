@@ -41,7 +41,7 @@ public class TerrainGenerator {
         if(chunkX < 0 || chunkX > planetWidth - 1) return null;
         if(chunkY < 0 || chunkY > planetHeight - 1) return null;
         if(y > radius) return null;
-        if(noise.eval(x / 10.0f, y / 10.0f) < 0) return null;
+        if(noise.eval(x / 10.0f, y / 10.0f) < -0.5f) return null;
 
         if(x < 1) type = TileType.DIRT;
 

@@ -32,6 +32,7 @@ public class OrbitPath {
     private float argumentOfPeriapsis;
     private float period;
 
+    private boolean ends = false;
     private ArrayList<Vector2> absolutePoints = new ArrayList<>();
     private ArrayList<Vector2> velocities = new ArrayList<>();
     private ArrayList<Vector2> points = new ArrayList<>();
@@ -56,6 +57,7 @@ public class OrbitPath {
     public Vector2 getVelocity(int i){ return velocities.get(i); }
     public ArrayList<Vector2> getPoints(){ return points; }
     public Entity getEntity(){ return entity; }
+    public boolean getEnds(){ return ends; }
 
     public void setParent(Celestial c){ parent = c; }
     
@@ -129,6 +131,7 @@ public class OrbitPath {
         points.clear();
         absolutePoints.clear();
         velocities.clear();
+        ends = false;
 
         points.add(p.cpy().sub(entity.getBody().getPosition()));
         absolutePoints.add(p.cpy());
@@ -153,7 +156,7 @@ public class OrbitPath {
                 break;
             }
 
-            if(p.len() * entity.getPhysScale() < parent.getRadius()) break;
+            if(p.len() * entity.getPhysScale() < parent.getRadius()){ ends = true; break; };
             if(p.dst(entity.getBody().getPosition()) < minDistance){
                 if(lookForEnd){
                     // Path ends hear, it's close enough
