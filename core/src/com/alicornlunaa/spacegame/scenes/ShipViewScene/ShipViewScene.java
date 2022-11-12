@@ -1,5 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.ShipViewScene;
 
+import com.alicornlunaa.spacegame.App;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -9,8 +11,15 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class ShipViewScene implements Screen {
     
     // Variables
+    private final App game;
+    private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
+    public ShipViewScene(final App game){
+        this.game = game;
+
+        
+    }
 
     // Functions
     @Override
