@@ -15,6 +15,8 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.ray3k.stripe.FreeTypeSkin;
 
 public class App extends Game {
@@ -76,6 +78,10 @@ public class App extends Game {
 				// Get all the particle effects
 				manager.initEffects(this);
 
+				// Initialize VisUI for dev screens
+				VisUI.load();
+				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame2");
+
 				// Start new scene
 				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
@@ -96,5 +102,6 @@ public class App extends Game {
 		spaceScene.dispose();
 		loadingScene.dispose();
 		manager.dispose();
+		VisUI.dispose();
 	}
 }
