@@ -61,6 +61,20 @@ public class SpaceUIPanel extends Stage {
             }
         });
 
+        sasBtn.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                game.spaceScene.spacePanel.ship.state.sas = !game.spaceScene.spacePanel.ship.state.sas;
+            }
+        });
+
+        rcsBtn.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                game.spaceScene.spacePanel.ship.state.rcs = !game.spaceScene.spacePanel.ship.state.rcs;
+            }
+        });
+
         shipViewButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){

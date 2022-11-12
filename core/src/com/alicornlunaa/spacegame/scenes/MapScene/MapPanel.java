@@ -15,14 +15,14 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MapPanel extends Stage {
 
     // Variables
     final App game;
 
-    private final SpacePanel spacePanel;
+    public final SpacePanel spacePanel;
     private final OrthographicCamera cam;
     private float oldZoom = 0.0f;
 
@@ -30,7 +30,7 @@ public class MapPanel extends Stage {
 
     // Constructor
     public MapPanel(final App game, final Screen previousScreen){
-        super(new FillViewport(1280, 720));
+        super(new ScreenViewport());
         this.game = game;
 
         spacePanel = game.spaceScene.spacePanel;

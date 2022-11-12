@@ -52,7 +52,7 @@ public class MapScene implements Screen {
     @Override
     public void resize(int width, int height) {
         mapPanel.getViewport().update(width, height, true);
-        // uiPanel.getViewport().update(width, height, true);
+        uiShip.getViewport().update(width, height, true);
     }
 
     @Override
