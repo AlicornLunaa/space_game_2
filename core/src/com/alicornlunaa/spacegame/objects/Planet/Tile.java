@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.Disposable;
 public class Tile implements Disposable {
 
     // Enumerator
-    enum TileType { DIRT, STONE };
+    public enum TileType { DIRT, STONE };
 
     // Static
     public static final float TILE_SIZE = 4;

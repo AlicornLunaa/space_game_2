@@ -1,14 +1,17 @@
 package com.alicornlunaa.spacegame.objects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Planet.Tile;
 import com.alicornlunaa.spacegame.parts.ShipPart;
 import com.alicornlunaa.spacegame.parts.ShipPart.Attachment;
 import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -16,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -23,12 +27,34 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
+/**
+ * The ship class will hold the physical ship in space as well as
+ * a tilemap and physics world for the player inside the ship
+ */
 public class Ship extends Entity {
     
     // Variables
     private final App game;
     private ShipPart rootPart = null;
     public ShipState state = new ShipState(); // Ship controls and stuff
+    
+    private World shipWorld;
+    private float physAccumulator;
+    private Body shipWorldBody;
+    private HashMap<Vector2, Tile> shipMap = new HashMap<>();
+
+    // Private functions
+    private void generateInterior(){
+        // Creates interior world and generates the interior squares
+        shipWorld = new World(new Vector2(), true);
+
+        BodyDef def = new BodyDef();
+		def.type = BodyType.StaticBody;
+		shipWorldBody = shipWorld.createBody(def);
+
+        
+        shipMap.put(new Vector2(0, 0), new Tile(game, shipWorldBody, 0, 0, 0, 0, Tile.TileType.STONE));
+    }
 
     // Constructor
     public Ship(final App game, World world, float x, float y, float rotation){
@@ -41,14 +67,41 @@ public class Ship extends Entity {
 		setBody(world.createBody(def));
 
         rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(), 0.0f);
+
+        generateInterior();
     }
 
-    // Functions
+    // Interior functions
+    public void drawWorld(Batch batch, float parentAlpha){
+        for(Tile tile : shipMap.values()){
+            tile.draw(batch);
+        }
+
+        game.player.draw(batch, parentAlpha);
+        game.debug.render(shipWorld, batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
+    }
+
+    public void updateWorld(float delta){
+        // Step the physics world inside the ship
+        physAccumulator += Math.min(delta, 0.25f);
+        while(physAccumulator >= Constants.TIME_STEP){
+            shipWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+            physAccumulator -= Constants.TIME_STEP;
+        }
+
+        game.player.act(delta);
+    }
+
+    public World getInteriorWorld(){ return shipWorld; }
+
+    // Space functions
     private void assemble(ShipPart head){
         FixtureDef def = new FixtureDef();
         def.shape = head.getShape();
         def.density = 1;
         body.createFixture(def);
+        
+        // TODO: Load interior collider for this part here
 
         for(ShipPart.Attachment a : head.getAttachments()){
             if(a.getChild() != null){

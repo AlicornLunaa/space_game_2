@@ -1,9 +1,10 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.spacegame.scenes.EditorScene.EditorScene;
+import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
@@ -12,7 +13,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.ray3k.stripe.FreeTypeSkin;
 
 public class App extends Game {
@@ -24,7 +28,7 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public SpaceScene spaceScene;
-	public EditorScene editorScene;
+	public Player player;
 
 	public boolean loaded = false;
 	
@@ -32,6 +36,7 @@ public class App extends Game {
 	public TextureAtlas particleAtlas;
 	public SpriteBatch spriteBatch;
 	public ShapeRenderer shapeRenderer;
+	public Box2DDebugRenderer debug;
 	
 	// Functions
 	@Override
@@ -47,6 +52,7 @@ public class App extends Game {
 
 		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
+		debug = new Box2DDebugRenderer();
 		
         ShaderProgram.pedantic = false;
 
@@ -72,9 +78,13 @@ public class App extends Game {
 				// Get all the particle effects
 				manager.initEffects(this);
 
+				// Initialize VisUI for dev screens
+				VisUI.load();
+				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame2");
+
 				// Start new scene
+				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
-				editorScene = new EditorScene(this);
 				this.setScreen(spaceScene);
 			} else {
 				// Loading is not complete, update progress bar
@@ -92,5 +102,6 @@ public class App extends Game {
 		spaceScene.dispose();
 		loadingScene.dispose();
 		manager.dispose();
+		VisUI.dispose();
 	}
 }

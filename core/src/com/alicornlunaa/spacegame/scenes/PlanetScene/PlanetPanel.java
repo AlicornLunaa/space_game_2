@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Chunk;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Planet.Tile;
@@ -21,16 +20,14 @@ public class PlanetPanel extends Stage {
     private final App game;
 
     public Planet planet;
-    public Player player;
     // private float worldWidthPixels;
 
     // Constructor
-    public PlanetPanel(final App game, final Planet planet, final Player player){
+    public PlanetPanel(final App game, final Planet planet){
         super(new FillViewport(1280, 720));
         this.game = game;
 
         this.planet = planet;
-        this.player = player;
         // worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
@@ -70,7 +67,7 @@ public class PlanetPanel extends Stage {
     private void setActiveChunks(){
         // Get player position, convert it to chunk coordinates
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        Vector2 playerPos = new Vector2(player.getPosition());
+        Vector2 playerPos = new Vector2(game.player.getPosition());
         float chunkWorldSize = (Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
 
         int chunkX = (int)Math.ceil(playerPos.x / chunkWorldSize) - 1;
@@ -107,7 +104,7 @@ public class PlanetPanel extends Stage {
         planet.updateWorld(delta);
 
         // Parent camera to player
-        player.updateCamera((OrthographicCamera)getCamera());
+        game.player.updateCamera((OrthographicCamera)getCamera());
     }
 
     @Override
@@ -124,7 +121,7 @@ public class PlanetPanel extends Stage {
         // batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
         // planet.drawWorld(batch, batch.getColor().a);
         // batch.setProjectionMatrix(getCamera().combined);
-        player.draw(batch, batch.getColor().a);
+        game.player.draw(batch, batch.getColor().a);
         batch.end();
 
         // Debug rendering

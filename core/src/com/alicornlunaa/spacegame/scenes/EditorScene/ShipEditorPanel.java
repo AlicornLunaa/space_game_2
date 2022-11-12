@@ -68,8 +68,9 @@ public class ShipEditorPanel extends Stage {
         this.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent e, float x, float y){
-                ShipEditorUIPanel ui = game.editorScene.uiPanel;
-                ShipEditorPanel editor = game.editorScene.editorPanel;
+                EditorScene editorScene = (EditorScene)game.getScreen();
+                ShipEditorUIPanel ui = editorScene.uiPanel;
+                ShipEditorPanel editor = editorScene.editorPanel;
 
                 if(ghostPart != null){
                     // Part is ghosted, spawn one and reset it

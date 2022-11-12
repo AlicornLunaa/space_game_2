@@ -12,6 +12,5 @@ public class ShipState {
     public float roll = 0; // Rotational movement intention
     public float vertical = 0; // Translation movement intention
     public float horizontal = 0; // Translation movement intention
-    
     public float artifRoll = 0; // Artificial roll, used by computer control
 }
