@@ -1,8 +1,10 @@
 package com.alicornlunaa.spacegame.scenes.SpaceScene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.scenes.MapScene.MapScene;
 import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
+import com.alicornlunaa.spacegame.scenes.ShipViewScene.ShipViewScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -78,9 +80,8 @@ public class SpaceUIPanel extends Stage {
         shipViewButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                // TODO: Send player inside the ship
-                game.editorScene.previouScreen = game.getScreen();
-                game.setScreen(new FadeTransitionScene(game, game.spaceScene, game.editorScene, 0.15f));
+                if(!(game.player.getDriving() instanceof Ship)) return;
+                game.setScreen(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, (Ship)game.player.getDriving()), 0.15f));
             }
         });
 
@@ -120,7 +121,7 @@ public class SpaceUIPanel extends Stage {
                 } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
                     game.spaceScene.spacePanel.ship.state.throttle = 0;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    game.setScreen(new MapScene(game, game.getScreen(), game.spaceScene.spacePanel.player));
+                    game.setScreen(new MapScene(game, game.getScreen(), game.player));
                 }
 
                 return false;

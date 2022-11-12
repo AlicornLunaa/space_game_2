@@ -6,7 +6,6 @@ import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -30,7 +29,6 @@ public class Planet extends Celestial {
 
     // Variables
     private final OpenSimplexNoise noise;
-    private final Player player;
 
     @SuppressWarnings("unused")
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
@@ -138,10 +136,9 @@ public class Planet extends Celestial {
     }
 
     // Constructor
-    public Planet(final App game, final World world, final Player player, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
+    public Planet(final App game, final World world, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
         super(game, world, radius);
         
-        this.player = player;
         atmosRadius = atmosRad;
         terrainColor = terrain;
         atmosColor = atmos;
@@ -331,7 +328,7 @@ public class Planet extends Celestial {
         if(dist < atmosRadius * 0.95f){
             // Move it into this world
             this.addEntityWorld(e);
-            game.setScreen(new PlanetScene(game, this, player));
+            game.setScreen(new PlanetScene(game, this));
 
             return true;
         }

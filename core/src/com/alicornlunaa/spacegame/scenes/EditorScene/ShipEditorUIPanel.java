@@ -28,6 +28,7 @@ public class ShipEditorUIPanel extends Stage {
 
     // Variables
     final App game;
+    private final EditorScene editorScene;
 
     public String selectedCategory;
     public String selectedPart;
@@ -43,6 +44,7 @@ public class ShipEditorUIPanel extends Stage {
     public ShipEditorUIPanel(final App game){
         super(new ScreenViewport());
         this.game = game;
+        editorScene = (EditorScene)game.getScreen();
         
         float scale = ControlSchema.GUI_SCALE;
 
@@ -193,7 +195,7 @@ public class ShipEditorUIPanel extends Stage {
         closeButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                game.setScreen(new FadeTransitionScene(game, game.editorScene, game.editorScene.previouScreen, 0.15f));
+                game.setScreen(new FadeTransitionScene(game, editorScene, editorScene.previouScreen, 0.15f));
             }
         });
 
@@ -202,7 +204,7 @@ public class ShipEditorUIPanel extends Stage {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 if(button == Buttons.LEFT && nameBar.hasKeyboardFocus() && event.getTarget() != nameBar){
-                    game.editorScene.uiPanel.setKeyboardFocus(null);
+                    editorScene.uiPanel.setKeyboardFocus(null);
                     return true;
                 }
 
@@ -230,7 +232,7 @@ public class ShipEditorUIPanel extends Stage {
         super.act(delta);
         
         // Resize editor into panel
-        ShipEditorPanel editor = game.editorScene.editorPanel;
+        ShipEditorPanel editor = editorScene.editorPanel;
         editor.getViewport().setWorldSize(editorPlaceholder.getWidth(), editorPlaceholder.getHeight());
         editor.getViewport().setScreenBounds(
             (int)editorPlaceholder.getX(),

@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
@@ -27,10 +26,10 @@ public class PlanetScene implements Screen {
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
-    public PlanetScene(final App game, final Planet planet, final Player player){
+    public PlanetScene(final App game, final Planet planet){
         this.game = game;
 
-        planetPanel = new PlanetPanel(game, planet, player);
+        planetPanel = new PlanetPanel(game, planet);
         uiPanel = new PlanetUIPanel(game);
         uiShip = new SpaceUIPanel(game);
 
@@ -39,7 +38,7 @@ public class PlanetScene implements Screen {
         inputs.addProcessor(uiShip);
 
         // Initialize UI
-        uiShip.shipCompass.setTarget(planetPanel.player);
+        uiShip.shipCompass.setTarget(game.player);
 
         // planetPanel.setDebugAll(true);
         // uiPanel.setDebugAll(true);

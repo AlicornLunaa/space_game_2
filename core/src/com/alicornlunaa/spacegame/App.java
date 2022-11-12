@@ -1,9 +1,10 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.spacegame.scenes.EditorScene.EditorScene;
+import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
@@ -24,7 +25,7 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public SpaceScene spaceScene;
-	public EditorScene editorScene;
+	public Player player;
 
 	public boolean loaded = false;
 	
@@ -73,8 +74,8 @@ public class App extends Game {
 				manager.initEffects(this);
 
 				// Start new scene
+				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
-				editorScene = new EditorScene(this);
 				this.setScreen(spaceScene);
 			} else {
 				// Loading is not complete, update progress bar

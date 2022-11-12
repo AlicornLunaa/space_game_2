@@ -29,7 +29,6 @@ public class Player extends Entity {
     private float horizontal = 0.0f;
     private boolean grounded = false;
 
-    private PolygonShape shape = new PolygonShape();
     private RayCastCallback jumpCallback;
     private TextureRegionDrawable idleTexture;
 
@@ -39,8 +38,8 @@ public class Player extends Entity {
     private static final float JUMP_FORCE = 700000.0f;
 
     // Constructor
-    public Player(final App game, World world, float x, float y, float physScale){
-        this.world = world;
+    public Player(final App game, float x, float y, float physScale){
+        this.world = new World(new Vector2(), true);
 
         setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
         setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
@@ -52,6 +51,7 @@ public class Player extends Entity {
         setBody(world.createBody(def));
         setPosition(x, y);
 
+        PolygonShape shape = new PolygonShape();
         shape.setAsBox(
             PLAYER_WIDTH / 2 / getPhysScale(),
             PLAYER_HEIGHT / 2 / getPhysScale(),
@@ -63,6 +63,7 @@ public class Player extends Entity {
         );
         body.createFixture(shape, 1.0f);
         body.setFixedRotation(true);
+        shape.dispose();
 
         jumpCallback = new RayCastCallback(){
             @Override
@@ -131,7 +132,6 @@ public class Player extends Entity {
 
     @Override
     public boolean remove(){
-        shape.dispose();
         return super.remove();
     }
 
