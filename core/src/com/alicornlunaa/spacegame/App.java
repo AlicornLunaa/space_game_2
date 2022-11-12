@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.ray3k.stripe.FreeTypeSkin;
 
@@ -33,6 +34,7 @@ public class App extends Game {
 	public TextureAtlas particleAtlas;
 	public SpriteBatch spriteBatch;
 	public ShapeRenderer shapeRenderer;
+	public Box2DDebugRenderer debug;
 	
 	// Functions
 	@Override
@@ -48,6 +50,7 @@ public class App extends Game {
 
 		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
+		debug = new Box2DDebugRenderer();
 		
         ShaderProgram.pedantic = false;
 

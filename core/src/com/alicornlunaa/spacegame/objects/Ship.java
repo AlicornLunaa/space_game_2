@@ -42,7 +42,7 @@ public class Ship extends Entity {
     private float physAccumulator;
     private Body shipWorldBody;
     private HashMap<Vector2, Tile> shipMap = new HashMap<>();
-    
+
     // Private functions
     private void generateInterior(){
         // Creates interior world and generates the interior squares
@@ -75,6 +75,9 @@ public class Ship extends Entity {
         for(Tile tile : shipMap.values()){
             tile.draw(batch);
         }
+
+        game.player.draw(batch, parentAlpha);
+        game.debug.render(shipWorld, batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
     }
 
     public void updateWorld(float delta){
@@ -84,7 +87,11 @@ public class Ship extends Entity {
             shipWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
         }
+
+        game.player.act(delta);
     }
+
+    public World getInteriorWorld(){ return shipWorld; }
 
     // Space functions
     private void assemble(ShipPart head){

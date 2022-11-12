@@ -1,7 +1,9 @@
 package com.alicornlunaa.spacegame.scenes.ShipViewScene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -13,16 +15,22 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class ShipViewScene implements Screen {
     
     // Variables
+    private final App game;
+    private Entity oldDrivingEnt;
     private ShipView shipPanel;
     private ShipViewUI uiPanel;
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
     public ShipViewScene(final App game, final Ship ship){
+        this.game = game;
+
         shipPanel = new ShipView(game, ship);
         uiPanel = new ShipViewUI(game);
         inputs.addProcessor(shipPanel);
         inputs.addProcessor(uiPanel);
+
+        game.player.loadBodyToWorld(ship.getInteriorWorld(), Constants.SHIP_PPM);
     }
 
     // Functions
@@ -50,11 +58,19 @@ public class ShipViewScene implements Screen {
 
     @Override
     public void show() {
+        oldDrivingEnt = game.player.getDriving();
+        game.player.stopDriving();
+        game.player.setPosition(0, 0);
+        game.player.getBody().setLinearVelocity(0, 0);
+
         Gdx.input.setInputProcessor(inputs);
     }
 
     @Override
-    public void hide() {}
+    public void hide() {
+        game.player.drive(oldDrivingEnt);
+        oldDrivingEnt = null;
+    }
 
     @Override
     public void dispose() {
