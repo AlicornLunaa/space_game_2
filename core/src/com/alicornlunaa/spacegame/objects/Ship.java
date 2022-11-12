@@ -52,6 +52,7 @@ public class Ship extends Entity {
 		def.type = BodyType.StaticBody;
 		shipWorldBody = shipWorld.createBody(def);
 
+        
         shipMap.put(new Vector2(0, 0), new Tile(game, shipWorldBody, 0, 0, 0, 0, Tile.TileType.STONE));
     }
 
@@ -99,6 +100,8 @@ public class Ship extends Entity {
         def.shape = head.getShape();
         def.density = 1;
         body.createFixture(def);
+        
+        // TODO: Load interior collider for this part here
 
         for(ShipPart.Attachment a : head.getAttachments()){
             if(a.getChild() != null){
