@@ -6,11 +6,11 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.PhysicsCollider;
 import com.alicornlunaa.spacegame.objects.Ship;
 import com.alicornlunaa.spacegame.states.ShipState;
-import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * A Part is an object that gets attached to a ship. It should
@@ -29,6 +29,7 @@ public class Part {
     private TextureRegion texture;
     private PhysicsCollider externalCollider;
     private PhysicsCollider internalCollider;
+    private Array<Vector2> attachmentPoints = new Array<>();
 
     private String type;
     private String id;
@@ -57,8 +58,25 @@ public class Part {
         internalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
     }
     
-    public Part(final Ship ship, JSONObject obj){
-        // TODO: Implement JSONObject constructor
+    public Part(final App game, final Ship ship, JSONObject obj){
+        parent = ship.getBody();
+        stateRef = ship.state;
+
+        type = obj.getString("type");
+        id = obj.getString("id");
+        name = obj.getString("name");
+        description = obj.getString("desc");
+
+        texture = game.atlas.findRegion("parts/" + id);
+        size.set(texture.getRegionWidth(), texture.getRegionHeight());
+
+        externalCollider = new PhysicsCollider(obj.getJSONArray("externalShape"));
+        internalCollider = new PhysicsCollider(obj.getJSONArray("internalShape"));
+        
+        for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
+            JSONObject vec = obj.getJSONArray("attachmentPoints").getJSONObject(i);
+            attachmentPoints.add(new Vector2(vec.getFloat("x"), vec.getFloat("y")));
+        }
     }
 
     // Functions
@@ -103,11 +121,13 @@ public class Part {
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }
     public boolean getFlipY(){ return flipY; }
+    public String getName(){ return name; }
+    public String getDescription(){ return description; }
 
     // Static functions
-    public static Part spawn(final App game, String type, String id){
-        // TODO: Implement part spawning
-        return null;
+    public static Part spawn(final App game, final Ship ship, String type, String id){
+        Part p = new Part(game, ship, game.partManager.get(type, id));
+        return p;
     }
 
     public static Part unserialize(final App game, final Ship ship, JSONObject obj){
@@ -119,7 +139,7 @@ public class Part {
         boolean flipX = obj.getBoolean("flipX");
         boolean flipY = obj.getBoolean("flipY");
 
-        Part newPart = Part.spawn(game, type, id);
+        Part newPart = Part.spawn(game, ship, type, id);
         newPart.position.set(x, y);
         newPart.rotation = rotation;
         newPart.flipX = flipX;
