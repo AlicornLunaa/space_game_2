@@ -74,8 +74,8 @@ public class Part {
             externalCollider = new PhysicsCollider(obj.getJSONArray("externalShape"));
             internalCollider = new PhysicsCollider(obj.getJSONArray("internalShape"));
         } else {
-            externalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size, 0);
-            internalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size, 0);
+            externalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0);
+            internalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0);
         }
         
         for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
