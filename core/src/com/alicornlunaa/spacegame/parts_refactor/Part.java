@@ -67,11 +67,16 @@ public class Part {
         name = obj.getString("name");
         description = obj.getString("desc");
 
-        texture = game.atlas.findRegion("parts/" + id);
+        texture = game.atlas.findRegion("parts/" + id.toLowerCase());
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
-        externalCollider = new PhysicsCollider(obj.getJSONArray("externalShape"));
-        internalCollider = new PhysicsCollider(obj.getJSONArray("internalShape"));
+        if(obj.has("externalShape") && obj.has("internalShape")){
+            externalCollider = new PhysicsCollider(obj.getJSONArray("externalShape"));
+            internalCollider = new PhysicsCollider(obj.getJSONArray("internalShape"));
+        } else {
+            externalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size, 0);
+            internalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size, 0);
+        }
         
         for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
             JSONObject vec = obj.getJSONArray("attachmentPoints").getJSONObject(i);
@@ -90,7 +95,7 @@ public class Part {
         drawEffectsBelow(batch, delta);
         batch.draw(
             texture,
-            position.x, position.y,
+            position.x - size.x / 2, position.y - size.y / 2,
             size.x / 2, size.y / 2,
             size.x, size.y,
             flipX ? -1 : 1, flipY ? -1 : 1,

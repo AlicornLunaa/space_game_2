@@ -50,7 +50,6 @@ public class Ship extends Entity {
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
 		shipWorldBody = shipWorld.createBody(def);
-
         
         shipMap.put(new Vector2(0, 0), new Tile(game, shipWorldBody, 0, 0, 0, 0, Tile.TileType.STONE));
     }
@@ -65,7 +64,7 @@ public class Ship extends Entity {
         def.angle = (float)Math.toRadians(rotation);
 		setBody(world.createBody(def));
 
-        rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(), 0.0f);
+        // rootPart = ShipPart.spawn(game, "AERO", "MED_CMD_POD", body, state, new Vector2(), 0.0f);
 
         generateInterior();
     }
