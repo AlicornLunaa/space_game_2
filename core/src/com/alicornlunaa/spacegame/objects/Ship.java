@@ -96,8 +96,7 @@ public class Ship extends Entity {
     // Space functions
     private void assemble(ShipPart head){
         head.buildExterior(body);
-        
-        // TODO: Load interior collider for this part here
+        head.buildInterior(shipWorldBody);
 
         for(ShipPart.Attachment a : head.getAttachments()){
             if(a.getChild() != null){
