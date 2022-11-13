@@ -136,7 +136,7 @@ public class PartEditor implements Screen {
         for(PhysShape s : interiorShapes){
             interior.put(s.serialize());
         }
-        o.put("interiorShapes", world);
+        o.put("interiorShapes", interior);
 
         // Save attachment points
         JSONArray attaches = new JSONArray();

@@ -19,7 +19,9 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class ShipPart extends Entity {
@@ -81,12 +83,24 @@ public class ShipPart extends Entity {
         }
     };
 
+    protected static class PhysShapeInternal {
+        private PolygonShape shape;
+        private int disableWhen = -1;
+        private PhysShapeInternal(PolygonShape s, int dis){
+            shape = s;
+            disableWhen = dis;
+        }
+    };
+
     // Variables
     protected Body parent;
     protected ShipState stateRef;
     private TextureRegion region;
-    private PolygonShape shape = new PolygonShape();
     private ArrayList<Attachment> attachments = new ArrayList<Attachment>();
+
+    private PolygonShape defaultBox = new PolygonShape();
+    private Array<PhysShapeInternal> interiorShapes = new Array<>();
+    private Vector2 partOffset = new Vector2();
 
     private String partType;
     private String partId;
@@ -97,8 +111,9 @@ public class ShipPart extends Entity {
     protected static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     // Constructor
-    public ShipPart(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
+    public ShipPart(Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints){
         this.parent = parent;
+        this.interiorShapes = interiorShapes;
         this.stateRef = stateRef;
         this.region = region;
 
@@ -111,7 +126,7 @@ public class ShipPart extends Entity {
         setPosition(pos.x, pos.y);
         setRotation(rot);
 
-        shape.setAsBox(
+        defaultBox.setAsBox(
             getWidth() / 2.f / Constants.PPM,
             getHeight() / 2.f / Constants.PPM,
             pos.cpy().scl(1 / Constants.PPM),
@@ -166,8 +181,8 @@ public class ShipPart extends Entity {
             getX() + aPosition.x - tPosition.x,
             getY() + aPosition.y - tPosition.y
         );
-
-        ((PolygonShape)target.getShape()).setAsBox(
+        
+        target.defaultBox.setAsBox(
             target.getWidth() / 2.f / Constants.PPM,
             target.getHeight() / 2.f / Constants.PPM,
             new Vector2(
@@ -176,9 +191,9 @@ public class ShipPart extends Entity {
             ),
             (float)Math.toRadians(t.getParent().getRotation())
         );
-
+        
+        partOffset.set((getX() + aPosition.x - tPosition.x) / Constants.PPM, (getY() + aPosition.y - tPosition.y) / Constants.PPM);
         target.parent = parent;
-
         return target;
     }
 
@@ -194,11 +209,27 @@ public class ShipPart extends Entity {
         return false;
     }
 
+    public void buildExterior(Body b){
+        FixtureDef def = new FixtureDef();
+        def.shape = defaultBox;
+        def.density = 1;
+        b.createFixture(def);
+    }
+
+    public void buildInterior(Body b){
+        for(PhysShapeInternal s : interiorShapes){
+            if(s.disableWhen != -1 && (attachments.get(s.disableWhen).inUse || attachments.get(s.disableWhen).getChild() != null)) continue;
+
+            FixtureDef def = new FixtureDef();
+            def.shape = s.shape;
+            def.density = 1;
+            b.createFixture(def);
+        }
+    }
+
     public ArrayList<Attachment> getAttachments(){
         return attachments;
     }
-
-    public PolygonShape getShape(){ return shape; }
 
     public void drawPoints(boolean draw){ this.drawAttachPoints = draw; }
 
@@ -311,7 +342,11 @@ public class ShipPart extends Entity {
             }
         }
 
-        shape.dispose();
+        for(PhysShapeInternal s : interiorShapes){
+            s.shape.dispose();
+        }
+
+        defaultBox.dispose();
         return super.remove();
     }
 
@@ -366,6 +401,24 @@ public class ShipPart extends Entity {
                 attachmentPoints.add(new Vector2(o.getFloat("x"), o.getFloat("y")));
             }
 
+            Array<PhysShapeInternal> interiorShapes = new Array<>();
+            try {
+                JSONArray interiorShapesRaw = data.getJSONArray("interiorShapes");
+                for(int i = 0; i < interiorShapesRaw.length(); i++){
+                    int disableWhen = interiorShapesRaw.getJSONObject(i).getInt("disableWhen");
+                    JSONArray vertices = interiorShapesRaw.getJSONObject(i).getJSONArray("vertices");
+                    Vector2[] verticesFiltered = new Vector2[vertices.length() / 2];
+
+                    for(int j = 0; j < vertices.length(); j += 2){
+                        verticesFiltered[j / 2] = new Vector2(vertices.getFloat(j), vertices.getFloat(j + 1));
+                    }
+
+                    PolygonShape p = new PolygonShape();
+                    p.set(verticesFiltered);
+                    interiorShapes.add(new PhysShapeInternal(p, disableWhen));
+                }
+            } catch(JSONException e){}
+
             JSONObject metadata = data.getJSONObject("metadata");
             switch(type){
                 case "AERO":
@@ -373,6 +426,7 @@ public class ShipPart extends Entity {
                     float lift = metadata.getFloat("lift");
                     return new Aero(
                         parent,
+                        interiorShapes,
                         stateRef,
                         region,
                         scale,
@@ -391,6 +445,7 @@ public class ShipPart extends Entity {
                     float battery = metadata.getFloat("batteryCapacity");
                     return new Structural(
                         parent,
+                        interiorShapes,
                         stateRef,
                         region,
                         scale,
@@ -412,6 +467,7 @@ public class ShipPart extends Entity {
                     return new Thruster(
                         game,
                         parent,
+                        interiorShapes,
                         stateRef,
                         region,
                         scale,
@@ -433,6 +489,7 @@ public class ShipPart extends Entity {
                     return new RCSPort(
                         game,
                         parent,
+                        interiorShapes,
                         stateRef,
                         region,
                         scale,

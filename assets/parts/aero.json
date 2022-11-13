@@ -1,18 +1,137 @@
 [
     {
-        "id": "MED_CMD_POD",
-        "type": "AERO",
-        "name": "Medium Command Pod",
-        "desc": "Mid-sized command pod",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": -7}
-        ],
         "metadata": {
             "drag": 1,
             "lift": 1
-        }
+        },
+        "interiorShapes": [
+            {
+                "vertices": [
+                    -8,
+                    -7,
+                    8,
+                    -7,
+                    8,
+                    -10,
+                    -8,
+                    -10,
+                    -8,
+                    -7
+                ],
+                "disableWhen": 0
+            },
+            {
+                "vertices": [
+                    -8,
+                    -2,
+                    -3,
+                    7,
+                    -8,
+                    7,
+                    -8,
+                    -2
+                ],
+                "disableWhen": -1
+            },
+            {
+                "vertices": [
+                    8,
+                    -2,
+                    8,
+                    7,
+                    3,
+                    7,
+                    8,
+                    -2
+                ],
+                "disableWhen": -1
+            },
+            {
+                "vertices": [
+                    -1,
+                    7,
+                    -1,
+                    10,
+                    -8,
+                    10,
+                    -8,
+                    7,
+                    -1,
+                    7
+                ],
+                "disableWhen": -1
+            },
+            {
+                "vertices": [
+                    1,
+                    7,
+                    8,
+                    7,
+                    8,
+                    10,
+                    1,
+                    10,
+                    1,
+                    7
+                ],
+                "disableWhen": -1
+            },
+            {
+                "vertices": [
+                    -1,
+                    8,
+                    1,
+                    8,
+                    1,
+                    10,
+                    -1,
+                    10,
+                    -1,
+                    8
+                ],
+                "disableWhen": -1
+            },
+            {
+                "vertices": [
+                    -11,
+                    10,
+                    -11,
+                    -7,
+                    -8,
+                    -7,
+                    -8,
+                    10,
+                    -11,
+                    10
+                ],
+                "disableWhen": -1
+            },
+            {
+                "vertices": [
+                    11,
+                    -7,
+                    11,
+                    10,
+                    8,
+                    10,
+                    8,
+                    -7,
+                    11,
+                    -7
+                ],
+                "disableWhen": -1
+            }
+        ],
+        "density": 0.1,
+        "name": "Medium Command Pod",
+        "scale": 1,
+        "id": "MED_CMD_POD",
+        "type": "AERO",
+        "attachmentPoints": [{
+            "x": 0,
+            "y": -7
+        }],
+        "desc": "My friend while developing this game"
     },
     {
         "id": "SML_CMD_POD",

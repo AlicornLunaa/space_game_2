@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.states.ShipState;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 
 public class Aero extends ShipPart {
     // Variables
@@ -15,8 +16,8 @@ public class Aero extends ShipPart {
     private float lift;
 
     // Constructor
-    public Aero(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float drag, float lift){
-        super(parent, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
+    public Aero(Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float drag, float lift){
+        super(parent, interiorShapes, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
 
         this.name = name;
         this.description = description;

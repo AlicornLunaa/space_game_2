@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -30,8 +29,6 @@ public class SpacePanel extends Stage {
 
     public Universe universe;
     public Ship ship;
-    
-    private Box2DDebugRenderer debug = new Box2DDebugRenderer();
 
     // Constructor
     public SpacePanel(final App game){
@@ -66,7 +63,6 @@ public class SpacePanel extends Stage {
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 OrthographicCamera cam = (OrthographicCamera)getCamera();
                 cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 30), 0.05f), 3.0f);
-
                 return true;
             }
         });
@@ -89,7 +85,6 @@ public class SpacePanel extends Stage {
         universe.update(delta);
 
         // Parent camera to the player
-        // player.updateCamera((OrthographicCamera)getCamera());
         OrthographicCamera cam = (OrthographicCamera)getCamera();
         cam.position.set(universe.getUniversalPosition(ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
         cam.update();
@@ -119,12 +114,13 @@ public class SpacePanel extends Stage {
 
         super.draw();
 
-        if(this.isDebugAll()){
-            debug.render(world, this.getCamera().combined.cpy().scl(Constants.PPM));
+        if(Constants.DEBUG){
+            game.debug.render(world, getCamera().combined.cpy());
+
+            batch.begin();
+            ship.draw(batch, 1);
+            batch.end();
         }
-        
-        batch.setProjectionMatrix(oldProj);
-        batch.setTransformMatrix(oldTrans);
     }
     
     @Override

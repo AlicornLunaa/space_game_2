@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.scenes.DevScenes.PartEditor;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
@@ -85,9 +84,8 @@ public class App extends Game {
 
 				// Start new scene
 				player = new Player(this, -50, 0, Constants.PPM);
-				// spaceScene = new SpaceScene(this);
-				// this.setScreen(spaceScene);
-				this.setScreen(new PartEditor(this));
+				spaceScene = new SpaceScene(this);
+				this.setScreen(spaceScene);
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());

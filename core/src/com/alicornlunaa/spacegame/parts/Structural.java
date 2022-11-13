@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.states.ShipState;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 
 public class Structural extends ShipPart {
     // Variables
@@ -15,8 +16,8 @@ public class Structural extends ShipPart {
     private float batteryCapacity;
 
     // Constructor
-    public Structural(Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float fuelCapacity, float batteryCapacity){
-        super(parent, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
+    public Structural(Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float fuelCapacity, float batteryCapacity){
+        super(parent, interiorShapes, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
 
         this.name = name;
         this.description = description;

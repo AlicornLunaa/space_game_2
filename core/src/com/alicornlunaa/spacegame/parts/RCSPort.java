@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 
 /*
  * Mono propellant/RCS ports are decided to be fired depending on the button pressed
@@ -31,8 +32,8 @@ public class RCSPort extends ShipPart {
     private PooledEffect effect;
 
     // Constructors
-    public RCSPort(App game, Body parent, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float denstiy, float power, float fuelUsage){
-        super(parent, stateRef, region, scale, pos, rot, attachmentPoints);
+    public RCSPort(App game, Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float denstiy, float power, float fuelUsage){
+        super(parent, interiorShapes, stateRef, region, scale, pos, rot, attachmentPoints);
 
         this.name = name;
         this.description = description;

@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.scenes.Misc;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
+import com.alicornlunaa.spacegame.scenes.DevScenes.PartEditor;
 import com.alicornlunaa.spacegame.scenes.DevScenes.PhysEditor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -54,6 +55,8 @@ public class ConsoleScene implements Screen {
             ((Star)game.spaceScene.spacePanel.universe.getCelestial(0)).reloadShaders();
         } else if(args[0].equals("phys_editor")){
             game.setScreen(new PhysEditor(game));
+        } else if(args[0].equals("part_editor")){
+            game.setScreen(new PartEditor(game));
         }
     }
 
