@@ -1,29 +1,23 @@
 package com.alicornlunaa.spacegame.parts;
 
-import java.util.ArrayList;
+import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.objects.Ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.utils.Array;
 
-/*
+/**
  * Mono propellant/RCS ports are decided to be fired depending on the button pressed
  * 
  * Roll can be calculated by getting the angle of the port to the ship's center of
  * mass and checking if its tangent value is positive or negative, just like on a
  * unit circle.
  */
-
-public class RCSPort extends ShipPart {
+public class RCSPort extends Part {
 
     // Variables
-    private String name;
-    private String description;
     private float power;
     private float fuelUsage;
 
@@ -32,16 +26,15 @@ public class RCSPort extends ShipPart {
     private PooledEffect effect;
 
     // Constructors
-    public RCSPort(App game, Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 pos, float rot, ArrayList<Vector2> attachmentPoints, String name, String description, float denstiy, float power, float fuelUsage){
-        super(parent, interiorShapes, stateRef, region, scale, pos, rot, attachmentPoints);
+    public RCSPort(final App game, final Ship ship, JSONObject obj){
+        super(game, ship, obj);
 
-        this.name = name;
-        this.description = description;
-        this.power = power;
-        this.fuelUsage = fuelUsage;
+        JSONObject metadata = obj.getJSONObject("metadata");
+        power = metadata.getFloat("power");
+        fuelUsage = metadata.getFloat("fuelUsage");
         
         effect = game.manager.getEffect("effects/rcs");
-        effect.setPosition(0, getOriginY());
+        effect.setPosition(0, getHeight() / 2);
         effect.scaleEffect(initial_scale);
         effect.start();
         
@@ -53,7 +46,7 @@ public class RCSPort extends ShipPart {
     // Functions
     private int getSignAtPos(){
         Vector2 center = parent.getLocalCenter();
-        Vector2 posOfCenter = new Vector2(getX() / getPhysScale() - center.x, getY() / getPhysScale() - center.y);
+        Vector2 posOfCenter = new Vector2(getX() / physScale - center.x, getY() / physScale - center.y);
         float tanVal = (float)Math.atan(posOfCenter.y / posOfCenter.x);
         return Math.round(Math.abs(tanVal) / tanVal);
     }
@@ -63,7 +56,7 @@ public class RCSPort extends ShipPart {
         float adj = portDir.dot(parentVert);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta / getPhysScale()), true);
+        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta / physScale), true);
 
         return adj;
     }
@@ -73,7 +66,7 @@ public class RCSPort extends ShipPart {
         float adj = portDir.dot(parentHori);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta / getPhysScale()), true);
+        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta / physScale), true);
 
         return adj;
     }
@@ -84,12 +77,12 @@ public class RCSPort extends ShipPart {
         Vector2 parentRight = new Vector2(1, 0).rotateRad(parent.getAngle());
         float adj = Math.abs(portDir.dot(parentRight)) * -1;
 
-        parent.applyForce(portDir.cpy().scl(power * adj * delta / getPhysScale()), portPos, true);
+        parent.applyForce(portDir.cpy().scl(power * adj * delta / physScale), portPos, true);
         return adj;
     }
     
     @Override
-    protected void drawEffects(Batch batch, float deltaTime){
+    protected void drawEffectsAbove(Batch batch, float deltaTime){
         if(scale <= 0.01f) return;
 
         effect.update(deltaTime);
@@ -97,12 +90,10 @@ public class RCSPort extends ShipPart {
     }
 
     @Override
-    public void act(float delta){
-        super.act(delta);
-
+    public void update(float delta){
         if(stateRef.rcs){
-            Vector2 portPos = new Vector2(getX() / getPhysScale(), getY() / getPhysScale()).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
-            Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getScaleX()).scl(-getScaleX(), -getScaleY());
+            Vector2 portPos = new Vector2(getX() / physScale, getY() / physScale).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
+            Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getWidth() / 2).scl(getFlipX() ? -1 : 1, getFlipY() ? -1 : 1);
 
             float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
 
@@ -123,19 +114,8 @@ public class RCSPort extends ShipPart {
     }
 
     @Override
-    public boolean remove(){
+    public void dispose(){
         effect.free();
-        return super.remove();
-    }
-
-    @Override
-    public String toString(){
-        String str = "Name: " + name;
-        str += "\nDesc: " + description;
-        str += "\nPower: " + String.valueOf(power);
-        str += "\nFuel usage: " + String.valueOf(fuelUsage);
-        str += "\n";
-        return str;
     }
     
 }

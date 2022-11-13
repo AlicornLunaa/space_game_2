@@ -11,7 +11,8 @@
         ],
         "metadata": {
             "power": 1000,
-            "cone": 5,
+            "coneAngle": 5,
+            "coneSpeed": 1.5,
             "fuelUsage": 1,
             "effect": "effects/rocket"
         }

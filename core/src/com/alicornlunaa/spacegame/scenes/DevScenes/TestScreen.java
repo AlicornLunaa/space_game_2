@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.DevScenes;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship;
-import com.alicornlunaa.spacegame.parts_refactor.Part;
+import com.alicornlunaa.spacegame.parts.Part;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;

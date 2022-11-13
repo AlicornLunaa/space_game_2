@@ -1,24 +1,19 @@
 package com.alicornlunaa.spacegame.parts;
 
-import java.util.ArrayList;
+import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.objects.Ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter.ScaledNumericValue;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.utils.Array;
 
-public class Thruster extends ShipPart {
+public class Thruster extends Part {
     // Variables
-    private String name;
-    private String description;
     private float power;
     private float coneAngle;
     private float coneSpeed;
@@ -32,20 +27,19 @@ public class Thruster extends ShipPart {
     private PooledEffect effect;
 
     // Constructor
-    public Thruster(App game, Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float power, float coneAngle, float fuelUsage, String effectName){
-        super(parent, interiorShapes, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
+    public Thruster(final App game, final Ship ship, JSONObject obj){
+        super(game, ship, obj);
 
-        this.name = name;
-        this.description = description;
-        this.power = power;
-        this.coneAngle = coneAngle;
-        this.coneSpeed = 1.5f;
-        this.fuelUsage = fuelUsage;
-        this.rotationOffset = rotOffset;
+        JSONObject metadata = obj.getJSONObject("metadata");
+        power = metadata.getFloat("power");
+        coneAngle = metadata.getFloat("coneAngle");
+        coneSpeed = metadata.getFloat("coneSpeed");
+        fuelUsage = metadata.getFloat("fuelUsage");
+        rotationOffset = getRotation();
 
         currentAngle = 0.f;
 
-        effect = game.manager.getEffect(effectName);
+        effect = game.manager.getEffect(metadata.getString("effect"));
         effect.setPosition(0, 0);
         effect.scaleEffect(initial_scale);
         effect.start();
@@ -68,11 +62,20 @@ public class Thruster extends ShipPart {
             (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getAngle())
         );
 
-        parent.applyForce(dir.scl(power * -throttle * delta / getPhysScale()), parent.getWorldPoint(new Vector2(getX() / getPhysScale(), getY() / getPhysScale())), true);
+        parent.applyForce(
+            dir.scl(power * -throttle * delta / physScale),
+            parent.getWorldPoint(
+                new Vector2(
+                    getX() / physScale,
+                    getY() / physScale
+                )
+            ),
+            true
+        );
     }
     
     @Override
-    protected void drawEffectsUnder(Batch batch, float deltaTime){
+    protected void drawEffectsBelow(Batch batch, float deltaTime){
         // Reset angle to draw
         Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
         batch.setTransformMatrix(batch.getTransformMatrix().mul(batchMatrix.inv()));
@@ -87,7 +90,7 @@ public class Thruster extends ShipPart {
         }
 
         // Draw effects
-        Vector3 pos = new Vector3(getOriginX(), getOriginY(), 0).mul(batchMatrix.inv());
+        Vector3 pos = new Vector3(0, 0, 0).mul(batchMatrix.inv());
         effect.setPosition(pos.x, pos.y);
 
         effect.update(deltaTime);
@@ -98,9 +101,7 @@ public class Thruster extends ShipPart {
     }
 
     @Override
-    public void act(float delta){
-        super.act(delta);
-
+    public void update(float delta){
         float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
 
         this.setTargetAngle(compRoll);
@@ -112,20 +113,8 @@ public class Thruster extends ShipPart {
     }
 
     @Override
-    public boolean remove(){
+    public void dispose(){
         effect.free();
-        return super.remove();
-    }
-
-    @Override
-    public String toString(){
-        String str = "Name: " + name;
-        str += "\nDesc: " + description;
-        str += "\nPower: " + String.valueOf(power);
-        str += "\nConeAngle: " + String.valueOf(coneAngle);
-        str += "\nFuelUsage: " + String.valueOf(fuelUsage);
-        str += "\n";
-        return str;
     }
 
 }

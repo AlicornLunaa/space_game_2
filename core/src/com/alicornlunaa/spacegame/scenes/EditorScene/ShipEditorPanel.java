@@ -58,62 +58,62 @@ public class ShipEditorPanel extends Stage {
             0,
             0
         );
-        rootShip.drawPoints(true);
+        // rootShip.drawPoints(true);
         this.addActor(rootShip);
         
         BodyDef def = new BodyDef();
 		def.type = BodyType.KinematicBody;
 		ghostBody = world.createBody(def);
         
-        this.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent e, float x, float y){
-                EditorScene editorScene = (EditorScene)game.getScreen();
-                ShipEditorUIPanel ui = editorScene.uiPanel;
-                ShipEditorPanel editor = editorScene.editorPanel;
+        // this.addListener(new ClickListener(){
+        //     @Override
+        //     public void clicked(InputEvent e, float x, float y){
+        //         EditorScene editorScene = (EditorScene)game.getScreen();
+        //         ShipEditorUIPanel ui = editorScene.uiPanel;
+        //         ShipEditorPanel editor = editorScene.editorPanel;
 
-                if(ghostPart != null){
-                    // Part is ghosted, spawn one and reset it
-                    if(selectedAttachment != null){
-                        ghostPart.setPosition(0, 0);
-                        selectedAttachment.getParent().attachPart(
-                            ghostPart,
-                            targetAttachmentId,
-                            selectedAttachment.getThisId()
-                        );
-                    }
+        //         if(ghostPart != null){
+        //             // Part is ghosted, spawn one and reset it
+        //             if(selectedAttachment != null){
+        //                 ghostPart.setPosition(0, 0);
+        //                 selectedAttachment.getParent().attachPart(
+        //                     ghostPart,
+        //                     targetAttachmentId,
+        //                     selectedAttachment.getThisId()
+        //                 );
+        //             }
 
-                    partOffset.set(0, 0);
-                    ghostPart = null;
-                    selectedAttachment = null;
-                    ui.selectedPart = "";
-                } else {
-                    // No part was in the player's hand, check if theyre picking up an already placed object
-                    Vector2 cursor = editor.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-                    ShipPart part = rootShip.getPartClicked(cursor);
+        //             partOffset.set(0, 0);
+        //             ghostPart = null;
+        //             selectedAttachment = null;
+        //             ui.selectedPart = "";
+        //         } else {
+        //             // No part was in the player's hand, check if theyre picking up an already placed object
+        //             Vector2 cursor = editor.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        //             ShipPart part = rootShip.getPartClicked(cursor);
 
-                    if(part != null){
-                        // Pick it up by severing the attachment in use because in use means attached to parent and not a child
-                        ShipPart parent = rootShip.findParent(part);
+        //             if(part != null){
+        //                 // Pick it up by severing the attachment in use because in use means attached to parent and not a child
+        //                 ShipPart parent = rootShip.findParent(part);
 
-                        if(parent != null){
-                            // A parent was found, detach the parent and the child
-                            for(Attachment a : parent.getAttachments()){
-                                if(a.getChild() == part){
-                                    // This is the one, detach and break
-                                    partOffset.set(part.getX(), part.getY());
-                                    parent.detachPart(a.getThisId());
-                                    ghostPart = part;
-                                    break;
-                                }
-                            }
-                        } else {
-                            // No parent found, this is the root item.
-                        }
-                    }
-                }
-            }
-        });
+        //                 if(parent != null){
+        //                     // A parent was found, detach the parent and the child
+        //                     for(Attachment a : parent.getAttachments()){
+        //                         if(a.getChild() == part){
+        //                             // This is the one, detach and break
+        //                             partOffset.set(part.getX(), part.getY());
+        //                             parent.detachPart(a.getThisId());
+        //                             ghostPart = part;
+        //                             break;
+        //                         }
+        //                     }
+        //                 } else {
+        //                     // No parent found, this is the root item.
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
 
         this.addListener(new InputListener(){
             Vector2 prevDrag = new Vector2();
@@ -173,30 +173,30 @@ public class ShipEditorPanel extends Stage {
 
         if(selectedAttachment == null){
             // No point selected, find snap point closest, only once
-            Attachment shipClosestToCursor = rootShip.getClosestAttachment(cursor.cpy(), snapDistance);
+            // Attachment shipClosestToCursor = rootShip.getClosestAttachment(cursor.cpy(), snapDistance);
 
-            if(shipClosestToCursor != null && shipClosestToCursor.getChild() == null && !shipClosestToCursor.getInUse()){
-                // Find attachment point on the ghostpart closest to the other attachment and snap them
-                ShipPart a = shipClosestToCursor.getParent();
-                Vector2 attachmentPoint1 = shipClosestToCursor.getPos().cpy();
-                attachmentPoint1.scl(a.getFlipX() ? -1 : 1, a.getFlipY() ? -1 : 1);
-                attachmentPoint1.rotateDeg(a.getRotation());
-                attachmentPoint1.add(rootShip.getPosition()).add(a.getPosition()); // A1 is now local to the ship
+            // if(shipClosestToCursor != null && shipClosestToCursor.getChild() == null && !shipClosestToCursor.getInUse()){
+            //     // Find attachment point on the ghostpart closest to the other attachment and snap them
+            //     ShipPart a = shipClosestToCursor.getParent();
+            //     Vector2 attachmentPoint1 = shipClosestToCursor.getPos().cpy();
+            //     attachmentPoint1.scl(a.getFlipX() ? -1 : 1, a.getFlipY() ? -1 : 1);
+            //     attachmentPoint1.rotateDeg(a.getRotation());
+            //     attachmentPoint1.add(rootShip.getPosition()).add(a.getPosition()); // A1 is now local to the ship
                 
-                Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1.cpy());
-                ShipPart p = ghostClosestToAttachment.getParent();
-                Vector2 attachmentPoint2 = ghostClosestToAttachment.getPos().cpy();
-                attachmentPoint2.scl(p.getFlipX() ? -1 : 1, p.getFlipY() ? -1 : 1);
-                attachmentPoint2.rotateDeg(ghostPart.getRotation());
-                attachmentPoint2.add(rootShip.getPosition()); // A2 is now local to the ship
+            //     Attachment ghostClosestToAttachment = ghostPart.getClosestAttachment(attachmentPoint1.cpy());
+            //     ShipPart p = ghostClosestToAttachment.getParent();
+            //     Vector2 attachmentPoint2 = ghostClosestToAttachment.getPos().cpy();
+            //     attachmentPoint2.scl(p.getFlipX() ? -1 : 1, p.getFlipY() ? -1 : 1);
+            //     attachmentPoint2.rotateDeg(ghostPart.getRotation());
+            //     attachmentPoint2.add(rootShip.getPosition()); // A2 is now local to the ship
 
-                this.attachmentPoint = rootShip.getPosition().cpy().add(attachmentPoint1.sub(attachmentPoint2));
+            //     this.attachmentPoint = rootShip.getPosition().cpy().add(attachmentPoint1.sub(attachmentPoint2));
 
-                selectedAttachment = shipClosestToCursor;
-                targetAttachmentId = ghostClosestToAttachment.getThisId();
+            //     selectedAttachment = shipClosestToCursor;
+            //     targetAttachmentId = ghostClosestToAttachment.getThisId();
 
-                return this.attachmentPoint;
-            }
+            //     return this.attachmentPoint;
+            // }
         } else {
             // Snap point already found, check distance between the two points
             float snapToCursorDist = this.attachmentPoint.dst2(cursor);
@@ -216,30 +216,30 @@ public class ShipEditorPanel extends Stage {
         super.act(delta);
 
         Vector2 cursor = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-        ShipPart part = rootShip.getPartClicked(cursor);
+        // ShipPart part = rootShip.getPartClicked(cursor);
 
-        // Find the snap point for attachments
-        if(ghostPart != null){
-            this.findSnapAttachment(cursor);
+        // // Find the snap point for attachments
+        // if(ghostPart != null){
+        //     this.findSnapAttachment(cursor);
 
-            if(selectedAttachment != null){
-                ghostPart.setPosition(attachmentPoint.x, attachmentPoint.y);
-            } else {
-                ghostPart.setPosition(cursor.x, cursor.y);
-            }
-        }
+        //     if(selectedAttachment != null){
+        //         ghostPart.setPosition(attachmentPoint.x, attachmentPoint.y);
+        //     } else {
+        //         ghostPart.setPosition(cursor.x, cursor.y);
+        //     }
+        // }
 
-        // Highlight selected parts light green
-        if(part != null && part != hoveredPart){
-            if(hoveredPart != null)
-                hoveredPart.setColor(1, 1, 1, 1);
+        // // Highlight selected parts light green
+        // if(part != null && part != hoveredPart){
+        //     if(hoveredPart != null)
+        //         hoveredPart.setColor(1, 1, 1, 1);
 
-            part.setColor(0.7f, 1, 0.7f, 1);
-            hoveredPart = part;
-        } else if(part == null && hoveredPart != null) {
-            hoveredPart.setColor(1, 1, 1, 1);
-            hoveredPart = null;
-        }
+        //     part.setColor(0.7f, 1, 0.7f, 1);
+        //     hoveredPart = part;
+        // } else if(part == null && hoveredPart != null) {
+        //     hoveredPart.setColor(1, 1, 1, 1);
+        //     hoveredPart = null;
+        // }
 
         // Center ship
         rootShip.setPosition(this.getWidth() / 2.0f, this.getHeight() / 2.0f);

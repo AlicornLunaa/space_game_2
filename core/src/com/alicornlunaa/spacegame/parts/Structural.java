@@ -1,43 +1,22 @@
 package com.alicornlunaa.spacegame.parts;
 
-import java.util.ArrayList;
+import org.json.JSONObject;
 
-import com.alicornlunaa.spacegame.states.ShipState;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.utils.Array;
+import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Ship;
 
-public class Structural extends ShipPart {
+public class Structural extends Part {
     // Variables
-    private String name;
-    private String description;
     private float fuelCapacity;
     private float batteryCapacity;
 
     // Constructor
-    public Structural(Body parent, Array<PhysShapeInternal> interiorShapes, ShipState stateRef, TextureRegion region, float scale, Vector2 posOffset, float rotOffset, ArrayList<Vector2> attachmentPoints, String name, String description, float density, float fuelCapacity, float batteryCapacity){
-        super(parent, interiorShapes, stateRef, region, scale, posOffset, rotOffset, attachmentPoints);
+    public Structural(final App game, final Ship ship, JSONObject obj){
+        super(game, ship, obj);
 
-        this.name = name;
-        this.description = description;
-        this.fuelCapacity = fuelCapacity;
-        this.batteryCapacity = batteryCapacity;
+        JSONObject metadata = obj.getJSONObject("metadata");
+        fuelCapacity = metadata.getFloat("fuelCapacity");
+        batteryCapacity = metadata.getFloat("batteryCapacity");
     }
 
-    // Functions
-    @Override
-    public void act(float delta){
-        super.act(delta);
-    }
-
-    @Override
-    public String toString(){
-        String str = "Name: " + name;
-        str += "\nDesc: " + description;
-        str += "\nFuel: " + String.valueOf(fuelCapacity);
-        str += "\nBattery: " + String.valueOf(batteryCapacity);
-        str += "\n";
-        return str;
-    }
 }

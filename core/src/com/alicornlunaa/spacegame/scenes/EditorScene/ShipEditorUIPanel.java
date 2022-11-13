@@ -186,7 +186,7 @@ public class ShipEditorUIPanel extends Stage {
 
                 if(shipName.length() > 0){
                     editor.rootShip.load("./saves/ships/" + shipName + ".ship");
-                    editor.rootShip.drawPoints(true);
+                    // editor.rootShip.drawPoints(true);
                 }
             }
         });

@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.parts_refactor;
+package com.alicornlunaa.spacegame.parts;
 
 import org.json.JSONObject;
 
@@ -25,6 +25,7 @@ public class Part {
     // Variables
     protected Body parent;
     protected ShipState stateRef;
+    protected float physScale;
 
     private TextureRegion texture;
     private PhysicsCollider externalCollider;
@@ -89,6 +90,12 @@ public class Part {
         parent = b;
         externalCollider.setScale(1 / physScale);
         externalCollider.attachCollider(b);
+        this.physScale = physScale;
+    }
+
+    public void buildInterior(Body b, float physScale){
+        internalCollider.setScale(1 / physScale);
+        internalCollider.attachCollider(b);
     }
 
     public void draw(Batch batch, float delta){
@@ -119,6 +126,8 @@ public class Part {
 
     protected void drawEffectsAbove(Batch batch, float delta){}
     protected void drawEffectsBelow(Batch batch, float delta){}
+    public void update(float delta){}
+    public void dispose(){}
 
     // Getters & setters
     public PhysicsCollider getInternalCollider(){ return internalCollider; }
@@ -126,13 +135,34 @@ public class Part {
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }
     public boolean getFlipY(){ return flipY; }
+    public float getX(){ return position.x; }
+    public float getY(){ return position.y; }
+    public float getWidth(){ return size.x; }
+    public float getHeight(){ return size.y; }
+    public float getRotation(){ return rotation; }
     public String getName(){ return name; }
     public String getDescription(){ return description; }
+    public Array<Vector2> getAttachmentPoints(){ return attachmentPoints; }
 
     // Static functions
     public static Part spawn(final App game, final Ship ship, String type, String id){
-        Part p = new Part(game, ship, game.partManager.get(type, id));
-        return p;
+        // Load part information from the json object
+        switch(type){
+            case "AERO":
+                return new Aero(game, ship, game.partManager.get(type, id));
+                
+            case "STRUCTURAL":
+                return new Structural(game, ship, game.partManager.get(type, id));
+                
+            case "THRUSTER":
+                return new Thruster(game, ship, game.partManager.get(type, id));
+                
+            case "RCSPORT":
+                return new RCSPort(game, ship, game.partManager.get(type, id));
+
+            default:
+                return null;
+        }
     }
 
     public static Part unserialize(final App game, final Ship ship, JSONObject obj){
