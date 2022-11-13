@@ -57,7 +57,7 @@ public class Planet extends Celestial {
 
     // Private functions
     private void generateTerrainSprite(){
-        pixmap = new Pixmap(Math.min((int)radius * 2, 2000), Math.min((int)radius * 2, 2000), Format.RGBA8888);
+        pixmap = new Pixmap(Math.min((int)radius * 2, 500), Math.min((int)radius * 2, 500), Format.RGBA8888);
 
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
@@ -80,7 +80,7 @@ public class Planet extends Celestial {
     }
     
     private void generateAtmosphereSprite(){
-        int imgRad = Math.min((int)atmosRadius * 2, 2500);
+        int imgRad = Math.min((int)atmosRadius * 2, 1000);
         pixmap = new Pixmap(imgRad, imgRad, Format.RGBA8888);
 
         for(int x = 0; x < pixmap.getWidth(); x++){
