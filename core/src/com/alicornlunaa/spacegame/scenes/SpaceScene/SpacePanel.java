@@ -39,7 +39,7 @@ public class SpacePanel extends Stage {
         backgroundTexture = new Starfield((int)getWidth(), (int)getHeight());
 
         ship = new Ship(game, world, 0, 0, 0);
-        ship.load("./saves/ships/null.ship");
+        // ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
         universe.addEntity(ship);

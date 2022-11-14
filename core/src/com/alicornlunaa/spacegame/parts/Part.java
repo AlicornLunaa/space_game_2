@@ -135,10 +135,13 @@ public class Part {
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }
     public boolean getFlipY(){ return flipY; }
+    public void setX(float x){ position.x = x; }
+    public void setY(float y){ position.y = y; }
     public float getX(){ return position.x; }
     public float getY(){ return position.y; }
     public float getWidth(){ return size.x; }
     public float getHeight(){ return size.y; }
+    public void setRotation(float rot){ rotation = rot; }
     public float getRotation(){ return rotation; }
     public String getName(){ return name; }
     public String getDescription(){ return description; }

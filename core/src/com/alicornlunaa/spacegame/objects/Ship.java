@@ -104,6 +104,12 @@ public class Ship extends Entity {
         }
     }
 
+    public Array<Part> getParts(){ return parts; }
+
+    public void addPart(Part p){
+        parts.add(p);
+    }
+
     public boolean save(String path){
         try {
             FileHandle file = Gdx.files.local(path);
