@@ -63,6 +63,7 @@ public class EditorScene implements Screen {
     private Ship editorShip;
     private String shipName = "";
     private String selectedCategory = "AERO";
+    private boolean snapped = false;
 
     // Private functions
     private void select(String category){
@@ -84,9 +85,13 @@ public class EditorScene implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 // Place part when clicked
-                editorShip.addPart(ghostPart);
-                ghostPart = null;
+                if(button != Buttons.LEFT) return false;
 
+                if(snapped){
+                    editorShip.addPart(ghostPart);
+                }
+
+                ghostPart = null;
                 editor.removeListener(this);
                 return true;
             }
@@ -256,7 +261,12 @@ public class EditorScene implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                if(button == Buttons.RIGHT){
+                if(button == Buttons.LEFT){
+                    if(ghostPart != null){
+                        // TODO: Create functionality to find which part was clicked, and to pick it up
+                        return true;
+                    }
+                } else if(button == Buttons.RIGHT){
                     prevDrag.set(x, y);
                     return true;
                 }
@@ -288,6 +298,7 @@ public class EditorScene implements Screen {
         Vector2 nearestPartPoint = new Vector2();
         float minDist = Float.MAX_VALUE;
         float minDistGhost = Float.MAX_VALUE;
+        snapped = false;
 
         // Loop every part on the ship
         for(Vector2 partPoint : editorShip.getAttachments().getMap().keySet()){
@@ -316,6 +327,8 @@ public class EditorScene implements Screen {
             ghostTrans = new Matrix3().rotate(ghostPart.getRotation()).scale(ghostPart.getFlipX() ? -1 : 1, ghostPart.getFlipY() ? -1 : 1);
             Vector2 p1 = nearestPartPoint.cpy();
             Vector2 p2 = ghostPart.getAttachmentPoints().get(nearestGhostAttachment).cpy().mul(ghostTrans);
+
+            snapped = true;
             return p1.sub(p2);
         }
 

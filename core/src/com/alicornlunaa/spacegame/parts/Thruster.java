@@ -101,6 +101,13 @@ public class Thruster extends Part {
     }
 
     @Override
+    protected void drawEffectsAbove(Batch batch, float deltaTime){
+        // Reset matrix
+        Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
+        batch.setTransformMatrix(batchMatrix.rotate(0, 0, 1, -currentAngle));
+    }
+
+    @Override
     public void update(float delta){
         float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
 
