@@ -11,8 +11,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -249,6 +252,15 @@ public class EditorScene implements Screen {
         });
     }
 
+    private void drawPoints(Part p){
+        Matrix3 trans = new Matrix3().translate(p.getX(), p.getY()).rotate(p.getRotation());
+
+        for(Vector2 a : p.getAttachmentPoints()){
+            Vector2 v = a.cpy().mul(trans);
+            game.shapeRenderer.circle(v.x, v.y, 1);
+        }
+    }
+
     private void drawEditor(float delta){
         cam.position.set(camOffset, 0);
         cam.update();
@@ -262,9 +274,16 @@ public class EditorScene implements Screen {
             ghostPart.setY(cursor.y);
             ghostPart.draw(batch, delta);
         }
-
+        
         editorShip.draw(batch, 1);
         batch.end();
+        
+        game.shapeRenderer.begin(ShapeType.Filled);
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.setColor(Color.GREEN);
+        for(Part p : editorShip.getParts()){ drawPoints(p); }
+        if(ghostPart != null){ drawPoints(ghostPart); }
+        game.shapeRenderer.end();
     }
 
     // Constructor
