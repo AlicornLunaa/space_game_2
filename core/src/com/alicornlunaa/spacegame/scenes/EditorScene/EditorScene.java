@@ -61,7 +61,7 @@ public class EditorScene implements Screen {
     private Part ghostPart;
     private World editorWorld;
     private Ship editorShip;
-    private String shipName;
+    private String shipName = "";
     private String selectedCategory = "AERO";
 
     // Private functions
@@ -281,6 +281,57 @@ public class EditorScene implements Screen {
         }
     }
 
+    private Vector2 getPartPos(){
+        // Get the closest snapping attachment point, otherwise just the cursor
+        // Linear search the two nearest points
+        int nearestGhostAttachment = 0;
+        int nearestShipAttachment = 0;
+        int nearestShipPart = 0;
+        Vector2 nearestPartPoint = new Vector2();
+        float minDist = Float.MAX_VALUE;
+        float minDistGhost = Float.MAX_VALUE;
+
+        // Loop every part on the ship
+        for(int j = 0; j < editorShip.getParts().size; j++){
+            Part part = editorShip.getParts().get(j);
+            Matrix3 partTrans = new Matrix3().translate(part.getX(), part.getY()).rotate(part.getRotation());
+            
+            for(int k = 0; k < part.getAttachmentPoints().size; k++){
+                Vector2 partAttachmentLocal = part.getAttachmentPoints().get(k);
+                Vector2 partPoint = partAttachmentLocal.cpy().mul(partTrans);
+                float dist = partPoint.dst(cursor);
+
+                if(dist < minDist){
+                    nearestShipAttachment = k;
+                    nearestShipPart = j;
+                    nearestPartPoint = partPoint;
+                    minDist = dist;
+                }
+            }
+        }
+
+        // Find mating point
+        Matrix3 ghostTrans = new Matrix3().translate(ghostPart.getX(), ghostPart.getY()).rotate(ghostPart.getRotation());
+        for(int i = 0; i < ghostPart.getAttachmentPoints().size; i++){
+            Vector2 ghostAttachmentLocal = ghostPart.getAttachmentPoints().get(i);
+            Vector2 ghostPoint = ghostAttachmentLocal.cpy().mul(ghostTrans);
+            float dist = ghostPoint.dst(nearestPartPoint);
+
+            if(dist < minDistGhost){
+                nearestGhostAttachment = i;
+                minDistGhost = dist;
+            }
+        }
+
+        if(minDist < 16){
+            Vector2 p1 = nearestPartPoint.cpy();
+            Vector2 p2 = ghostPart.getAttachmentPoints().get(nearestGhostAttachment).cpy();
+            return p1.sub(p2);
+        }
+
+        return cursor;
+    }
+
     private void drawEditor(float delta){
         cam.position.set(camOffset, 0);
         cam.update();
@@ -290,8 +341,9 @@ public class EditorScene implements Screen {
         batch.setProjectionMatrix(cam.combined);
         
         if(ghostPart != null){
-            ghostPart.setX(cursor.x);
-            ghostPart.setY(cursor.y);
+            Vector2 pos = getPartPos();
+            ghostPart.setX(pos.x);
+            ghostPart.setY(pos.y);
             ghostPart.draw(batch, delta);
         }
         

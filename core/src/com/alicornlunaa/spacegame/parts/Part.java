@@ -36,6 +36,7 @@ public class Part {
     private String id;
     private String name;
     private String description;
+    private boolean freeform = false;
     private boolean flipX = false;
     private boolean flipY = false;
     private Vector2 position = new Vector2();
@@ -67,6 +68,7 @@ public class Part {
         id = obj.getString("id");
         name = obj.getString("name");
         description = obj.getString("desc");
+        freeform = obj.optBoolean("freeform", false);
 
         texture = game.atlas.findRegion("parts/" + id.toLowerCase());
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
@@ -131,6 +133,7 @@ public class Part {
 
     // Getters & setters
     public PhysicsCollider getInternalCollider(){ return internalCollider; }
+    public boolean getFreeform(){ return freeform; }
     public void setFlipX(){ flipX = !flipX; }
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }
