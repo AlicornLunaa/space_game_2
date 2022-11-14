@@ -324,8 +324,9 @@ public class EditorScene implements Screen {
         }
 
         if(minDist < 16){
+            ghostTrans = new Matrix3().rotate(ghostPart.getRotation());
             Vector2 p1 = nearestPartPoint.cpy();
-            Vector2 p2 = ghostPart.getAttachmentPoints().get(nearestGhostAttachment).cpy();
+            Vector2 p2 = ghostPart.getAttachmentPoints().get(nearestGhostAttachment).cpy().mul(ghostTrans);
             return p1.sub(p2);
         }
 
