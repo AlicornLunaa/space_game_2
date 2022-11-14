@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.EditorScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.parts.Part;
 import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
@@ -285,28 +285,17 @@ public class EditorScene implements Screen {
         // Get the closest snapping attachment point, otherwise just the cursor
         // Linear search the two nearest points
         int nearestGhostAttachment = 0;
-        int nearestShipAttachment = 0;
-        int nearestShipPart = 0;
         Vector2 nearestPartPoint = new Vector2();
         float minDist = Float.MAX_VALUE;
         float minDistGhost = Float.MAX_VALUE;
 
         // Loop every part on the ship
-        for(int j = 0; j < editorShip.getParts().size; j++){
-            Part part = editorShip.getParts().get(j);
-            Matrix3 partTrans = new Matrix3().translate(part.getX(), part.getY()).rotate(part.getRotation());
-            
-            for(int k = 0; k < part.getAttachmentPoints().size; k++){
-                Vector2 partAttachmentLocal = part.getAttachmentPoints().get(k);
-                Vector2 partPoint = partAttachmentLocal.cpy().mul(partTrans);
-                float dist = partPoint.dst(cursor);
+        for(Vector2 partPoint : editorShip.getAttachments().getMap().keySet()){
+            float dist = partPoint.dst(cursor);
 
-                if(dist < minDist){
-                    nearestShipAttachment = k;
-                    nearestShipPart = j;
-                    nearestPartPoint = partPoint;
-                    minDist = dist;
-                }
+            if(dist < minDist){
+                nearestPartPoint = partPoint;
+                minDist = dist;
             }
         }
 
@@ -323,8 +312,8 @@ public class EditorScene implements Screen {
             }
         }
 
-        if(minDist < 16){
-            ghostTrans = new Matrix3().rotate(ghostPart.getRotation());
+        if(minDist < 16 && !editorShip.getAttachments().getActive(nearestPartPoint)){
+            ghostTrans = new Matrix3().rotate(ghostPart.getRotation()).scale(ghostPart.getFlipX() ? -1 : 1, ghostPart.getFlipY() ? -1 : 1);
             Vector2 p1 = nearestPartPoint.cpy();
             Vector2 p2 = ghostPart.getAttachmentPoints().get(nearestGhostAttachment).cpy().mul(ghostTrans);
             return p1.sub(p2);
@@ -354,7 +343,10 @@ public class EditorScene implements Screen {
         game.shapeRenderer.begin(ShapeType.Filled);
         game.shapeRenderer.setProjectionMatrix(cam.combined);
         game.shapeRenderer.setColor(Color.GREEN);
-        for(Part p : editorShip.getParts()){ drawPoints(p); }
+        for(Vector2 pos : editorShip.getAttachments().getMap().keySet()){
+            game.shapeRenderer.setColor(editorShip.getAttachments().getActive(pos) ? Color.RED : Color.GREEN);
+            game.shapeRenderer.circle(pos.x, pos.y, 1.0f);
+        }
         if(ghostPart != null){ drawPoints(ghostPart); }
         game.shapeRenderer.end();
     }

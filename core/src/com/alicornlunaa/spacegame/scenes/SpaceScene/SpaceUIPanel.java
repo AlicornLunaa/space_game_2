@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.SpaceScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.scenes.MapScene.MapScene;
 import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.ShipViewScene.ShipViewScene;

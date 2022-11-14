@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.parts;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;

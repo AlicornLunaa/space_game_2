@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.ShipViewScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;

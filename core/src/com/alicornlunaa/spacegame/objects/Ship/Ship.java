@@ -1,10 +1,11 @@
-package com.alicornlunaa.spacegame.objects;
+package com.alicornlunaa.spacegame.objects.Ship;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.parts.Part;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -31,6 +32,7 @@ public class Ship extends Entity {
     // Variables
     private final App game;
     private Array<Part> parts = new Array<>();
+    private AttachmentList attachments = new AttachmentList();
     
     public ShipState state = new ShipState(); // Ship controls and stuff
     
@@ -99,9 +101,14 @@ public class Ship extends Entity {
         }
     }
 
+    public AttachmentList getAttachments(){ return attachments; }
+
     public Array<Part> getParts(){ return parts; }
 
-    public void addPart(Part p){ parts.add(p); }
+    public void addPart(Part p){
+        parts.add(p);
+        attachments.addPart(p);
+    }
 
     public boolean save(String path){
         try {
@@ -138,7 +145,7 @@ public class Ship extends Entity {
             JSONArray partArray = data.getJSONArray("assembly");
             parts.clear();
             for(int i = 0; i < partArray.length(); i++){
-                parts.add(Part.unserialize(game, this, partArray.getJSONObject(i)));
+                addPart(Part.unserialize(game, this, partArray.getJSONObject(i)));
             }
             assemble();
 
