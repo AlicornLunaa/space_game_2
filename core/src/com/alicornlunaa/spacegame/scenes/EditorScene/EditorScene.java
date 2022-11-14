@@ -9,6 +9,7 @@ import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -31,8 +32,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
+import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
+import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
+import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class EditorScene implements Screen {
@@ -45,6 +51,9 @@ public class EditorScene implements Screen {
     private Stage ui;
     private Stage editor;
     private OrthographicCamera cam;
+
+    // UI variables
+    private FileChooser fileChooser;
 
     // Editor variables
     private Vector2 cursor = new Vector2();
@@ -111,6 +120,9 @@ public class EditorScene implements Screen {
     private void initUI(){
         SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
         builder.build(ui, game.skin, Gdx.files.internal("layouts/editor_hud.json"));
+        
+        fileChooser = new FileChooser(Gdx.files.internal("./saves/ships"), Mode.OPEN);
+        fileChooser.setSelectionMode(SelectionMode.FILES);
 
         ui.getRoot().findActor("shipnamebar").addListener(new ChangeListener() {
             @Override
@@ -152,7 +164,15 @@ public class EditorScene implements Screen {
         ui.getRoot().findActor("loadbutton").addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                // TODO: Open file explorer for ship
+                fileChooser.setListener(new FileChooserAdapter() {
+                    @Override
+                    public void selected(Array<FileHandle> files) {
+                        FileHandle bodyHandle = files.first();
+                        editorShip.load(bodyHandle.path());
+                    }
+                });
+                
+                ui.addActor(fileChooser);
             }
         });
 
