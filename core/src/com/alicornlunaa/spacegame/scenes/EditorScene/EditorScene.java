@@ -64,6 +64,7 @@ public class EditorScene implements Screen {
     private String shipName = "";
     private String selectedCategory = "AERO";
     private boolean snapped = false;
+    private ClickListener ghostPartListener;
 
     // Private functions
     private void select(String category){
@@ -81,21 +82,7 @@ public class EditorScene implements Screen {
 
         // Put a ghosted part on the cursor
         ghostPart = Part.spawn(game, editorShip, selectedCategory, partID);
-        editor.addListener(new ClickListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                // Place part when clicked
-                if(button != Buttons.LEFT) return false;
-
-                if(snapped){
-                    editorShip.addPart(ghostPart);
-                }
-
-                ghostPart = null;
-                editor.removeListener(this);
-                return true;
-            }
-        });
+        editor.addListener(ghostPartListener);
     }
 
     private VerticalGroup addPartList(final String category){
@@ -263,13 +250,14 @@ public class EditorScene implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 if(button == Buttons.LEFT){
                     if(ghostPart == null){
-                        // TODO: Create functionality to find which part was clicked, and to pick it up
                         for(Part p : editorShip.getParts()){
                             if(p.hit(cursor)){
-                                System.out.println(p);
+                                editorShip.removePart(p);
+                                ghostPart = p;
+                                editor.addListener(ghostPartListener);
+                                return true;
                             }
                         }
-                        return true;
                     }
                 } else if(button == Buttons.RIGHT){
                     prevDrag.set(x, y);
@@ -285,6 +273,22 @@ public class EditorScene implements Screen {
                 camOffset.add(vel);
             }
         });
+    
+        ghostPartListener = new ClickListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                // Place part when clicked
+                if(button != Buttons.LEFT) return false;
+
+                if(snapped){
+                    editorShip.addPart(ghostPart);
+                }
+
+                ghostPart = null;
+                editor.removeListener(this);
+                return true;
+            }
+        };
     }
 
     private void drawPoints(Part p){

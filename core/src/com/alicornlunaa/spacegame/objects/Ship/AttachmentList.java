@@ -12,8 +12,22 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class AttachmentList {
 
+    // Classes
+    private static class Attachment {
+        /** This class exists to count the number of attachments so when a part is removed, the correct
+         * points are kept.
+         */
+        private boolean inUse = false;
+        private int count = 0;
+
+        private Attachment(boolean inUse, int count){
+            this.inUse = inUse;
+            this.count = count;
+        }
+    };
+
     // Variables
-    private HashMap<Vector2, Boolean> attachments = new HashMap<>();
+    private HashMap<Vector2, Attachment> attachments = new HashMap<>();
     
     // Constructor
     public AttachmentList(){}
@@ -23,7 +37,14 @@ public class AttachmentList {
         Matrix3 partTrans = new Matrix3().translate(p.getX(), p.getY()).rotate(p.getRotation()).scale(p.getFlipX() ? -1 : 1, p.getFlipY() ? -1 : 1);
         for(Vector2 a : p.getAttachmentPoints()){
             Vector2 transformed = a.cpy().mul(partTrans);
-            attachments.put(transformed, attachments.containsKey(transformed));
+
+            // If the attachment exists, add one ot the count, otherwise add new
+            if(attachments.containsKey(transformed)){
+                attachments.get(transformed).inUse = true;
+                attachments.get(transformed).count++;
+            } else {
+                attachments.put(transformed, new Attachment(false, 1));
+            }
         }
     }
 
@@ -33,19 +54,21 @@ public class AttachmentList {
             Vector2 transformed = a.cpy().mul(partTrans);
 
             if(attachments.containsKey(transformed)){
-                attachments.remove(transformed);
+                attachments.get(transformed).count--;
+
+                if(attachments.get(transformed).count == 0){
+                    attachments.remove(transformed);
+                } else if(attachments.get(transformed).count == 1){
+                    attachments.get(transformed).inUse = false;
+                }
             }
         }
     }
 
-    public void setActive(Vector2 pos, boolean active){
-        attachments.put(pos, active);
-    }
-
     public boolean getActive(Vector2 pos){
-        return attachments.get(pos);
+        return attachments.get(pos).inUse;
     }
 
-    public HashMap<Vector2, Boolean> getMap(){ return attachments; }
+    public HashMap<Vector2, Attachment> getMap(){ return attachments; }
 
 }

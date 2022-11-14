@@ -110,6 +110,11 @@ public class Ship extends Entity {
         attachments.addPart(p);
     }
 
+    public void removePart(Part p){
+        parts.removeValue(p, true);
+        attachments.removePart(p);
+    }
+
     public boolean save(String path){
         try {
             FileHandle file = Gdx.files.local(path);
