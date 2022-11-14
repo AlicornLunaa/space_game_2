@@ -170,7 +170,7 @@ public class Part {
 
     public static Part unserialize(final App game, final Ship ship, JSONObject obj){
         String type = obj.getString("type");
-        String id = obj.getString("type");
+        String id = obj.getString("id");
         float x = obj.getFloat("x");
         float y = obj.getFloat("y");
         float rotation = obj.getFloat("rotation");

@@ -17,7 +17,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
@@ -94,10 +93,6 @@ public class Ship extends Entity {
     // Space functions
     public void assemble(){
         // Puts all the parts together with their respective physics bodies
-        for(Fixture f : body.getFixtureList()){
-            body.destroyFixture(f);
-        }
-        
         for(Part p : parts){
             p.setParent(body, Constants.PPM);
             p.buildInterior(internalBody, Constants.SHIP_PPM);
@@ -106,9 +101,7 @@ public class Ship extends Entity {
 
     public Array<Part> getParts(){ return parts; }
 
-    public void addPart(Part p){
-        parts.add(p);
-    }
+    public void addPart(Part p){ parts.add(p); }
 
     public boolean save(String path){
         try {
