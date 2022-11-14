@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
@@ -111,6 +112,13 @@ public class Part {
             rotation
         );
         drawEffectsAbove(batch, delta);
+    }
+
+    public boolean hit(Vector2 p){
+        // Convert point into part-space coordinates
+        Matrix3 trans = new Matrix3().translate(getX(), getY()).rotate(getRotation()).scale(flipX ? -1 : 1, flipY ? -1 : 1).inv();
+        Vector2 localPoint = p.cpy().mul(trans);
+        return ((localPoint.x < size.x / 2 && localPoint.x > size.x / -2) && (localPoint.y < size.y / 2 && localPoint.y > size.y / -2));
     }
 
     public JSONObject serialize(){

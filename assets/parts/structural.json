@@ -12,6 +12,22 @@
             {"x": 7.5, "y": 0},
             {"x": -7.5, "y": 0}
         ],
+        "internalShape": [
+            [
+                -15, -15,
+                15, -15,
+                15, 15,
+                -15, 15
+            ]
+        ],
+        "externalShape": [
+            [
+                -15, -15,
+                15, -15,
+                15, 15,
+                -15, 15
+            ]
+        ],
         "metadata": {
             "fuelCapacity": 1000,
             "batteryCapacity": 1000

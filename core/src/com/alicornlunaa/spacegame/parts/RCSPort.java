@@ -5,7 +5,9 @@ import org.json.JSONObject;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter.ScaledNumericValue;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -82,9 +84,17 @@ public class RCSPort extends Part {
     }
     
     @Override
-    protected void drawEffectsAbove(Batch batch, float deltaTime){
+    protected void drawEffectsBelow(Batch batch, float deltaTime){
         if(scale <= 0.01f) return;
 
+        for(ParticleEmitter emitter : effect.getEmitters()){
+            ScaledNumericValue emitterAngle = emitter.getAngle();
+            emitterAngle.setHigh(getRotation() - 180);
+            emitterAngle.setLow(getRotation() - 180);
+        }
+
+        effect.setPosition(getX(), getY());
+        effect.setFlip(getFlipX(), getFlipY());
         effect.update(deltaTime);
         effect.draw(batch, deltaTime);
     }
@@ -92,6 +102,7 @@ public class RCSPort extends Part {
     @Override
     public void update(float delta){
         if(stateRef.rcs){
+            // TODO: Convert this logic to ship-space coordinates
             Vector2 portPos = new Vector2(getX() / physScale, getY() / physScale).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
             Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getWidth() / 2).scl(getFlipX() ? -1 : 1, getFlipY() ? -1 : 1);
 

@@ -262,8 +262,13 @@ public class EditorScene implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 if(button == Buttons.LEFT){
-                    if(ghostPart != null){
+                    if(ghostPart == null){
                         // TODO: Create functionality to find which part was clicked, and to pick it up
+                        for(Part p : editorShip.getParts()){
+                            if(p.hit(cursor)){
+                                System.out.println(p);
+                            }
+                        }
                         return true;
                     }
                 } else if(button == Buttons.RIGHT){
