@@ -734,7 +734,7 @@ public class PartEditor implements Screen {
     public PartEditor(final App game){
         // Initialize components
         this.game = game;
-        referenceImage = new Texture(Gdx.files.internal("textures/parts/aero/med_cmd_pod.png"));
+        referenceImage = new Texture(Gdx.files.internal("textures/parts/med_cmd_pod.png"));
 
         initUI();
         initEditor();

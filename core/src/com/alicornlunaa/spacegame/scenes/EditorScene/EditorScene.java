@@ -3,10 +3,10 @@ package com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.parts.Part;
-import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.alicornlunaa.spacegame.widgets.ConsoleWidget;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.files.FileHandle;
@@ -35,6 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
@@ -194,7 +195,9 @@ public class EditorScene implements Screen {
                     game.setScreen(new PauseScene(game, (int)ui.getWidth(), (int)ui.getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, (int)ui.getWidth(), (int)ui.getHeight()));
+                    VisWindow console = new ConsoleWidget(game).fadeIn(0.15f);
+                    ui.addActor(console);
+                    ui.setKeyboardFocus(console);
                     return true;
                 }
 
