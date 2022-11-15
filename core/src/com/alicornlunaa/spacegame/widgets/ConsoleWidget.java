@@ -2,8 +2,7 @@ package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
-import com.alicornlunaa.spacegame.scenes.DevScenes.PartEditor;
-import com.alicornlunaa.spacegame.scenes.DevScenes.PhysEditor;
+import com.alicornlunaa.spacegame.scenes.DevEditors.PartEditor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -43,8 +42,6 @@ public class ConsoleWidget extends VisWindow {
             game.spaceScene.spacePanel.universe.setTimewarp(Float.parseFloat(args[1]));
         } else if(args[0].equals("reload_shaders")){
             ((Star)game.spaceScene.spacePanel.universe.getCelestial(0)).reloadShaders();
-        } else if(args[0].equals("phys_editor")){
-            game.setScreen(new PhysEditor(game));
         } else if(args[0].equals("part_editor")){
             game.setScreen(new PartEditor(game));
         }

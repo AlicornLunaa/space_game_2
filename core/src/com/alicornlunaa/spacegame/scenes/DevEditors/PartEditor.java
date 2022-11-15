@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.DevScenes;
+package com.alicornlunaa.spacegame.scenes.DevEditors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +37,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
+import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 
 /**
  * The part editor has four modes so far. The exterior controls the shape given to the universe
@@ -60,8 +61,7 @@ public class PartEditor implements Screen {
             disableWhen = ps.disableWhen;
         }
 
-        private JSONObject serialize(){
-            JSONObject o = new JSONObject();
+        private JSONArray serialize(){
             JSONArray arr = new JSONArray();
             
             for(Vector2 v : vertices){
@@ -69,9 +69,7 @@ public class PartEditor implements Screen {
                 arr.put(v.y);
             }
 
-            o.put("vertices", arr);
-            o.put("disableWhen", disableWhen);
-            return o;
+            return arr;
         }
     }
 
@@ -84,6 +82,7 @@ public class PartEditor implements Screen {
     // UI variables
     private VisTable root;
     private FileChooser fileChooser;
+    private TabbedPane tabs;
 
     // Editor variables
     private enum EditType { SHAPE_EDITOR_WORLD, SHAPE_EDITOR_INTERIOR, ATTACHMENT_EDITOR, ANIMATOR };
@@ -124,19 +123,19 @@ public class PartEditor implements Screen {
     private void savePart(FileHandle handle){
         JSONObject o = new JSONObject();
 
-        // Save world polygons
-        JSONArray world = new JSONArray();
+        // Save exterior polygons
+        JSONArray exterior = new JSONArray();
         for(PhysShape s : worldShapes){
-            world.put(s.serialize());
+            exterior.put(s.serialize());
         }
-        o.put("worldShapes", world);
+        o.put("exteriorShape", exterior);
 
         // Save interior polygons
         JSONArray interior = new JSONArray();
         for(PhysShape s : interiorShapes){
             interior.put(s.serialize());
         }
-        o.put("interiorShapes", interior);
+        o.put("interiorShape", interior);
 
         // Save attachment points
         JSONArray attaches = new JSONArray();
@@ -160,6 +159,10 @@ public class PartEditor implements Screen {
         handle.writeString(o.toString(4), false);
     }
 
+    private void loadPart(FileHandle handle){
+        addCategory("Test");
+    }
+
     private void changeMode(EditType type){
         mode = type;
         editor.removeListener(currentControl);
@@ -173,6 +176,11 @@ public class PartEditor implements Screen {
         }
         
         editor.addListener(currentControl);
+    }
+
+    private void addCategory(String name){
+        /** Adds category to the editors tabs */
+
     }
 
     private void initUI(){
@@ -190,30 +198,15 @@ public class PartEditor implements Screen {
         menuBar.addMenu(modeMenu);
         menuBar.addMenu(settingsMenu);
         root.add(menuBar.getTable()).fillX().expandX().top().row();
+
+        tabs = new TabbedPane();
+        root.add(tabs.getTable()).fillX().expandX().top().row();
         root.add().fill().expand().row();
 
-        fileChooser = new FileChooser("Reference Image", Mode.OPEN);
+        fileChooser = new FileChooser("Part Editor", Mode.OPEN);
         fileChooser.setSelectionMode(SelectionMode.FILES);
 
-        fileMenu.addItem(new MenuItem("Load reference image", new ChangeListener(){
-            @Override
-            public void changed(ChangeEvent event, Actor a){
-                // Load an image with a file chooser
-                fileChooser.setMode(Mode.OPEN);
-                fileChooser.setListener(new FileChooserAdapter() {
-                    @Override
-                    public void selected(Array<FileHandle> files) {
-                        FileHandle imgHandle = files.first();
-                        referenceImage.dispose();
-                        referenceImage = new Texture(imgHandle);
-                    }
-                });
-
-                ui.addActor(fileChooser);
-            }
-        }));
-
-        fileMenu.addItem(new MenuItem("Save part", new ChangeListener(){
+        fileMenu.addItem(new MenuItem("New", new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Load an image with a file chooser
@@ -230,21 +223,39 @@ public class PartEditor implements Screen {
             }
         }));
 
-        // fileMenu.addItem(new MenuItem("Import part", new ChangeListener(){
-        //     @Override
-        //     public void changed(ChangeEvent event, Actor a){
-        //         // Load an image with a file chooser
-        //         fileChooser.setMode(Mode.SAVE);
-        //         fileChooser.setListener(new FileChooserAdapter() {
-        //             @Override
-        //             public void selected(Array<FileHandle> files) {
-        //                 FileHandle bodyHandle = files.first();
-        //             }
-        //         });
+        fileMenu.addItem(new MenuItem("Export", new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent event, Actor a){
+                // Load an image with a file chooser
+                fileChooser.setMode(Mode.SAVE);
+                fileChooser.setListener(new FileChooserAdapter() {
+                    @Override
+                    public void selected(Array<FileHandle> files) {
+                        FileHandle bodyHandle = files.first();
+                        savePart(bodyHandle);
+                    }
+                });
                 
-        //         ui.addActor(fileChooser);
-        //     }
-        // }));
+                ui.addActor(fileChooser);
+            }
+        }));
+
+        fileMenu.addItem(new MenuItem("Import", new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent event, Actor a){
+                // Load an image with a file chooser
+                fileChooser.setMode(Mode.OPEN);
+                fileChooser.setListener(new FileChooserAdapter() {
+                    @Override
+                    public void selected(Array<FileHandle> files) {
+                        FileHandle bodyHandle = files.first();
+                        loadPart(bodyHandle);
+                    }
+                });
+                
+                ui.addActor(fileChooser);
+            }
+        }));
 
         modeMenu.addItem(new MenuItem("Exterior Shape", new ChangeListener(){
             @Override
