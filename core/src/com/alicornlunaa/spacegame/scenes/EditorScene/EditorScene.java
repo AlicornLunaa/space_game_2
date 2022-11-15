@@ -296,6 +296,7 @@ public class EditorScene implements Screen {
 
         for(Vector2 a : p.getAttachmentPoints()){
             Vector2 v = a.cpy().mul(trans);
+            game.shapeRenderer.setColor(Color.GREEN);
             game.shapeRenderer.circle(v.x, v.y, 1);
         }
     }
@@ -353,10 +354,14 @@ public class EditorScene implements Screen {
         batch.setProjectionMatrix(cam.combined);
         
         if(ghostPart != null){
+            batch.setColor(0.8f, 0.8f, 0.8f, 0.5f);
+
             Vector2 pos = getPartPos();
             ghostPart.setX(pos.x);
             ghostPart.setY(pos.y);
             ghostPart.draw(batch, delta);
+
+            batch.setColor(1, 1, 1, 1);
         }
         
         editorShip.draw(batch, 1);
