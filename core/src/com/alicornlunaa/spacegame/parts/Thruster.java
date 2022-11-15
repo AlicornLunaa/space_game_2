@@ -90,20 +90,26 @@ public class Thruster extends Part {
         }
 
         // Draw effects
-        Vector3 pos = new Vector3(getX(), getY(), 0).mul(batchMatrix.inv());
+        Vector3 pos = new Vector3(getX(), getY() - getHeight() / 2, 0).rotate(currentAngle, 0, 0, 1).mul(batchMatrix.inv());
         effect.setPosition(pos.x, pos.y);
         effect.update(deltaTime);
         effect.draw(batch, deltaTime);
         
         // Adjust thruster angle
-        batch.setTransformMatrix(batchMatrix.rotate(0, 0, 1, currentAngle));
+        batchMatrix.translate(getX(), getY(), 0);
+        batchMatrix.rotate(0, 0, 1, currentAngle);
+        batchMatrix.translate(-getX(), -getY(), 0);
+        batch.setTransformMatrix(batchMatrix);
     }
 
     @Override
     protected void drawEffectsAbove(Batch batch, float deltaTime){
         // Reset matrix
         Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
-        batch.setTransformMatrix(batchMatrix.rotate(0, 0, 1, -currentAngle));
+        batchMatrix.translate(getX(), getY(), 0);
+        batchMatrix.rotate(0, 0, 1, -currentAngle);
+        batchMatrix.translate(-getX(), -getY(), 0);
+        batch.setTransformMatrix(batchMatrix);
     }
 
     @Override
