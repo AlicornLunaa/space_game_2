@@ -92,12 +92,16 @@ public class Part {
     public void setParent(Body b, float physScale){
         parent = b;
         externalCollider.setScale(1 / physScale);
+        externalCollider.setPosition(position.cpy().scl(1 / physScale));
+        externalCollider.setRotation(rotation);
         externalCollider.attachCollider(b);
         this.physScale = physScale;
     }
 
     public void buildInterior(Body b, float physScale){
         internalCollider.setScale(1 / physScale);
+        externalCollider.setPosition(position.cpy().scl(1 / physScale));
+        externalCollider.setRotation(rotation);
         internalCollider.attachCollider(b);
     }
 

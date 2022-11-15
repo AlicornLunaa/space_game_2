@@ -58,7 +58,7 @@ public class RCSPort extends Part {
         float adj = portDir.dot(parentVert);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta / physScale), true);
+        parent.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / physScale), true);
 
         return adj;
     }
@@ -68,7 +68,7 @@ public class RCSPort extends Part {
         float adj = portDir.dot(parentHori);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(portDir.cpy().scl(power * adj * delta / physScale), true);
+        parent.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / physScale), true);
 
         return adj;
     }
@@ -79,7 +79,7 @@ public class RCSPort extends Part {
         Vector2 parentRight = new Vector2(1, 0).rotateRad(parent.getAngle());
         float adj = Math.abs(portDir.dot(parentRight)) * -1;
 
-        parent.applyForce(portDir.cpy().scl(power * adj * delta / physScale), portPos, true);
+        parent.applyForce(portDir.cpy().scl(power * -adj * delta / physScale), portPos, true);
         return adj;
     }
     
@@ -102,7 +102,6 @@ public class RCSPort extends Part {
     @Override
     public void update(float delta){
         if(stateRef.rcs){
-            // TODO: Convert this logic to ship-space coordinates
             Vector2 portPos = new Vector2(getX() / physScale, getY() / physScale).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
             Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getWidth() / 2).scl(getFlipX() ? -1 : 1, getFlipY() ? -1 : 1);
 
@@ -110,8 +109,8 @@ public class RCSPort extends Part {
 
             float thrust = 0.0f;
             thrust += rollThrust(delta, getSignAtPos() * compRoll, portPos, portDir);
-            thrust += verticalThrust(delta, stateRef.vertical, portPos, portDir);
-            thrust += horizontalThrust(delta, stateRef.horizontal, portPos, portDir);
+            thrust += verticalThrust(delta, -stateRef.vertical, portPos, portDir);
+            thrust += horizontalThrust(delta, -stateRef.horizontal, portPos, portDir);
             thrust = Math.min(Math.max(thrust, -1), 1);
 
             effect.scaleEffect(1 / scale);

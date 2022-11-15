@@ -88,6 +88,7 @@ public class PhysicsCollider {
             
             FixtureDef def = new FixtureDef();
             def.shape = physShape;
+            def.density = 0.1f;
             b.createFixture(def);
 
             physShape.dispose();
