@@ -4,7 +4,7 @@
             "drag": 1,
             "lift": 1
         },
-        "interiorShape": [
+        "internalShape": [
             [
                 -8,
                 -7,
@@ -100,7 +100,7 @@
                 7
             ]
         ],
-        "exteriorShape": [[
+        "externalShape": [[
             -8,
             -7,
             8,

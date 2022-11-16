@@ -128,14 +128,14 @@ public class PartEditor implements Screen {
         for(PhysShape s : worldShapes){
             exterior.put(s.serialize());
         }
-        o.put("exteriorShape", exterior);
+        o.put("externalShape", exterior);
 
         // Save interior polygons
         JSONArray interior = new JSONArray();
         for(PhysShape s : interiorShapes){
             interior.put(s.serialize());
         }
-        o.put("interiorShape", interior);
+        o.put("internalShape", interior);
 
         // Save attachment points
         JSONArray attaches = new JSONArray();
@@ -501,8 +501,7 @@ public class PartEditor implements Screen {
                             for(int j = 0; j < interiorShapes.get(i).vertices.size; j++){
                                 if(!cursor.equals(interiorShapes.get(i).vertices.get(j))) continue;
                                 editingVertexShapeID = i;
-
-                                shapePopup.showMenu(ui, cursor.x, cursor.y);
+                                shapePopup.showMenu(ui, x, y);
                             }
                         }
                     }
