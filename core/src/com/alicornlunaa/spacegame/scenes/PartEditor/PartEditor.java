@@ -50,32 +50,6 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
  */
 public class PartEditor implements Screen {
 
-    // Classes
-    private static class PhysShape {
-        private Array<Vector2> vertices = new Array<>();
-        private int disableWhen = -1; // The index of the attachment point to disable this collider when attached
-
-        private PhysShape(){}
-        private PhysShape(PhysShape ps){
-            for(Vector2 v : ps.vertices){
-                vertices.add(v.cpy());
-            }
-
-            disableWhen = ps.disableWhen;
-        }
-
-        private JSONArray serialize(){
-            JSONArray arr = new JSONArray();
-            
-            for(Vector2 v : vertices){
-                arr.put(v.x);
-                arr.put(v.y);
-            }
-
-            return arr;
-        }
-    }
-
     // Variables
     private final App game;
     private Stage ui;
@@ -115,7 +89,7 @@ public class PartEditor implements Screen {
     private boolean lineStarted = false;
     private Vector2 start = new Vector2();
     private Vector2 point1 = new Vector2();
-    private PhysShape currentShape = new PhysShape();
+    private PhysShape currentShape;
     private InputListener worldEditorControls;
     private InputListener interiorEditorControls;
 
@@ -216,6 +190,7 @@ public class PartEditor implements Screen {
         editorPanes.add(new AttachmentEditor(game));
 
         splitPane = new VisSplitPane(partSettings, editorPanes, false);
+        splitPane.setSplitAmount(0.25f);
         root.add(splitPane).fill().expand().row();
 
         fileChooser = new FileChooser("Part Editor", Mode.OPEN);
@@ -404,6 +379,7 @@ public class PartEditor implements Screen {
         // Create editor variables
         editor = new Stage(new FillViewport(640, 360));
         editorCam = (OrthographicCamera)editor.getCamera();
+        currentShape = new PhysShape(game.shapeRenderer);
 
         shapePopup = new PopupMenu();
         shapePopup.addItem(new MenuItem("Delete", new ChangeListener(){
@@ -485,7 +461,7 @@ public class PartEditor implements Screen {
                         if(point1.equals(start)){
                             // End the shape
                             lineStarted = false;
-                            worldShapes.add(new PhysShape(currentShape));
+                            worldShapes.add(new PhysShape(game.shapeRenderer, currentShape));
                             currentShape.vertices.clear();
                         }
                     }
@@ -560,7 +536,7 @@ public class PartEditor implements Screen {
                         if(point1.equals(start)){
                             // End the shape
                             lineStarted = false;
-                            interiorShapes.add(new PhysShape(currentShape));
+                            interiorShapes.add(new PhysShape(game.shapeRenderer, currentShape));
                             currentShape.vertices.clear();
                         }
                     }
@@ -794,10 +770,6 @@ public class PartEditor implements Screen {
 
         ui.getViewport().apply();
         renderUI(delta);
-
-        for(Actor a : editorPanes.getChildren()){
-            ((AttachmentEditor)a).render(delta);
-        }
     }
 
     @Override
