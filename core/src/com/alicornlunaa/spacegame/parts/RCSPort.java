@@ -59,6 +59,7 @@ public class RCSPort extends Part {
         if(adj >= 0) return 0.0f;
 
         parent.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / physScale), true);
+        stateRef.rcsStored -= (fuelUsage * power * -adj * delta);
 
         return adj;
     }
@@ -69,6 +70,7 @@ public class RCSPort extends Part {
         if(adj >= 0) return 0.0f;
 
         parent.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / physScale), true);
+        stateRef.rcsStored -= (fuelUsage * power * -adj * delta);
 
         return adj;
     }
@@ -80,6 +82,8 @@ public class RCSPort extends Part {
         float adj = Math.abs(portDir.dot(parentRight)) * -1;
 
         parent.applyForce(portDir.cpy().scl(power * -adj * delta / physScale), portPos, true);
+        stateRef.rcsStored -= (fuelUsage * power * -adj * delta);
+
         return adj;
     }
     

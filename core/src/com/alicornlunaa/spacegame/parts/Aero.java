@@ -19,4 +19,8 @@ public class Aero extends Part {
         lift = metadata.getFloat("lift");
     }
 
+    // Getters
+    public float getDrag(){ return drag; }
+    public float getLift(){ return lift; }
+
 }

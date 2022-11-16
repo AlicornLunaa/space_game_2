@@ -19,4 +19,8 @@ public class Structural extends Part {
         batteryCapacity = metadata.getFloat("batteryCapacity");
     }
 
+    // Getters
+    public float getFuelCapacity(){ return fuelCapacity; }
+    public float getBatteryCapacity(){ return batteryCapacity; }
+
 }

@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.PhysicsCollider;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
@@ -100,8 +101,8 @@ public class Part {
 
     public void buildInterior(Body b, float physScale){
         internalCollider.setScale(1 / physScale);
-        externalCollider.setPosition(position.cpy().scl(1 / physScale));
-        externalCollider.setRotation(rotation);
+        internalCollider.setPosition(position.cpy().scl(1 / Constants.SHIP_PPM));
+        internalCollider.setRotation(rotation);
         internalCollider.attachCollider(b);
     }
 

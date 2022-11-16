@@ -72,6 +72,7 @@ public class Thruster extends Part {
             ),
             true
         );
+        stateRef.liquidFuelStored -= (fuelUsage * power * -throttle * delta);
     }
     
     @Override
