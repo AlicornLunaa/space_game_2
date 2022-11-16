@@ -21,7 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -41,6 +40,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
+import com.ray3k.stripe.ViewportWidget;
 
 /**
  * The part editor has four modes so far. The exterior controls the shape given to the universe
@@ -62,7 +62,7 @@ public class PartEditor implements Screen {
     private TabbedPane tabs;
     private VisSplitPane splitPane;
     private VisTable partSettings;
-    private Stack editorPanes;
+    private AttachmentEditor editorWindow;
 
     // Editor variables
     private enum EditType { SHAPE_EDITOR_WORLD, SHAPE_EDITOR_INTERIOR, ATTACHMENT_EDITOR, ANIMATOR };
@@ -186,10 +186,9 @@ public class PartEditor implements Screen {
         partSettings = new VisTable();
         partSettings.add(new VisTextButton("TEST")).expandX().fillX().pad(10);
 
-        editorPanes = new Stack();
-        editorPanes.add(new AttachmentEditor(game));
+        editorWindow = new AttachmentEditor(game);
 
-        splitPane = new VisSplitPane(partSettings, editorPanes, false);
+        splitPane = new VisSplitPane(partSettings, editorWindow, false);
         splitPane.setSplitAmount(0.25f);
         root.add(splitPane).fill().expand().row();
 
@@ -752,23 +751,22 @@ public class PartEditor implements Screen {
 
     @Override
     public void render(float delta) {
-        editor.getViewport().apply();
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
         cursor = editor.screenToStageCoordinates(cursor.set(Gdx.input.getX(), Gdx.input.getY())).sub(editor.getWidth() / 2, editor.getHeight() / 2);
         cursor.set(Math.round(cursor.x), Math.round(cursor.y)); // Snap points
 
-        if(mode == EditType.SHAPE_EDITOR_WORLD){
-            renderShapeEditorWorld(delta);
-        } else if(mode == EditType.SHAPE_EDITOR_INTERIOR){
-            renderShapeEditorInterior(delta);
-        } else if(mode == EditType.ATTACHMENT_EDITOR){
-            renderAttachmentEditor(delta);
-        } else if(mode == EditType.ANIMATOR){
-            renderAnimator(delta);
-        }
+        // if(mode == EditType.SHAPE_EDITOR_WORLD){
+        //     renderShapeEditorWorld(delta);
+        // } else if(mode == EditType.SHAPE_EDITOR_INTERIOR){
+        //     renderShapeEditorInterior(delta);
+        // } else if(mode == EditType.ATTACHMENT_EDITOR){
+        //     renderAttachmentEditor(delta);
+        // } else if(mode == EditType.ANIMATOR){
+        //     renderAnimator(delta);
+        // }
 
-        ui.getViewport().apply();
+        editorWindow.render(splitPane.getSecondWidgetBounds());
         renderUI(delta);
     }
 

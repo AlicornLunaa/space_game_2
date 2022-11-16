@@ -1,35 +1,35 @@
 package com.alicornlunaa.spacegame.scenes.PartEditor;
 
 import com.alicornlunaa.spacegame.App;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
 import com.kotcrab.vis.ui.widget.VisTable;
 
 public class AttachmentEditor extends VisTable {
 
     // Variables
     private final ShapeRenderer render;
+    private PhysShape shape;
 
     // Constructor
     public AttachmentEditor(final App game){
         super();
         this.render = game.shapeRenderer;
-
         setFillParent(true);
-        add(new PhysShape(game.shapeRenderer));
+        add().expand().fill();
+
+        shape = new PhysShape(game.shapeRenderer);
     }
 
     // Functions
-    @Override
-    public void draw(Batch batch, float alpha){
-        batch.end();
+    public void render(final Rectangle bounds){
         render.begin(ShapeType.Filled);
         
-        super.draw(batch, alpha);
+        // shape.draw(batch, alpha);
+        render.circle(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, 10.0f);
 
         render.end();
-        batch.begin();
     }
     
 }

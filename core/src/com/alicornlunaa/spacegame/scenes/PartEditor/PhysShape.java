@@ -2,14 +2,12 @@ package com.alicornlunaa.spacegame.scenes.PartEditor;
 
 import org.json.JSONArray;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
 /** This class draws a polygon */
-class PhysShape extends Actor {
+class PhysShape {
 
     // Variables
     private final ShapeRenderer render;
@@ -33,9 +31,8 @@ class PhysShape extends Actor {
     }
 
     // Functions
-    @Override
-    public void draw(Batch batch, float parentAlpha){
-        render.circle(0, 0, 2.0f);
+    public void draw(){
+        render.circle(0, 0, 20.0f);
     }
 
     JSONArray serialize(){
