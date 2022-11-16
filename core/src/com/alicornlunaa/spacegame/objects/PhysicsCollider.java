@@ -67,6 +67,7 @@ public class PhysicsCollider {
         // Remove existing body
         if(bodyRef != null){
             for(Fixture f : fixtures){
+                if(f == null) continue;
                 bodyRef.destroyFixture(f);
             }
 

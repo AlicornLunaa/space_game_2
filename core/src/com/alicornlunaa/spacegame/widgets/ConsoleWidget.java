@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
-import com.alicornlunaa.spacegame.scenes.DevEditors.PartEditor;
+import com.alicornlunaa.spacegame.scenes.PartEditor.PartEditor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -58,6 +58,9 @@ public class ConsoleWidget extends VisWindow {
         setSize(640, 360);
         closeOnEscape();
         addCloseButton();
+        setModal(true);
+        center();
+        fadeIn(0.15f);
 
         addListener(new InputListener(){
             @Override

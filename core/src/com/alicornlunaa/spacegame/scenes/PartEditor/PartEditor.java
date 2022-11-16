@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.DevEditors;
+package com.alicornlunaa.spacegame.scenes.PartEditor;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -32,7 +33,9 @@ import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
+import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
@@ -83,6 +86,9 @@ public class PartEditor implements Screen {
     private VisTable root;
     private FileChooser fileChooser;
     private TabbedPane tabs;
+    private VisSplitPane splitPane;
+    private VisTable partSettings;
+    private Stack editorPanes;
 
     // Editor variables
     private enum EditType { SHAPE_EDITOR_WORLD, SHAPE_EDITOR_INTERIOR, ATTACHMENT_EDITOR, ANIMATOR };
@@ -189,6 +195,7 @@ public class PartEditor implements Screen {
         root = new VisTable();
         root.setFillParent(true);
         ui.addActor(root);
+        ui.setDebugAll(true);
 
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
@@ -201,7 +208,15 @@ public class PartEditor implements Screen {
 
         tabs = new TabbedPane();
         root.add(tabs.getTable()).fillX().expandX().top().row();
-        root.add().fill().expand().row();
+
+        partSettings = new VisTable();
+        partSettings.add(new VisTextButton("TEST")).expandX().fillX().pad(10);
+
+        editorPanes = new Stack();
+        editorPanes.add(new AttachmentEditor(game));
+
+        splitPane = new VisSplitPane(partSettings, editorPanes, false);
+        root.add(splitPane).fill().expand().row();
 
         fileChooser = new FileChooser("Part Editor", Mode.OPEN);
         fileChooser.setSelectionMode(SelectionMode.FILES);
@@ -761,6 +776,7 @@ public class PartEditor implements Screen {
 
     @Override
     public void render(float delta) {
+        editor.getViewport().apply();
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
         cursor = editor.screenToStageCoordinates(cursor.set(Gdx.input.getX(), Gdx.input.getY())).sub(editor.getWidth() / 2, editor.getHeight() / 2);
@@ -776,7 +792,12 @@ public class PartEditor implements Screen {
             renderAnimator(delta);
         }
 
+        ui.getViewport().apply();
         renderUI(delta);
+
+        for(Actor a : editorPanes.getChildren()){
+            ((AttachmentEditor)a).render(delta);
+        }
     }
 
     @Override

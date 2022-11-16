@@ -195,7 +195,7 @@ public class EditorScene implements Screen {
                     game.setScreen(new PauseScene(game, (int)ui.getWidth(), (int)ui.getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    VisWindow console = new ConsoleWidget(game).fadeIn(0.15f);
+                    VisWindow console = new ConsoleWidget(game);
                     ui.addActor(console);
                     ui.setKeyboardFocus(console);
                     return true;

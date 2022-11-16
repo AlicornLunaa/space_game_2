@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
@@ -143,6 +144,10 @@ public class Ship extends Entity {
             JSONObject data = new JSONObject(file.readString());
 
             // Reset body
+            for(Fixture f : body.getFixtureList()){
+                body.destroyFixture(f);
+            }
+
             body.setLinearVelocity(0, 0);
             body.setAngularVelocity(0);
 
