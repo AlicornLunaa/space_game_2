@@ -1,8 +1,11 @@
 package com.alicornlunaa.spacegame.scenes.PartEditor;
 
+import org.json.JSONObject;
+
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class AttachmentEditor extends EditorPanel {
 
@@ -17,7 +20,7 @@ public class AttachmentEditor extends EditorPanel {
 
     // Functions
     @Override
-    public void render(final Rectangle bounds){
+    public void render(final Rectangle bounds, JSONObject part, Vector2 cursor){
         render.begin(ShapeType.Filled);
         
         // shape.draw(batch, alpha);
