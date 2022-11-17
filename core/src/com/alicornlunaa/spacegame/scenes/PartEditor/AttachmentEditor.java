@@ -3,13 +3,12 @@ package com.alicornlunaa.spacegame.scenes.PartEditor;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 public class AttachmentEditor extends EditorPanel {
 
@@ -17,9 +16,9 @@ public class AttachmentEditor extends EditorPanel {
     public AttachmentEditor(final App game, final PartEditor editor){
         super(game, editor);
 
-        controls = new InputListener(){
+        controls = new InputAdapter(){
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+            public boolean touchDown(int screenX, int screenY, int pointer, int button){
                 float snapX = (int)(cursor.x * 2) / 2.0f;
                 float snapY = (int)(cursor.y * 2) / 2.0f;
 

@@ -3,11 +3,11 @@ package com.alicornlunaa.spacegame.scenes.PartEditor;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.kotcrab.vis.ui.widget.VisTable;
 
 public class EditorPanel extends VisTable {
@@ -15,7 +15,7 @@ public class EditorPanel extends VisTable {
     // Variables
     protected final PartEditor editor;
     protected final ShapeRenderer render;
-    protected InputListener controls;
+    protected InputProcessor controls;
     protected Vector2 cursor = new Vector2();
     private Rectangle bounds = new Rectangle();
 
@@ -29,7 +29,7 @@ public class EditorPanel extends VisTable {
     }
 
     // Functions
-    public InputListener getInputListener(){ return controls; }
+    public InputProcessor getInputListener(){ return controls; }
 
     public void render(final Rectangle bounds, JSONObject part, Vector2 corner, Vector2 cursor){
         this.bounds = bounds;

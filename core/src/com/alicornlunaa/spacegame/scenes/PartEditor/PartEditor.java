@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -49,6 +50,7 @@ public class PartEditor implements Screen {
     // Variables
     private final App game;
     private Stage ui;
+    private InputMultiplexer inputs = new InputMultiplexer();
 
     // UI variables
     private VisTable root;
@@ -75,6 +77,18 @@ public class PartEditor implements Screen {
 
     // Private functions
     private void saveParts(FileHandle handle){
+        if(selectedPartIndex != -1){
+            JSONObject part = partList.getJSONObject(selectedPartIndex);
+            JSONArray attachments = new JSONArray();
+            for(Vector2 a : attachmentPoints){
+                JSONObject v = new JSONObject();
+                v.put("x", a.x);
+                v.put("y", a.y);
+                attachments.put(v);
+            }
+            part.put("attachmentPoints", attachments);
+        }
+
         handle.writeString(partList.toString(2), false);
     }
 
@@ -152,8 +166,8 @@ public class PartEditor implements Screen {
     }
 
     private void changeMode(EditType type){
-        ui.removeListener(panels.get(mode).getInputListener());
-        ui.addListener(panels.get(type).getInputListener());
+        inputs.removeProcessor(panels.get(mode).getInputListener());
+        inputs.addProcessor(panels.get(type).getInputListener());
         mode = type;
     }
 
@@ -167,10 +181,8 @@ public class PartEditor implements Screen {
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
         Menu modeMenu = new Menu("Mode");
-        Menu settingsMenu = new Menu("Settings");
         menuBar.addMenu(fileMenu);
         menuBar.addMenu(modeMenu);
-        menuBar.addMenu(settingsMenu);
         root.add(menuBar.getTable()).fillX().expandX().top().row();
 
         // Properties menu
@@ -223,7 +235,7 @@ public class PartEditor implements Screen {
         placeholder.setFillParent(true);
         placeholder.add().expand().fill();
         panels.put(EditType.ATTACHMENT_EDITOR, new AttachmentEditor(game, this));
-        ui.addListener(panels.get(EditType.ATTACHMENT_EDITOR).getInputListener());
+        inputs.addProcessor(panels.get(EditType.ATTACHMENT_EDITOR).getInputListener());
 
         splitPane = new VisSplitPane(partSettings, placeholder, false);
         splitPane.setSplitAmount(0.25f);
@@ -301,6 +313,9 @@ public class PartEditor implements Screen {
                 changeMode(EditType.ANIMATOR);
             }
         }));
+    
+        // Controls
+        inputs.addProcessor(0, ui);
     }
 
     // Constructor
@@ -315,7 +330,7 @@ public class PartEditor implements Screen {
     // Functions
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(ui);
+        Gdx.input.setInputProcessor(inputs);
     }
 
     @Override
