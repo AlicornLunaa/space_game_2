@@ -7,7 +7,6 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.util.Validators;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
@@ -51,8 +49,6 @@ public class PartEditor implements Screen {
     // Variables
     private final App game;
     private Stage ui;
-    private Stage editor;
-    private InputMultiplexer inputs = new InputMultiplexer();
 
     // UI variables
     private VisTable root;
@@ -60,19 +56,22 @@ public class PartEditor implements Screen {
     private TabbedPane tabs;
     private VisSplitPane splitPane;
     private VisTable partSettings;
-    private boolean renderExternal = true;
 
     // Editor variables
-    private enum EditType { SHAPE_EDITOR_WORLD, SHAPE_EDITOR_INTERIOR, ATTACHMENT_EDITOR, ANIMATOR };
-    private EditType mode = EditType.ATTACHMENT_EDITOR;
-    private Vector2 cursor = new Vector2();
-    private HashMap<EditType, EditorPanel> panels = new HashMap<>();
-    private JSONArray partList;
-    private JSONObject partMetadata;
-    private TextureRegion externalTexture;
-    private TextureRegion internalTexture;
-    private String selectedType = "";
-    private int selectedPartIndex = 0;
+    public enum EditType { SHAPE_EDITOR_WORLD, SHAPE_EDITOR_INTERIOR, ATTACHMENT_EDITOR, ANIMATOR };
+    public EditType mode = EditType.ATTACHMENT_EDITOR;
+    public Vector2 cursor = new Vector2();
+    public HashMap<EditType, EditorPanel> panels = new HashMap<>();
+    public JSONArray partList;
+    public JSONObject partMetadata;
+    public TextureRegion externalTexture;
+    public TextureRegion internalTexture;
+    public Array<Vector2> attachmentPoints = new Array<>();
+    public String selectedType = "";
+    public int selectedPartIndex = -1;
+    public boolean renderExternal = true;
+    public Vector2 center = new Vector2();
+    public float partSize = 128;
 
     // Private functions
     private void saveParts(FileHandle handle){
@@ -91,6 +90,19 @@ public class PartEditor implements Screen {
     }
 
     private void selectPart(String id){
+        // Save old info
+        if(selectedPartIndex != -1){
+            JSONObject part = partList.getJSONObject(selectedPartIndex);
+            JSONArray attachments = new JSONArray();
+            for(Vector2 a : attachmentPoints){
+                JSONObject v = new JSONObject();
+                v.put("x", a.x);
+                v.put("y", a.y);
+                attachments.put(v);
+            }
+            part.put("attachmentPoints", attachments);
+        }
+
         // Load the part into the UI
         for(int i = 0; i < partList.length(); i++){
             JSONObject obj = partList.getJSONObject(i);
@@ -106,6 +118,12 @@ public class PartEditor implements Screen {
 
                 externalTexture = game.atlas.findRegion("parts/" + id.toLowerCase());
                 internalTexture = game.atlas.findRegion("parts/" + id.toLowerCase());
+
+                attachmentPoints.clear();
+                for(int j = 0; j < obj.getJSONArray("attachmentPoints").length(); j++){
+                    JSONObject v = obj.getJSONArray("attachmentPoints").getJSONObject(j);
+                    attachmentPoints.add(new Vector2(v.getFloat("x"), v.getFloat("y")));
+                }
                 return;
             }
         }
@@ -133,7 +151,11 @@ public class PartEditor implements Screen {
         });
     }
 
-    private void changeMode(EditType type){ mode = type; }
+    private void changeMode(EditType type){
+        ui.removeListener(panels.get(mode).getInputListener());
+        ui.addListener(panels.get(type).getInputListener());
+        mode = type;
+    }
 
     private void initUI(){
         // Initialize UI
@@ -200,7 +222,8 @@ public class PartEditor implements Screen {
         VisTable placeholder = new VisTable();
         placeholder.setFillParent(true);
         placeholder.add().expand().fill();
-        panels.put(EditType.ATTACHMENT_EDITOR, new AttachmentEditor(game));
+        panels.put(EditType.ATTACHMENT_EDITOR, new AttachmentEditor(game, this));
+        ui.addListener(panels.get(EditType.ATTACHMENT_EDITOR).getInputListener());
 
         splitPane = new VisSplitPane(partSettings, placeholder, false);
         splitPane.setSplitAmount(0.25f);
@@ -278,14 +301,6 @@ public class PartEditor implements Screen {
                 changeMode(EditType.ANIMATOR);
             }
         }));
-
-        // Initialize controls
-        inputs.addProcessor(ui);
-    }
-
-    private void initEditor(){
-        // Create editor variables
-        editor = new Stage(new FillViewport(640, 360));
     }
 
     // Constructor
@@ -293,13 +308,14 @@ public class PartEditor implements Screen {
         // Initialize components
         this.game = game;
         initUI();
-        initEditor();
+
+        loadParts(Gdx.files.internal("assets/parts/aero.json"));
     }
 
     // Functions
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(inputs);
+        Gdx.input.setInputProcessor(ui);
     }
 
     @Override
@@ -315,22 +331,25 @@ public class PartEditor implements Screen {
         if(tabs.getActiveTab() != null){
             if(internalTexture != null && externalTexture != null){
                 Rectangle rect = splitPane.getSecondWidgetBounds();
-                float size = 128;
-                Vector2 corner = new Vector2(rect.x + rect.width / 2 - size / 2, rect.y + rect.height / 2 - size / 2);
+                Vector2 corner = new Vector2(rect.x + rect.width / 2 - partSize / 2, rect.y + rect.height / 2 - partSize / 2);
                 Vector2 cursorOnPart;
 
                 Batch batch = ui.getBatch();
                 batch.begin();
                 if(renderExternal){
-                    cursorOnPart = cursor.cpy().sub(corner).scl(1 / size).scl(externalTexture.getRegionWidth());
-                    batch.draw(externalTexture, corner.x, corner.y, size, size);
+                    float ratio = ((float)externalTexture.getRegionHeight() / externalTexture.getRegionWidth());
+                    center.set(externalTexture.getRegionWidth() / 2.0f, externalTexture.getRegionHeight() / 2.0f);
+                    cursorOnPart = cursor.cpy().sub(corner).scl(1 / partSize, 1 / (partSize * ratio)).scl(externalTexture.getRegionWidth(), externalTexture.getRegionWidth() * ratio);
+                    batch.draw(externalTexture, corner.x, corner.y, partSize, partSize * ratio);
                 } else {
-                    cursorOnPart = cursor.cpy().sub(corner).scl(1 / size).scl(externalTexture.getRegionWidth());
-                    batch.draw(internalTexture, corner.x, corner.y, size, size);
+                    float ratio = ((float)internalTexture.getRegionHeight() / internalTexture.getRegionWidth());
+                    center.set(internalTexture.getRegionWidth() / 2.0f, internalTexture.getRegionHeight() / 2.0f);
+                    cursorOnPart = cursor.cpy().sub(corner).scl(1 / partSize, 1 / (partSize * ratio)).scl(internalTexture.getRegionWidth(), internalTexture.getRegionWidth() * ratio);
+                    batch.draw(internalTexture, corner.x, corner.y, partSize, partSize * ratio);
                 }
                 batch.end();
                 
-                panels.get(mode).render(splitPane.getSecondWidgetBounds(), ((PartTab)tabs.getActiveTab()).getData(), cursorOnPart);
+                panels.get(mode).render(splitPane.getSecondWidgetBounds(), ((PartTab)tabs.getActiveTab()).getData(), corner, cursorOnPart);
             }
         }
 
@@ -342,7 +361,6 @@ public class PartEditor implements Screen {
     @Override
     public void resize(int width, int height) {
         ui.getViewport().update(width, height, true);
-        editor.getViewport().update(width, height, true);
     }
 
     @Override
@@ -353,7 +371,6 @@ public class PartEditor implements Screen {
 
     @Override
     public void dispose() {
-        editor.dispose();
         ui.dispose();
     }
     
