@@ -4,15 +4,13 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 public class ExternalShapeEditor extends EditorPanel {
-
-    // Variables
-    private Array<PhysShape> shapes = new Array<>();
 
     // Constructor
     public ExternalShapeEditor(final App game, final PartEditor editor){
@@ -21,6 +19,15 @@ public class ExternalShapeEditor extends EditorPanel {
         controls = new InputAdapter(){
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button){
+                float snapX = (int)(cursor.x * 2) / 2.0f;
+                float snapY = (int)(cursor.y * 2) / 2.0f;
+
+                if(button == Buttons.LEFT){
+                    editor.attachmentPoints.add(new Vector2(snapX - editor.center.x, snapY - editor.center.y));
+                } else if(button == Buttons.RIGHT){
+                    editor.attachmentPoints.removeValue(new Vector2(snapX - editor.center.x, snapY - editor.center.y), false);
+                }
+
                 return false;
             }
 
@@ -37,8 +44,26 @@ public class ExternalShapeEditor extends EditorPanel {
         super.render(bounds, part, corner, cursor);
         render.begin(ShapeType.Filled);
         
-        // shape.draw(batch, alpha);
-        render.circle(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, 2.0f);
+        Vector2 screenScale;
+        if(editor.renderExternal){
+            float ratio = ((float)editor.externalTexture.getRegionHeight() / editor.externalTexture.getRegionWidth());
+            screenScale = new Vector2(1.0f / editor.externalTexture.getRegionWidth(), 1.0f / (editor.externalTexture.getRegionWidth() * ratio)).scl(editor.partSize, editor.partSize * ratio);
+        } else {
+            float ratio = ((float)editor.internalTexture.getRegionHeight() / editor.internalTexture.getRegionWidth());
+            screenScale = new Vector2(1.0f / editor.internalTexture.getRegionWidth(), 1.0f / (editor.internalTexture.getRegionWidth() * ratio)).scl(editor.partSize, editor.partSize * ratio);
+        }
+        
+        render.setColor(Color.CYAN);
+        float snapX = (int)(cursor.x * 2) / 2.0f;
+        float snapY = (int)(cursor.y * 2) / 2.0f;
+        render.circle(corner.x + snapX * screenScale.x, corner.y + snapY * screenScale.y, 4.0f);
+        
+        render.setColor(Color.GREEN);
+        for(PhysShape shape : editor.externalShape){
+            for(Vector2 v : shape.vertices){
+                render.circle(corner.x + (v.x + editor.center.x) * screenScale.x, corner.y + (v.y + editor.center.y) * screenScale.y, 4.0f);
+            }
+        }
 
         render.end();
     }

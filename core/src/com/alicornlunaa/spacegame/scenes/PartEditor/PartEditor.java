@@ -68,12 +68,14 @@ public class PartEditor implements Screen {
     public JSONObject partMetadata;
     public TextureRegion externalTexture;
     public TextureRegion internalTexture;
+    public Array<PhysShape> externalShape = new Array<>();
+    public Array<PhysShape> internalShape = new Array<>();
     public Array<Vector2> attachmentPoints = new Array<>();
     public String selectedType = "";
     public int selectedPartIndex = -1;
     public boolean renderExternal = true;
     public Vector2 center = new Vector2();
-    public float partSize = 128;
+    public float partSize = 256;
 
     // Private functions
     private void saveParts(FileHandle handle){
@@ -87,6 +89,18 @@ public class PartEditor implements Screen {
                 attachments.put(v);
             }
             part.put("attachmentPoints", attachments);
+
+            JSONArray external = new JSONArray();
+            for(PhysShape s : externalShape){
+                external.put(s.serialize());
+            }
+            part.put("externalShape", external);
+
+            JSONArray internal = new JSONArray();
+            for(PhysShape s : internalShape){
+                internal.put(s.serialize());
+            }
+            part.put("internalShape", internal);
         }
 
         handle.writeString(partList.toString(2), false);
@@ -115,6 +129,18 @@ public class PartEditor implements Screen {
                 attachments.put(v);
             }
             part.put("attachmentPoints", attachments);
+
+            JSONArray external = new JSONArray();
+            for(PhysShape s : externalShape){
+                external.put(s.serialize());
+            }
+            part.put("externalShape", external);
+
+            JSONArray internal = new JSONArray();
+            for(PhysShape s : internalShape){
+                internal.put(s.serialize());
+            }
+            part.put("internalShape", internal);
         }
 
         // Load the part into the UI
@@ -137,6 +163,16 @@ public class PartEditor implements Screen {
                 for(int j = 0; j < obj.getJSONArray("attachmentPoints").length(); j++){
                     JSONObject v = obj.getJSONArray("attachmentPoints").getJSONObject(j);
                     attachmentPoints.add(new Vector2(v.getFloat("x"), v.getFloat("y")));
+                }
+
+                externalShape.clear();
+                for(int j = 0; j < obj.getJSONArray("externalShape").length(); j++){
+                    externalShape.add(PhysShape.unserialize(game.shapeRenderer, obj.getJSONArray("externalShape").getJSONArray(j)));
+                }
+
+                internalShape.clear();
+                for(int j = 0; j < obj.getJSONArray("internalShape").length(); j++){
+                    internalShape.add(PhysShape.unserialize(game.shapeRenderer, obj.getJSONArray("internalShape").getJSONArray(j)));
                 }
                 return;
             }
@@ -235,6 +271,7 @@ public class PartEditor implements Screen {
         placeholder.setFillParent(true);
         placeholder.add().expand().fill();
         panels.put(EditType.ATTACHMENT_EDITOR, new AttachmentEditor(game, this));
+        panels.put(EditType.SHAPE_EDITOR_WORLD, new ExternalShapeEditor(game, this));
         inputs.addProcessor(panels.get(EditType.ATTACHMENT_EDITOR).getInputListener());
 
         splitPane = new VisSplitPane(partSettings, placeholder, false);

@@ -45,4 +45,14 @@ class PhysShape {
 
         return arr;
     }
+
+    public static PhysShape unserialize(ShapeRenderer render, JSONArray arr){
+        PhysShape s = new PhysShape(render);
+
+        for(int i = 0; i < arr.length(); i += 2){
+            s.vertices.add(new Vector2(arr.getFloat(i), arr.getFloat(i + 1)));
+        }
+
+        return s;
+    }
 }
