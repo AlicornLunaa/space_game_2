@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.parts.Part;
+import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -32,11 +32,13 @@ public class Ship extends Entity {
     
     // Variables
     private final App game;
+
     private Array<Part> parts = new Array<>();
     private AttachmentList attachments = new AttachmentList();
-    
+
     public ShipState state = new ShipState(); // Ship controls and stuff
     
+    // TODO: Move this into the interior
     private World internalWorld;
     private float physAccumulator = 0.0f;
     private Body internalBody;
@@ -56,6 +58,9 @@ public class Ship extends Entity {
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
 		internalBody = internalWorld.createBody(def);
+
+        // Create shapes from the external shapes
+
     }
 
     // Constructor
@@ -98,7 +103,6 @@ public class Ship extends Entity {
         // Puts all the parts together with their respective physics bodies
         for(Part p : parts){
             p.setParent(body, Constants.PPM);
-            p.buildInterior(internalBody, Constants.SHIP_PPM);
         }
     }
 

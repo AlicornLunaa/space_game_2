@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.objects.Ship;
 
 import java.util.HashMap;
 
-import com.alicornlunaa.spacegame.parts.Part;
+import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 

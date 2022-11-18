@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.EditorScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
-import com.alicornlunaa.spacegame.parts.Part;
+import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
 import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;

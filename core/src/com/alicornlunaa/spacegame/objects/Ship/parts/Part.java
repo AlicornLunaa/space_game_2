@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.parts;
+package com.alicornlunaa.spacegame.objects.Ship.parts;
 
 import org.json.JSONObject;
 
