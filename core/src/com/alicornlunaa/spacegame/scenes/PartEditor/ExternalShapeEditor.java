@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class ExternalShapeEditor extends EditorPanel {
 
@@ -23,9 +24,9 @@ public class ExternalShapeEditor extends EditorPanel {
                 float snapY = (int)(cursor.y * 2) / 2.0f;
 
                 if(button == Buttons.LEFT){
-                    editor.attachmentPoints.add(new Vector2(snapX - editor.center.x, snapY - editor.center.y));
+                    editor.externalShape.get(0).vertices.add(new Vector2(snapX - editor.center.x, snapY - editor.center.y));
                 } else if(button == Buttons.RIGHT){
-                    editor.attachmentPoints.removeValue(new Vector2(snapX - editor.center.x, snapY - editor.center.y), false);
+                    editor.externalShape.get(0).vertices.removeValue(new Vector2(snapX - editor.center.x, snapY - editor.center.y), false);
                 }
 
                 return false;
@@ -60,8 +61,26 @@ public class ExternalShapeEditor extends EditorPanel {
         
         render.setColor(Color.GREEN);
         for(PhysShape shape : editor.externalShape){
+            Array<Vector2> arr = shape.calculateHull();
+
+            for(int i = 0; i < arr.size; i++){
+                Vector2 v1 = arr.get(i);
+                Vector2 v2 = arr.get((i + 1) % arr.size);
+                render.rectLine(
+                    corner.x + (v1.x + editor.center.x) * screenScale.x,
+                    corner.y + (v1.y + editor.center.y) * screenScale.y,
+                    corner.x + (v2.x + editor.center.x) * screenScale.x,
+                    corner.y + (v2.y + editor.center.y) * screenScale.y,
+                    2.0f
+                );
+            }
+
             for(Vector2 v : shape.vertices){
-                render.circle(corner.x + (v.x + editor.center.x) * screenScale.x, corner.y + (v.y + editor.center.y) * screenScale.y, 4.0f);
+                render.circle(
+                    corner.x + (v.x + editor.center.x) * screenScale.x,
+                    corner.y + (v.y + editor.center.y) * screenScale.y,
+                    4.0f
+                );
             }
         }
 

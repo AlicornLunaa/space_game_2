@@ -13,6 +13,7 @@ class PhysShape {
     private final ShapeRenderer render;
     
     Array<Vector2> vertices = new Array<>();
+    Array<Vector2> hull = new Array<>();
     int disableWhen = -1; // The index of the attachment point to disable this collider when attached
 
     // Constructors
@@ -35,15 +36,56 @@ class PhysShape {
         render.circle(0, 0, 20.0f);
     }
 
-    JSONArray serialize(){
+    public JSONArray serialize(){
         JSONArray arr = new JSONArray();
         
-        for(Vector2 v : vertices){
+        for(Vector2 v : calculateHull()){
             arr.put(v.x);
             arr.put(v.y);
         }
 
         return arr;
+    }
+
+    private int orientation(Vector2 p, Vector2 q, Vector2 r){
+        float val = (int)((q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y));
+        if(val == 0) return 0;
+        return (val > 0) ? 1 : 2;
+    }
+
+    public Array<Vector2> calculateHull(){
+        // Start with left-most point
+        int min = 0;
+        float minX = vertices.get(min).x;
+        for(int i = 1; i < vertices.size; i++){
+            if(vertices.get(i).x < minX){
+                min = i;
+                minX = vertices.get(i).x;
+            }
+        }
+
+        // Find next point
+        hull.clear();
+        
+        if(vertices.size > 3){
+            int p = min;
+            int q;
+
+            do {
+                hull.add(vertices.get(p));
+                q = (p + 1) % vertices.size;
+                
+                for(int i = 0; i < vertices.size; i++){
+                    if(orientation(vertices.get(p), vertices.get(i), vertices.get(q)) == 2){
+                        q = i;
+                    }
+                }
+
+                p = q;
+            } while(p != min);
+        }
+
+        return hull;
     }
 
     public static PhysShape unserialize(ShapeRenderer render, JSONArray arr){
