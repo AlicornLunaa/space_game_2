@@ -204,6 +204,7 @@ public class PartEditor implements Screen {
     private void changeMode(EditType type){
         inputs.removeProcessor(panels.get(mode).getInputListener());
         inputs.addProcessor(panels.get(type).getInputListener());
+        panels.get(type).updateContent();
         mode = type;
     }
 
@@ -268,10 +269,12 @@ public class PartEditor implements Screen {
         root.add(tabs.getTable()).fillX().expandX().top().row();
 
         VisTable placeholder = new VisTable();
+        placeholder.setName("editorPlaceholder");
         placeholder.setFillParent(true);
         placeholder.add().expand().fill();
-        panels.put(EditType.ATTACHMENT_EDITOR, new AttachmentEditor(game, this));
-        panels.put(EditType.SHAPE_EDITOR_WORLD, new ExternalShapeEditor(game, this));
+        panels.put(EditType.ATTACHMENT_EDITOR, new AttachmentEditor(game, this, placeholder));
+        panels.put(EditType.SHAPE_EDITOR_WORLD, new ExternalShapeEditor(game, this, placeholder));
+        panels.put(EditType.SHAPE_EDITOR_INTERIOR, new InternalShapeEditor(game, this, placeholder));
         inputs.addProcessor(panels.get(EditType.ATTACHMENT_EDITOR).getInputListener());
 
         splitPane = new VisSplitPane(partSettings, placeholder, false);

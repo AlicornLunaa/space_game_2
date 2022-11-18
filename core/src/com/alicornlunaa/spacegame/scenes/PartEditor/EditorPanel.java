@@ -15,15 +15,17 @@ public class EditorPanel extends VisTable {
     // Variables
     protected final PartEditor editor;
     protected final ShapeRenderer render;
+    protected final VisTable content;
     protected InputProcessor controls;
     protected Vector2 cursor = new Vector2();
     private Rectangle bounds = new Rectangle();
 
     // Constructor
-    public EditorPanel(final App game, final PartEditor editor){
+    public EditorPanel(final App game, final PartEditor editor, final VisTable content){
         super();
         this.editor = editor;
         this.render = game.shapeRenderer;
+        this.content = content;
         setFillParent(true);
         add().expand().fill().row();
     }
@@ -34,6 +36,10 @@ public class EditorPanel extends VisTable {
     public void render(final Rectangle bounds, JSONObject part, Vector2 corner, Vector2 cursor){
         this.bounds = bounds;
         this.cursor = cursor;
+    }
+
+    public void updateContent(){
+        content.clear();
     }
 
     @Override

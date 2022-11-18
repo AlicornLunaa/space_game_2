@@ -9,12 +9,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.kotcrab.vis.ui.widget.VisTable;
 
 public class AttachmentEditor extends EditorPanel {
 
     // Constructor
-    public AttachmentEditor(final App game, final PartEditor editor){
-        super(game, editor);
+    public AttachmentEditor(final App game, final PartEditor editor, final VisTable content){
+        super(game, editor, content);
 
         controls = new InputAdapter(){
             @Override

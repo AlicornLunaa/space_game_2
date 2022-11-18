@@ -54,6 +54,8 @@ class PhysShape {
     }
 
     public Array<Vector2> calculateHull(){
+        if(vertices.size == 0) return new Array<>();
+
         // Start with left-most point
         int min = 0;
         float minX = vertices.get(min).x;
@@ -67,7 +69,7 @@ class PhysShape {
         // Find next point
         hull.clear();
         
-        if(vertices.size > 3){
+        if(vertices.size >= 3){
             int p = min;
             int q;
 
