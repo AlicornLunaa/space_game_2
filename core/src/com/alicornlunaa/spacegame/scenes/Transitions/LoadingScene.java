@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -36,6 +37,7 @@ public class LoadingScene implements Screen {
         tbl.row().expand().fillX().center();
 
         Label lbl = new Label("Space Game 2", game.skin);
+        lbl.setStyle(game.skin.get("title", LabelStyle.class));
         lbl.setAlignment(Align.center);
         tbl.add(lbl);
 
