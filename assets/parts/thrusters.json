@@ -1,36 +1,64 @@
-[
-    {
-        "id": "BSC_THRUSTER",
-        "type": "THRUSTER",
-        "name": "Basic Thruster",
-        "desc": "Ol' reliable with its 5 degrees if cone angle!",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": 7.5}
-        ],
-        "internalShape": [
-            [
-                -15, -15,
-                15, -15,
-                15, 15,
-                -15, 15
-            ]
-        ],
-        "externalShape": [
-            [
-                -15, -15,
-                15, -15,
-                15, 15,
-                -15, 15
-            ]
-        ],
-        "metadata": {
-            "power": 1000,
-            "coneAngle": 5,
-            "coneSpeed": 1.5,
-            "fuelUsage": 1,
-            "effect": "effects/rocket"
-        }
-    }
-]
+[{
+  "externalShape": [
+    [
+      -7.5,
+      8,
+      -7.5,
+      7,
+      -6.5,
+      6,
+      -4.5,
+      5,
+      4.5,
+      5,
+      6.5,
+      6,
+      7.5,
+      7,
+      7.5,
+      8
+    ],
+    [
+      -3.5,
+      5,
+      -3.5,
+      2,
+      3.5,
+      2,
+      3.5,
+      5
+    ],
+    [
+      -6.5,
+      -8,
+      6.5,
+      -8,
+      6.5,
+      -4,
+      4.5,
+      2,
+      -4.5,
+      2,
+      -6.5,
+      -4
+    ]
+  ],
+  "metadata": {
+    "coneSpeed": 1.5,
+    "coneAngle": 5,
+    "effect": "effects/rocket",
+    "fuelUsage": 1,
+    "power": 1000
+  },
+  "density": "0.1",
+  "internalShape": [],
+  "name": "Basic Thruster",
+  "scale": "1.0",
+  "id": "BSC_THRUSTER",
+  "type": "THRUSTER",
+  "attachmentPoints": [{
+    "x": 0,
+    "y": 8
+  }],
+  "desc": "Ol' reliable with its 5 degrees if cone angle!"
+}]

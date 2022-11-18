@@ -1,36 +1,82 @@
-[
+[{
+  "externalShape": [[
+    -7.5,
+    8,
+    -7.5,
+    -8,
+    7.5,
+    -8,
+    7.5,
+    8
+  ]],
+  "metadata": {
+    "fuelCapacity": 1000,
+    "batteryCapacity": 1000
+  },
+  "density": "0.1",
+  "internalShape": [
+    [
+      -15,
+      16,
+      15,
+      16,
+      15,
+      19.5,
+      -15,
+      19.5
+    ],
+    [
+      -18.5,
+      16,
+      -18.5,
+      -16,
+      -15,
+      -16,
+      -15,
+      16
+    ],
+    [
+      15,
+      16,
+      15,
+      -16,
+      18,
+      -16,
+      18,
+      16
+    ],
+    [
+      -15,
+      -16,
+      -15,
+      -19,
+      15,
+      -19,
+      15,
+      -16
+    ]
+  ],
+  "name": "Basic Fuselage",
+  "scale": "1.0",
+  "id": "BSC_FUSELAGE",
+  "type": "STRUCTURAL",
+  "attachmentPoints": [
     {
-        "id": "BSC_FUSELAGE",
-        "type": "STRUCTURAL",
-        "name": "Basic Fuselage",
-        "desc": "Ol' reliable with its 1000 fuel and battery!",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": -8},
-            {"x": 0, "y": 8},
-            {"x": 7.5, "y": 0},
-            {"x": -7.5, "y": 0}
-        ],
-        "internalShape": [
-            [
-                -15, -15,
-                15, -15,
-                15, 15,
-                -15, 15
-            ]
-        ],
-        "externalShape": [
-            [
-                -15, -15,
-                15, -15,
-                15, 15,
-                -15, 15
-            ]
-        ],
-        "metadata": {
-            "fuelCapacity": 1000,
-            "batteryCapacity": 1000
-        }
+      "x": 0,
+      "y": 8
+    },
+    {
+      "x": 7.5,
+      "y": 0
+    },
+    {
+      "x": 0,
+      "y": -8
+    },
+    {
+      "x": -7.5,
+      "y": 0
     }
-]
+  ],
+  "desc": "Ol' reliable with its 1000 fuel and battery!"
+}]

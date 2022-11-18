@@ -16,6 +16,9 @@ The metadata field depends on the type of part it is.
     "attachmentPoints": [
         {"x": 8, "y": 0}
     ],
+    "freeform": false,
+    "externalShape": [],
+    "internalShape": [],
     "metadata": {}
 }
 ```

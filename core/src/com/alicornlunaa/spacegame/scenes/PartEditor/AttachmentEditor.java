@@ -36,6 +36,11 @@ public class AttachmentEditor extends EditorPanel {
 
     // Functions
     @Override
+    public void updateContent(){
+        editor.renderExternal = true;
+    }
+
+    @Override
     public void render(final Rectangle bounds, JSONObject part, Vector2 corner, Vector2 cursor){
         super.render(bounds, part, corner, cursor);
         render.begin(ShapeType.Filled);

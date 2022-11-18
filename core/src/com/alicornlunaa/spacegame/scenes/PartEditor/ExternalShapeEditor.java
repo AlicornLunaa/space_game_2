@@ -30,6 +30,8 @@ public class ExternalShapeEditor extends EditorPanel {
         controls = new InputAdapter(){
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button){
+                if(editor.externalShape.size == 0) return false;
+                
                 float snapX = (int)(cursor.x * 2) / 2.0f;
                 float snapY = (int)(cursor.y * 2) / 2.0f;
 
@@ -52,6 +54,9 @@ public class ExternalShapeEditor extends EditorPanel {
     // Functions
     @Override
     public void updateContent(){
+        editor.renderExternal = true;
+        selectedShape = 0;
+
         super.updateContent();
         content.add(new VisLabel("Shapes")).top().left().pad(10);
         

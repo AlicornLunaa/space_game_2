@@ -87,7 +87,6 @@ public class App extends Game {
 				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
 				this.setScreen(spaceScene);
-				this.setScreen(new PartEditor(this));
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());

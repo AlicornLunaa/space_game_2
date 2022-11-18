@@ -3,6 +3,8 @@ package com.alicornlunaa.spacegame.widgets;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.scenes.PartEditor.PartEditor;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,6 +21,7 @@ public class ConsoleWidget extends VisWindow {
 
     // Variables
     private final App game;
+    private final InputProcessor oldInput;
 
     private VisScrollPane historyScroll;
     private VerticalGroup history;
@@ -55,19 +58,13 @@ public class ConsoleWidget extends VisWindow {
     public ConsoleWidget(final App game){
         super("Console", true);
         this.game = game;
+        this.oldInput = Gdx.input.getInputProcessor();
         setSize(640, 360);
         closeOnEscape();
         addCloseButton();
         setModal(true);
         center();
         fadeIn(0.15f);
-
-        addListener(new InputListener(){
-            @Override
-            public boolean keyDown(InputEvent event, int keycode){
-                return true;
-            }
-        });
 
         history = new VerticalGroup().left().columnLeft();
         historyScroll = new VisScrollPane(history);
@@ -92,6 +89,13 @@ public class ConsoleWidget extends VisWindow {
                 return true;
             }
         });
+    }
+
+    // Functions
+    @Override
+    public boolean remove(){
+        Gdx.input.setInputProcessor(oldInput);
+        return super.remove();
     }
     
 }

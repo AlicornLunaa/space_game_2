@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
@@ -156,8 +157,8 @@ public class PartEditor implements Screen {
                 ((VisValidatableTextField)ui.getRoot().findActor("part_density")).setText(String.valueOf(obj.getFloat("density")));
                 ((VisValidatableTextField)ui.getRoot().findActor("part_scale")).setText(String.valueOf(obj.getFloat("scale")));
 
-                externalTexture = game.atlas.findRegion("parts/" + id.toLowerCase());
-                internalTexture = game.atlas.findRegion("parts/" + id.toLowerCase());
+                externalTexture = game.atlas.findRegion("parts/" + id.toLowerCase() + "_external");
+                internalTexture = game.atlas.findRegion("parts/" + id.toLowerCase() + "_internal");
 
                 attachmentPoints.clear();
                 for(int j = 0; j < obj.getJSONArray("attachmentPoints").length(); j++){
@@ -356,6 +357,13 @@ public class PartEditor implements Screen {
     
         // Controls
         inputs.addProcessor(0, ui);
+        inputs.addProcessor(1, new InputAdapter(){
+            @Override
+            public boolean scrolled(float amountX, float amountY){
+                partSize = Math.min(Math.max(partSize - amountY * 20, 1), 500);
+                return true;
+            }
+        });
     }
 
     // Constructor
@@ -363,8 +371,6 @@ public class PartEditor implements Screen {
         // Initialize components
         this.game = game;
         initUI();
-
-        loadParts(Gdx.files.internal("assets/parts/aero.json"));
     }
 
     // Functions

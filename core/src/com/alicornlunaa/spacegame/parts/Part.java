@@ -29,7 +29,8 @@ public class Part {
     protected ShipState stateRef;
     protected float physScale;
 
-    private TextureRegion texture;
+    private TextureRegion externalTexture;
+    private TextureRegion internalTexture;
     private PhysicsCollider externalCollider;
     private PhysicsCollider internalCollider;
     private Array<Vector2> attachmentPoints = new Array<>();
@@ -55,7 +56,8 @@ public class Part {
         this.name = name;
         this.description = desc;
 
-        this.texture = texture;
+        this.externalTexture = texture;
+        this.internalTexture = texture;
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
         externalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
@@ -72,8 +74,9 @@ public class Part {
         description = obj.getString("desc");
         freeform = obj.optBoolean("freeform", false);
 
-        texture = game.atlas.findRegion("parts/" + id.toLowerCase());
-        size.set(texture.getRegionWidth(), texture.getRegionHeight());
+        externalTexture = game.atlas.findRegion("parts/" + id.toLowerCase() + "_external");
+        internalTexture = game.atlas.findRegion("parts/" + id.toLowerCase() + "_internal");
+        size.set(externalTexture.getRegionWidth(), externalTexture.getRegionHeight());
 
         if(obj.has("externalShape") && obj.has("internalShape")){
             externalCollider = new PhysicsCollider(obj.getJSONArray("externalShape"));
@@ -109,7 +112,7 @@ public class Part {
     public void draw(Batch batch, float delta){
         drawEffectsBelow(batch, delta);
         batch.draw(
-            texture,
+            externalTexture,
             position.x - size.x / 2, position.y - size.y / 2,
             size.x / 2, size.y / 2,
             size.x, size.y,
