@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.objects.Ship.interior;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.PhysicsCollider;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -13,6 +14,7 @@ public class InteriorCell {
     protected int x = 0;
     protected int y = 0;
     private TextureRegion texture;
+    private PhysicsCollider collider;
 
     // Constructor
     public InteriorCell(final App game, int x, int y, boolean up, boolean down, boolean left, boolean right){
