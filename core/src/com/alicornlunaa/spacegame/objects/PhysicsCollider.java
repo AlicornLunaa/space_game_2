@@ -114,5 +114,21 @@ public class PhysicsCollider {
         Vector2[] vertices = { new Vector2(-1, -1), new Vector2(1, -1), new Vector2(1, 1), new Vector2(-1, 1) };
         return new PhysicsCollider(vertices);
     }
+
+    public static PhysicsCollider loadTriangulated(JSONArray triangulation){
+        // A triangulated collider is just an array of floats. Every 2 indices is one vertex
+        // Every 3 vertices is one triangle. One triangle is one shape.
+        PhysicsCollider c = new PhysicsCollider();
+        
+        for(int i = 0; i < triangulation.length(); i += 6){
+            Array<Vector2> arr = new Array<>();
+            arr.add(new Vector2(triangulation.getFloat(i + 0), triangulation.getFloat(i + 1)));
+            arr.add(new Vector2(triangulation.getFloat(i + 2), triangulation.getFloat(i + 3)));
+            arr.add(new Vector2(triangulation.getFloat(i + 4), triangulation.getFloat(i + 5)));
+            c.vertices.add(arr);
+        }
+
+        return c;
+    }
     
 }
