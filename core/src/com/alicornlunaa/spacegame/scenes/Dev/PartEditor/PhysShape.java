@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.PartEditor;
+package com.alicornlunaa.spacegame.scenes.Dev.PartEditor;
 
 import org.json.JSONArray;
 
@@ -7,21 +7,24 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /** This class draws a polygon */
-class PhysShape {
+public class PhysShape {
 
     // Variables
     private final ShapeRenderer render;
     
-    Array<Vector2> vertices = new Array<>();
-    Array<Vector2> hull = new Array<>();
-    int disableWhen = -1; // The index of the attachment point to disable this collider when attached
+    public Array<Vector2> vertices = new Array<>();
+    public Array<Vector2> hull = new Array<>();
+    public int disableWhen = -1; // The index of the attachment point to disable this collider when attached
+    public float friction = 1.0f;
+    public float restitution = 0.0f;
+    public float density = 0.0f;
 
     // Constructors
-    PhysShape(ShapeRenderer render){
+    public PhysShape(ShapeRenderer render){
         this.render = render;
     }
 
-    PhysShape(ShapeRenderer render, PhysShape ps){
+    public PhysShape(ShapeRenderer render, PhysShape ps){
         this(render);
 
         for(Vector2 v : ps.vertices){

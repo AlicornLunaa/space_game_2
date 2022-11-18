@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.PartEditor;
+package com.alicornlunaa.spacegame.scenes.Dev.PartEditor;
 
 import org.json.JSONObject;
 

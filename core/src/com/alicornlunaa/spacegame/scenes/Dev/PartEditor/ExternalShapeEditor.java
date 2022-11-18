@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.PartEditor;
+package com.alicornlunaa.spacegame.scenes.Dev.PartEditor;
 
 import org.json.JSONObject;
 
@@ -16,13 +16,13 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 
-public class InternalShapeEditor extends EditorPanel {
+public class ExternalShapeEditor extends EditorPanel {
 
     // Variables
     private int selectedShape = 0;
 
     // Constructor
-    public InternalShapeEditor(final App game, final PartEditor editor, final VisTable content){
+    public ExternalShapeEditor(final App game, final PartEditor editor, final VisTable content){
         super(game, editor, content);
 
         add(new VisTextButton("New Shape")).pad(10).top().row();
@@ -30,15 +30,15 @@ public class InternalShapeEditor extends EditorPanel {
         controls = new InputAdapter(){
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button){
-                if(editor.internalShape.size == 0) return false;
+                if(editor.externalShape.size == 0) return false;
                 
                 float snapX = (int)(cursor.x * 2) / 2.0f;
                 float snapY = (int)(cursor.y * 2) / 2.0f;
 
                 if(button == Buttons.LEFT){
-                    editor.internalShape.get(selectedShape).vertices.add(new Vector2(snapX - editor.center.x, snapY - editor.center.y));
+                    editor.externalShape.get(selectedShape).vertices.add(new Vector2(snapX - editor.center.x, snapY - editor.center.y));
                 } else if(button == Buttons.RIGHT){
-                    editor.internalShape.get(selectedShape).vertices.removeValue(new Vector2(snapX - editor.center.x, snapY - editor.center.y), false);
+                    editor.externalShape.get(selectedShape).vertices.removeValue(new Vector2(snapX - editor.center.x, snapY - editor.center.y), false);
                 }
 
                 return false;
@@ -54,7 +54,7 @@ public class InternalShapeEditor extends EditorPanel {
     // Functions
     @Override
     public void updateContent(){
-        editor.renderExternal = false;
+        editor.renderExternal = true;
         selectedShape = 0;
 
         super.updateContent();
@@ -64,10 +64,10 @@ public class InternalShapeEditor extends EditorPanel {
         newBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                editor.internalShape.add(new PhysShape(render));
-                selectedShape = editor.internalShape.size - 1;
+                editor.externalShape.add(new PhysShape(render));
+                selectedShape = editor.externalShape.size - 1;
                 
-                final int id = editor.internalShape.size - 1;
+                final int id = editor.externalShape.size - 1;
                 VisTextButton selectBtn = new VisTextButton("Shape " + id);
                 selectBtn.addListener(new ChangeListener() {
                     @Override
@@ -85,15 +85,15 @@ public class InternalShapeEditor extends EditorPanel {
         delBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                if(editor.internalShape.size == 0) return;
-                editor.internalShape.removeIndex(selectedShape);
+                if(editor.externalShape.size == 0) return;
+                editor.externalShape.removeIndex(selectedShape);
                 content.removeActor(content.findActor("select" + selectedShape));
                 selectedShape = 0;
             }
         });
         content.add(delBtn).top().left().pad(10).expand().row();
         
-        for(int i = 0; i < editor.internalShape.size; i++){
+        for(int i = 0; i < editor.externalShape.size; i++){
             final int id = i;
             VisTextButton selectBtn = new VisTextButton("Shape " + id);
             selectBtn.addListener(new ChangeListener() {
@@ -114,8 +114,8 @@ public class InternalShapeEditor extends EditorPanel {
         
         Vector2 screenScale;
         if(editor.renderExternal){
-            float ratio = ((float)editor.internalTexture.getRegionHeight() / editor.internalTexture.getRegionWidth());
-            screenScale = new Vector2(1.0f / editor.internalTexture.getRegionWidth(), 1.0f / (editor.internalTexture.getRegionWidth() * ratio)).scl(editor.partSize, editor.partSize * ratio);
+            float ratio = ((float)editor.externalTexture.getRegionHeight() / editor.externalTexture.getRegionWidth());
+            screenScale = new Vector2(1.0f / editor.externalTexture.getRegionWidth(), 1.0f / (editor.externalTexture.getRegionWidth() * ratio)).scl(editor.partSize, editor.partSize * ratio);
         } else {
             float ratio = ((float)editor.internalTexture.getRegionHeight() / editor.internalTexture.getRegionWidth());
             screenScale = new Vector2(1.0f / editor.internalTexture.getRegionWidth(), 1.0f / (editor.internalTexture.getRegionWidth() * ratio)).scl(editor.partSize, editor.partSize * ratio);
@@ -126,8 +126,8 @@ public class InternalShapeEditor extends EditorPanel {
         float snapY = (int)(cursor.y * 2) / 2.0f;
         render.circle(corner.x + snapX * screenScale.x, corner.y + snapY * screenScale.y, 4.0f);
         
-        for(PhysShape shape : editor.internalShape){
-            render.setColor((shape == editor.internalShape.get(selectedShape)) ? Color.GREEN : Color.RED);
+        for(PhysShape shape : editor.externalShape){
+            render.setColor((shape == editor.externalShape.get(selectedShape)) ? Color.GREEN : Color.RED);
             Array<Vector2> arr = shape.calculateHull();
 
             for(int i = 0; i < arr.size; i++){
