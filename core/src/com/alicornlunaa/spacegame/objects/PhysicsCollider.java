@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.objects;
 
 import org.json.JSONArray;
 
+import com.alicornlunaa.spacegame.scenes.Dev.PhysicsEditor.Collider;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -17,7 +18,7 @@ import com.badlogic.gdx.utils.Array;
 public class PhysicsCollider {
 
     // Variables
-    private Array<Array<Vector2>> vertices = new Array<>();
+    private Collider collider = new Collider();
     private Vector2 position = new Vector2();
     private Vector2 scale = new Vector2(1, 1);
     private float rotation = 0.0f;
@@ -27,36 +28,13 @@ public class PhysicsCollider {
 
     // Constructor
     public PhysicsCollider(){}
-    
-    public PhysicsCollider(Vector2[] vertices){
-        this.vertices.add(new Array<Vector2>());
-        for(int i = 0; i < vertices.length; i++){
-            this.vertices.get(this.vertices.size - 1).add(vertices[i]);
-        }
-    }
 
-    public PhysicsCollider(JSONArray object){
-        /** JSONObject format is just an array containing arrays of floats */
-        for(int i = 0; i < object.length(); i++){
-            Array<Vector2> arr = new Array<>();
-
-            for(int j = 0; j < object.getJSONArray(i).length(); j += 2){
-                arr.add(new Vector2(object.getJSONArray(i).getFloat(j), object.getJSONArray(i).getFloat(j + 1)));
-            }
-
-            vertices.add(arr);
-        }
+    public PhysicsCollider(JSONArray obj){
+        collider = Collider.unserialize(obj);
     }
 
     public PhysicsCollider(PhysicsCollider pc){
-        for(Array<Vector2> shape : pc.vertices){
-            vertices.add(new Array<Vector2>());
-
-            for(Vector2 vertex : shape){
-                vertices.get(vertices.size - 1).add(vertex.cpy());
-            }
-        }
-
+        collider = new Collider(pc.collider);
         position = pc.position.cpy();
         scale = pc.scale.cpy();
         rotation = pc.rotation;
@@ -78,18 +56,23 @@ public class PhysicsCollider {
         Matrix3 trans = new Matrix3().translate(position).rotate(rotation).scale(scale);
         bodyRef = b;
 
-        for(Array<Vector2> shape : vertices){
-            Vector2[] verticesTransformed = new Vector2[shape.size];
-            for(int i = 0; i < shape.size; i++){
-                verticesTransformed[i] = shape.get(i).cpy().mul(trans);
+        for(int i = 0; i < collider.getShapeCount(); i++){
+            Vector2[] vertexData = new Vector2[collider.getIndexCount(i)];
+
+            for(int j = 0; j < collider.getIndexCount(i); j++){
+                Vector2 v = collider.getVertex(i, collider.getIndex(i, j));
+                vertexData[j] = v.cpy().mul(trans);
             }
 
             PolygonShape physShape = new PolygonShape();
-            physShape.set(verticesTransformed);
+            physShape.set(vertexData);
             
             FixtureDef def = new FixtureDef();
             def.shape = physShape;
-            def.density = 0.1f;
+            def.friction = collider.getFriction(i);
+            def.restitution = collider.getDensity(i);
+            def.density = collider.getDensity(i);
+            def.isSensor = collider.getSensor(i);
             b.createFixture(def);
 
             physShape.dispose();
@@ -111,23 +94,12 @@ public class PhysicsCollider {
 
     // Static functions
     public static PhysicsCollider box(Vector2 pos, Vector2 size, float rotation){
-        Vector2[] vertices = { new Vector2(-1, -1), new Vector2(1, -1), new Vector2(1, 1), new Vector2(-1, 1) };
-        return new PhysicsCollider(vertices);
-    }
-
-    public static PhysicsCollider loadTriangulated(JSONArray triangulation){
-        // A triangulated collider is just an array of floats. Every 2 indices is one vertex
-        // Every 3 vertices is one triangle. One triangle is one shape.
         PhysicsCollider c = new PhysicsCollider();
-        
-        for(int i = 0; i < triangulation.length(); i += 6){
-            Array<Vector2> arr = new Array<>();
-            arr.add(new Vector2(triangulation.getFloat(i + 0), triangulation.getFloat(i + 1)));
-            arr.add(new Vector2(triangulation.getFloat(i + 2), triangulation.getFloat(i + 3)));
-            arr.add(new Vector2(triangulation.getFloat(i + 4), triangulation.getFloat(i + 5)));
-            c.vertices.add(arr);
-        }
-
+        c.collider.addShape();
+        c.collider.addVertex(0, new Vector2(-1, -1));
+        c.collider.addVertex(0, new Vector2(1, -1));
+        c.collider.addVertex(0, new Vector2(1, 1));
+        c.collider.addVertex(0, new Vector2(-1, 1));
         return c;
     }
     

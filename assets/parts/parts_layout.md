@@ -12,13 +12,10 @@ The metadata field depends on the type of part it is.
     "name": "PART_NAME",
     "desc": "PART_DESCRIPTION",
     "scale": 1,
-    "density": 0.1,
     "attachmentPoints": [
         {"x": 8, "y": 0}
     ],
     "freeform": false,
-    "externalShape": [],
-    "internalShape": [],
     "metadata": {}
 }
 ```

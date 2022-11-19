@@ -1,239 +1,47 @@
 [
   {
-    "externalShape": [[
-      -8,
-      -7.5,
-      8,
-      -7.5,
-      8,
-      -2.5,
-      4,
-      5.5,
-      1,
-      7.5,
-      -1,
-      7.5,
-      -4,
-      5.5,
-      -8,
-      -2.5
-    ]],
-    "metadata": {
-      "lift": 1,
-      "drag": 1
-    },
-    "density": "0.1",
-    "internalShape": [
-      [
-        -16,
-        -15,
-        -16,
-        -19,
-        16,
-        -19,
-        16,
-        -15
-      ],
-      [
-        16,
-        -15,
-        20,
-        -15,
-        20,
-        18.5,
-        16,
-        18.5
-      ],
-      [
-        -20,
-        -15,
-        -16,
-        -15,
-        -16,
-        18.5,
-        -20,
-        18.5
-      ],
-      [
-        -16,
-        18.5,
-        -16,
-        15,
-        16,
-        15,
-        16,
-        18.5
-      ],
-      [
-        -16,
-        -5,
-        -8,
-        11,
-        -16,
-        11
-      ],
-      [
-        8,
-        11,
-        16,
-        -5,
-        16,
-        11
-      ],
-      [
-        -16,
-        15,
-        -16,
-        11,
-        -8,
-        11,
-        -2,
-        15
-      ],
-      [
-        2,
-        15,
-        8,
-        11,
-        16,
-        11,
-        16,
-        15
-      ]
-    ],
-    "name": "Medium Command Pod",
-    "scale": "1.0",
+    "type": "AERO",
     "id": "MED_CMD_POD",
-    "type": "AERO",
+    "name": "Medium Command Pod",
+    "desc": "My friend while developing this game",
+    "scale": 1.0,
     "attachmentPoints": [{
       "x": 0,
       "y": -7.5
     }],
-    "desc": "My friend while developing this game"
-  },
-  {
-    "externalShape": [[
-      -4,
-      -7.5,
-      4,
-      -7.5,
-      4,
-      0.5,
-      2,
-      6.5,
-      1,
-      7.5,
-      -1,
-      7.5,
-      -2,
-      6.5,
-      -4,
-      0.5
-    ]],
     "metadata": {
       "lift": 1,
       "drag": 1
-    },
-    "density": "0.1",
-    "internalShape": [
-      [
-        -8,
-        -15,
-        -8,
-        -19,
-        8,
-        -19,
-        8,
-        -15
-      ],
-      [
-        8,
-        -15,
-        12,
-        -15,
-        12,
-        17.5,
-        8,
-        17.5
-      ],
-      [
-        -12,
-        -15,
-        -8,
-        -15,
-        -8,
-        17.5,
-        -12,
-        17.5
-      ],
-      [
-        -8,
-        17.5,
-        -8,
-        15,
-        8,
-        15,
-        8,
-        17.5
-      ],
-      [
-        -8,
-        1,
-        -2,
-        15,
-        -8,
-        15
-      ],
-      [
-        2,
-        15,
-        8,
-        1,
-        8,
-        15
-      ]
-    ],
-    "name": "Small Command Pod",
-    "scale": "1.0",
-    "id": "SML_CMD_POD",
+    }
+  },
+  {
     "type": "AERO",
+    "id": "SML_CMD_POD",
+    "name": "Small Command Pod",
+    "desc": "Skinnier command pod",
+    "scale": 1.0,
     "attachmentPoints": [{
       "x": 0,
       "y": -7.5
     }],
-    "desc": "Skinnier command pod"
+    "metadata": {
+      "lift": 1,
+      "drag": 1
+    }
   },
   {
-    "externalShape": [[
-      -6,
-      8,
-      -6,
-      -6,
-      -4,
-      -8,
-      4,
-      -8,
-      6,
-      -6,
-      6,
-      -2,
-      -4,
-      8
-    ]],
-    "metadata": {
-      "lift": 10,
-      "drag": 0.4
-    },
-    "density": "0.1",
-    "internalShape": [],
-    "name": "Basic fin",
-    "scale": "1.0",
-    "id": "BSC_FIN",
     "type": "AERO",
+    "id": "BSC_FIN",
+    "name": "Basic fin",
+    "desc": "Aerodynamic stabilization",
+    "scale": 1.0,
     "attachmentPoints": [{
       "x": -6,
       "y": 0
     }],
-    "desc": "Aerodynamic stabilization"
+    "metadata": {
+      "lift": 10,
+      "drag": 0.4
+    }
   }
 ]

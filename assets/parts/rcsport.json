@@ -1,31 +1,15 @@
 [{
-  "externalShape": [[
-    -1,
-    1.5,
-    -1,
-    -1.5,
-    0,
-    -2.5,
-    1,
-    -2.5,
-    1,
-    2.5,
-    0,
-    2.5
-  ]],
-  "metadata": {
-    "fuelUsage": 0.1,
-    "power": 50
-  },
-  "density": "0.01",
-  "internalShape": [],
-  "name": "Basic RCS Port",
-  "scale": "1.0",
-  "id": "BSC_RCS_PORT",
   "type": "RCSPORT",
+  "id": "BSC_RCS_PORT",
+  "name": "Basic RCS Port",
+  "desc": "Run-of-the-mill RCS port for all your locomotive needs",
+  "scale": 1.0,
   "attachmentPoints": [{
     "x": 1,
     "y": 0
   }],
-  "desc": "Run-of-the-mill RCS port for all your locomotive needs"
+  "metadata": {
+    "fuelUsage": 0.1,
+    "power": 50
+  }
 }]

@@ -15,12 +15,10 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
@@ -38,11 +36,6 @@ public class Ship extends Entity {
 
     public ShipState state = new ShipState(); // Ship controls and stuff
     
-    // TODO: Move this into the interior
-    private World internalWorld;
-    private float physAccumulator = 0.0f;
-    private Body internalBody;
-
     // Private functions
     private void generateExterior(World world){
         // Create exterior body for the real-world scenes
@@ -51,24 +44,10 @@ public class Ship extends Entity {
         setBody(world.createBody(def));
     }
 
-    private void generateInterior(){
-        // Creates interior world and generates the interior squares
-        internalWorld = new World(new Vector2(), true);
-
-        BodyDef def = new BodyDef();
-		def.type = BodyType.StaticBody;
-		internalBody = internalWorld.createBody(def);
-
-        // Create shapes from the external shapes
-
-    }
-
     // Constructor
     public Ship(final App game, World world, float x, float y, float rotation){
         this.game = game;
-        
         generateExterior(world);
-        generateInterior();
 
         setPosition(x, y);
         setRotation(rotation);
@@ -82,21 +61,14 @@ public class Ship extends Entity {
         }
 
         game.player.draw(batch, parentAlpha);
-        game.debug.render(internalWorld, batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
     }
 
     public void updateWorld(float delta){
         // Step the physics world inside the ship
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            internalWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        }
-
         game.player.act(delta);
     }
 
-    public World getInteriorWorld(){ return internalWorld; }
+    //! public World getInteriorWorld(){ return internalWorld; }
 
     // Space functions
     public void assemble(){

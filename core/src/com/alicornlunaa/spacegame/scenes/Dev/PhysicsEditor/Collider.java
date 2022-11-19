@@ -38,6 +38,21 @@ public class Collider {
         // Constructor
         private Shape(){}
 
+        private Shape(Shape s){
+            for(Vector2 v : s.vertices){
+                vertices.add(v.cpy());
+            }
+            for(int i : s.indices){
+                indices.add(i);
+            }
+
+            convex = s.convex;
+            sensor = s.sensor;
+            friction = s.friction;
+            restitution = s.restitution;
+            density = s.density;
+        }
+
         // Functions
         public void simplify(){
             convex = (vertices.size <= 8);
@@ -151,7 +166,7 @@ public class Collider {
                 s.vertices.add(new Vector2(x, y));
             }
 
-            JSONArray indexData = obj.getJSONArray("vertices");
+            JSONArray indexData = obj.getJSONArray("indices");
             for(int i = 0; i < indexData.length(); i++){
                 s.indices.add(indexData.getInt(i));
             }
@@ -166,6 +181,12 @@ public class Collider {
 
     // Constructors
     public Collider(){}
+
+    public Collider(Collider c){
+        for(Shape s : c.shapes){
+            shapes.add(new Shape(s));
+        }
+    }
 
     // Functions
     public int addShape(){
@@ -231,7 +252,7 @@ public class Collider {
     public static Collider unserialize(JSONArray arr){
         Collider c = new Collider();
 
-        for(int i = 0; i < arr.length(); i += 2){
+        for(int i = 0; i < arr.length(); i++){
             c.shapes.add(Shape.unserialize(arr.getJSONObject(i)));
         }
 

@@ -3,7 +3,6 @@ package com.alicornlunaa.spacegame.scenes.ShipViewScene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -30,7 +29,7 @@ public class ShipViewScene implements Screen {
         inputs.addProcessor(shipPanel);
         inputs.addProcessor(uiPanel);
 
-        game.player.loadBodyToWorld(ship.getInteriorWorld(), Constants.SHIP_PPM);
+        // game.player.loadBodyToWorld(ship.getInteriorWorld(), Constants.SHIP_PPM);
     }
 
     // Functions

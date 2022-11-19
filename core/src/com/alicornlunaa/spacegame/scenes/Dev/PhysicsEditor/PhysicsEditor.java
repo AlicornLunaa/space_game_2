@@ -240,6 +240,7 @@ public class PhysicsEditor implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Load image into reference
+				fileChooser.setPrefsName("com.alicornlunaa.spacegame2.physeditor.img");
                 fileChooser.setMode(Mode.OPEN);
                 fileChooser.setListener(new FileChooserAdapter() {
                     @Override
@@ -258,6 +259,7 @@ public class PhysicsEditor implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Load an image with a file chooser
+				fileChooser.setPrefsName("com.alicornlunaa.spacegame2.physeditor.import");
                 fileChooser.setMode(Mode.OPEN);
                 fileChooser.setListener(new FileChooserAdapter() {
                     @Override
@@ -275,6 +277,7 @@ public class PhysicsEditor implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Load an image with a file chooser
+				fileChooser.setPrefsName("com.alicornlunaa.spacegame2.physeditor.export");
                 fileChooser.setMode(Mode.SAVE);
                 fileChooser.setListener(new FileChooserAdapter() {
                     @Override
@@ -292,6 +295,7 @@ public class PhysicsEditor implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Clear shape
+                shapeBeingEdited = -1;
                 collider.clear();
             }
         }));

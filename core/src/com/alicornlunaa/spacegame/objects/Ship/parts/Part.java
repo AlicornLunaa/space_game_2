@@ -1,12 +1,13 @@
 package com.alicornlunaa.spacegame.objects.Ship.parts;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.PhysicsCollider;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.states.ShipState;
-import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
@@ -29,10 +30,8 @@ public class Part {
     protected ShipState stateRef;
     protected float physScale;
 
-    private TextureRegion externalTexture;
-    private TextureRegion internalTexture;
-    private PhysicsCollider externalCollider;
-    private PhysicsCollider internalCollider;
+    private TextureRegion texture;
+    private PhysicsCollider collider;
     private Array<Vector2> attachmentPoints = new Array<>();
 
     private String type;
@@ -56,12 +55,10 @@ public class Part {
         this.name = name;
         this.description = desc;
 
-        this.externalTexture = texture;
-        this.internalTexture = texture;
+        this.texture = texture;
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
-        externalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
-        internalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
+        collider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
     }
     
     public Part(final App game, final Ship ship, JSONObject obj){
@@ -74,17 +71,10 @@ public class Part {
         description = obj.getString("desc");
         freeform = obj.optBoolean("freeform", false);
 
-        externalTexture = game.atlas.findRegion("parts/" + id.toLowerCase() + "_external");
-        internalTexture = game.atlas.findRegion("parts/" + id.toLowerCase() + "_internal");
-        size.set(externalTexture.getRegionWidth(), externalTexture.getRegionHeight());
+        texture = game.atlas.findRegion("parts/" + id.toLowerCase());
+        size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
-        if(obj.has("externalShape") && obj.has("internalShape")){
-            externalCollider = new PhysicsCollider(obj.getJSONArray("externalShape"));
-            internalCollider = new PhysicsCollider(obj.getJSONArray("internalShape"));
-        } else {
-            externalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0);
-            internalCollider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0);
-        }
+        collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/parts/" + id.toLowerCase() + ".json").readString()));
         
         for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
             JSONObject vec = obj.getJSONArray("attachmentPoints").getJSONObject(i);
@@ -95,24 +85,17 @@ public class Part {
     // Functions
     public void setParent(Body b, float physScale){
         parent = b;
-        externalCollider.setScale(1 / physScale);
-        externalCollider.setPosition(position.cpy().scl(1 / physScale));
-        externalCollider.setRotation(rotation);
-        externalCollider.attachCollider(b);
+        collider.setScale(1 / physScale);
+        collider.setPosition(position.cpy().scl(1 / physScale));
+        collider.setRotation(rotation);
+        collider.attachCollider(b);
         this.physScale = physScale;
-    }
-
-    public void buildInterior(Body b, float physScale){
-        internalCollider.setScale(1 / physScale);
-        internalCollider.setPosition(position.cpy().scl(1 / Constants.SHIP_PPM));
-        internalCollider.setRotation(rotation);
-        internalCollider.attachCollider(b);
     }
 
     public void draw(Batch batch, float delta){
         drawEffectsBelow(batch, delta);
         batch.draw(
-            externalTexture,
+            texture,
             position.x - size.x / 2, position.y - size.y / 2,
             size.x / 2, size.y / 2,
             size.x, size.y,
@@ -148,7 +131,6 @@ public class Part {
     public void dispose(){}
 
     // Getters & setters
-    public PhysicsCollider getInternalCollider(){ return internalCollider; }
     public boolean getFreeform(){ return freeform; }
     public void setFlipX(){ flipX = !flipX; }
     public void setFlipY(){ flipY = !flipY; }
