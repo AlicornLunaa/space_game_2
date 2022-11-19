@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -26,9 +27,11 @@ import com.kotcrab.vis.ui.util.Validators;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.VisCheckBox;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
@@ -51,7 +54,7 @@ public class PhysicsEditor implements Screen {
     private FileChooser fileChooser;
     private VisSplitPane splitPane;
     private VisTable partSettings;
-    // private VerticalGroup shapeGroup;
+    private VerticalGroup shapeGroup;
 
     // Editor variables
     public Vector2 cursorOnPart = new Vector2();
@@ -59,70 +62,80 @@ public class PhysicsEditor implements Screen {
     public Vector2 center = new Vector2();
     public float partSize = 256;
     public Texture reference;
-    public Collider shape = new Collider();
-    public float friction = 1.0f;
-    public float restitution = 0.0f;
-    public float density = 0.0f;
+    public Collider collider = new Collider();
+
+    private int shapeBeingEdited = -1;
 
     // Private functions
-    private void saveCollider(FileHandle handle){
-        // JSONArray shapeData = new JSONArray();
-        // for(PhysShape s : shapes){
-        //     shapeData.put(s.serialize());
-        // }
-        handle.writeString(shape.serialize().toString(), false);
-    }
+    private void saveCollider(FileHandle handle){ handle.writeString(collider.serialize().toString(2), false); }
 
     private void loadCollider(FileHandle handle){
-        // shapes.clear();
+        shapeBeingEdited = -1;
+        collider.clear();
+        collider = Collider.unserialize(new JSONArray(handle.readString()));
 
-        // JSONArray shapeData = new JSONArray(handle.readString());
-        // for(int i = 0; i < shapeData.length(); i++){
-        //     JSONArray shape = shapeData.getJSONArray(i);
-        //     shapes.add(PhysShape.unserialize(game.shapeRenderer, shape));
-        // }
-        shape = Collider.unserialize(new JSONArray(handle.readString()));
+        for(int i = 0; i < collider.getShapeCount(); i++){
+            final int index = i;
+
+            VisTextButton btn = new VisTextButton("Select " + index);
+            btn.addListener(new ChangeListener(){
+                @Override
+                public void changed(ChangeEvent e, Actor a){
+                    selectShape(index);
+                }
+            });
+            btn.pad(5);
+            shapeGroup.addActor(btn);
+        }
     }
 
-    // private void newShape(){
-    //     shapes.add(new PhysShape(game.shapeRenderer));
-    //     shapeBeingEdited = (shapes.size - 1);
+    private void newShape(){
+        shapeBeingEdited = collider.addShape();
 
-    //     VisTextButton btn = new VisTextButton("Select " + shapeBeingEdited);
-    //     btn.addListener(new ChangeListener(){
-    //         final int i = shapes.size - 1;
+        VisTextButton btn = new VisTextButton("Select " + shapeBeingEdited);
+        btn.addListener(new ChangeListener(){
+            final int i = shapeBeingEdited;
 
-    //         @Override
-    //         public void changed(ChangeEvent e, Actor a){
-    //             shapeBeingEdited = i;
-    //         }
-    //     });
-    //     btn.pad(5);
-    //     shapeGroup.addActor(btn);
-    // }
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                selectShape(i);
+            }
+        });
+        btn.pad(5);
+        shapeGroup.addActor(btn);
+    }
 
-    // private void delShape(){
-    //     if(shapeBeingEdited == -1) return;
-    //     if(shapeBeingEdited > shapes.size - 1) return;
-    //     shapes.removeIndex(shapeBeingEdited);
-    //     shapeGroup.removeActorAt(shapeBeingEdited, false);
+    private void delShape(){
+        if(shapeBeingEdited == -1) return;
 
-    //     for(int i = shapeBeingEdited; i < shapeGroup.getChildren().size; i++){
-    //         final int index = i;
+        collider.removeShape(shapeBeingEdited);
+        shapeGroup.removeActorAt(shapeBeingEdited, false);
+
+        for(int i = shapeBeingEdited; i < shapeGroup.getChildren().size; i++){
+            final int index = i;
             
-    //         VisTextButton btn = ((VisTextButton)shapeGroup.getChild(i));
-    //         btn.setText("Select " + i);
-    //         btn.removeListener(btn.getListeners().get(2));
-    //         btn.addListener(new ChangeListener(){
-    //             @Override
-    //             public void changed(ChangeEvent e, Actor a){
-    //                 shapeBeingEdited = index;
-    //             }
-    //         });
-    //     }
+            VisTextButton btn = ((VisTextButton)shapeGroup.getChild(i));
+            btn.setText("Select " + i);
+            btn.removeListener(btn.getListeners().get(2));
+            btn.addListener(new ChangeListener(){
+                @Override
+                public void changed(ChangeEvent e, Actor a){
+                    selectShape(index);
+                }
+            });
+        }
 
-    //     shapeBeingEdited = -1;
-    // }
+        shapeBeingEdited = -1;
+    }
+
+    private void selectShape(int shape){
+        shapeBeingEdited = shape;
+
+        ((VisTextField)ui.getRoot().findActor("frictionField")).setText(String.valueOf(collider.getFriction(shape)));
+        ((VisTextField)ui.getRoot().findActor("restitutionField")).setText(String.valueOf(collider.getRestitution(shape)));
+        ((VisTextField)ui.getRoot().findActor("densityField")).setText(String.valueOf(collider.getDensity(shape)));
+        ((VisCheckBox)ui.getRoot().findActor("sensorCheck")).setChecked(collider.getSensor(shape));
+    }
 
     private void initUI(){
         // Initialize UI
@@ -131,7 +144,6 @@ public class PhysicsEditor implements Screen {
         root.setFillParent(true);
         ui.addActor(root);
         reference = new Texture(1, 1, Format.RGBA8888);
-        shape.triangulate();
 
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
@@ -139,12 +151,13 @@ public class PhysicsEditor implements Screen {
         root.add(menuBar.getTable()).fillX().expandX().top().row();
 
         // Properties menu
-        VisTextField frictionField = new VisValidatableTextField(Validators.FLOATS);
-        VisTextField restitutionField = new VisValidatableTextField(Validators.FLOATS);
-        VisTextField densityField = new VisValidatableTextField(Validators.FLOATS);
-        // VisTextButton newShapeBtn = new VisTextButton("New Shape");
-        // VisTextButton delShapeBtn = new VisTextButton("Delete Shape");
-        // shapeGroup = new VerticalGroup();
+        VisTextField frictionField = new VisValidatableTextField(Validators.FLOATS); frictionField.setName("frictionField");
+        VisTextField restitutionField = new VisValidatableTextField(Validators.FLOATS); restitutionField.setName("restitutionField");
+        VisTextField densityField = new VisValidatableTextField(Validators.FLOATS); densityField.setName("densityField");
+        VisCheckBox sensorCheck = new VisCheckBox("Sensor"); sensorCheck.setName("sensorCheck");
+        VisTextButton newShapeBtn = new VisTextButton("New Shape");
+        VisTextButton delShapeBtn = new VisTextButton("Delete Shape");
+        shapeGroup = new VerticalGroup();
         
         partSettings = new VisTable(); partSettings.top();
         partSettings.add(new VisLabel("Friction")).pad(10).right();
@@ -153,52 +166,64 @@ public class PhysicsEditor implements Screen {
         partSettings.add(restitutionField).expandX().fillX().padRight(10).row();
         partSettings.add(new VisLabel("Density")).pad(10).right();
         partSettings.add(densityField).expandX().fillX().padRight(10).row();
+        partSettings.add(sensorCheck).expandX().fillX().padRight(10).colspan(2).row();
 
-        // partSettings.add(new VisLabel("Shapes")).pad(10, 10, 0, 10).center().colspan(2).row();
-        // partSettings.add(newShapeBtn).expandX().fillX().pad(10);
-        // partSettings.add(delShapeBtn).expandX().fillX().pad(10).row();
-        // partSettings.add(shapeGroup).expandX().fillX().pad(10).colspan(2).row();
+        partSettings.add(new VisLabel("Shapes")).pad(10, 10, 0, 10).center().colspan(2).row();
+        partSettings.add(newShapeBtn).expandX().fillX().pad(10);
+        partSettings.add(delShapeBtn).expandX().fillX().pad(10).row();
+        partSettings.add(shapeGroup).expandX().fillX().pad(10).colspan(2).row();
 
         frictionField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                // if(shapeBeingEdited == -1) return;
-                // shapes.get(shapeBeingEdited).friction = Float.parseFloat(((VisTextField)a).getText());
-                friction = Float.parseFloat(((VisTextField)a).getText());
+                if(shapeBeingEdited == -1) return;
+                try {
+                    collider.setFriction(shapeBeingEdited, Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
             }
         });
 
         restitutionField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                // if(shapeBeingEdited == -1) return;
-                // shapes.get(shapeBeingEdited).restitution = Float.parseFloat(((VisTextField)a).getText());
-                restitution = Float.parseFloat(((VisTextField)a).getText());
+                if(shapeBeingEdited == -1) return;
+                try {
+                    collider.setRestitution(shapeBeingEdited, Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
             }
         });
 
         densityField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                // if(shapeBeingEdited == -1) return;
-                // shapes.get(shapeBeingEdited).density = Float.parseFloat(((VisTextField)a).getText());
-                density = Float.parseFloat(((VisTextField)a).getText());
+                if(shapeBeingEdited == -1) return;
+                try {
+                    collider.setDensity(shapeBeingEdited, Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
             }
         });
 
-        // newShapeBtn.addListener(new ChangeListener(){
-        //     @Override
-        //     public void changed(ChangeEvent e, Actor a){
-        //         newShape();
-        //     }
-        // });
+        sensorCheck.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                if(shapeBeingEdited == -1) return;
+                collider.setSensor(shapeBeingEdited, !collider.getSensor(shapeBeingEdited));
+            }
+        });
 
-        // delShapeBtn.addListener(new ChangeListener(){
-        //     @Override
-        //     public void changed(ChangeEvent e, Actor a){
-        //         delShape();
-        //     }
-        // });
+        newShapeBtn.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                newShape();
+            }
+        });
+
+        delShapeBtn.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                delShape();
+            }
+        });
 
         VisTable placeholder = new VisTable();
         placeholder.setFillParent(true);
@@ -267,8 +292,7 @@ public class PhysicsEditor implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Clear shape
-                shape.vertices.clear();
-                shape.triangles.clear();
+                collider.clear();
             }
         }));
 
@@ -287,18 +311,15 @@ public class PhysicsEditor implements Screen {
         inputs.addProcessor(new InputAdapter(){
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button){
-                // if(shapes.size == 0) return false;
-                // if(shapeBeingEdited == -1) return false;
+                if(shapeBeingEdited == -1) return false;
                 
                 float snapX = (int)(cursorOnPart.x * 2) / 2.0f;
                 float snapY = (int)(cursorOnPart.y * 2) / 2.0f;
 
                 if(button == Buttons.LEFT){
-                    // shapes.get(shapeBeingEdited).vertices.add(new Vector2(snapX - center.x, snapY - center.y));
-                    shape.vertices.add(new Vector2(snapX - center.x, snapY - center.y));
+                    collider.addVertex(shapeBeingEdited, new Vector2(snapX - center.x, snapY - center.y));
                 } else if(button == Buttons.RIGHT){
-                    // shapes.get(shapeBeingEdited).vertices.removeValue(new Vector2(snapX - center.x, snapY - center.y), false);
-                    shape.vertices.removeValue(new Vector2(snapX - center.x, snapY - center.y), false);
+                    collider.removeVertex(shapeBeingEdited, new Vector2(snapX - center.x, snapY - center.y));
                 }
 
                 return false;
@@ -352,75 +373,43 @@ public class PhysicsEditor implements Screen {
         float snapX = (int)(cursorOnPart.x * 2) / 2.0f;
         float snapY = (int)(cursorOnPart.y * 2) / 2.0f;
         
+        collider.calculateShapes();
+
         game.shapeRenderer.begin(ShapeType.Filled);
+        
+        for(int i = 0; i < collider.getShapeCount(); i++){
+            game.shapeRenderer.setColor((shapeBeingEdited == i) ? Color.GREEN : Color.RED);
+
+            for(int j = 0; j < collider.getIndexCount(i); j++){
+                Vector2 v1 = collider.getVertex(i, collider.getIndex(i, j));
+                Vector2 v2 = collider.getVertex(i, collider.getIndex(i, (j + 1) % collider.getIndexCount(i)));
+
+                game.shapeRenderer.rectLine(
+                    corner.x + (v1.x + center.x) * screenScale.x,
+                    corner.y + (v1.y + center.y) * screenScale.y,
+                    corner.x + (v2.x + center.x) * screenScale.x,
+                    corner.y + (v2.y + center.y) * screenScale.y,
+                    2.0f
+                );
+            }
+        }
+
+        for(int i = 0; i < collider.getShapeCount(); i++){
+            game.shapeRenderer.setColor((shapeBeingEdited == i) ? Color.GREEN : Color.RED);
+
+            for(int j = 0; j < collider.getVertexCount(i); j++){
+                Vector2 v = collider.getVertex(i, j);
+
+                game.shapeRenderer.circle(
+                    corner.x + (v.x + center.x) * screenScale.x,
+                    corner.y + (v.y + center.y) * screenScale.y,
+                    6.0f
+                );
+            }
+        }
+        
         game.shapeRenderer.setColor(Color.CYAN);
         game.shapeRenderer.circle(corner.x + snapX * screenScale.x, corner.y + snapY * screenScale.y, 4.0f);
-        
-        game.shapeRenderer.setColor(Color.GREEN);
-        Array<Vector2> arr = shape.triangulate();
-        for(int i = 0; i < arr.size; i += 3){
-            Vector2 v1 = arr.get(i);
-            Vector2 v2 = arr.get((i + 1) % arr.size);
-            Vector2 v3 = arr.get((i + 2) % arr.size);
-            
-            game.shapeRenderer.rectLine(
-                corner.x + (v1.x + center.x) * screenScale.x,
-                corner.y + (v1.y + center.y) * screenScale.y,
-                corner.x + (v2.x + center.x) * screenScale.x,
-                corner.y + (v2.y + center.y) * screenScale.y,
-                2.0f
-            );
-            
-            game.shapeRenderer.rectLine(
-                corner.x + (v2.x + center.x) * screenScale.x,
-                corner.y + (v2.y + center.y) * screenScale.y,
-                corner.x + (v3.x + center.x) * screenScale.x,
-                corner.y + (v3.y + center.y) * screenScale.y,
-                2.0f
-            );
-            
-            game.shapeRenderer.rectLine(
-                corner.x + (v3.x + center.x) * screenScale.x,
-                corner.y + (v3.y + center.y) * screenScale.y,
-                corner.x + (v1.x + center.x) * screenScale.x,
-                corner.y + (v1.y + center.y) * screenScale.y,
-                2.0f
-            );
-        }
-
-        game.shapeRenderer.setColor(Color.RED);
-        for(Vector2 v : shape.vertices){
-            game.shapeRenderer.circle(
-                corner.x + (v.x + center.x) * screenScale.x,
-                corner.y + (v.y + center.y) * screenScale.y,
-                4.0f
-            );
-        }
-
-        // for(PhysShape shape : shapes){
-        //     game.shapeRenderer.setColor((shapeBeingEdited != -1 && shape == shapes.get(shapeBeingEdited)) ? Color.GREEN : Color.RED);
-        //     Array<Vector2> arr = shape.calculateHull();
-
-        //     for(int i = 0; i < arr.size; i++){
-        //         Vector2 v1 = arr.get(i);
-        //         Vector2 v2 = arr.get((i + 1) % arr.size);
-        //         game.shapeRenderer.rectLine(
-        //             corner.x + (v1.x + center.x) * screenScale.x,
-        //             corner.y + (v1.y + center.y) * screenScale.y,
-        //             corner.x + (v2.x + center.x) * screenScale.x,
-        //             corner.y + (v2.y + center.y) * screenScale.y,
-        //             2.0f
-        //         );
-        //     }
-
-        //     for(Vector2 v : shape.vertices){
-        //         game.shapeRenderer.circle(
-        //             corner.x + (v.x + center.x) * screenScale.x,
-        //             corner.y + (v.y + center.y) * screenScale.y,
-        //             4.0f
-        //         );
-        //     }
-        // }
 
         game.shapeRenderer.end();
 
