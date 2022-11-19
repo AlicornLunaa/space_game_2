@@ -61,6 +61,7 @@ public class PhysicsEditor implements Screen {
     public Vector2 cursor = new Vector2();
     public Vector2 center = new Vector2();
     public float partSize = 256;
+    public float snapDistance = 2;
     public Texture reference;
     public Collider collider = new Collider();
 
@@ -155,6 +156,7 @@ public class PhysicsEditor implements Screen {
         VisTextField restitutionField = new VisValidatableTextField(Validators.FLOATS); restitutionField.setName("restitutionField");
         VisTextField densityField = new VisValidatableTextField(Validators.FLOATS); densityField.setName("densityField");
         VisCheckBox sensorCheck = new VisCheckBox("Sensor"); sensorCheck.setName("sensorCheck");
+        VisTextField snapField = new VisValidatableTextField(Validators.FLOATS); snapField.setName("snapField"); snapField.setText("2");
         VisTextButton newShapeBtn = new VisTextButton("New Shape");
         VisTextButton delShapeBtn = new VisTextButton("Delete Shape");
         shapeGroup = new VerticalGroup();
@@ -166,6 +168,8 @@ public class PhysicsEditor implements Screen {
         partSettings.add(restitutionField).expandX().fillX().padRight(10).row();
         partSettings.add(new VisLabel("Density")).pad(10).right();
         partSettings.add(densityField).expandX().fillX().padRight(10).row();
+        partSettings.add(new VisLabel("Snap distnace")).pad(10).right();
+        partSettings.add(snapField).expandX().fillX().padRight(10).row();
         partSettings.add(sensorCheck).expandX().fillX().padRight(10).colspan(2).row();
 
         partSettings.add(new VisLabel("Shapes")).pad(10, 10, 0, 10).center().colspan(2).row();
@@ -199,6 +203,15 @@ public class PhysicsEditor implements Screen {
                 if(shapeBeingEdited == -1) return;
                 try {
                     collider.setDensity(shapeBeingEdited, Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
+            }
+        });
+
+        snapField.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                try {
+                    snapDistance = Float.parseFloat(((VisTextField)a).getText());
                 } catch(NumberFormatException exception){}
             }
         });
@@ -317,8 +330,8 @@ public class PhysicsEditor implements Screen {
             public boolean touchDown(int screenX, int screenY, int pointer, int button){
                 if(shapeBeingEdited == -1) return false;
                 
-                float snapX = (int)(cursorOnPart.x * 2) / 2.0f;
-                float snapY = (int)(cursorOnPart.y * 2) / 2.0f;
+                float snapX = (int)(cursorOnPart.x * snapDistance) / snapDistance;
+                float snapY = (int)(cursorOnPart.y * snapDistance) / snapDistance;
 
                 if(button == Buttons.LEFT){
                     collider.addVertex(shapeBeingEdited, new Vector2(snapX - center.x, snapY - center.y));
@@ -374,8 +387,8 @@ public class PhysicsEditor implements Screen {
 
         // Drawing the colliders
         Vector2 screenScale = new Vector2(1.0f / reference.getWidth(), 1.0f / (reference.getWidth() * ratio)).scl(partSize, partSize * ratio);
-        float snapX = (int)(cursorOnPart.x * 2) / 2.0f;
-        float snapY = (int)(cursorOnPart.y * 2) / 2.0f;
+        float snapX = (int)(cursorOnPart.x * snapDistance) / snapDistance;
+        float snapY = (int)(cursorOnPart.y * snapDistance) / snapDistance;
         
         collider.calculateShapes();
 

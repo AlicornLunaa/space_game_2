@@ -17,8 +17,6 @@ import com.badlogic.gdx.utils.Array;
 public class Interior {
 
     // Variables
-    private final App game;
-
     private Array<InteriorCell> cells = new Array<>();
     private World internalWorld;
     private float physAccumulator = 0.0f;
@@ -27,17 +25,22 @@ public class Interior {
     // Constructor
     public Interior(final App game, final Ship ship){
         // Construct interior cells based on the ship
-        this.game = game;
         internalWorld = new World(new Vector2(), true);
 
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
 		internalBody = internalWorld.createBody(def);
 
-
+        cells.add(new InteriorCell(game, internalBody, -1, 0, false, false, false, true));
+        cells.add(new InteriorCell(game, internalBody, 0, 0, true, false, true, true));
+        cells.add(new InteriorCell(game, internalBody, 1, 0, true, false, true, false));
+        cells.add(new InteriorCell(game, internalBody, 1, 1, false, true, true, false));
+        cells.add(new InteriorCell(game, internalBody, 0, 1, false, true, false, true));
     }
     
     // Functions
+    public World getWorld(){ return internalWorld; }
+
     public void update(float delta){
         physAccumulator += Math.min(delta, 0.25f);
         while(physAccumulator >= Constants.TIME_STEP){
@@ -50,8 +53,6 @@ public class Interior {
         for(InteriorCell c : cells){
             c.draw(batch);
         }
-        
-        game.debug.render(internalWorld, batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
     }
     
 }
