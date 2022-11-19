@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -33,6 +34,7 @@ public class Ship extends Entity {
 
     private Array<Part> parts = new Array<>();
     private AttachmentList attachments = new AttachmentList();
+    private Interior interior;
 
     public ShipState state = new ShipState(); // Ship controls and stuff
     
@@ -48,6 +50,7 @@ public class Ship extends Entity {
     public Ship(final App game, World world, float x, float y, float rotation){
         this.game = game;
         generateExterior(world);
+        interior = new Interior(game, this);
 
         setPosition(x, y);
         setRotation(rotation);
@@ -55,20 +58,17 @@ public class Ship extends Entity {
 
     // Interior functions
     public void drawWorld(Batch batch, float parentAlpha){
-        for(Part p : parts){
-            // TODO: Add interior rendering method
-            p.draw(batch, parentAlpha);
-        }
-
+        interior.draw(batch);
         game.player.draw(batch, parentAlpha);
     }
 
     public void updateWorld(float delta){
         // Step the physics world inside the ship
+        interior.update(delta);
         game.player.act(delta);
     }
 
-    //! public World getInteriorWorld(){ return internalWorld; }
+    public World getInteriorWorld(){ return interior.getWorld(); }
 
     // Space functions
     public void assemble(){
