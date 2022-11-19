@@ -4,6 +4,7 @@
   "name": "Basic Thruster",
   "desc": "Ol' reliable with its 5 degrees if cone angle!",
   "scale": 1.0,
+  "interiorSize": 0,
   "attachmentPoints": [{
     "x": 0,
     "y": 8

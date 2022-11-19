@@ -5,6 +5,7 @@
     "name": "Medium Command Pod",
     "desc": "My friend while developing this game",
     "scale": 1.0,
+    "interiorSize": 1,
     "attachmentPoints": [{
       "x": 0,
       "y": -7.5
@@ -20,6 +21,7 @@
     "name": "Small Command Pod",
     "desc": "Skinnier command pod",
     "scale": 1.0,
+    "interiorSize": 1,
     "attachmentPoints": [{
       "x": 0,
       "y": -7.5
@@ -35,6 +37,7 @@
     "name": "Basic fin",
     "desc": "Aerodynamic stabilization",
     "scale": 1.0,
+    "interiorSize": 0,
     "attachmentPoints": [{
       "x": -6,
       "y": 0

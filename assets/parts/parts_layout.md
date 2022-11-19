@@ -12,6 +12,7 @@ The metadata field depends on the type of part it is.
     "name": "PART_NAME",
     "desc": "PART_DESCRIPTION",
     "scale": 1,
+    "interiorSize": 0,
     "attachmentPoints": [
         {"x": 8, "y": 0}
     ],

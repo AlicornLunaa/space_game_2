@@ -17,16 +17,16 @@ import com.badlogic.gdx.physics.box2d.Body;
 public class InteriorCell {
 
     // Variables
+    private final App game;
+    private final Body body;
+
     protected int x = 0;
     protected int y = 0;
+    protected PhysicsCollider collider;
     private TextureRegion texture;
-    private PhysicsCollider collider;
 
-    // Constructor
-    public InteriorCell(final App game, final Body body, int x, int y, boolean up, boolean down, boolean left, boolean right){
-        this.x = x;
-        this.y = y;
-        
+    // Private functions
+    private void createShapes(boolean up, boolean down, boolean left, boolean right){
         int connections = 0;
         connections += (up ? 1 : 0);
         connections += (down ? 1 : 0);
@@ -118,8 +118,23 @@ public class InteriorCell {
         collider.setPosition(new Vector2(x * texture.getRegionWidth(), y * texture.getRegionHeight()).scl(1 / Constants.SHIP_PPM));
         collider.attachCollider(body);
     }
+    
+    // Constructor
+    public InteriorCell(final App game, final Body body, int x, int y, boolean up, boolean down, boolean left, boolean right){
+        this.game = game;
+        this.body = body;
+        this.x = x;
+        this.y = y;
+
+        createShapes(up, down, left, right);
+    }
 
     // Functions
+    public void updateConnections(boolean up, boolean down, boolean left, boolean right){
+        collider.detachCollider();
+        createShapes(up, down, left, right);
+    }
+
     public void draw(Batch batch){
         batch.draw(
             texture,

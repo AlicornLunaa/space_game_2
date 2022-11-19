@@ -4,6 +4,7 @@
   "name": "Basic Fuselage",
   "desc": "Ol' reliable with its 1000 fuel and battery!",
   "scale": 1.0,
+  "interiorSize": 3,
   "attachmentPoints": [
     {
       "x": 0,

@@ -76,6 +76,8 @@ public class Ship extends Entity {
         for(Part p : parts){
             p.setParent(body, Constants.PPM);
         }
+
+        interior.assemble();
     }
 
     public AttachmentList getAttachments(){ return attachments; }

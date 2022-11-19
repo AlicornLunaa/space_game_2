@@ -81,6 +81,18 @@ public class PhysicsCollider {
         return b;
     }
 
+    public void detachCollider(){
+        // Remove existing body
+        if(bodyRef != null){
+            for(Fixture f : fixtures){
+                if(f == null) continue;
+                bodyRef.destroyFixture(f);
+            }
+
+            fixtures.clear();
+        }
+    }
+
     public void reattach(){ attachCollider(bodyRef); }
 
     // Getters & setters

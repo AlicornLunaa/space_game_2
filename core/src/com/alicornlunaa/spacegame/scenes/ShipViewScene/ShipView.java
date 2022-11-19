@@ -29,7 +29,7 @@ public class ShipView extends Stage {
         super.draw();
 
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.zoom = 0.25f;
+        cam.zoom = 1.65f;
 
         Batch batch = getBatch();
         batch.begin();

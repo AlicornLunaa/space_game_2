@@ -4,6 +4,7 @@
   "name": "Basic RCS Port",
   "desc": "Run-of-the-mill RCS port for all your locomotive needs",
   "scale": 1.0,
+  "interiorSize": 0,
   "attachmentPoints": [{
     "x": 1,
     "y": 0

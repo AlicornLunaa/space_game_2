@@ -23,7 +23,7 @@ import com.badlogic.gdx.utils.Array;
  * Drawing this shape is always in ship-local coordinates
  * as the batch will use a transformation matrix at the ship
  */
-public class Part {
+public class Part implements Comparable<Part> {
 
     // Variables
     protected Body parent;
@@ -38,6 +38,7 @@ public class Part {
     private String id;
     private String name;
     private String description;
+    private int interiorSize;
     private boolean freeform = false;
     private boolean flipX = false;
     private boolean flipY = false;
@@ -69,6 +70,7 @@ public class Part {
         id = obj.getString("id");
         name = obj.getString("name");
         description = obj.getString("desc");
+        interiorSize = obj.getInt("interiorSize");
         freeform = obj.optBoolean("freeform", false);
 
         texture = game.atlas.findRegion("parts/" + id.toLowerCase());
@@ -130,8 +132,10 @@ public class Part {
     public void update(float delta){}
     public void dispose(){}
 
+
     // Getters & setters
     public boolean getFreeform(){ return freeform; }
+    public int getInteriorSize(){ return interiorSize; }
     public void setFlipX(){ flipX = !flipX; }
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }
@@ -147,6 +151,14 @@ public class Part {
     public String getName(){ return name; }
     public String getDescription(){ return description; }
     public Array<Vector2> getAttachmentPoints(){ return attachmentPoints; }
+
+    @Override
+    public int compareTo(Part o) {
+        if(o.getX() == getX() && o.getY() == getY()) return 0;
+        if(o.getX() + o.getY() > getX() + getY()) return 1;
+        if(o.getX() + o.getY() < getX() + getY()) return -1;
+        return 0;
+    }
 
     // Static functions
     public static Part spawn(final App game, final Ship ship, String type, String id){
