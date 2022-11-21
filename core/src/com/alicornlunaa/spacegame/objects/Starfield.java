@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.objects;
 
-import com.badlogic.gdx.Gdx;
+import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,7 +23,7 @@ public class Starfield implements Drawable {
     private float y = 0.0f;
 
     // Constructor
-    public Starfield(int width, int height){
+    public Starfield(final App game, int width, int height){
         Pixmap map = new Pixmap(width, height, Format.RGBA8888);
         map.setColor(new Color(0.1f, 0.1f, 0.1f, 1.0f));
         map.fill();
@@ -37,10 +37,7 @@ public class Starfield implements Drawable {
         texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
         map.dispose();
 
-        shader = new ShaderProgram(
-            Gdx.files.internal("shaders/starfield/vertex.glsl"),
-            Gdx.files.internal("shaders/starfield/fragment.glsl")
-        );
+        shader = game.manager.get("shaders/starfield", ShaderProgram.class);
     }
 
     // Functions

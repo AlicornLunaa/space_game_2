@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.scenes.Dev.PartEditor.PartEditor;
 import com.alicornlunaa.spacegame.scenes.Dev.PhysicsEditor.PhysicsEditor;
 import com.badlogic.gdx.Gdx;
@@ -45,7 +44,6 @@ public class ConsoleWidget extends VisWindow {
         } else if(args[0].equals("set_timewarp")){
             game.spaceScene.spacePanel.universe.setTimewarp(Float.parseFloat(args[1]));
         } else if(args[0].equals("reload_shaders")){
-            ((Star)game.spaceScene.spacePanel.universe.getCelestial(0)).reloadShaders();
         } else if(args[0].equals("part_editor")){
             game.setScreen(new PartEditor(game));
         } else if(args[0].equals("phys_editor")){
