@@ -3,12 +3,14 @@ package com.alicornlunaa.spacegame.util;
 import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.util.AssetLoaders.ShaderAssetLoader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.ray3k.stripe.FreeTypeSkinLoader;
 
@@ -26,10 +28,18 @@ public class Assets extends AssetManager {
 
         // Create loaders
         setLoader(Skin.class, new FreeTypeSkinLoader(getFileHandleResolver()));
+        setLoader(ShaderProgram.class, new ShaderAssetLoader(getFileHandleResolver()));
 
         // Load skin
         load("skins/spacecadet/spacecadet.json", Skin.class);
         load("skins/default/uiskin.json", Skin.class);
+        finishLoading();
+
+        // Load shaders
+        load("shaders/star", ShaderProgram.class);
+        load("shaders/planet", ShaderProgram.class);
+        load("shaders/starfield", ShaderProgram.class);
+        load("shaders/atmosphere", ShaderProgram.class);
 
         // Load the texture atlases
         load("textures_packed/textures.atlas", TextureAtlas.class);
@@ -51,6 +61,12 @@ public class Assets extends AssetManager {
 
     public PooledEffect getEffect(String name){
         return effects.get(name).obtain();
+    }
+
+    public void reloadShaders(String shader){
+        unload(shader);
+        load(shader, ShaderProgram.class);
+        finishLoading();
     }
 
 }

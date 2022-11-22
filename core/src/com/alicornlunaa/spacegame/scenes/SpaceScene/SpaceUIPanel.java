@@ -1,15 +1,16 @@
 package com.alicornlunaa.spacegame.scenes.SpaceScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Ship;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.scenes.MapScene.MapScene;
-import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.ShipViewScene.ShipViewScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
+import com.alicornlunaa.spacegame.widgets.ConsoleWidget;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.widget.VisWindow;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class SpaceUIPanel extends Stage {
@@ -38,6 +40,7 @@ public class SpaceUIPanel extends Stage {
 
     private Label positionLabel;
     private Label velocityLabel;
+    private Label fpsCounter;
 
     // Constructor
     @SuppressWarnings("unchecked")
@@ -97,6 +100,9 @@ public class SpaceUIPanel extends Stage {
         velocityLabel = new Label("Vel: N/a", game.skin);
         velocityLabel.setPosition(20, getHeight() - 90);
         this.addActor(velocityLabel);
+        fpsCounter = new Label("FPS: N/A", game.skin);
+        fpsCounter.setPosition(20, getHeight() - 120);
+        this.addActor(fpsCounter);
 
         // Controls
         this.addListener(new InputListener(){
@@ -105,7 +111,9 @@ public class SpaceUIPanel extends Stage {
                     game.setScreen(new PauseScene(game, (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, (int)getWidth(), (int)getHeight()));
+                    VisWindow console = new ConsoleWidget(game).fadeIn(0.15f);
+                    addActor(console);
+                    setKeyboardFocus(console);
                     return true;
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
                     game.spaceScene.spacePanel.ship.state.debug = !game.spaceScene.spacePanel.ship.state.debug;
@@ -122,6 +130,9 @@ public class SpaceUIPanel extends Stage {
                     game.spaceScene.spacePanel.ship.state.throttle = 0;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.setScreen(new MapScene(game, game.getScreen(), game.player));
+                } else if(keycode == Keys.F5){
+                    game.manager.reloadShaders("shaders/atmosphere");
+                    game.manager.reloadShaders("shaders/planet");
                 }
 
                 return false;
@@ -141,6 +152,7 @@ public class SpaceUIPanel extends Stage {
 
         positionLabel.setText(spacePanel.ship.getBody().getWorldCenter().toString());
         velocityLabel.setText(spacePanel.ship.getBody().getLinearVelocity().toString());
+        fpsCounter.setText((int)(1 / Gdx.graphics.getDeltaTime()));
     }
 
     @Override

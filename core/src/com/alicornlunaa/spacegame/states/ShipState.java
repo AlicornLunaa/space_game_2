@@ -13,4 +13,11 @@ public class ShipState {
     public float vertical = 0; // Translation movement intention
     public float horizontal = 0; // Translation movement intention
     public float artifRoll = 0; // Artificial roll, used by computer control
+
+    public float rcsStored = 0.0f;
+    public float rcsCapacity = 0.0f;
+    public float liquidFuelStored = 0.0f;
+    public float liquidFuelCapacity = 0.0f;
+    public float batteryStored = 0.0f;
+    public float batteryCapacity = 0.0f;
 }

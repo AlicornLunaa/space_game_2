@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.scenes.MapScene.MapScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
@@ -8,7 +9,6 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -17,12 +17,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.ray3k.stripe.FreeTypeSkin;
 
 public class App extends Game {
 
 	// Variables
-	public Assets manager = new Assets();
+	public Assets manager;
 	public PartManager partManager = new PartManager();
 	public Skin skin;
 
@@ -43,7 +42,9 @@ public class App extends Game {
 	public void create(){
 		// Load files and settings
 		ControlSchema.fromFile("./saves/settings/controls.json");
-		skin = new FreeTypeSkin(Gdx.files.internal("skins/default/uiskin.json"));
+
+		manager = new Assets();
+		skin = manager.get("skins/spacecadet/spacecadet.json");
 
 		partManager.load("parts/aero.json");
 		partManager.load("parts/structural.json");
@@ -86,6 +87,8 @@ public class App extends Game {
 				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
 				this.setScreen(spaceScene);
+				this.setScreen(new MapScene(this, spaceScene, player));
+				// this.setScreen(new PhysicsEditor(this));
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
@@ -99,7 +102,7 @@ public class App extends Game {
 	
 	@Override
 	public void dispose(){
-		spaceScene.dispose();
+		// spaceScene.dispose();
 		loadingScene.dispose();
 		manager.dispose();
 		VisUI.dispose();

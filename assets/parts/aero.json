@@ -1,47 +1,50 @@
 [
-    {
-        "id": "MED_CMD_POD",
-        "type": "AERO",
-        "name": "Medium Command Pod",
-        "desc": "Mid-sized command pod",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": -7}
-        ],
-        "metadata": {
-            "drag": 1,
-            "lift": 1
-        }
-    },
-    {
-        "id": "SML_CMD_POD",
-        "type": "AERO",
-        "name": "Small Command Pod",
-        "desc": "Skinnier command pod",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": -7}
-        ],
-        "metadata": {
-            "drag": 1,
-            "lift": 1
-        }
-    },
-    {
-        "id": "BSC_FIN",
-        "type": "AERO",
-        "name": "Basic fin",
-        "desc": "Aerodynamic stabilization",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": -5.5, "y": 0}
-        ],
-        "metadata": {
-            "drag": 0.4,
-            "lift": 10
-        }
+  {
+    "type": "AERO",
+    "id": "MED_CMD_POD",
+    "name": "Medium Command Pod",
+    "desc": "My friend while developing this game",
+    "scale": 1.0,
+    "interiorSize": 1,
+    "attachmentPoints": [{
+      "x": 0,
+      "y": -7.5
+    }],
+    "metadata": {
+      "lift": 1,
+      "drag": 1
     }
+  },
+  {
+    "type": "AERO",
+    "id": "SML_CMD_POD",
+    "name": "Small Command Pod",
+    "desc": "Skinnier command pod",
+    "scale": 1.0,
+    "interiorSize": 1,
+    "attachmentPoints": [{
+      "x": 0,
+      "y": -7.5
+    }],
+    "metadata": {
+      "lift": 1,
+      "drag": 1
+    }
+  },
+  {
+    "type": "AERO",
+    "id": "BSC_FIN",
+    "name": "Basic fin",
+    "desc": "Aerodynamic stabilization",
+    "scale": 1.0,
+    "interiorSize": 0,
+    "attachmentPoints": [{
+      "x": -6,
+      "y": 0
+    }],
+    "metadata": {
+      "lift": 10,
+      "drag": 0.4
+    }
+  }
 ]

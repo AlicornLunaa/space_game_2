@@ -1,15 +1,16 @@
 package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.Misc.ConsoleScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.alicornlunaa.spacegame.widgets.ConsoleWidget;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.kotcrab.vis.ui.widget.VisWindow;
 
 public class PlanetUIPanel extends Stage {
     
@@ -34,7 +35,9 @@ public class PlanetUIPanel extends Stage {
                     game.setScreen(new PauseScene(game,  (int)getWidth(), (int)getHeight()));
                     return true;
                 } else if(keycode == ControlSchema.CONSOLE_OPEN){
-                    game.setScreen(new ConsoleScene(game, (int)getWidth(), (int)getHeight()));
+                    VisWindow console = new ConsoleWidget(game).fadeIn(0.15f);
+                    addActor(console);
+                    setKeyboardFocus(console);
                     return true;
                 }
 

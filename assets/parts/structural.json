@@ -1,20 +1,30 @@
-[
+[{
+  "type": "STRUCTURAL",
+  "id": "BSC_FUSELAGE",
+  "name": "Basic Fuselage",
+  "desc": "Ol' reliable with its 1000 fuel and battery!",
+  "scale": 1.0,
+  "interiorSize": 3,
+  "attachmentPoints": [
     {
-        "id": "BSC_FUSELAGE",
-        "type": "STRUCTURAL",
-        "name": "Basic Fuselage",
-        "desc": "Ol' reliable with its 1000 fuel and battery!",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": -8},
-            {"x": 0, "y": 8},
-            {"x": 7.5, "y": 0},
-            {"x": -7.5, "y": 0}
-        ],
-        "metadata": {
-            "fuelCapacity": 1000,
-            "batteryCapacity": 1000
-        }
+      "x": 0,
+      "y": 8
+    },
+    {
+      "x": 7.5,
+      "y": 0
+    },
+    {
+      "x": 0,
+      "y": -8
+    },
+    {
+      "x": -7.5,
+      "y": 0
     }
-]
+  ],
+  "metadata": {
+    "fuelCapacity": 1000,
+    "batteryCapacity": 1000
+  }
+}]

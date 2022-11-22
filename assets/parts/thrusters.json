@@ -1,19 +1,19 @@
-[
-    {
-        "id": "BSC_THRUSTER",
-        "type": "THRUSTER",
-        "name": "Basic Thruster",
-        "desc": "Ol' reliable with its 5 degrees if cone angle!",
-        "scale": 1,
-        "density": 0.1,
-        "attachmentPoints": [
-            {"x": 0, "y": 7.5}
-        ],
-        "metadata": {
-            "power": 1000,
-            "cone": 5,
-            "fuelUsage": 1,
-            "effect": "effects/rocket"
-        }
-    }
-]
+[{
+  "type": "THRUSTER",
+  "id": "BSC_THRUSTER",
+  "name": "Basic Thruster",
+  "desc": "Ol' reliable with its 5 degrees if cone angle!",
+  "scale": 1.0,
+  "interiorSize": 0,
+  "attachmentPoints": [{
+    "x": 0,
+    "y": 8
+  }],
+  "metadata": {
+    "coneSpeed": 1.5,
+    "coneAngle": 5,
+    "effect": "effects/rocket",
+    "fuelUsage": 1,
+    "power": 1000
+  }
+}]

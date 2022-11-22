@@ -86,8 +86,7 @@ public class Celestial extends Entity {
 
     @Override
     public void draw(Batch batch, float a){
-        if(!this.getDebug()) return;
-
+        if(!Constants.DEBUG) return;
         batch.end();
 
         ShapeRenderer s = game.shapeRenderer;
@@ -99,6 +98,8 @@ public class Celestial extends Entity {
         s.setColor(Color.YELLOW);
         s.circle(0, 0, getRadius(), 500);
         s.end();
+        
+        game.debug.render(influenceWorld, batch.getProjectionMatrix().cpy().scl(Constants.PPM));
 
         batch.begin();
     }

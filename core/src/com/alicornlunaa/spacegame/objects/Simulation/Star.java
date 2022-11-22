@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.objects.Simulation;
 
 import com.alicornlunaa.spacegame.App;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,24 +21,9 @@ public class Star extends Celestial {
 
     // Private functions
     public void generateSprite(){
-        pixmap = new Pixmap(Math.min((int)radius * 2, 2000), Math.min((int)radius * 2, 2000), Format.RGBA8888);
+        pixmap = new Pixmap(2000, 2000, Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
-
-        // for(int x = 0; x < pixmap.getWidth(); x++){
-        //     for(int y = 0; y < pixmap.getHeight(); y++){
-        //         int mX = x - pixmap.getWidth() / 2;
-        //         int mY = y - pixmap.getHeight() / 2;
-        //         int radSqr = mX * mX + mY * mY;
-        //         Color c = new Color(1, 1, 1, 1);
-
-        //         if(radSqr > (float)Math.pow(pixmap.getWidth() / 2, 2)) c.a = 0;
-
-        //         pixmap.setColor(c);
-        //         pixmap.drawPixel(x, y);
-        //     }
-        // }
-
         starTexture = new Texture(pixmap);
         pixmap.dispose();
     }
@@ -50,15 +34,10 @@ public class Star extends Celestial {
         generateSprite();
         setPosition(x, y);
 
-        shader = new ShaderProgram(Gdx.files.internal("shaders/star/vertex.glsl"), Gdx.files.internal("shaders/star/fragment.glsl"));
+        shader = game.manager.get("shaders/star", ShaderProgram.class);
     }
 
     // Functions
-    public void reloadShaders(){
-        shader.dispose();
-        shader = new ShaderProgram(Gdx.files.internal("shaders/star/vertex.glsl"), Gdx.files.internal("shaders/star/fragment.glsl"));
-    }
-
     @Override
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
