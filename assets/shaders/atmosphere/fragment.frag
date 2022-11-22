@@ -15,12 +15,12 @@ precision mediump float;
 #define OPTICAL_DEPTH_POINTS 10
 
 #define planetPosition vec3(0.5, 0.5, 0.0)
-#define cameraWorldPos vec3(0.0, 0.0, -10.0)
+#define cameraWorldPos vec3(0.0, 0.0, -50.0)
 
-varying vec4 v_color;
 varying vec2 v_texcoord;
 
 uniform sampler2D u_texture;
+uniform vec3 atmosColor;
 uniform vec3 starDirection;
 uniform float atmosPlanetRatio;
 
@@ -92,24 +92,22 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 dirToSun,
 }
 
 vec4 calculateScattering(){
-    vec2 fragPos = v_texcoord;
-    vec3 fragPos3D = fakeSphere(planetPosition.xy, 0.5, fragPos);
+    vec3 fragPos3D = fakeSphere(planetPosition.xy, 0.5, v_texcoord);
     vec3 fragToSun = normalize(starDirection);
     vec3 fragToCam = normalize(fragPos3D - cameraWorldPos);
 
-    if(distance(fragPos3D, planetPosition) - 0.0000001 <= (atmosPlanetRatio / 2.0)) return vec4(0, 0, 0, 1);
+    if(distance(fragPos3D, planetPosition) - 0.0000001 <= (atmosPlanetRatio / 2.0)) return vec4(0, 0, 0, 0);
     
     vec2 hitInfo = sphereRaycast(planetPosition, 0.5, cameraWorldPos, fragToCam);
-    float distToSurface = sphereRaycast(planetPosition, atmosPlanetRatio, cameraWorldPos, fragToCam).y;
     float distToAtmos = hitInfo.x;
     float distThruAtmos = hitInfo.y;
 
     if(distThruAtmos > 0.0){
-        vec3 light = calculateLight(fragPos3D, fragToCam, distThruAtmos, fragToSun, v_color.rgb);
-        return vec4(light, 1.0);
+        vec3 light = calculateLight(fragPos3D, fragToCam, distThruAtmos, fragToSun, atmosColor);
+        return vec4(light, length(light));
     }
 
-    return vec4(0, 0, 0, 1);
+    return vec4(0, 0, 0, 0);
 }
 
 void main(){

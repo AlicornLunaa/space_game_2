@@ -153,7 +153,24 @@ public class Universe extends Actor {
         
         return closest;
     }
-    
+
+    public Vector2 getDirToNearestStar(Entity e){
+        float minDist = Float.MAX_VALUE;
+        Vector2 dir = new Vector2();
+        Vector2 absPos = getUniversalPosition(e);
+
+        for(Celestial c : celestials){
+            Vector2 cAbsPos = getUniversalPosition(c);
+            float curDist = cAbsPos.dst2(absPos);
+            if(curDist < minDist && c instanceof Star){
+                minDist = curDist;
+                dir = cAbsPos.cpy().sub(absPos);
+            }
+        }
+
+        return dir;
+    }
+
     public void setTimewarp(float warp){
         paths.clear();
         initPos.clear();
