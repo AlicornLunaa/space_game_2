@@ -10,11 +10,13 @@ import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -37,7 +39,7 @@ public class Planet extends Celestial {
     private float atmosRadius;
     private float atmosDensity = 1.0f;
     private Color terrainColor = new Color(.72f, 0.7f, 0.9f, 1);
-    private Color atmosColor = new Color(0.6f, 0.6f, 1, 0.5f);
+    private Color atmosColor = new Color(0.6f, 0.6f, 1, 1);
     private long seed = 123;
 
     // World variables
@@ -80,23 +82,9 @@ public class Planet extends Celestial {
     }
     
     private void generateAtmosphereSprite(){
-        int imgRad = Math.min((int)atmosRadius * 2, 100);
-        pixmap = new Pixmap(imgRad, imgRad, Format.RGBA8888);
-
-        for(int x = 0; x < pixmap.getWidth(); x++){
-            for(int y = 0; y < pixmap.getHeight(); y++){
-                int mX = x - imgRad / 2;
-                int mY = y - imgRad / 2;
-                float rad = (float)Math.sqrt((float)(mX * mX + mY * mY));
-                Color c = new Color(atmosColor.r, atmosColor.g, atmosColor.b, atmosDensity * (0.5f - (rad / (float)imgRad)));
-
-                if(rad > imgRad / 2) c.a = 0;
-
-                pixmap.setColor(c);
-                pixmap.drawPixel(x, y);
-            }
-        }
-
+        pixmap = new Pixmap(500, 500, Format.RGBA8888);
+        pixmap.setColor(atmosColor);
+        pixmap.fill();
         atmosTexture = new Texture(pixmap);
         pixmap.dispose();
     }
@@ -290,8 +278,17 @@ public class Planet extends Celestial {
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
 
+        ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
+        ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
+
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
+
+        atmosShader.setUniformf("atmosphereRadius", atmosRadius);
+        atmosShader.setUniformf("planetPosition", getX(), getY());
+        atmosShader.setUniformf("starPosition", 78000, 0);
+        batch.setShader(atmosShader);
         batch.draw(atmosTexture, atmosRadius * -1, atmosRadius * -1, atmosRadius * 2, atmosRadius * 2);
+        batch.setShader(null);
     }
 
     @Override

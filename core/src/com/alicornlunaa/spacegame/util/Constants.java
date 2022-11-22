@@ -17,6 +17,6 @@ public class Constants {
     public static final float GRAVITY_CONSTANT = 0.6f;
     public static final float DRAG_COEFFICIENT = 0.004f;
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
 }

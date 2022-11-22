@@ -10,6 +10,7 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
 import com.alicornlunaa.spacegame.widgets.ConsoleWidget;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -125,6 +126,9 @@ public class SpaceUIPanel extends Stage {
                     game.spaceScene.spacePanel.ship.state.throttle = 0;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.setScreen(new MapScene(game, game.getScreen(), game.player));
+                } else if(keycode == Keys.F5){
+                    game.manager.reloadShaders("shaders/atmosphere");
+                    game.manager.reloadShaders("shaders/planet");
                 }
 
                 return false;

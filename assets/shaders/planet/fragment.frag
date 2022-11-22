@@ -6,7 +6,7 @@ uniform float temperature;
 
 void main(){
     if(length(v_texCoords - vec2(0.5, 0.5)) <= 0.5){
-        gl_FragColor = v_color * vec4(1, 0.8, 0, 1);
+        gl_FragColor = v_color;
     } else {
         gl_FragColor = vec4(0, 0, 0, 0);
     }

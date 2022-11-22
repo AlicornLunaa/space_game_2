@@ -63,4 +63,10 @@ public class Assets extends AssetManager {
         return effects.get(name).obtain();
     }
 
+    public void reloadShaders(String shader){
+        unload(shader);
+        load(shader, ShaderProgram.class);
+        finishLoading();
+    }
+
 }

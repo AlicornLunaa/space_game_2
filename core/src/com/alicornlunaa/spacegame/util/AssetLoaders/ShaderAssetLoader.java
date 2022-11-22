@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.Array;
 @SuppressWarnings("all")
 public class ShaderAssetLoader extends SynchronousAssetLoader<ShaderProgram, ShaderAssetLoader.ShaderParameters> {
 
-    private static final String VERTEX_SHADER_FILE = "/vertex.glsl";
-    private static final String FRAGMENT_SHADER_FILE = "/fragment.glsl";
+    private static final String VERTEX_SHADER_FILE = "/vertex.vert";
+    private static final String FRAGMENT_SHADER_FILE = "/fragment.frag";
 
     public ShaderAssetLoader(FileHandleResolver resolver) {
         super(resolver);
