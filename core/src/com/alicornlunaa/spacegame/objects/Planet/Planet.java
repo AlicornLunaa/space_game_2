@@ -283,9 +283,13 @@ public class Planet extends Celestial {
 
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
 
-        atmosShader.setUniformf("atmosphereRadius", atmosRadius);
-        atmosShader.setUniformf("planetPosition", getX(), getY());
-        atmosShader.setUniformf("starPosition", 78000, 0);
+        float width = 1280.0f; float height = 720.0f;
+        atmosShader.setUniformf("u_resolution", width, height);
+        atmosShader.setUniformf("planetPosition", 0.5f, 0.5f, 0.0f);
+        atmosShader.setUniformf("planetRadius", 0.2f);
+        atmosShader.setUniformf("atmosRadius", 0.3f);
+        atmosShader.setUniformf("starPosition", 50, 0, 0);
+        atmosShader.setUniformf("cameraWorldPos", 0, 0, 10);
         batch.setShader(atmosShader);
         batch.draw(atmosTexture, atmosRadius * -1, atmosRadius * -1, atmosRadius * 2, atmosRadius * 2);
         batch.setShader(null);

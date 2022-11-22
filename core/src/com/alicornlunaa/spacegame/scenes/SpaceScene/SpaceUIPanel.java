@@ -40,6 +40,7 @@ public class SpaceUIPanel extends Stage {
 
     private Label positionLabel;
     private Label velocityLabel;
+    private Label fpsCounter;
 
     // Constructor
     @SuppressWarnings("unchecked")
@@ -99,6 +100,9 @@ public class SpaceUIPanel extends Stage {
         velocityLabel = new Label("Vel: N/a", game.skin);
         velocityLabel.setPosition(20, getHeight() - 90);
         this.addActor(velocityLabel);
+        fpsCounter = new Label("FPS: N/A", game.skin);
+        fpsCounter.setPosition(20, getHeight() - 120);
+        this.addActor(fpsCounter);
 
         // Controls
         this.addListener(new InputListener(){
@@ -148,6 +152,7 @@ public class SpaceUIPanel extends Stage {
 
         positionLabel.setText(spacePanel.ship.getBody().getWorldCenter().toString());
         velocityLabel.setText(spacePanel.ship.getBody().getLinearVelocity().toString());
+        fpsCounter.setText((int)(1 / Gdx.graphics.getDeltaTime()));
     }
 
     @Override
