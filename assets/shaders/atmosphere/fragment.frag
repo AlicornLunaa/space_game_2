@@ -28,7 +28,7 @@ vec3 fakeSphere(vec2 center, float radius, vec2 position){
     vec2 p = position - center;
     vec3 threeD = vec3(position.x, position.y, sqrt(pow(radius, 2.0) - pow(p.x, 2.0) - pow(p.y, 2.0)));
     
-    if(length(p) > radius) return vec3(position, 0.0);
+    if(length(p) >= radius) return vec3(position, 0.0);
     return threeD;
 }
 
@@ -84,7 +84,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 dirToSun,
         float localDensity = densityAtPoint(inScatterPoint);
         viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * float(i));
 
-        inScatterLight += localDensity * transmittance * RAYLEIGH_CONSTANTS;
+        inScatterLight += localDensity * transmittance * RAYLEIGH_CONSTANTS * atmosColor;
         inScatterPoint += rayDir * stepSize;
     }
 
