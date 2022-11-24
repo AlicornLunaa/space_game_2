@@ -12,12 +12,15 @@ import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -32,6 +35,7 @@ public class Planet extends Celestial {
     // Variables
     private final OpenSimplexNoise noise;
     private final Universe universe;
+    private final OrthographicCamera cam;
 
     @SuppressWarnings("unused")
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
@@ -126,9 +130,10 @@ public class Planet extends Celestial {
     }
 
     // Constructor
-    public Planet(final App game, final Universe universe, final World world, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
+    public Planet(final App game, final Universe universe, final OrthographicCamera cam, final World world, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
         super(game, world, radius);
         this.universe = universe;
+        this.cam = cam;
         
         atmosRadius = atmosRad;
         terrainColor = terrain;
@@ -282,13 +287,16 @@ public class Planet extends Celestial {
 
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
-        Vector2 dirToNearestStar = universe.getDirToNearestStar(this);
 
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
+
         batch.setShader(atmosShader);
+        atmosShader.setUniformMatrix("invProjViewMatrix", cam.invProjectionView.cpy().inv());
+        atmosShader.setUniformf("cameraWorldPos", cam.position);
+        atmosShader.setUniformf("planetCenter", new Vector3(universe.getUniversalPosition(this), 0.0f));
         atmosShader.setUniformf("atmosColor", atmosColor.r, atmosColor.g, atmosColor.b);
-        atmosShader.setUniformf("starDirection", dirToNearestStar.x, -dirToNearestStar.y, 0);
-        atmosShader.setUniformf("atmosPlanetRatio", 0.42f);
+        atmosShader.setUniformf("planetRadius", getRadius());
+        atmosShader.setUniformf("atmosRadius", getAtmosRadius());
         batch.draw(atmosTexture, atmosRadius * -1, atmosRadius * -1, atmosRadius * 2, atmosRadius * 2);
         batch.setShader(null);
     }

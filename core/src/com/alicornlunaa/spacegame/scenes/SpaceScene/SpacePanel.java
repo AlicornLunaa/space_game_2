@@ -42,15 +42,15 @@ public class SpacePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
-        universe.addEntity(ship);
-        universe.addEntity(game.player);
+        // universe.addEntity(ship);
+        // universe.addEntity(game.player);
         universe.addCelestial(new Star(game, world, 78000, 0, 15000), null);
-        universe.addCelestial(new Planet(game, universe, world, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), universe.getCelestial(0));
-        universe.addCelestial(new Planet(game, universe, world, 5000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(1));
+        universe.addCelestial(new Planet(game, universe, (OrthographicCamera)getCamera(), world, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), universe.getCelestial(0));
+        universe.addCelestial(new Planet(game, universe, (OrthographicCamera)getCamera(), world, 5000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(1));
         universe.createCelestialOrbit(universe.getCelestial(1));
         universe.createCelestialOrbit(universe.getCelestial(2));
-        universe.createEntityOrbit(ship);
-        universe.createEntityOrbit(game.player);
+        // universe.createEntityOrbit(ship);
+        // universe.createEntityOrbit(game.player);
         this.addActor(universe);
 
         game.player.drive(ship);
@@ -87,7 +87,8 @@ public class SpacePanel extends Stage {
 
         // Parent camera to the player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(universe.getUniversalPosition(ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
+        // cam.position.set(universe.getUniversalPosition(ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
+        cam.position.set(universe.getUniversalPosition(universe.getCelestial(2)), 0);
         cam.update();
     }
 
