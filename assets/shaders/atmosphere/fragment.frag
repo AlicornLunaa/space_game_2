@@ -8,7 +8,7 @@ precision mediump float;
 
 #define WAVELENGTHS vec3(700, 530, 440)
 #define SCATTER_DIVISOR 400.0
-#define SCATTER_STRENGTH 4.0
+#define SCATTER_STRENGTH 8.0
 #define RAYLEIGH_CONSTANTS vec3(pow(SCATTER_DIVISOR / WAVELENGTHS.r, 4.0), pow(SCATTER_DIVISOR / WAVELENGTHS.g, 4.0), pow(SCATTER_DIVISOR / WAVELENGTHS.b, 4.0)) * SCATTER_STRENGTH
 #define DENSITY_FALLOFF 0.8
 #define IN_SCATTER_POINTS 5
@@ -20,10 +20,10 @@ precision mediump float;
 #define rad 0.5
 
 varying vec2 v_texcoord;
+varying vec3 v_viewvector;
 
 uniform sampler2D u_texture;
 uniform vec3 atmosColor;
-// uniform vec3 starDirection;
 uniform float atmosPlanetRatio;
 
 float sphereDepth(vec2 sample, float radius){
@@ -115,7 +115,7 @@ vec4 calculateScattering(){
     if(distThruAtmos > 0.0){
         vec3 pointInAtmosphere = rayOrigin + rayDir * distToAtmos;
         vec3 light = calculateLight(pointInAtmosphere, rayDir, distThruAtmos, fragToSun, atmosColor);
-        color += light;
+        color += light * 0.2;
     }
 
     return vec4(color, length(color));
