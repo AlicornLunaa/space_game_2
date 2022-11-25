@@ -24,6 +24,8 @@ public class ShaderScene implements Screen {
     private Stage stage;
 
     private Texture texture;
+    private float time = 0.0f;
+    private float lastUpdate = 0.0f;
 
     public ShaderScene(final App game){
         this.game = game;
@@ -31,7 +33,7 @@ public class ShaderScene implements Screen {
         cam = (OrthographicCamera)stage.getCamera();
 
         // cam.zoom = 0.05f;
-        cam.position.set(0, 0, 0);
+        cam.position.set(0, 0, -2);
         cam.update();
 
         texture = new Texture(128, 128, Format.RGBA8888);
@@ -53,6 +55,13 @@ public class ShaderScene implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
 
+        lastUpdate += delta;
+        time += delta;
+        if(lastUpdate > 2.f){
+            game.manager.reloadShaders("shaders/atmosphere");
+            lastUpdate = 0.f;
+        }
+
         ShaderProgram shader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
 
         Batch batch = stage.getBatch();
@@ -62,8 +71,8 @@ public class ShaderScene implements Screen {
 
         batch.setShader(shader);
         shader.setUniformMatrix("u_invProjViewMatrix", cam.invProjectionView);
-        shader.setUniformf("atmosColor", Color.WHITE);
-        shader.setUniformf("atmosPlanetRatio", 0.85f);
+        shader.setUniformf("u_cameraPosition", cam.position);
+        shader.setUniformf("u_time", time);
         batch.draw(texture, 0, 0, 1, 1);
 
         batch.setShader(null);

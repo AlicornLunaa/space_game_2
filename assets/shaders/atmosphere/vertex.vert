@@ -10,6 +10,5 @@ varying vec3 v_viewvector;
 void main(){
     v_texcoord = a_texCoord0;
     v_viewvector = vec3(u_invProjViewMatrix * vec4(a_texCoord0.xy * 2.0 - 1.0, 0.0, -1.0));
-    
     gl_Position = u_projTrans * a_position;
 }

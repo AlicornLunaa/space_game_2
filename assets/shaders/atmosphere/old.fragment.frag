@@ -1,12 +1,15 @@
+/** Reference Sebastian Lague https://www.youtube.com/watch?v=DxfEbulyFcY */
 #ifdef GL_ES
 precision mediump float;
 #endif
 
+#define PI 3.14159265359
+
 #define WAVELENGTHS vec3(700, 530, 440)
 #define SCATTER_DIVISOR 400.0
-#define SCATTER_STRENGTH 2.0
+#define SCATTER_STRENGTH 1.0
 #define RAYLEIGH_CONSTANTS vec3(pow(SCATTER_DIVISOR / WAVELENGTHS.r, 4.0), pow(SCATTER_DIVISOR / WAVELENGTHS.g, 4.0), pow(SCATTER_DIVISOR / WAVELENGTHS.b, 4.0)) * SCATTER_STRENGTH
-#define DENSITY_FALLOFF 8.0
+#define DENSITY_FALLOFF 1.0
 #define MAX_IN_SCATTER_POINTS 8
 #define MAX_OPTICAL_DEPTH_POINTS 8
 #define EPSILON 1e-4
@@ -38,7 +41,7 @@ vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
         float far = (-b + s) / (2.0 * a);
 
         if(far >= 0.0){
-            return vec2(near, far - near);
+            return vec2(far, far - near);
         }
     }
 
@@ -55,7 +58,7 @@ float densityAtPoint(vec3 sample){
 float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength){
     vec3 sample = rayOrigin;
     float stepSize = rayLength / float(MAX_OPTICAL_DEPTH_POINTS - 1);
-    float opticalDepth;
+    float opticalDepth = 0.0;
 
     for(int i = 0; i < MAX_OPTICAL_DEPTH_POINTS; i++){
         float localDensity = densityAtPoint(sample);
@@ -66,48 +69,46 @@ float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength){
     return opticalDepth;
 }
 
-vec3 light(vec3 rayOrigin, vec3 rayDir, float rayLength){
-    vec3 inScatterLight = vec3(0.0);
+vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength){
     vec3 inScatterPoint = rayOrigin;
+    float inScatterLight = 0.0;
     float stepSize = rayLength / float(MAX_IN_SCATTER_POINTS - 1);
 
     for(int i = 0; i < MAX_IN_SCATTER_POINTS; i++){
         float sunRayLength = sphereRaycast(u_planetCenter, u_atmosRadius, inScatterPoint, sunPos).y;
         float sunRayOpticalDepth = opticalDepth(inScatterPoint, sunPos, sunRayLength);
         float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * float(i));
+        float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth));
         float localDensity = densityAtPoint(inScatterPoint);
-        vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * RAYLEIGH_CONSTANTS);
 
-        inScatterLight += localDensity * transmittance * RAYLEIGH_CONSTANTS;
+        inScatterLight += localDensity * transmittance * stepSize;
         inScatterPoint += rayDir * stepSize;
     }
 
-    return inScatterLight;
+    return vec3(inScatterLight);
 }
 
-void main() {
-    vec3 color = vec3(0, 0, 0);
+vec4 calculateScattering(){
+    vec3 color = vec3(0, 1, 0);
     vec3 rayOrigin = u_cameraPosition;
     vec3 rayDir = normalize(v_viewvector);
 
-    vec2 surfaceRay = sphereRaycast(u_planetCenter, u_planetRadius, rayOrigin, rayDir);
-    vec2 atmosRay = sphereRaycast(u_planetCenter, u_atmosRadius, rayOrigin, rayDir);
-
-    float tMin = 1e19;
-    if(surfaceRay.x > 0.0 && tMin > surfaceRay.x) {
-        vec3 sN = normalize((normalize(rayOrigin + rayDir * surfaceRay.x) - u_planetCenter));
-        tMin = surfaceRay.x;
-        color = vec3(max(0.0, dot(sN, sunPos)));
+    float distToSurface = sphereRaycast(u_planetCenter, u_planetRadius, rayOrigin, rayDir).x;
+    
+    vec2 hitInfo = sphereRaycast(u_planetCenter, u_atmosRadius, rayOrigin, rayDir);
+    float distToAtmos = hitInfo.x;
+    float distThruAtmos = min(hitInfo.y, distToSurface - distToAtmos);
+    
+    if(distThruAtmos > 0.0){
+        float epsilon = 0.0001;
+        vec3 pointInAtmosphere = rayOrigin + rayDir * (distToAtmos + epsilon);
+        vec3 light = calculateLight(pointInAtmosphere, rayDir, (distThruAtmos - epsilon * 2.0));
+        return vec4(light, 1.0);
     }
 
-    float distToAtmos = atmosRay.x;
-    float distThruAtmos = min(atmosRay.y, tMin - atmosRay.x);
-    if(distThruAtmos > 0.0 && tMin > atmosRay.x) {
-        vec3 pointInAtmosphere = rayOrigin + rayDir * (distToAtmos - EPSILON);
-        vec3 light = light(pointInAtmosphere, rayDir, distThruAtmos + EPSILON * 2.0);
+    return vec4(color, 0.0);
+}
 
-        color = color * (1.0 - light) + light;
-    }
-
-    gl_FragColor = vec4(color, 1.0);
+void main(){
+    gl_FragColor = calculateScattering();
 }
