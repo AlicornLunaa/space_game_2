@@ -2,21 +2,21 @@
 precision mediump float;
 #endif
 
-#define PI 3.14159265359
-#define MAX_FLOAT 34000000000000000000.0
-#define CENTER vec3(0.5, 0.5, 0.5)
-#define RADIUS 0.5
+#define EPSILON 1e-4
+#define u_planetCenter vec3(0.0, 0.0, 2.235)
+#define u_planetRadius 1.0
 
 varying vec2 v_texcoord;
 
 uniform sampler2D u_texture;
-uniform vec3 starDirection;
+uniform vec4 u_planetColor;
+uniform vec3 u_starDirection;
 
-vec2 sphereRaycast(vec3 rayOrigin, vec3 rayDir){
-    vec3 offset = rayOrigin - CENTER;
+vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
+    vec3 offset = rayOrigin - center;
     float a = 1.0;
     float b = 2.0 * dot(offset, rayDir);
-    float c = dot(offset, offset) - pow(RADIUS, 2.0);
+    float c = dot(offset, offset) - radius * radius;
     float d = b * b - 4.0 * a * c;
 
     if(d > 0.0){
@@ -25,23 +25,33 @@ vec2 sphereRaycast(vec3 rayOrigin, vec3 rayDir){
         float far = (-b + s) / (2.0 * a);
 
         if(far >= 0.0){
-            return vec2(far, min(-b - s, -b + s));
+            return vec2(near, far - near);
         }
     }
 
-    return vec2(MAX_FLOAT, 0.0);
+    return vec2(0.0);
 }
 
-float sphereDepth(vec2 sample){
-    if(length(sample - CENTER.xy) >= RADIUS) return 0.0;
-    return sqrt(pow(RADIUS, 2.0) - pow(sample.x - CENTER.x, 2.0) - pow(sample.y - CENTER.y, 2.0)) + CENTER.z;
-}
+void main() {
+    vec2 uv = (v_texcoord * 2.0 - 1.0);
+    vec3 cameraZ = vec3(0, 0, 1);
+    vec3 cameraX = vec3(1, 0, 0);
+    vec3 cameraY = vec3(0, 1, 0);
 
-void main(){
-    vec3 position = vec3(v_texcoord, sphereDepth(v_texcoord));
-    vec3 rayOrigin = vec3(-1.0, 0.5, 1.0);
-    vec3 rayDir = normalize(position - rayOrigin);
-    vec2 hitInfo = sphereRaycast(rayOrigin, rayDir);
+    vec4 color = vec4(0, 0, 0, 0);
+    vec3 rayOrigin = vec3(0, 0, 0);
+    vec3 rayDir = normalize(uv.x * cameraX + uv.y * cameraY + 2.0 * cameraZ);
 
-    gl_FragColor = vec4(vec3(hitInfo.y), 1);
+    vec2 surfaceRay = sphereRaycast(u_planetCenter, u_planetRadius, rayOrigin, rayDir);
+    float distToSurface = surfaceRay.x;
+    float distThruSurface = surfaceRay.y;
+
+    float tMin = 1e19;
+    if(distThruSurface > 0.0 && tMin > distToSurface) {
+        vec3 sN = normalize((normalize(rayOrigin + rayDir * distToSurface) - u_planetCenter));
+        tMin = surfaceRay.x;
+        color = u_planetColor.rgba * vec4(vec3(max(0.0, dot(sN, u_starDirection))), 1.0);
+    }
+
+    gl_FragColor = color;
 }

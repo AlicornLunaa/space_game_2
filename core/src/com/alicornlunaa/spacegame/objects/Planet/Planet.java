@@ -84,7 +84,7 @@ public class Planet extends Celestial {
     }
     
     private void generateAtmosphereSprite(){
-        pixmap = new Pixmap(500, 500, Format.RGBA8888);
+        pixmap = new Pixmap(1, 1, Format.RGBA8888);
         pixmap.setColor(atmosColor);
         pixmap.fill();
         atmosTexture = new Texture(pixmap);
@@ -281,14 +281,18 @@ public class Planet extends Celestial {
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
 
+        Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.f);
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
 
+        batch.setShader(terrainShader);
+        terrainShader.setUniformf("u_planetColor", terrainColor);
+        terrainShader.setUniformf("u_starDirection", dirToStar);
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
 
         batch.setShader(atmosShader);
         atmosShader.setUniformf("u_atmosColor", atmosColor);
-        atmosShader.setUniformf("u_starDirection", new Vector3(universe.getDirToNearestStar(this), 0));
+        atmosShader.setUniformf("u_starDirection", dirToStar);
         atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
         batch.draw(atmosTexture, atmosRadius * -1.05f, atmosRadius * -1.05f, atmosRadius * 2.1f, atmosRadius * 2.1f);
         batch.setShader(null);
