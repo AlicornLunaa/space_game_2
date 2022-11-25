@@ -1,17 +1,15 @@
 package com.alicornlunaa.spacegame.scenes.Dev;
 
 import com.alicornlunaa.spacegame.App;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -72,6 +70,7 @@ public class ShaderScene implements Screen {
         batch.setProjectionMatrix(cam.combined);
 
         batch.setShader(shader);
+        shader.setUniformf("u_time", time);
         shader.setUniformf("u_planetColor", Color.WHITE);
         shader.setUniformf("u_starDirection", new Vector3(0, 1, 0));
         batch.draw(texture, -128, -128, 256, 256);

@@ -281,7 +281,7 @@ public class Planet extends Celestial {
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
 
-        Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.f);
+        Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.2f);
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
 
