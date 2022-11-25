@@ -13,10 +13,10 @@ precision mediump float;
 
 #define u_starDirection vec3(1.0, 0.0, 0.0)
 #define u_planetCenter vec3(0.0, 0.0, 0.0)
-#define u_planetRadius 1.0
+#define u_planetRadius 1.75
 #define u_atmosRadius 2.0
 
-#define sunPos normalize(vec3(cos(u_time), 0, sin(-u_time)))
+#define sunPos normalize(vec3(cos(u_time / 5.0), sin(-u_time / 5.0), 0.16))
 
 varying vec2 v_texcoord;
 varying vec3 v_viewvector;

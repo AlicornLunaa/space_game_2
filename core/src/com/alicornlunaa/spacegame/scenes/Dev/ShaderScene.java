@@ -1,9 +1,9 @@
 package com.alicornlunaa.spacegame.scenes.Dev;
 
 import com.alicornlunaa.spacegame.App;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -32,7 +32,6 @@ public class ShaderScene implements Screen {
         stage = new Stage(new ScreenViewport());
         cam = (OrthographicCamera)stage.getCamera();
 
-        // cam.zoom = 0.05f;
         cam.position.set(0, 0, -2);
         cam.update();
 
@@ -54,6 +53,9 @@ public class ShaderScene implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
+
+        if(Gdx.input.isKeyPressed(Keys.W)){ cam.position.z += 0.5f * delta; }
+        if(Gdx.input.isKeyPressed(Keys.S)){ cam.position.z -= 0.5f * delta; }
 
         lastUpdate += delta;
         time += delta;
