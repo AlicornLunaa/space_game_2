@@ -11,19 +11,15 @@ precision mediump float;
 #define MAX_OPTICAL_DEPTH_POINTS 8
 #define EPSILON 1e-4
 
-#define u_starDirection vec3(1.0, 0.0, 0.0)
-#define u_planetCenter vec3(0.0, 0.0, 0.0)
-#define u_planetRadius 1.75
-#define u_atmosRadius 2.0
-
-#define sunPos normalize(vec3(cos(u_time / 5.0), sin(-u_time / 5.0), 0.16))
+#define u_planetCenter vec3(0.0, 0.0, 2.235)
+#define u_atmosRadius 1.5
 
 varying vec2 v_texcoord;
-varying vec3 v_viewvector;
 
 uniform sampler2D u_texture;
-uniform vec3 u_cameraPosition;
-uniform float u_time;
+uniform vec4 u_atmosColor;
+uniform vec3 u_starDirection;
+uniform float u_planetRadius;
 
 vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     vec3 offset = rayOrigin - center;
@@ -72,8 +68,8 @@ vec3 light(vec3 rayOrigin, vec3 rayDir, float rayLength){
     float stepSize = rayLength / float(MAX_IN_SCATTER_POINTS - 1);
 
     for(int i = 0; i < MAX_IN_SCATTER_POINTS; i++){
-        float sunRayLength = sphereRaycast(u_planetCenter, u_atmosRadius, inScatterPoint, sunPos).y;
-        float sunRayOpticalDepth = opticalDepth(inScatterPoint, sunPos, sunRayLength);
+        float sunRayLength = sphereRaycast(u_planetCenter, u_atmosRadius, inScatterPoint, u_starDirection).y;
+        float sunRayOpticalDepth = opticalDepth(inScatterPoint, u_starDirection, sunRayLength);
         float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * float(i));
         float localDensity = densityAtPoint(inScatterPoint);
         vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * RAYLEIGH_CONSTANTS);
@@ -82,13 +78,18 @@ vec3 light(vec3 rayOrigin, vec3 rayDir, float rayLength){
         inScatterPoint += rayDir * stepSize;
     }
 
-    return inScatterLight;
+    return u_atmosColor.rgb * inScatterLight;
 }
 
 void main() {
+    vec2 uv = (v_texcoord * 2.0 - 1.0);
+    vec3 cameraZ = vec3(0, 0, 1);
+    vec3 cameraX = vec3(1, 0, 0);
+    vec3 cameraY = vec3(0, 1, 0);
+
     vec3 color = vec3(0, 0, 0);
-    vec3 rayOrigin = u_cameraPosition;
-    vec3 rayDir = normalize(v_viewvector);
+    vec3 rayOrigin = vec3(0, 0, 0);
+    vec3 rayDir = normalize(uv.x * cameraX + uv.y * cameraY + 2.0 * cameraZ);
 
     vec2 surfaceRay = sphereRaycast(u_planetCenter, u_planetRadius, rayOrigin, rayDir);
     vec2 atmosRay = sphereRaycast(u_planetCenter, u_atmosRadius, rayOrigin, rayDir);
@@ -97,7 +98,7 @@ void main() {
     if(surfaceRay.x > 0.0 && tMin > surfaceRay.x) {
         vec3 sN = normalize((normalize(rayOrigin + rayDir * surfaceRay.x) - u_planetCenter));
         tMin = surfaceRay.x;
-        color = vec3(max(0.0, dot(sN, sunPos)));
+        color = vec3(max(0.0, dot(sN, u_starDirection)));
     }
 
     float distToAtmos = atmosRay.x;
@@ -105,9 +106,8 @@ void main() {
     if(distThruAtmos > 0.0 && tMin > atmosRay.x) {
         vec3 pointInAtmosphere = rayOrigin + rayDir * (distToAtmos - EPSILON);
         vec3 light = light(pointInAtmosphere, rayDir, distThruAtmos + EPSILON * 2.0);
-
         color = color * (1.0 - light) + light;
     }
 
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, length(color));
 }

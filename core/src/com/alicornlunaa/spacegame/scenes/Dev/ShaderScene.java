@@ -7,9 +7,11 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,10 +34,11 @@ public class ShaderScene implements Screen {
         stage = new Stage(new ScreenViewport());
         cam = (OrthographicCamera)stage.getCamera();
 
-        cam.position.set(0, 0, -2);
+        cam.position.set(0, 0, 0);
         cam.update();
 
-        texture = new Texture(128, 128, Format.RGBA8888);
+        texture = new Texture(16, 16, Format.RGBA8888);
+        texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
         // Controls
         stage.addListener(new InputListener(){
@@ -54,9 +57,6 @@ public class ShaderScene implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
 
-        if(Gdx.input.isKeyPressed(Keys.W)){ cam.position.z += 0.5f * delta; }
-        if(Gdx.input.isKeyPressed(Keys.S)){ cam.position.z -= 0.5f * delta; }
-
         lastUpdate += delta;
         time += delta;
         if(lastUpdate > 2.f){
@@ -68,14 +68,12 @@ public class ShaderScene implements Screen {
 
         Batch batch = stage.getBatch();
         batch.begin();
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1, 1));
-        batch.setTransformMatrix(new Matrix4());
+        batch.setProjectionMatrix(cam.combined);
 
         batch.setShader(shader);
-        shader.setUniformMatrix("u_invProjViewMatrix", cam.invProjectionView);
-        shader.setUniformf("u_cameraPosition", cam.position);
-        shader.setUniformf("u_time", time);
-        batch.draw(texture, 0, 0, 1, 1);
+        shader.setUniformf("u_starDirection", new Vector3(1, 0, 0));
+        shader.setUniformf("u_planetRadius", 8000.0f / 10000.f);
+        batch.draw(texture, -128, -128, 256, 256);
 
         batch.setShader(null);
         batch.end();
@@ -86,7 +84,7 @@ public class ShaderScene implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height);
     }
 
     @Override
