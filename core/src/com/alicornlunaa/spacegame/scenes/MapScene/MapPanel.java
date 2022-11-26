@@ -10,7 +10,9 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,6 +28,7 @@ public class MapPanel extends Stage {
     private final OrthographicCamera cam;
     private float oldZoom = 0.0f;
 
+    private TextureRegion shipIcon;
     private Array<OrbitPath> orbits = new Array<>();
 
     // Constructor
@@ -38,6 +41,9 @@ public class MapPanel extends Stage {
         oldZoom = cam.zoom;
         cam.zoom = 25.0f;
         cam.update();
+
+        // Load textures
+        shipIcon = game.atlas.findRegion("ui/ship_icon");
 
         // Create paths from entities
         Universe u = game.spaceScene.spacePanel.universe;
@@ -102,6 +108,10 @@ public class MapPanel extends Stage {
         for(OrbitPath o : orbits){
             o.draw(batch);
         }
+
+        Vector2 size = new Vector2(1024, 1024);
+        Vector2 plyPos = spacePanel.universe.getUniversalPosition(game.player);
+        batch.draw(shipIcon, plyPos.x - size.x / 2.f, plyPos.y - size.y / 2.f, size.x, size.y);
 
         batch.end();
         super.draw();
