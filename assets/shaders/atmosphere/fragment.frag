@@ -1,3 +1,4 @@
+/** Referenced from Sebastian Lague at https://www.youtube.com/watch?v=DxfEbulyFcY */
 #ifdef GL_ES
 precision mediump float;
 #endif
