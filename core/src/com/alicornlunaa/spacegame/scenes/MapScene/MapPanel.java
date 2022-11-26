@@ -92,7 +92,7 @@ public class MapPanel extends Stage {
 
     @Override
     public void draw(){
-        spacePanel.draw();
+        spacePanel.drawSkybox();
 
         Batch batch = getBatch();
         batch.begin();
@@ -105,6 +105,8 @@ public class MapPanel extends Stage {
 
         batch.end();
         super.draw();
+
+        spacePanel.draw();
     }
     
     @Override

@@ -91,8 +91,7 @@ public class SpacePanel extends Stage {
         cam.update();
     }
 
-    @Override
-    public void draw(){
+    public void drawSkybox(){
         Batch batch = getBatch();
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
@@ -112,7 +111,10 @@ public class SpacePanel extends Stage {
 
         cam.zoom = oldZoom;
         cam.update();
+    }
 
+    @Override
+    public void draw(){
         super.draw();
 
         if(Constants.DEBUG){
