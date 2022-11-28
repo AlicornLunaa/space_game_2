@@ -15,12 +15,20 @@ precision mediump float;
 #define u_planetCenter vec3(0.0, 0.0, 2.235)
 #define u_atmosRadius 1.5
 
+struct Celestial {
+    vec2 pos;
+    float radius;
+};
+
 varying vec2 v_texcoord;
 
 uniform sampler2D u_texture;
 uniform vec4 u_atmosColor;
 uniform vec3 u_starDirection;
 uniform float u_planetRadius;
+
+uniform Celestial u_occluders[10];
+uniform int u_numOccluders;
 
 vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     vec3 offset = rayOrigin - center;
@@ -82,6 +90,11 @@ vec3 light(vec3 rayOrigin, vec3 rayDir, float rayLength){
     return u_atmosColor.rgb * inScatterLight;
 }
 
+float shadow(vec3 rayOrigin, vec3 rayDir){
+    vec2 rayToStar = sphereRaycast(vec3(1.5, 0.0, 0.5), u_planetRadius, rayOrigin, rayDir);
+    return step(0.1, rayToStar.x);
+}
+
 void main() {
     vec2 uv = (v_texcoord * 2.0 - 1.0);
     vec3 cameraZ = vec3(0, 0, 1);
@@ -95,6 +108,7 @@ void main() {
     vec2 surfaceRay = sphereRaycast(u_planetCenter, u_planetRadius, rayOrigin, rayDir);
     vec2 atmosRay = sphereRaycast(u_planetCenter, u_atmosRadius, rayOrigin, rayDir);
 
+    // Surface shading
     float tMin = 1e19;
     if(surfaceRay.x > 0.0 && tMin > surfaceRay.x) {
         vec3 sN = normalize((normalize(rayOrigin + rayDir * surfaceRay.x) - u_planetCenter));
@@ -102,6 +116,7 @@ void main() {
         color = vec3(max(0.0, dot(sN, u_starDirection)));
     }
 
+    // Atmosphere shading
     float distToAtmos = atmosRay.x;
     float distThruAtmos = min(atmosRay.y, tMin - atmosRay.x);
     if(distThruAtmos > 0.0 && tMin > atmosRay.x) {
@@ -110,5 +125,9 @@ void main() {
         color = color * (1.0 - light) + light;
     }
 
-    gl_FragColor = vec4(color, length(color));
+    // Shadow shading
+    float castedShadow = shadow(vec3(uv, 0.0), u_starDirection);
+
+    gl_FragColor = vec4(vec3(castedShadow), 1.0);
+    // gl_FragColor = vec4(color, length(color));
 }

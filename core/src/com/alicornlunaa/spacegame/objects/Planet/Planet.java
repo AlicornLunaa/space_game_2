@@ -23,6 +23,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * The World object will hold the data for the world's tiles
@@ -281,9 +282,10 @@ public class Planet extends Celestial {
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
 
-        // Celestial shadows calculated by law of cosines. Sort the children and parent by distance, send it to the shader
-        
+        // Get any possible occluders, or any planet closer to the star
+        Array<Celestial> occluders = new Array<>();
 
+        // Shade the planet in
         Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.0f);
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
@@ -297,6 +299,13 @@ public class Planet extends Celestial {
         atmosShader.setUniformf("u_atmosColor", atmosColor);
         atmosShader.setUniformf("u_starDirection", dirToStar);
         atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
+        atmosShader.setUniformi("u_numOccluders", occluders.size);
+        for(int i = 0; i < occluders.size; i++){
+            // TODO: Convert to local
+            Celestial occluder = occluders.get(i);
+            atmosShader.setUniformf("u_occluders[" + i + "].pos", occluder.getPosition());
+            atmosShader.setUniformf("u_occluders[" + i + "].radius", occluder.getRadius());
+        }
         batch.draw(atmosTexture, atmosRadius * -1.05f, atmosRadius * -1.05f, atmosRadius * 2.1f, atmosRadius * 2.1f);
         batch.setShader(null);
     }
