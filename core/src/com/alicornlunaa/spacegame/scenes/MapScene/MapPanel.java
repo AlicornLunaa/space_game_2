@@ -111,7 +111,18 @@ public class MapPanel extends Stage {
 
         Vector2 size = new Vector2(1024, 1024);
         Vector2 plyPos = spacePanel.universe.getUniversalPosition(game.player);
-        batch.draw(shipIcon, plyPos.x - size.x / 2.f, plyPos.y - size.y / 2.f, size.x, size.y);
+        batch.draw(
+            shipIcon,
+            plyPos.x - size.x / 2.f,
+            plyPos.y - size.y / 2.f,
+            size.x / 2.f,
+            size.y / 2.f,
+            size.x,
+            size.y,
+            1,
+            1,
+            game.player.getRotation()
+        );
 
         batch.end();
         super.draw();

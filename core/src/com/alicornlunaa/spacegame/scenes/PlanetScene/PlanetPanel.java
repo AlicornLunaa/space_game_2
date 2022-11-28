@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -20,7 +21,7 @@ public class PlanetPanel extends Stage {
     private final App game;
 
     public Planet planet;
-    // private float worldWidthPixels;
+    private float worldWidthPixels;
 
     // Constructor
     public PlanetPanel(final App game, final Planet planet){
@@ -28,7 +29,7 @@ public class PlanetPanel extends Stage {
         this.game = game;
 
         this.planet = planet;
-        // worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+        worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
         this.addListener(new InputListener(){
@@ -111,16 +112,24 @@ public class PlanetPanel extends Stage {
     public void draw(){
         super.draw();
 
+        // Convert position to polar for atmosphere color
+        // double theta = ((game.player.getX() / worldWidthPixels) * Math.PI * 2);
+        // float radius = game.player.getY();
+        // float polarX = (float)(Math.cos(theta) * radius);
+        // float polarY = (float)(Math.sin(theta) * radius);
+
         // Draw every map tile
         Batch batch = getBatch();
-        batch.begin();
         batch.setProjectionMatrix(getCamera().combined);
+        batch.setTransformMatrix(new Matrix4());
+
+        batch.begin();
+        batch.setTransformMatrix(new Matrix4().translate(worldWidthPixels, 0, 0));
         planet.drawWorld(batch, batch.getColor().a);
-        // batch.setProjectionMatrix(getCamera().combined.cpy().translate(worldWidthPixels, 0, 0).scl(1, 1, 1));
-        // planet.drawWorld(batch, batch.getColor().a);
         // batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
         // planet.drawWorld(batch, batch.getColor().a);
-        // batch.setProjectionMatrix(getCamera().combined);
+        batch.setTransformMatrix(new Matrix4());
+        planet.drawWorld(batch, batch.getColor().a);
         game.player.draw(batch, batch.getColor().a);
         batch.end();
 

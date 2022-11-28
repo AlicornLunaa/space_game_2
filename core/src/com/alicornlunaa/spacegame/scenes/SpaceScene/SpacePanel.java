@@ -55,6 +55,7 @@ public class SpacePanel extends Stage {
 
         game.player.drive(ship);
 
+        // ship.getBody().applyForceToCenter(10, 6, true);
         universe.getCelestial(2).getBody().applyLinearImpulse(0, 350, universe.getCelestial(2).getBody().getWorldCenter().x, universe.getCelestial(2).getBody().getWorldCenter().y, true);
 
         // Controls
@@ -96,6 +97,7 @@ public class SpacePanel extends Stage {
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
         OrthographicCamera cam = (OrthographicCamera)getCamera();
+        
         float oldZoom = cam.zoom;
         cam.zoom = 1;
         cam.update();
