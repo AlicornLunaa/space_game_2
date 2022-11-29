@@ -60,6 +60,9 @@ public class SpacePanel extends Stage {
         // ship.getBody().applyForceToCenter(10, 6, true);
         // universe.getCelestial(2).getBody().applyLinearImpulse(0, 350, universe.getCelestial(2).getBody().getWorldCenter().x, universe.getCelestial(2).getBody().getWorldCenter().y, true);
 
+        //! TESTING
+        ship.setPosition(1000, 0);
+
         // Controls
         this.addListener(new InputListener(){
             @Override

@@ -100,7 +100,7 @@ public class Chunk {
             }
         }
 
-        visible = false;
+        // visible = false;
     }
 
     public void dispose(){

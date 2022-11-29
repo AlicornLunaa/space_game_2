@@ -6,6 +6,8 @@ import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
@@ -230,7 +232,7 @@ public class Planet extends Celestial {
         // Draws the flat planar world
         atmosSpritePlanet.draw(batch, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
 
-        // Draw each chunk rotated around, theta = x, r = y
+        // Draw each chunk
         for(Chunk chunk : map.values()){
             chunk.draw(batch);
         }
@@ -275,7 +277,9 @@ public class Planet extends Celestial {
         while(leavingEnts.size() > 0){
             Entity e  = leavingEnts.pop();
             this.delEntityWorld(e);
-            game.setScreen(game.spaceScene);
+
+            if(e instanceof Player || e instanceof Ship)
+                game.setScreen(game.spaceScene);
         }
     }
 
@@ -283,12 +287,8 @@ public class Planet extends Celestial {
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
         
-        // Variables
-        Vector3 globalBodyPosition = new Vector3(universe.getUniversalPosition(this), 0.0f);
-        Vector3 globalStarPosition = new Vector3(universe.getUniversalPosition(universe.getNearestStar(this)), 0.0f);
-        Celestial occluder = universe.getParentCelestial(this);
-
         // Shade the planet in
+        Celestial occluder = universe.getParentCelestial(this);
         Matrix3 globalToLocal = new Matrix3().translate(universe.getUniversalPosition(this)).scl(getRadius()).inv();
         Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.0f);
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
@@ -304,7 +304,7 @@ public class Planet extends Celestial {
 
         batch.setShader(atmosShader);
         atmosShader.setUniformf("u_atmosColor", atmosColor);
-        atmosShader.setUniformf("u_starDirection", globalStarPosition.cpy().sub(globalBodyPosition).nor().scl(1, -1, 1));
+        atmosShader.setUniformf("u_starDirection", dirToStar);
         atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
         atmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
         atmosShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
@@ -348,7 +348,9 @@ public class Planet extends Celestial {
         if(dist < atmosRadius * 0.95f){
             // Move it into this world
             this.addEntityWorld(e);
-            game.setScreen(new PlanetScene(game, this));
+
+            if(e instanceof Player || e instanceof Ship)
+                game.setScreen(new PlanetScene(game, this));
 
             return true;
         }
