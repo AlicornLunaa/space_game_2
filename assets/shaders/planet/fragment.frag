@@ -6,11 +6,18 @@ precision mediump float;
 #define u_planetCenter vec3(0.0, 0.0, 2.235)
 #define u_planetRadius 1.0
 
+struct Celestial {
+    vec2 pos;
+    float radius;
+};
+
 varying vec2 v_texcoord;
 
 uniform sampler2D u_texture;
 uniform vec4 u_planetColor;
 uniform vec3 u_starDirection;
+uniform Celestial u_occluder;
+uniform float u_occlusionEnabled;
 
 vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     vec3 offset = rayOrigin - center;
@@ -30,6 +37,13 @@ vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     }
 
     return vec2(0.0);
+}
+
+float shadowCast(vec3 rayOrigin, vec3 rayDir){
+    vec3 pos = vec3(u_occluder.pos, 0.0);
+    float rad = u_occluder.radius;
+    vec2 rayToStar = sphereRaycast(pos, rad, rayOrigin, rayDir);
+    return (rayToStar.x > 0.0 && u_occlusionEnabled > 0.5) ? 1.0 : 0.0;
 }
 
 void main() {
@@ -53,5 +67,7 @@ void main() {
         color = u_planetColor.rgba * vec4(vec3(max(0.0, dot(sN, u_starDirection))), 1.0);
     }
 
-    gl_FragColor = color;
+    float inShadow = shadowCast(vec3(uv, 0.0), u_starDirection);
+
+    gl_FragColor = color * vec4(vec3(1.0 - inShadow), 1.0);
 }

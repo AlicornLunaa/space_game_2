@@ -26,10 +26,8 @@ uniform sampler2D u_texture;
 uniform vec4 u_atmosColor;
 uniform vec3 u_starDirection;
 uniform float u_planetRadius;
-
-uniform Celestial u_occluders[10];
-uniform int u_numOccluders;
-uniform int u_thisOccluderIndex;
+uniform Celestial u_occluder;
+uniform float u_occlusionEnabled;
 
 vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     vec3 offset = rayOrigin - center;
@@ -92,20 +90,10 @@ vec3 light(vec3 rayOrigin, vec3 rayDir, float rayLength){
 }
 
 float shadowCast(vec3 rayOrigin, vec3 rayDir){
-    for(int i = 0; i < u_numOccluders; i++){
-        if(i == u_thisOccluderIndex) continue;
-
-        vec3 pos = vec3(u_occluders[i].pos, 0.0);
-        float rad = u_occluders[i].radius;
-
-        vec2 rayToStar = sphereRaycast(pos, rad, rayOrigin, rayDir);
-
-        if(rayToStar.x > 0.0){
-            return 1.0;
-        }
-    }
-
-    return 0.0;
+    vec3 pos = vec3(u_occluder.pos, 0.0);
+    float rad = u_occluder.radius;
+    vec2 rayToStar = sphereRaycast(pos, rad, rayOrigin, rayDir);
+    return (rayToStar.x > 0.0 && u_occlusionEnabled > 0.5) ? 1.0 : 0.0;
 }
 
 void main() {
@@ -141,6 +129,5 @@ void main() {
     // Shadow shading
     float inShadow = shadowCast(vec3(uv, 0.0), u_starDirection);
 
-    // gl_FragColor = vec4(vec3(inShadow), 1.0);
     gl_FragColor = vec4(color, length(color)) * (1.0 - inShadow);
 }

@@ -7,14 +7,15 @@ import java.util.Stack;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
@@ -24,7 +25,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * The World object will hold the data for the world's tiles
@@ -286,15 +286,7 @@ public class Planet extends Celestial {
         // Variables
         Vector3 globalBodyPosition = new Vector3(universe.getUniversalPosition(this), 0.0f);
         Vector3 globalStarPosition = new Vector3(universe.getUniversalPosition(universe.getNearestStar(this)), 0.0f);
-
-        // Get any possible occluders, or any planet closer to the star
-        int thisIndex = 0;
-        Array<Celestial> occluders = new Array<>();
-        occluders.add(this);
-        for(Celestial child : getChildren()){
-            occluders.add(child);
-        }
-        // TODO: Sort to only cast on objects closer ot the star
+        Celestial occluder = universe.getParentCelestial(this);
 
         // Shade the planet in
         Matrix3 globalToLocal = new Matrix3().translate(universe.getUniversalPosition(this)).scl(getRadius()).inv();
@@ -305,19 +297,18 @@ public class Planet extends Celestial {
         batch.setShader(terrainShader);
         terrainShader.setUniformf("u_planetColor", terrainColor);
         terrainShader.setUniformf("u_starDirection", dirToStar);
+        terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        terrainShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
+        terrainShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
 
         batch.setShader(atmosShader);
         atmosShader.setUniformf("u_atmosColor", atmosColor);
         atmosShader.setUniformf("u_starDirection", globalStarPosition.cpy().sub(globalBodyPosition).nor().scl(1, -1, 1));
         atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
-        atmosShader.setUniformi("u_thisOccluderIndex", thisIndex);
-        atmosShader.setUniformi("u_numOccluders", occluders.size);
-        for(int i = 0; i < occluders.size; i++){
-            Celestial occluder = occluders.get(i);
-            atmosShader.setUniformf("u_occluders[" + i + "].pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
-            atmosShader.setUniformf("u_occluders[" + i + "].radius", occluder.getRadius() * (1.f / getRadius()));
-        }
+        atmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        atmosShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
+        atmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         batch.draw(atmosTexture, atmosRadius * -1.05f, atmosRadius * -1.05f, atmosRadius * 2.1f, atmosRadius * 2.1f);
         batch.setShader(null);
     }
