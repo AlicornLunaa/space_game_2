@@ -89,7 +89,6 @@ public class SpacePanel extends Stage {
         }
         
         universe.update(delta);
-        ship.act(delta);
 
         // Parent camera to the player
         OrthographicCamera cam = (OrthographicCamera)getCamera();

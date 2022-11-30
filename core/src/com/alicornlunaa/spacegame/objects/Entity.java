@@ -25,6 +25,9 @@ public class Entity extends Actor implements Disposable {
     protected float physScale = Constants.PPM;
 
     // Functions
+    public void update(float delta){} // Update ran every frame
+    public void fixedUpdate(float timestep){} // Update ran every physics tick
+
     public Body setBody(Body b){
         if(b != null){
             setPosition(b.getPosition().cpy().scl(physScale));

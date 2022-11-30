@@ -252,26 +252,30 @@ public class Planet extends Celestial {
         while(physAccumulator >= Constants.TIME_STEP){
             planetWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
-        }
         
-        // Constrain entities to the world
-        float worldWidthPixels = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+            // Constrain entities to the world
+            float worldWidthPixels = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+    
+            for(Entity e : planetEnts){
+                if(e.getX() > worldWidthPixels){
+                    e.setX(e.getX() - worldWidthPixels);
+                } else if(e.getX() < 0){
+                    e.setX(e.getX() + worldWidthPixels);
+                }
+    
+                e.fixedUpdate(Constants.TIME_STEP);
+                applyDrag(e.getBody());
+                this.checkLeavePlanet(e);
+                
+                // Taken from Celestial.java to correctly apply the right force
+                float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
+                float force = Constants.GRAVITY_CONSTANT * ((e.getBody().getMass() * body.getMass()) / (orbitRadius * orbitRadius));
+                e.getBody().applyForceToCenter(0, -1 * force, true);
+            }
+        }
 
         for(Entity e : planetEnts){
-            if(e.getX() > worldWidthPixels){
-                e.setX(e.getX() - worldWidthPixels);
-            } else if(e.getX() < 0){
-                e.setX(e.getX() + worldWidthPixels);
-            }
-
-            e.act(delta);
-            applyDrag(e.getBody());
-            this.checkLeavePlanet(e);
-            
-            // Taken from Celestial.java to correctly apply the right force
-            float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
-            float force = Constants.GRAVITY_CONSTANT * ((e.getBody().getMass() * body.getMass()) / (orbitRadius * orbitRadius));
-            e.getBody().applyForceToCenter(0, -1 * force, true);
+            e.update(delta);
         }
 
         while(leavingEnts.size() > 0){

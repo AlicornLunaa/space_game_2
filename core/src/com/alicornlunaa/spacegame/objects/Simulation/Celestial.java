@@ -104,12 +104,13 @@ public class Celestial extends Entity {
         batch.begin();
     }
 
+    @Override
     public void update(float delta){
         // Step the physics on the world
-        physAccumulator += Math.min(delta, 0.25f) + Constants.TIME_WARP;
-        while(physAccumulator >= Constants.TIME_STEP + Constants.TIME_WARP){
-            influenceWorld.step(Constants.TIME_STEP + Constants.TIME_WARP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP + Constants.TIME_WARP;
+        physAccumulator += Math.min(delta, 0.25f);
+        while(physAccumulator >= Constants.TIME_STEP){
+            influenceWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+            physAccumulator -= Constants.TIME_STEP;
         }
     }
 
@@ -119,7 +120,6 @@ public class Celestial extends Entity {
         float orbitRadius = b.getPosition().len(); // Entity radius in physics scale
         Vector2 direction = b.getPosition().cpy().nor().scl(-1);
         float force = Constants.GRAVITY_CONSTANT * ((b.getMass() * body.getMass()) / (orbitRadius * orbitRadius));
-
         return direction.scl(force);
     }
 

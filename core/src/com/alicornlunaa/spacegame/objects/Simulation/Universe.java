@@ -302,27 +302,30 @@ public class Universe extends Actor {
             while(physAccumulator >= Constants.TIME_STEP){
                 universalWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
                 physAccumulator -= Constants.TIME_STEP;
-            }
 
-            for(int i = 0; i < ents.size(); i++){
-                Entity e = ents.get(i);
-                e.act(delta);
-                checkTransfer(e);
-                
-                Celestial parent = entParents.get(e);
-                if(parent != null){
-                    e.getBody().applyForceToCenter(parent.applyPhysics(delta, e), true);
+                for(int i = 0; i < ents.size(); i++){
+                    Entity e = ents.get(i);
+                    e.fixedUpdate(Constants.TIME_STEP);
+                    checkTransfer(e);
+                    
+                    Celestial parent = entParents.get(e);
+                    if(parent != null){
+                        e.getBody().applyForceToCenter(parent.applyPhysics(delta, e), true);
+                    }
+                }
+
+                for(Celestial c : celestials){
+                    c.fixedUpdate(Constants.TIME_STEP);
+                    
+                    Celestial parent = celestialParents.get(c);
+                    if(parent != null){
+                        c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
+                    }
                 }
             }
 
-            for(Celestial c : celestials){
-                c.update(delta);
-                
-                Celestial parent = celestialParents.get(c);
-                if(parent != null){
-                    c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
-                }
-            }
+            for(Entity e : ents){ e.update(delta); }
+            for(Celestial c : celestials){ c.update(delta); }
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             for(int i = 0; i < paths.size; i++){
