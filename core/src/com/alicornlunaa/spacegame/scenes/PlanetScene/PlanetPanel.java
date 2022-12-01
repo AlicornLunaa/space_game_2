@@ -113,12 +113,6 @@ public class PlanetPanel extends Stage {
     public void draw(){
         super.draw();
 
-        // Convert position to polar for atmosphere color
-        // double theta = ((game.player.getX() / worldWidthPixels) * Math.PI * 2);
-        // float radius = game.player.getY();
-        // float polarX = (float)(Math.cos(theta) * radius);
-        // float polarY = (float)(Math.sin(theta) * radius);
-
         // Draw every map tile
         Batch batch = getBatch();
         batch.setProjectionMatrix(getCamera().combined);

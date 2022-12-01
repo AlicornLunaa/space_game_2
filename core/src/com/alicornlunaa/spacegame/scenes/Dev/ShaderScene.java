@@ -1,14 +1,17 @@
 package com.alicornlunaa.spacegame.scenes.Dev;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Lights.PointLight;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,7 +21,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class ShaderScene implements Screen {
 
-    // private final App game;
+    private final App game;
     private OrthographicCamera cam;
     private Stage stage;
     private Label fpsCounter;
@@ -28,10 +31,10 @@ public class ShaderScene implements Screen {
     private int avgFps = 0;
     private float lastUpdate = 0.0f;
 
-    private Texture casterTexture;
-    private PointLight light;
+    private Texture tex;
 
     public ShaderScene(final App game){
+        this.game = game;
         stage = new Stage(new ScreenViewport());
 
         fpsCounter = new Label("FPS: N/A", game.skin);
@@ -46,16 +49,14 @@ public class ShaderScene implements Screen {
         cam.position.set(0, 0, 0);
         cam.update();
 
-        casterTexture = new Texture(Gdx.files.internal("textures/ui/caster.png"));
-        light = new PointLight(game, new Vector2());
+        tex = new Texture(16, 16, Format.RGBA8888);
 
         // Controls
         stage.addListener(new InputListener(){
             @Override
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == Keys.F5){
-                    game.manager.reloadShaders("shaders/shadow_map");
-                    game.manager.reloadShaders("shaders/light");
+                    game.manager.reloadShaders("shaders/cartesian_atmosphere");
                 }
 
                 return false;
@@ -80,25 +81,24 @@ public class ShaderScene implements Screen {
             lastUpdate = 0.f;
         }
 
+        if(Gdx.input.isKeyJustPressed(Keys.F5)){
+            game.manager.reloadShaders("shaders/cartesian_atmosphere");
+        }
+
+        ShaderProgram shader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         Batch batch = stage.getBatch();
-
-        light.getPosition().set(Gdx.input.getX(), Gdx.input.getY());
-        light.getPosition().set(stage.screenToStageCoordinates(light.getPosition()));
-
-        light.beginOcclusion(batch);
-        batch.draw(casterTexture, 0, 0);
-        light.endOcclusion(batch);
-
         batch.begin();
-        cam.setToOrtho(false);
-        cam.update();
-        batch.setProjectionMatrix(cam.combined);
-        light.drawLight(batch);
-        batch.end();
+
+        batch.setShader(shader);
+        shader.setUniformf("u_atmosColor", Color.WHITE);
+        shader.setUniformf("u_starDirection", new Vector3(1, 0, 0));
+        shader.setUniformf("u_planetRadius", 0.8f);
+        shader.setUniformf("u_occluder.pos", new Vector2(0, 100));
+        shader.setUniformf("u_occluder.radius", 1.f);
+        shader.setUniformf("u_occlusionEnabled", 0.f);
+        batch.draw(tex, -1024 / 2, -512 / 2, 1024, 512);
 
         batch.setShader(null);
-        batch.begin();
-        batch.draw(casterTexture, 0, 0);
         batch.end();
         
         fpsCounter.setText(String.valueOf(avgFps));

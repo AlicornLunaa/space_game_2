@@ -26,7 +26,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * The World object will hold the data for the world's tiles
@@ -53,8 +52,6 @@ public class Planet extends Celestial {
     private float physAccumulator;
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private TerrainGenerator generator;
-    private Texture atmosTexturePlanet;
-    private TextureRegionDrawable atmosSpritePlanet;
     private ArrayList<Entity> planetEnts = new ArrayList<>(); // Entities on the rectangular planet
     private Stack<Entity> leavingEnts = new Stack<>(); // Entities leaving the rectangular world
 
@@ -95,21 +92,6 @@ public class Planet extends Celestial {
         pixmap.dispose();
     }
 
-    private void generateAtmospherePlanetSprite(){
-        int imgRad = Math.min((int)atmosRadius * 2, 100);
-        pixmap = new Pixmap(imgRad, imgRad, Format.RGBA8888);
-
-        for(int y = 0; y < pixmap.getHeight(); y++){
-            Color c = new Color(atmosColor.r, atmosColor.g, atmosColor.b, atmosDensity * (y / (float)pixmap.getHeight()));
-            pixmap.setColor(c);
-            pixmap.drawLine(0, y, pixmap.getWidth(), y);
-        }
-
-        atmosTexturePlanet = new Texture(pixmap);
-        atmosSpritePlanet = new TextureRegionDrawable(atmosTexturePlanet);
-        pixmap.dispose();
-    }
-
     private void initializeWorld(){
         // Create new world for on the planet
         planetWorld = new World(new Vector2(), true);
@@ -127,7 +109,6 @@ public class Planet extends Celestial {
         // Create textures
         generateTerrainSprite();
         generateAtmosphereSprite();
-        generateAtmospherePlanetSprite();
     }
 
     // Constructor
@@ -230,7 +211,20 @@ public class Planet extends Celestial {
 
     public void drawWorld(Batch batch, float parentAlpha){
         // Draws the flat planar world
-        atmosSpritePlanet.draw(batch, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
+        Celestial occluder = universe.getParentCelestial(this);
+        Matrix3 globalToLocal = new Matrix3().translate(universe.getUniversalPosition(this)).scl(getRadius()).inv();
+        Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.0f);
+        ShaderProgram cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
+
+        batch.setShader(cartesianAtmosShader);
+        cartesianAtmosShader.setUniformf("u_atmosColor", atmosColor);
+        cartesianAtmosShader.setUniformf("u_starDirection", dirToStar);
+        cartesianAtmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
+        cartesianAtmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        cartesianAtmosShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
+        cartesianAtmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
+        batch.draw(atmosTexture, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
+        batch.setShader(null);
 
         // Draw each chunk
         for(Chunk chunk : map.values()){
@@ -270,7 +264,7 @@ public class Planet extends Celestial {
                 // Taken from Celestial.java to correctly apply the right force
                 float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
                 float force = Constants.GRAVITY_CONSTANT * ((e.getBody().getMass() * body.getMass()) / (orbitRadius * orbitRadius));
-                e.getBody().applyForceToCenter(0, -1 * force, true);
+                e.getBody().applyForceToCenter(0, -0.75f * force, true);
             }
         }
 
