@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -120,7 +121,8 @@ public class OrbitPath {
             parent = universe.getParentCelestial(entity);
         }
 
-        Vector2 p = entity.getBody().getPosition().cpy();
+        Vector2 parentCenter = universe.getUniversalPosition(parent);
+        Vector2 p = center.cpy();
         Vector2 v = entity.getBody().getLinearVelocity().cpy();
 
         boolean lookForEnd = false;
@@ -132,38 +134,50 @@ public class OrbitPath {
         velocities.clear();
         ends = false;
 
-        points.add(p.cpy().sub(entity.getBody().getPosition()));
+        points.add(p.cpy());
         absolutePoints.add(p.cpy());
         velocities.add(v.cpy());
         for(int i = 0; i < maxSteps; i++){
             if(currentParent == null) break;
 
             // Newtons gravitational law: F = (G(m1 * m2)) / r^2
-            float orbitRadius = p.len(); // Entity radius in physics scale
-            Vector2 direction = p.cpy().nor().scl(-1);
-            float force = Constants.GRAVITY_CONSTANT * ((entity.getBody().getMass() * parent.getBody().getMass()) / (orbitRadius * orbitRadius));
+            float orbitRadius = p.cpy().sub(parentCenter).len() / entity.getPhysScale(); // Entity radius in physics scale
+            Vector2 direction = p.cpy().sub(parentCenter).nor().scl(-1);
+            float force = Constants.GRAVITY_CONSTANT * ((entity.getBody().getMass() * currentParent.getBody().getMass()) / (orbitRadius * orbitRadius));
 
             v.add(direction.scl(force / entity.getBody().getMass()));
-            p.add(v);
+            p.add(v.cpy().scl(entity.getPhysScale()));
 
-            points.add(p.cpy().sub(entity.getBody().getPosition()));
+            points.add(p.cpy());
             absolutePoints.add(p.cpy());
             velocities.add(v.cpy());
 
-            if(p.len() * entity.getPhysScale() > parent.getSphereOfInfluence()){
+            if(orbitRadius * entity.getPhysScale() > currentParent.getSphereOfInfluence()){
                 // Outside of the sphere of influence, calculate new forces based on new parent
-                break;
-            }
+                v.add(currentParent.getBody().getLinearVelocity());
 
-            if(p.len() * entity.getPhysScale() < parent.getRadius()){ ends = true; break; };
-            if(p.dst(entity.getBody().getPosition()) < minDistance){
-                if(lookForEnd){
-                    // Path ends hear, it's close enough
-                    i = maxSteps - 2;
-                }
-            } else {
-                lookForEnd = true;
+                currentParent = currentParent.getCelestialParent();
+                if(currentParent == null) break;
+                parentCenter = universe.getUniversalPosition(currentParent);
             }
+            
+            // for(Celestial child : currentParent.getChildren()){
+            //     if(p.dst(universe.getUniversalPosition(child)) < child.getSphereOfInfluence()){
+            //         // Outside of the sphere of influence, calculate new forces based on new parent
+            //         currentParent = child;
+            //         parentCenter = universe.getUniversalPosition(child);
+            //     }
+            // }
+
+            // if(orbitRadius * entity.getPhysScale() < currentParent.getRadius()){ ends = true; break; };
+            // if(p.dst(center) < minDistance){
+            //     if(lookForEnd){
+            //         // Path ends hear, it's close enough
+            //         i = maxSteps - 2;
+            //     }
+            // } else {
+            //     lookForEnd = true;
+            // }
         }
     }
 
@@ -179,13 +193,7 @@ public class OrbitPath {
         for(int i = 0; i < points.size() - 1; i++){
             Vector2 p1 = points.get(i);
             Vector2 p2 = points.get((i + 1) % points.size());
-            render.rectLine(
-                p1.x * Constants.PPM + center.x,
-                p1.y * Constants.PPM + center.y,
-                p2.x * Constants.PPM + center.x,
-                p2.y * Constants.PPM + center.y,
-                50
-            );
+            render.rectLine(p1, p2, 50);
         }
 
         render.end();
