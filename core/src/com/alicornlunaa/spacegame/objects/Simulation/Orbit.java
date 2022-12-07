@@ -1,5 +1,7 @@
 package com.alicornlunaa.spacegame.objects.Simulation;
 
+import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class Orbit {
@@ -15,7 +17,8 @@ public class Orbit {
     // Constructor
     public Orbit(Vector3 pos, Vector3 vel, float mass){
         Vector3 h = pos.cpy().crs(vel);
-        float mu = (float)(6.6743e-11) * mass / 1000000000;
+        float mu = Constants.GRAVITY_CONSTANT * mass;
+        // float mu = (float)(6.6743e-11) * mass / 1000000000;
 
         Vector3 eV = (vel.cpy().crs(h).scl(1 / mu).sub(pos.cpy().nor()));
         Vector3 n = new Vector3(0, 0, 1).crs(h);
@@ -38,6 +41,16 @@ public class Orbit {
     }
 
     // Functions
+    public Vector2 getVelocityAtTime(float t){
+        // Kepler to cartesian
+        return Vector2.Zero.cpy();
+    }
+
+    public Vector2 getPositionAtTime(float t){
+        // Kepler to cartesian
+        return Vector2.Zero.cpy();
+    }
+
     @Override
     public String toString(){
         return String.format("a: %f%ne: %f%nw: %f%nv: %f%nO: %f%ni: %f%n", semiMajorAxis, eccentricity, argumentOfPeriapsis, trueAnomaly, ascendingNode, inclination);

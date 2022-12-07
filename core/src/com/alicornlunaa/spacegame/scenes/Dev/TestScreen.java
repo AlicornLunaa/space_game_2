@@ -40,16 +40,16 @@ public class TestScreen implements Screen {
         interior = new Interior(game, ship);
 
         System.out.println("");
-        Orbit o = new Orbit(
-            new Vector3(-5060f, 549f, -4419f),
-            new Vector3(-3.53f, -5.97f, 3.3f),
-            (float)(5.97219e24)
-        );
         // Orbit o = new Orbit(
-        //     new Vector3(1000, 5000, 7000),
-        //     new Vector3(3, 4, 5),
-        //     (float)(5.972 * 10e24)
+        //     new Vector3(-5060f, 549f, -4419f),
+        //     new Vector3(-3.53f, -5.97f, 3.3f),
+        //     (float)(5.97219e24)
         // );
+        Orbit o = new Orbit(
+            new Vector3(154.252550f, 105.699660f, 0.f),
+            new Vector3(-4.779790f, 9.428806f, 0),
+            (float)(27611.654000f)
+        );
         System.out.println(o);
 
         Gdx.app.exit();
