@@ -4,7 +4,6 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbit;
-import com.alicornlunaa.spacegame.objects.Simulation.OrbitPath;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -31,7 +30,7 @@ public class MapPanel extends Stage {
     private float oldZoom = 0.0f;
 
     private TextureRegion shipIcon;
-    private Array<OrbitPath> orbits = new Array<>();
+    private Array<Orbit> orbits = new Array<>();
 
     // Constructor
     public MapPanel(final App game, final Screen previousScreen){
@@ -53,14 +52,14 @@ public class MapPanel extends Stage {
             Celestial parent = u.getParentCelestial(e);
 
             if(parent != null){
-                orbits.add(new OrbitPath(game, u, parent, e));
+                orbits.add(new Orbit(parent, e));
             }
         }
         for(Celestial c : u.getCelestials()){
             Celestial parent = u.getParentCelestial(c);
 
             if(parent != null){
-                orbits.add(new OrbitPath(game, u, parent, c));
+                orbits.add(new Orbit(parent, c));
             }
         }
 
@@ -90,9 +89,8 @@ public class MapPanel extends Stage {
     public void act(float delta){
         spacePanel.act();
 
-        for(OrbitPath o : orbits){
-            o.simulate(2048);
-            // o.recalculate();
+        for(Orbit o : orbits){
+            o.calculate();
         }
 
         super.act(delta);
@@ -107,9 +105,14 @@ public class MapPanel extends Stage {
         batch.setProjectionMatrix(cam.combined);
         batch.setTransformMatrix(new Matrix4());
 
-        for(OrbitPath o : orbits){
-            o.draw(batch);
+        batch.end();
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.begin(ShapeType.Filled);
+        for(Orbit o : orbits){
+            o.draw(game.shapeRenderer);
         }
+        game.shapeRenderer.end();
+        batch.begin();
 
         Vector2 size = new Vector2(1024, 1024);
         Vector2 plyPos = spacePanel.universe.getUniversalPosition(game.player);
@@ -130,15 +133,6 @@ public class MapPanel extends Stage {
         super.draw();
 
         spacePanel.draw();
-
-        // Test rendering
-        game.shapeRenderer.setProjectionMatrix(cam.combined);
-        game.shapeRenderer.begin(ShapeType.Filled);
-        Orbit o1 = new Orbit(spacePanel.universe.getCelestial(1), spacePanel.universe.getCelestial(2));
-        Orbit o2 = new Orbit(spacePanel.universe.getCelestial(2), spacePanel.ship);
-        o1.draw(game.shapeRenderer);
-        o2.draw(game.shapeRenderer);
-        game.shapeRenderer.end();
     }
     
     @Override

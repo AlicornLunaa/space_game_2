@@ -33,7 +33,7 @@ public class Universe extends Actor {
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
     private Array<Vector2> initPos = new Array<>();
-    private Array<OrbitPath> paths = new Array<>();
+    private Array<Orbit> paths = new Array<>();
 
     // Private functions
     private void parentCelestial(Celestial target, Celestial parent){
@@ -200,8 +200,7 @@ public class Universe extends Actor {
                 Celestial parent = getParentCelestial(e);
                 if(parent == null) continue;
 
-                OrbitPath path = new OrbitPath(game, this, parent, e);
-                path.simulate(2048);
+                Orbit path = new Orbit(parent, e);
                 paths.add(path);
                 initPos.add(e.getBody().getPosition());
             }
@@ -209,8 +208,7 @@ public class Universe extends Actor {
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
                 
-                OrbitPath path = new OrbitPath(game, this, parent, c);
-                path.simulate(2048);
+                Orbit path = new Orbit(parent, c);
                 paths.add(path);
                 initPos.add(c.getBody().getPosition());
             }
@@ -329,18 +327,18 @@ public class Universe extends Actor {
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             for(int i = 0; i < paths.size; i++){
-                OrbitPath path = paths.get(i);
+                Orbit path = paths.get(i);
                 Entity e = path.getEntity();
 
                 if(e.getDriving() != null) continue;
 
-                Vector2 curPos = path.getAbsolute(((int)currentFuture) % path.getPoints().size());
-                Vector2 curVel = path.getVelocity(((int)currentFuture) % path.getPoints().size());
-                Vector2 nextPos = path.getAbsolute(((int)currentFuture + 1) % path.getPoints().size());
-                Vector2 nextVel = path.getVelocity(((int)currentFuture + 1) % path.getPoints().size());
+                // Vector2 curPos = path.getAbsolute(((int)currentFuture) % path.getPoints().size());
+                // Vector2 curVel = path.getVelocity(((int)currentFuture) % path.getPoints().size());
+                // Vector2 nextPos = path.getAbsolute(((int)currentFuture + 1) % path.getPoints().size());
+                // Vector2 nextVel = path.getVelocity(((int)currentFuture + 1) % path.getPoints().size());
 
-                e.getBody().setTransform(curPos.cpy().lerp(nextPos, currentFuture % 1.0f), e.getBody().getAngle());
-                e.getBody().setLinearVelocity(curVel.cpy().lerp(nextVel, currentFuture % 1.0f));
+                // e.getBody().setTransform(curPos.cpy().lerp(nextPos, currentFuture % 1.0f), e.getBody().getAngle());
+                // e.getBody().setLinearVelocity(curVel.cpy().lerp(nextVel, currentFuture % 1.0f));
             }
 
             currentFuture += (timewarp - 1);

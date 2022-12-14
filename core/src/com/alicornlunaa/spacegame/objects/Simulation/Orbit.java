@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 
+@SuppressWarnings("unused")
 public class Orbit {
     
     // Variables
@@ -68,10 +69,8 @@ public class Orbit {
         float linearE = semiMajorAxis - periapsis;
         float semiMinorAxis = (float)(Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
 
-        // TODO: Implement newtonian method
-
         render.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()).rotate(0, 0, 1, argumentOfPeriapsis));
-        render.setColor(Color.MAGENTA);
+        render.setColor(Color.CYAN);
 
         for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
             float angle1 = (float)((i / (Constants.ORBIT_RESOLUTION - 1.0)) * Math.PI * 2.0);
@@ -79,10 +78,8 @@ public class Orbit {
             Vector2 p1 = new Vector2((float)(Math.cos(angle1) * semiMajorAxis + center.x - linearE), (float)(Math.sin(angle1) * semiMinorAxis + center.y)).scl(Constants.PPM);
             Vector2 p2 = new Vector2((float)(Math.cos(angle2) * semiMajorAxis + center.x - linearE), (float)(Math.sin(angle2) * semiMinorAxis + center.y)).scl(Constants.PPM);
 
-            render.rectLine(p1, p2, 225);
+            render.rectLine(p1, p2, 100);
         }
-
-        render.circle(0, 0, 600);
     }
 
     public Vector2 getVelocityAtTime(float t){
@@ -94,6 +91,10 @@ public class Orbit {
         // Kepler to cartesian TODO: Implement
         return Vector2.Zero.cpy();
     }
+
+    public Celestial getCelestial(){ return parent; }
+
+    public Entity getEntity(){ return child; }
 
     @Override
     public String toString(){
