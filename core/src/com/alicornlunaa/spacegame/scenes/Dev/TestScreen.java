@@ -45,12 +45,12 @@ public class TestScreen implements Screen {
         //     new Vector3(-3.53f, -5.97f, 3.3f),
         //     (float)(5.97219e24)
         // );
-        Orbit o = new Orbit(
-            new Vector3(154.252550f, 105.699660f, 0.f),
-            new Vector3(-4.779790f, 9.428806f, 0),
-            (float)(27611.654000f)
-        );
-        System.out.println(o);
+        // Orbit o = new Orbit(
+        //     new Vector3(154.252550f, 105.699660f, 0.f),
+        //     new Vector3(-4.779790f, 9.428806f, 0),
+        //     (float)(27611.654000f)
+        // );
+        // System.out.println(o);
 
         Gdx.app.exit();
     }

@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.scenes.MapScene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbit;
 import com.alicornlunaa.spacegame.objects.Simulation.OrbitPath;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -128,6 +130,15 @@ public class MapPanel extends Stage {
         super.draw();
 
         spacePanel.draw();
+
+        // Test rendering
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.begin(ShapeType.Filled);
+        Orbit o1 = new Orbit(spacePanel.universe.getCelestial(1), spacePanel.universe.getCelestial(2));
+        Orbit o2 = new Orbit(spacePanel.universe.getCelestial(2), spacePanel.ship);
+        o1.draw(game.shapeRenderer);
+        o2.draw(game.shapeRenderer);
+        game.shapeRenderer.end();
     }
     
     @Override

@@ -86,11 +86,11 @@ public class App extends Game {
 				// Start new scene
 				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
-				// this.setScreen(spaceScene);
+				this.setScreen(spaceScene);
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
-				this.setScreen(new TestScreen(this));
+				// this.setScreen(new TestScreen(this));
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
