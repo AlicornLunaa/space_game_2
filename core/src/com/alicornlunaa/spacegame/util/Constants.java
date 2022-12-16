@@ -8,7 +8,7 @@ public class Constants {
     public static final int MAX_PREDICTION_STEPS = 2;
     public static float TIME_WARP = 0;
     
-    public static final int ORBIT_RESOLUTION = 128;
+    public static final int ORBIT_RESOLUTION = 512;
     
     public static final float PPM = 128.0f;
     public static final float PLANET_PPM = 128.0f;
