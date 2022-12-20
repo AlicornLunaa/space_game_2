@@ -101,57 +101,45 @@ public class Orbit {
     }
 
     public Vector2 getVelocityAtTime(float t){
-        // Kepler to cartesian TODO: FIX
+        // Kepler to cartesian
+        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
+        // float h = (float)Math.sqrt(mu * semiMajorAxis * (1 - Math.pow(semiMajorAxis, 2.0)));
+
         float meanAnomaly = (float)(t * Math.PI * 2.0);
         float ecceAnomaly = solveKeplersEquation(meanAnomaly, eccentricity);
 
-        // Convert from degrees to radians
-        float inclination = (float)Math.toRadians(this.inclination);
-        float longitudeOfAscendingNode = (float)Math.toRadians(this.ascendingNode);
-        float argumentOfPerigee = (float)Math.toRadians(this.argumentOfPeriapsis);
-        float trueAnomaly = (float)Math.toRadians(this.trueAnomaly);
+        float O = (float)Math.toRadians(ascendingNode);
+        float w = (float)Math.toRadians(argumentOfPeriapsis);
+        float v = (float)(2 * Math.atan(Math.sqrt((1 + eccentricity) / (1 - eccentricity)) * Math.tan(ecceAnomaly / 2)));
+        float i = (float)Math.toRadians(inclination);
 
-        // Compute the radius and true anomaly
-        float radius = (float)(semiMajorAxis * (1 - eccentricity * Math.cos(ecceAnomaly)));
-        float trueAnomalyRadians = (float)(Math.atan2(Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(ecceAnomaly), eccentricity + Math.cos(ecceAnomaly)));
+        // float semiLatusRectum = (float)(semiMajorAxis * (1 - Math.pow(eccentricity, 2.0)));
+        // Vector2 velocity = new Vector2(
+        //     (float)(Math.sqrt(mu / semiLatusRectum) * (Math.cos(O) * Math.cos(w + v) - Math.sin(O) * Math.sin(w + v) * Math.cos(i))),
+        //     (float)(Math.sqrt(mu / semiLatusRectum) * (Math.sin(O) * Math.cos(w + v) + Math.cos(O) * Math.sin(w + v) * Math.cos(i)))
+        // );
 
-        // Compute the position in the orbital plane
-        float xOrbital = (float)(radius * Math.cos(trueAnomalyRadians));
-        float yOrbital = (float)(radius * Math.sin(trueAnomalyRadians));
-
-        // Rotate the position about the z-axis to the plane of the orbit
-        float x = (float)(xOrbital * Math.cos(longitudeOfAscendingNode) - yOrbital * Math.sin(longitudeOfAscendingNode) * Math.cos(inclination));
-        float y = (float)(xOrbital * Math.sin(longitudeOfAscendingNode) + yOrbital * Math.cos(longitudeOfAscendingNode) * Math.cos(inclination));
-
-        // Rotate the position about the y-axis to the argument of perigee
-        float xRotated = (float)(x * Math.cos(argumentOfPerigee));
-        float yRotated = (float)(y);
-
-        // Compute the velocity in the orbital plane
-        float vxOrbital = (float)(-semiMajorAxis * Math.sin(ecceAnomaly) / radius);
-        float vyOrbital = (float)(semiMajorAxis * Math.sqrt(1 - eccentricity * eccentricity) * Math.cos(ecceAnomaly) / radius);
-
-        // Rotate the velocity about the z-axis to the plane of the orbit
-        float vx = (float)(vxOrbital * Math.cos(longitudeOfAscendingNode) - vyOrbital * Math.sin(longitudeOfAscendingNode) * Math.cos(inclination));
-        float vy = (float)(vxOrbital * Math.sin(longitudeOfAscendingNode) + vyOrbital * Math.cos(longitudeOfAscendingNode) * Math.cos(inclination));
-
-        // Rotate the velocity about the y-axis to the argument of perigee
-        float vxRotated = (float)(vx * Math.cos(argumentOfPerigee));
-        float vyRotated = (float)(vy);
-
-        return new Vector2(vxRotated, vyRotated);
+        double[] stateVectors = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, i, O, w, meanAnomaly, mu);
+        return new Vector2((float)stateVectors[3], (float)stateVectors[4]);
     }
 
     public Vector2 getPositionAtTime(float t){
         // Kepler to cartesian
-        float linearE = semiMajorAxis - periapsis;
-        float semiMinorAxis = (float)(Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
-        Vector2 center = new Vector2(-linearE, 0);
+        // float linearE = semiMajorAxis - periapsis;
+        // float semiMinorAxis = (float)(Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
+        // Vector2 center = new Vector2(-linearE, 0);
         
         float meanAnomaly = (float)(t * Math.PI * 2.0);
         float ecceAnomaly = solveKeplersEquation(meanAnomaly, eccentricity);
 
-        return new Vector2((float)Math.cos(ecceAnomaly) * semiMajorAxis + center.x, (float)Math.sin(ecceAnomaly) * semiMinorAxis + center.y);
+        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
+        float O = (float)Math.toRadians(ascendingNode);
+        float w = (float)Math.toRadians(argumentOfPeriapsis);
+        float i = (float)Math.toRadians(inclination);
+        double[] stateVectors = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, i, O, w, meanAnomaly, mu);
+        return new Vector2((float)stateVectors[0], (float)stateVectors[1]);
+
+        // return new Vector2((float)Math.cos(ecceAnomaly) * semiMajorAxis + center.x, (float)Math.sin(ecceAnomaly) * semiMinorAxis + center.y);
     }
 
     public Celestial getCelestial(){ return parent; }

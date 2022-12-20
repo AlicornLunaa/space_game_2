@@ -329,7 +329,7 @@ public class Universe extends Actor {
                 Orbit path = paths.get(i);
                 Entity e = path.getEntity();
 
-                // if(e.getDriver() == null) continue;
+                if(e.getDriver() == null) continue; //! Testing, constrain to ship entity only
                 if(e.getDriving() != null) continue;
 
                 Vector2 curPos = path.getPositionAtTime(currentFuture);
@@ -340,7 +340,7 @@ public class Universe extends Actor {
             }
 
             // currentFuture += (timewarp - 1);
-            currentFuture += (0.001f);
+            currentFuture += (0.0001f);
             // currentFuture = (currentFuture % 1);
         }
     }
