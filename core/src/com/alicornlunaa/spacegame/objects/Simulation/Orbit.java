@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -26,6 +27,7 @@ public class Orbit {
     private float inclination = 0.f;
     private float periapsis = 0.f;
     private float apoapsis = 0.f;
+    private float startingMeanAnomaly = 0.f;
 
     // Private functions
     private float solveKeplersEquation(float M, float e){
@@ -72,6 +74,10 @@ public class Orbit {
         float w = (float)Math.atan2(eV.y, eV.x);
         float a = (float)(1 / ((2 / pos.len()) - (vel.len2() / mu)));
 
+        //! how to get mean anomaly from cartesian state vectors
+        float E = (float)Math.atan2(Math.sqrt(1-e*e)*pos.y, pos.x - a*(1-e*e)); // E is the eccentric anomaly
+        float M = (float)(E - e * Math.sin(E)); // M is the mean anomaly
+
         semiMajorAxis = a;
         eccentricity = e;
         argumentOfPeriapsis = (float)Math.toDegrees(w);
@@ -80,6 +86,27 @@ public class Orbit {
         inclination = (float)Math.toDegrees(i);
         periapsis = a * (1 - e);
         apoapsis = a * (1 + e);
+        startingMeanAnomaly = M;
+    }
+
+    public Matrix3 getMatrix(){
+        double Omega = Math.toRadians(ascendingNode);
+        double omega = Math.toRadians(argumentOfPeriapsis);
+        double i = Math.toRadians(inclination);
+
+        float[] v = {
+            (float)(Math.cos(Omega) * Math.cos(omega) - Math.sin(Omega) * Math.sin(omega) * Math.cos(i)),
+            (float)(-Math.cos(Omega) * Math.sin(omega) - Math.sin(Omega) * Math.cos(omega) * Math.cos(i)),
+            (float)(Math.sin(Omega) * Math.sin(i)),
+            (float)(Math.sin(Omega) * Math.cos(omega) + Math.cos(Omega) * Math.sin(omega) * Math.cos(i)),
+            (float)(Math.cos(Omega) * Math.cos(omega) - Math.sin(Omega) * Math.sin(omega) * Math.cos(i)),
+            (float)(-Math.sin(Omega) * Math.sin(omega) + Math.cos(Omega) * Math.cos(omega) * Math.cos(i)),
+            (float)(Math.sin(omega) * Math.sin(i)),
+            (float)(Math.cos(omega) * Math.sin(i)),
+            (float)(Math.cos(i))
+        };
+
+        return new Matrix3(v);
     }
 
     public void draw(ShapeRenderer render){
@@ -103,41 +130,31 @@ public class Orbit {
     public Vector2 getVelocityAtTime(float t){
         // Kepler to cartesian
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
-        // float h = (float)Math.sqrt(mu * semiMajorAxis * (1 - Math.pow(semiMajorAxis, 2.0)));
 
-        float meanAnomaly = (float)(t * Math.PI * 2.0);
-        float ecceAnomaly = solveKeplersEquation(meanAnomaly, eccentricity);
+        float omega = 0.f; // True anomaly
+        float scale = (float)(Math.sqrt(mu / semiMajorAxis) / (1 + eccentricity * Math.cos(omega)));
 
-        float O = (float)Math.toRadians(ascendingNode);
-        float w = (float)Math.toRadians(argumentOfPeriapsis);
-        float v = (float)(2 * Math.atan(Math.sqrt((1 + eccentricity) / (1 - eccentricity)) * Math.tan(ecceAnomaly / 2)));
-        float i = (float)Math.toRadians(inclination);
+        Vector2 perifocal = new Vector2((float)Math.sin(omega) * -1, eccentricity + (float)Math.cos(omega));
+        perifocal.scl(scale);
 
-        // float semiLatusRectum = (float)(semiMajorAxis * (1 - Math.pow(eccentricity, 2.0)));
-        // Vector2 velocity = new Vector2(
-        //     (float)(Math.sqrt(mu / semiLatusRectum) * (Math.cos(O) * Math.cos(w + v) - Math.sin(O) * Math.sin(w + v) * Math.cos(i))),
-        //     (float)(Math.sqrt(mu / semiLatusRectum) * (Math.sin(O) * Math.cos(w + v) + Math.cos(O) * Math.sin(w + v) * Math.cos(i)))
-        // );
-
-        double[] stateVectors = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, i, O, w, meanAnomaly, mu);
-        return new Vector2((float)stateVectors[3], (float)stateVectors[4]);
+        return perifocal;
     }
 
     public Vector2 getPositionAtTime(float t){
         // Kepler to cartesian
-        // float linearE = semiMajorAxis - periapsis;
-        // float semiMinorAxis = (float)(Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
-        // Vector2 center = new Vector2(-linearE, 0);
-        
         float meanAnomaly = (float)(t * Math.PI * 2.0);
         float ecceAnomaly = solveKeplersEquation(meanAnomaly, eccentricity);
 
-        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
-        float O = (float)Math.toRadians(ascendingNode);
-        float w = (float)Math.toRadians(argumentOfPeriapsis);
-        float i = (float)Math.toRadians(inclination);
-        double[] stateVectors = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, i, O, w, meanAnomaly, mu);
-        return new Vector2((float)stateVectors[0], (float)stateVectors[1]);
+        float omega = 0.f;//(t * 2.f * (float)Math.PI); // True anomaly
+        float scale = (float)(semiMajorAxis * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(omega)));
+
+        Vector2 perifocal = new Vector2((float)Math.cos(omega), (float)Math.sin(omega));
+        perifocal.scl(scale);
+        
+        Vector3 eci = new Vector3(perifocal, 0);
+        eci.mul(getMatrix());
+
+        return new Vector2(eci.x, eci.y);
 
         // return new Vector2((float)Math.cos(ecceAnomaly) * semiMajorAxis + center.x, (float)Math.sin(ecceAnomaly) * semiMinorAxis + center.y);
     }
