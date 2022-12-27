@@ -89,26 +89,6 @@ public class Orbit {
         startingMeanAnomaly = M;
     }
 
-    public Matrix3 getMatrix(){
-        double Omega = Math.toRadians(ascendingNode);
-        double omega = Math.toRadians(argumentOfPeriapsis);
-        double i = Math.toRadians(inclination);
-
-        float[] v = {
-            (float)(Math.cos(Omega) * Math.cos(omega) - Math.sin(Omega) * Math.sin(omega) * Math.cos(i)),
-            (float)(-Math.cos(Omega) * Math.sin(omega) - Math.sin(Omega) * Math.cos(omega) * Math.cos(i)),
-            (float)(Math.sin(Omega) * Math.sin(i)),
-            (float)(Math.sin(Omega) * Math.cos(omega) + Math.cos(Omega) * Math.sin(omega) * Math.cos(i)),
-            (float)(Math.cos(Omega) * Math.cos(omega) - Math.sin(Omega) * Math.sin(omega) * Math.cos(i)),
-            (float)(-Math.sin(Omega) * Math.sin(omega) + Math.cos(Omega) * Math.cos(omega) * Math.cos(i)),
-            (float)(Math.sin(omega) * Math.sin(i)),
-            (float)(Math.cos(omega) * Math.sin(i)),
-            (float)(Math.cos(i))
-        };
-
-        return new Matrix3(v);
-    }
-
     public void draw(ShapeRenderer render){
         float linearE = semiMajorAxis - periapsis;
         float semiMinorAxis = (float)(Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
@@ -130,32 +110,25 @@ public class Orbit {
     public Vector2 getVelocityAtTime(float t){
         // Kepler to cartesian
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
+        float meanAnomaly = (float)(t * Math.PI * 2.0); // True anomaly
 
-        float omega = 0.f; // True anomaly
-        float scale = (float)(Math.sqrt(mu / semiMajorAxis) / (1 + eccentricity * Math.cos(omega)));
+        double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, Math.toRadians(inclination), Math.toRadians(ascendingNode), Math.toRadians(argumentOfPeriapsis), meanAnomaly, mu);
+        Vector2 vel = new Vector2((float)cartesian[3], (float)cartesian[4]);
 
-        Vector2 perifocal = new Vector2((float)Math.sin(omega) * -1, eccentricity + (float)Math.cos(omega));
-        perifocal.scl(scale);
-
-        return perifocal;
+        return vel;
     }
 
     public Vector2 getPositionAtTime(float t){
+        //! Ascending node could be causing problems
         // Kepler to cartesian
+        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
         float meanAnomaly = (float)(t * Math.PI * 2.0);
         float ecceAnomaly = solveKeplersEquation(meanAnomaly, eccentricity);
 
-        float omega = 0.f;//(t * 2.f * (float)Math.PI); // True anomaly
-        float scale = (float)(semiMajorAxis * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(omega)));
+        double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, Math.toRadians(inclination), Math.toRadians(ascendingNode), Math.toRadians(argumentOfPeriapsis), meanAnomaly, mu);
+        Vector2 pos = new Vector2((float)cartesian[0], (float)cartesian[1]);
 
-        Vector2 perifocal = new Vector2((float)Math.cos(omega), (float)Math.sin(omega));
-        perifocal.scl(scale);
-        
-        Vector3 eci = new Vector3(perifocal, 0);
-        eci.mul(getMatrix());
-
-        return new Vector2(eci.x, eci.y);
-
+        return pos;
         // return new Vector2((float)Math.cos(ecceAnomaly) * semiMajorAxis + center.x, (float)Math.sin(ecceAnomaly) * semiMinorAxis + center.y);
     }
 

@@ -27,8 +27,8 @@ public class TestOrbit {
     double[] vel = { -v * Math.sin(nu), v * (e + Math.cos(nu)) };
 
     // Rotate the position and velocity vectors to the desired reference plane
-    double[] posRotated = rotate(pos, i, omega, w);
-    double[] velRotated = rotate(vel, i, omega, w);
+    double[] posRotated = rotate(pos, 0, omega, w - Math.PI / 2);
+    double[] velRotated = rotate(vel, 0, omega, w - Math.PI / 2);
 
     // Return the Cartesian state vector
     return new double[] { posRotated[0], posRotated[1], posRotated[2], velRotated[0], velRotated[1], velRotated[2] };
