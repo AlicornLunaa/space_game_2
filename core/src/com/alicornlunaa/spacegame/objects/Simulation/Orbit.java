@@ -70,6 +70,13 @@ public class Orbit {
         return eccentricAnomalyToMeanAnomaly(ea);
     }
 
+    private float timeToMeanAnomaly(float t){
+        // M = M0 + n(t - t0)
+        double mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
+        double n = Math.sqrt(mu / Math.pow(semiMajorAxis, 3.0));
+        return (float)(n * t);
+    }
+
     // Constructor
     public Orbit(Celestial parent, Entity child){
         this.parent = parent;
@@ -129,7 +136,8 @@ public class Orbit {
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
 
         float initialMeanAnomaly = trueAnomalyToMeanAnomaly(initialTrueAnomaly);
-        float futureMeanAnomaly = (float)(t * Math.PI * 2.0);
+        // float futureMeanAnomaly = (float)(t * Math.PI * 2.0);
+        float futureMeanAnomaly = timeToMeanAnomaly(t);
         float futureTrueAnomaly = meanAnomalyToTrueAnomaly(initialMeanAnomaly + futureMeanAnomaly);
 
         double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, inclination, ascendingNode, argumentOfPeriapsis, futureTrueAnomaly, mu);
@@ -143,7 +151,8 @@ public class Orbit {
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
         
         float initialMeanAnomaly = trueAnomalyToMeanAnomaly(initialTrueAnomaly);
-        float futureMeanAnomaly = (float)(t * Math.PI * 2.0);
+        // float futureMeanAnomaly = (float)(t * Math.PI * 2.0);
+        float futureMeanAnomaly = timeToMeanAnomaly(t);
         float futureTrueAnomaly = meanAnomalyToTrueAnomaly(initialMeanAnomaly + futureMeanAnomaly);
 
         double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, inclination, ascendingNode, argumentOfPeriapsis, futureTrueAnomaly, mu);

@@ -339,9 +339,7 @@ public class Universe extends Actor {
                 e.getBody().setLinearVelocity(curVel.cpy());
             }
 
-            // currentFuture += (timewarp - 1);
-            currentFuture += (0.0001f);
-            // currentFuture = (currentFuture % 1);
+            currentFuture += (timewarp - 1) / 6;
         }
     }
 
