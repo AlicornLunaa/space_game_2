@@ -2,23 +2,12 @@ package com.alicornlunaa.spacegame.objects.Simulation;
 
 public class TestOrbit {
 
-  public static double[] keplerianToCartesian(double a, double e, double i, double omega, double w, double M,
-      double mu) {
+  public static double[] keplerianToCartesian(double a, double e, double i, double omega, double w, double trueAnomaly, double mu) {
     // Calculate the semi-latus rectum
     double p = a * (1 - e * e);
 
-    // Calculate the eccentric anomaly
-    double E = M;
-    double tolerance = 1e-6;
-    double error = 1;
-    while (error > tolerance) {
-      double ratio = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
-      E = E - ratio;
-      error = Math.abs(ratio);
-    }
-
     // Calculate the true anomaly
-    double nu = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+    double nu = trueAnomaly;
 
     // Calculate the position and velocity in the orbital plane
     double r = p / (1 + e * Math.cos(nu));
@@ -27,8 +16,8 @@ public class TestOrbit {
     double[] vel = { -v * Math.sin(nu), v * (e + Math.cos(nu)) };
 
     // Rotate the position and velocity vectors to the desired reference plane
-    double[] posRotated = rotate(pos, 0, omega, w - Math.PI / 2);
-    double[] velRotated = rotate(vel, 0, omega, w - Math.PI / 2);
+    double[] posRotated = rotate(pos, i, 0, w);
+    double[] velRotated = rotate(vel, i, 0, w);
 
     // Return the Cartesian state vector
     return new double[] { posRotated[0], posRotated[1], posRotated[2], velRotated[0], velRotated[1], velRotated[2] };

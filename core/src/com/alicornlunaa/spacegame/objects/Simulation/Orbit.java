@@ -22,30 +22,52 @@ public class Orbit {
     private float semiMajorAxis = 0.f;
     private float eccentricity = 0.f;
     private float argumentOfPeriapsis = 0.f;
-    private float trueAnomaly = 0.f;
+    private float initialTrueAnomaly = 0.f;
     private float ascendingNode = 0.f;
     private float inclination = 0.f;
     private float periapsis = 0.f;
     private float apoapsis = 0.f;
-    private float startingMeanAnomaly = 0.f;
 
     // Private functions
-    private float solveKeplersEquation(float M, float e){
+    private float meanAnomalyToEccentricAnomaly(float ma){
+        // Mean anomaly => Eccentric anomaly
         float step = 0.0001f;
         float epsilon = 0.0000001f;
         float guess = 0;
 
         for(int i = 0; i < 100; i++){
-            float y = (float)(M - guess + e * Math.sin(guess));
+            float y = (float)(ma - guess + eccentricity * Math.sin(guess));
 
             if(Math.abs(y) < epsilon) break;
 
-            float slope = (float)((M - (guess + step) + e * Math.sin(guess + step)) - y) / step;
+            float slope = (float)((ma - (guess + step) + eccentricity * Math.sin(guess + step)) - y) / step;
             float s = y / slope;
             guess -= s;
         }
 
         return guess;
+    }
+
+    private float trueAnomalyToEccentricAnomaly(float ta){
+        return (float)Math.atan2(Math.sqrt(1 - Math.pow(eccentricity, 2)) * Math.sin(ta), eccentricity + Math.cos(ta));
+    }
+
+    private float eccentricAnomalyToMeanAnomaly(float ea){
+        return (float)(ea - eccentricity * Math.sin(ea));
+    }
+    
+    private float eccentricAnomalyToTrueAnomaly(float ea){
+        return (float)(2.0 * Math.atan(Math.sqrt((1 + eccentricity) / (1 - eccentricity)) * Math.tan(ea / 2.0)));
+    }
+
+    private float meanAnomalyToTrueAnomaly(float ma){
+        float ea = meanAnomalyToEccentricAnomaly(ma);
+        return eccentricAnomalyToTrueAnomaly(ea);
+    }
+
+    private float trueAnomalyToMeanAnomaly(float ta){
+        float ea = trueAnomalyToEccentricAnomaly(ta);
+        return eccentricAnomalyToMeanAnomaly(ea);
     }
 
     // Constructor
@@ -74,19 +96,14 @@ public class Orbit {
         float w = (float)Math.atan2(eV.y, eV.x);
         float a = (float)(1 / ((2 / pos.len()) - (vel.len2() / mu)));
 
-        //! how to get mean anomaly from cartesian state vectors
-        float E = (float)Math.atan2(Math.sqrt(1-e*e)*pos.y, pos.x - a*(1-e*e)); // E is the eccentric anomaly
-        float M = (float)(E - e * Math.sin(E)); // M is the mean anomaly
-
         semiMajorAxis = a;
         eccentricity = e;
-        argumentOfPeriapsis = (float)Math.toDegrees(w);
-        trueAnomaly = (float)Math.toDegrees(anomaly);
-        ascendingNode = (float)Math.toDegrees(O);
-        inclination = (float)Math.toDegrees(i);
+        argumentOfPeriapsis = w;
+        initialTrueAnomaly = anomaly;
+        ascendingNode = O;
+        inclination = i;
         periapsis = a * (1 - e);
         apoapsis = a * (1 + e);
-        startingMeanAnomaly = M;
     }
 
     public void draw(ShapeRenderer render){
@@ -94,7 +111,7 @@ public class Orbit {
         float semiMinorAxis = (float)(Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
         Vector2 center = new Vector2(-linearE, 0);
 
-        render.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()).rotate(0, 0, 1, argumentOfPeriapsis));
+        render.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()).rotateRad(0, 0, 1, argumentOfPeriapsis));
         render.setColor(eccentricity <= 1 ? Color.CYAN : Color.RED);
 
         for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
@@ -110,26 +127,29 @@ public class Orbit {
     public Vector2 getVelocityAtTime(float t){
         // Kepler to cartesian
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
-        float meanAnomaly = (float)(t * Math.PI * 2.0); // True anomaly
 
-        double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, Math.toRadians(inclination), Math.toRadians(ascendingNode), Math.toRadians(argumentOfPeriapsis), meanAnomaly, mu);
+        float initialMeanAnomaly = trueAnomalyToMeanAnomaly(initialTrueAnomaly);
+        float futureMeanAnomaly = (float)(t * Math.PI * 2.0);
+        float futureTrueAnomaly = meanAnomalyToTrueAnomaly(initialMeanAnomaly + futureMeanAnomaly);
+
+        double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, inclination, ascendingNode, argumentOfPeriapsis, futureTrueAnomaly, mu);
         Vector2 vel = new Vector2((float)cartesian[3], (float)cartesian[4]);
 
         return vel;
     }
 
     public Vector2 getPositionAtTime(float t){
-        //! Ascending node could be causing problems
         // Kepler to cartesian
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
-        float meanAnomaly = (float)(t * Math.PI * 2.0);
-        float ecceAnomaly = solveKeplersEquation(meanAnomaly, eccentricity);
+        
+        float initialMeanAnomaly = trueAnomalyToMeanAnomaly(initialTrueAnomaly);
+        float futureMeanAnomaly = (float)(t * Math.PI * 2.0);
+        float futureTrueAnomaly = meanAnomalyToTrueAnomaly(initialMeanAnomaly + futureMeanAnomaly);
 
-        double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, Math.toRadians(inclination), Math.toRadians(ascendingNode), Math.toRadians(argumentOfPeriapsis), meanAnomaly, mu);
+        double[] cartesian = TestOrbit.keplerianToCartesian(semiMajorAxis, eccentricity, inclination, ascendingNode, argumentOfPeriapsis, futureTrueAnomaly, mu);
         Vector2 pos = new Vector2((float)cartesian[0], (float)cartesian[1]);
 
         return pos;
-        // return new Vector2((float)Math.cos(ecceAnomaly) * semiMajorAxis + center.x, (float)Math.sin(ecceAnomaly) * semiMinorAxis + center.y);
     }
 
     public Celestial getCelestial(){ return parent; }
@@ -138,7 +158,7 @@ public class Orbit {
 
     @Override
     public String toString(){
-        return String.format("a: %f%ne: %f%nw: %f%nv: %f%nO: %f%ni: %f%n", semiMajorAxis, eccentricity, argumentOfPeriapsis, trueAnomaly, ascendingNode, inclination);
+        return String.format("a: %f%ne: %f%nw: %f%nv: %f%nO: %f%ni: %f%n", semiMajorAxis, eccentricity, argumentOfPeriapsis, initialTrueAnomaly, ascendingNode, inclination);
     }
 
 }
