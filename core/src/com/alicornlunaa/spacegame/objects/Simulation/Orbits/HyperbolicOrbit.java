@@ -15,38 +15,35 @@ class HyperbolicOrbit {
     // Functions
     public static float meanAnomalyToEccentricAnomaly(ConicSection orbit, float ma){
         // Mean anomaly => Eccentric anomaly
-        float step = 0.0001f;
         float epsilon = 0.0000001f;
-        float guess = 0;
+        float guess = ma;
 
         for(int i = 0; i < 100; i++){
-            float y = (float)(ma - guess + orbit.getEccentricity() * Math.sin(guess));
+            // M = e sinh(F) - F
+            float y = (float)((guess - orbit.getEccentricity() * Math.sinh(guess) - ma) / (1 - orbit.getEccentricity() * Math.cosh(guess)));
+            guess = guess - y;
 
             if(Math.abs(y) < epsilon) break;
-
-            float slope = (float)((ma - (guess + step) + orbit.getEccentricity() * Math.sin(guess + step)) - y) / step;
-            float s = y / slope;
-            guess -= s;
         }
 
         return guess;
     }
 
     public static float trueAnomalyToEccentricAnomaly(ConicSection orbit, float ta){
-        return (float)Math.atan2(Math.sqrt(1 - Math.pow(orbit.getEccentricity(), 2)) * Math.sin(ta), orbit.getEccentricity() + Math.cos(ta));
+        return (float)(2.0 * Math.atan(Math.sqrt((orbit.getEccentricity() - 1) / (orbit.getEccentricity() + 1)) * Math.tan(ta / 2)));
     }
 
     public static float eccentricAnomalyToMeanAnomaly(ConicSection orbit, float ea){
-        return (float)(ea - orbit.getEccentricity() * Math.sin(ea));
+        return (float)(orbit.getEccentricity() * Math.sinh(ea) - ea);
     }
     
     public static float eccentricAnomalyToTrueAnomaly(ConicSection orbit, float ea){
-        return (float)(2.0 * Math.atan(Math.sqrt((1 + orbit.getEccentricity()) / (1 - orbit.getEccentricity())) * Math.tan(ea / 2.0)));
+        return (float)(2.0 * Math.atan(Math.sqrt((orbit.getEccentricity() + 1) / (orbit.getEccentricity() - 1)) * Math.tan(ea / 2.0)));
     }
 
     public static float meanAnomalyToTrueAnomaly(ConicSection orbit, float ma){
         float ea = meanAnomalyToEccentricAnomaly(orbit, ma);
-        return eccentricAnomalyToTrueAnomaly(orbit, ea);
+        return -eccentricAnomalyToTrueAnomaly(orbit, ea);
     }
 
     public static float trueAnomalyToMeanAnomaly(ConicSection orbit, float ta){
@@ -57,7 +54,7 @@ class HyperbolicOrbit {
     public static float timeToMeanAnomaly(ConicSection orbit, float t){
         // M = M0 + n(t - t0)
         double mu = Constants.GRAVITY_CONSTANT * orbit.getParent().getBody().getMass();
-        double n = Math.sqrt(mu / Math.pow(orbit.getSemiMajorAxis(), 3.0));
+        double n = Math.sqrt(mu / Math.pow(-orbit.getSemiMajorAxis(), 3.0));
         return (float)(n * t);
     }
 
@@ -125,6 +122,7 @@ class HyperbolicOrbit {
         position.rotateRad(orbit.getInclination(), 1, 0, 0);
         position.rotateRad(orbit.getArgumentOfPeriapsis(), 0, 0, 1);
 
-        return new Vector2(position.x, position.y);
+         return new Vector2(position.x, position.y);
     }
+
 }
