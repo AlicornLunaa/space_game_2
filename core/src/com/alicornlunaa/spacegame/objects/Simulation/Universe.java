@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
@@ -33,7 +33,7 @@ public class Universe extends Actor {
 
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
-    private Array<Orbit> paths = new Array<>();
+    private Array<ConicSection> paths = new Array<>();
 
     // Private functions
     private void parentCelestial(Celestial target, Celestial parent){
@@ -201,7 +201,7 @@ public class Universe extends Actor {
                 Celestial parent = getParentCelestial(e);
                 if(parent == null) continue;
 
-                Orbit path = new Orbit(parent, e);
+                ConicSection path = new ConicSection(parent, e);
                 paths.add(path);
             }
 
@@ -209,7 +209,7 @@ public class Universe extends Actor {
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
                 
-                Orbit path = new Orbit(parent, c);
+                ConicSection path = new ConicSection(parent, c);
                 paths.add(path);
             }
         }
@@ -327,8 +327,8 @@ public class Universe extends Actor {
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             for(int i = 0; i < paths.size; i++){
-                Orbit path = paths.get(i);
-                Entity e = path.getEntity();
+                ConicSection path = paths.get(i);
+                Entity e = path.getChild();
 
                 if(e.getDriver() == null) continue; //! Testing, constrain to ship entity only
                 if(e.getDriving() != null) continue;

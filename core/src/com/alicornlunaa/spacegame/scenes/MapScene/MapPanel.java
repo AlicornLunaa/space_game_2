@@ -4,7 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
@@ -30,7 +30,7 @@ public class MapPanel extends Stage {
     private float oldZoom = 0.0f;
 
     private TextureRegion shipIcon;
-    private Array<Orbit> orbits = new Array<>();
+    private Array<ConicSection> orbits = new Array<>();
 
     // Constructor
     public MapPanel(final App game, final Screen previousScreen){
@@ -52,14 +52,14 @@ public class MapPanel extends Stage {
             Celestial parent = u.getParentCelestial(e);
 
             if(parent != null){
-                orbits.add(new Orbit(parent, e));
+                orbits.add(new ConicSection(parent, e));
             }
         }
         for(Celestial c : u.getCelestials()){
             Celestial parent = u.getParentCelestial(c);
 
             if(parent != null){
-                orbits.add(new Orbit(parent, c));
+                orbits.add(new ConicSection(parent, c));
             }
         }
 
@@ -89,7 +89,7 @@ public class MapPanel extends Stage {
     public void act(float delta){
         spacePanel.act();
 
-        for(Orbit o : orbits){
+        for(ConicSection o : orbits){
             o.calculate();
         }
 
@@ -108,7 +108,7 @@ public class MapPanel extends Stage {
         batch.end();
         game.shapeRenderer.setProjectionMatrix(cam.combined);
         game.shapeRenderer.begin(ShapeType.Filled);
-        for(Orbit o : orbits){
+        for(ConicSection o : orbits){
             o.draw(game.shapeRenderer);
         }
         game.shapeRenderer.end();
