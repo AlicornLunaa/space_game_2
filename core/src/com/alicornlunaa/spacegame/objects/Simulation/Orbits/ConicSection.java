@@ -58,28 +58,34 @@ public class ConicSection {
     }
 
     public Vector2 getVelocityAtTime(float t){
-        if(eccentricity >= 0){
-            // Circular or elliptical
-            return EllipticOrbit.getVelocityAtTime(this, t);
+        if(eccentricity > 1){
+            // Hyperbolic
+            return HyperbolicOrbit.getVelocityAtTime(this, t);
         } else if(eccentricity == 1){
             // Parabolic
             return null;
+        } else if(eccentricity > 0){
+            // Elliptic
+            return EllipticOrbit.getVelocityAtTime(this, t);
         } else {
-            // Hyperbolic
-            return HyperbolicOrbit.getVelocityAtTime(this, t);
+            // Circular
+            return null;
         }
     }
 
     public Vector2 getPositionAtTime(float t){
-        if(eccentricity >= 0){
-            // Circular or elliptical
-            return EllipticOrbit.getPositionAtTime(this, t);
+        if(eccentricity > 1){
+            // Hyperbolic
+            return HyperbolicOrbit.getPositionAtTime(this, t);
         } else if(eccentricity == 1){
             // Parabolic
             return null;
+        } else if(eccentricity > 0){
+            // Elliptic
+            return EllipticOrbit.getPositionAtTime(this, t);
         } else {
-            // Hyperbolic
-            return HyperbolicOrbit.getPositionAtTime(this, t);
+            // Circular
+            return null;
         }
     }
 
@@ -95,14 +101,16 @@ public class ConicSection {
     public float getApoapsis() { return apoapsis; }
 
     public void draw(ShapeRenderer renderer){
-        if(eccentricity >= 0){
-            // Circular or elliptical
-            EllipticOrbit.draw(this, renderer);
-        } else if(eccentricity == 1){
-            // Parabolic
-        } else if(eccentricity >= 1){
+        if(eccentricity > 1){
             // Hyperbolic
             HyperbolicOrbit.draw(this, renderer);
+        } else if(eccentricity == 1){
+            // Parabolic
+        } else if(eccentricity > 0){
+            // Elliptic
+            EllipticOrbit.draw(this, renderer);
+        } else {
+            // Circular
         }
     }
 

@@ -106,12 +106,12 @@ public class MapPanel extends Stage {
         batch.setTransformMatrix(new Matrix4());
 
         batch.end();
-        game.shapeRenderer.setProjectionMatrix(cam.combined);
-        game.shapeRenderer.begin(ShapeType.Filled);
-        for(ConicSection o : orbits){
-            o.draw(game.shapeRenderer);
-        }
-        game.shapeRenderer.end();
+        // game.shapeRenderer.setProjectionMatrix(cam.combined);
+        // game.shapeRenderer.begin(ShapeType.Filled);
+        // for(ConicSection o : orbits){
+        //     o.draw(game.shapeRenderer);
+        // }
+        // game.shapeRenderer.end();
         batch.begin();
 
         Vector2 size = new Vector2(1024, 1024);
@@ -133,6 +133,14 @@ public class MapPanel extends Stage {
         super.draw();
 
         spacePanel.draw();
+
+        // TODO: temp placeholder
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.begin(ShapeType.Filled);
+        for(ConicSection o : orbits){
+            o.draw(game.shapeRenderer);
+        }
+        game.shapeRenderer.end();
     }
     
     @Override

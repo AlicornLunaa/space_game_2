@@ -62,20 +62,35 @@ class HyperbolicOrbit {
     }
 
     public static void draw(ConicSection orbit, ShapeRenderer render){
-        float linearE = orbit.getSemiMajorAxis() - orbit.getPeriapsis();
-        float semiMinorAxis = (float)(Math.sqrt(Math.pow(orbit.getSemiMajorAxis(), 2.0) - Math.pow(linearE, 2.0)));
+        float linearE = orbit.getSemiMajorAxis() * orbit.getEccentricity();
+        float semiMinorAxis = (float)Math.sqrt(linearE * linearE - Math.pow(orbit.getSemiMajorAxis(), 2.0));
         Vector2 center = new Vector2(-linearE, 0);
 
         render.setTransformMatrix(new Matrix4().set(orbit.getParent().getUniverseTransform()).rotateRad(0, 0, 1, orbit.getArgumentOfPeriapsis()));
-        render.setColor(orbit.getEccentricity() <= 1 ? Color.CYAN : Color.RED);
+        render.setColor(Color.RED);
 
-        for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-            float ang1 = (float)((i / (Constants.ORBIT_RESOLUTION - 1.f)) * Math.PI * 2.0);
-            float ang2 = (float)((((i + 1) % Constants.ORBIT_RESOLUTION) / (Constants.ORBIT_RESOLUTION - 1.f)) * Math.PI * 2.0);
-            Vector2 p1 = new Vector2((float)(Math.cos(ang1) * orbit.getSemiMajorAxis() + center.x), (float)(Math.sin(ang1) * semiMinorAxis + center.y)).scl(Constants.PPM);
-            Vector2 p2 = new Vector2((float)(Math.cos(ang2) * orbit.getSemiMajorAxis() + center.x), (float)(Math.sin(ang2) * semiMinorAxis + center.y)).scl(Constants.PPM);
+        for(float i = 0; i < Constants.ORBIT_RESOLUTION; i++){
+            float x1 = (i / Constants.ORBIT_RESOLUTION) * semiMinorAxis;
+            float y1 = (float)Math.sqrt((1 + (x1 * x1) / (semiMinorAxis * semiMinorAxis)) * Math.pow(orbit.getSemiMajorAxis(), 2.0));
 
-            render.rectLine(p1, p2, 100);
+            float x2 = ((i + 1) / Constants.ORBIT_RESOLUTION) * semiMinorAxis;
+            float y2 = (float)Math.sqrt((1 + (x2 * x2) / (semiMinorAxis * semiMinorAxis)) * Math.pow(orbit.getSemiMajorAxis(), 2.0));
+
+            render.rectLine(
+                (-y1 + center.x) * Constants.PPM,
+                (x1 + center.y) * Constants.PPM,
+                (-y2 + center.x) * Constants.PPM,
+                (x2 + center.y) * Constants.PPM,
+                100
+            );
+
+            render.rectLine(
+                (-y1 + center.x) * Constants.PPM,
+                (-x1 + center.y) * Constants.PPM,
+                (-y2 + center.x) * Constants.PPM,
+                (-x2 + center.y) * Constants.PPM,
+                100
+            );
         }
     }
 
