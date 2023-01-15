@@ -58,18 +58,12 @@ public class ConicSection {
     }
 
     public Vector2 getVelocityAtTime(float t){
-        if(eccentricity > 1){
+        if(eccentricity >= 1){
             // Hyperbolic
             return HyperbolicOrbit.getVelocityAtTime(this, t);
-        } else if(eccentricity == 1){
-            // Parabolic
-            return null;
-        } else if(eccentricity > 0){
+        } else {
             // Elliptic
             return EllipticOrbit.getVelocityAtTime(this, t);
-        } else {
-            // Circular
-            return null;
         }
     }
 
@@ -77,15 +71,9 @@ public class ConicSection {
         if(eccentricity > 1){
             // Hyperbolic
             return HyperbolicOrbit.getPositionAtTime(this, t);
-        } else if(eccentricity == 1){
-            // Parabolic
-            return null;
-        } else if(eccentricity > 0){
+        } else {
             // Elliptic
             return EllipticOrbit.getPositionAtTime(this, t);
-        } else {
-            // Circular
-            return null;
         }
     }
 
@@ -101,16 +89,12 @@ public class ConicSection {
     public float getApoapsis() { return apoapsis; }
 
     public void draw(ShapeRenderer renderer){
-        if(eccentricity > 1){
-            // Hyperbolic
+        if(eccentricity >= 1){
+            // Hyperbolic or parabolic
             HyperbolicOrbit.draw(this, renderer);
-        } else if(eccentricity == 1){
-            // Parabolic
-        } else if(eccentricity > 0){
-            // Elliptic
-            EllipticOrbit.draw(this, renderer);
         } else {
-            // Circular
+            // Elliptic or circular
+            EllipticOrbit.draw(this, renderer);
         }
     }
 
