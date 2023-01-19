@@ -37,18 +37,19 @@ public class PatchedConicSolver {
     private boolean checkSOITransition(Celestial parent, ConicSection section){
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(section.getSemiMajorAxis() >= parent.getSphereOfInfluence() / Constants.PPM) return true;
+        if(section.getEccentricity() >= 1.f) return true;
         
-        for(int i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
+        for(float i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
             double meanAnomaly = (2.0 * Math.PI * (i / (Constants.PATCHED_CONIC_STEPS - 1)));
             Vector2 entPosAtAnomaly = section.getPositionAtAnomaly((float)meanAnomaly);
 
             for(Celestial child : parent.getChildren()){
                 ConicSection celestialConic = new ConicSection(child.getCelestialParent(), child);
-                Vector2 celestialPosAtAnomaly = celestialConic.getPositionAtAnomaly((float)meanAnomaly);
+                Vector2 celestialPosAtAnomaly = celestialConic.getPositionAtAnomaly((float)meanAnomaly); //! CONVERT TO UNIVERSAL POSITION HERE
                 float distanceToSOI = celestialPosAtAnomaly.dst2(entPosAtAnomaly) - (child.getSphereOfInfluence() * child.getSphereOfInfluence());
 
                 //! Solve distanceToSOI <= 0 here
-                if(distanceToSOI <= 0) return true;
+                // if(distanceToSOI <= 0) return true;
             }
         }
 

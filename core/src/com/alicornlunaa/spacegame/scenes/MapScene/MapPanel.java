@@ -53,7 +53,7 @@ public class MapPanel extends Stage {
         for(Entity e : u.getEntities()){
             Celestial parent = u.getParentCelestial(e);
 
-            if(parent != null){
+            if(parent != null && e.getDriving() == null){
                 orbits.add(new ConicSection(parent, e));
                 patchedConics.add(new PatchedConicSolver(u, e));
             }
