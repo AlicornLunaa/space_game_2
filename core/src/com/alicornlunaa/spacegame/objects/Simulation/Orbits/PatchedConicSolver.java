@@ -34,21 +34,21 @@ public class PatchedConicSolver {
     private ArrayList<ConicSection> conics = new ArrayList<>();
 
     // Private functions
-    private float meanAnomalyToTime(ConicSection section){
-        // double mu = Constants.GRAVITY_CONSTANT * section.getParent().getBody().getMass();
-        // double n = Math.sqrt(mu / Math.pow(section.getSemiMajorAxis(), 3.0));
-        // return (float)(n * t);
-        return 0.f;
-    }
-
     private boolean checkSOITransition(Celestial parent, ConicSection section){
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(section.getSemiMajorAxis() >= parent.getSphereOfInfluence() / Constants.PPM) return true;
         
-        float epoch = 0.f;
         for(int i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-            for(Celestial children : parent.getChildren()){
-                
+            double meanAnomaly = (2.0 * Math.PI * (i / (Constants.PATCHED_CONIC_STEPS - 1)));
+            Vector2 entPosAtAnomaly = section.getPositionAtAnomaly((float)meanAnomaly);
+
+            for(Celestial child : parent.getChildren()){
+                ConicSection celestialConic = new ConicSection(child.getCelestialParent(), child);
+                Vector2 celestialPosAtAnomaly = celestialConic.getPositionAtAnomaly((float)meanAnomaly);
+                float distanceToSOI = celestialPosAtAnomaly.dst2(entPosAtAnomaly) - (child.getSphereOfInfluence() * child.getSphereOfInfluence());
+
+                //! Solve distanceToSOI <= 0 here
+                if(distanceToSOI <= 0) return true;
             }
         }
 

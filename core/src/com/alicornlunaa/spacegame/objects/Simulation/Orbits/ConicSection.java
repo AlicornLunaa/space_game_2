@@ -57,6 +57,26 @@ public class ConicSection {
         apoapsis = a * (1 + e);
     }
 
+    public Vector2 getVelocityAtAnomaly(float t){
+        if(eccentricity >= 1){
+            // Hyperbolic
+            return HyperbolicOrbit.getVelocityAtAnomaly(this, t);
+        } else {
+            // Elliptic
+            return EllipticOrbit.getVelocityAtAnomaly(this, t);
+        }
+    }
+
+    public Vector2 getPositionAtAnomaly(float t){
+        if(eccentricity > 1){
+            // Hyperbolic
+            return HyperbolicOrbit.getVelocityAtAnomaly(this, t);
+        } else {
+            // Elliptic
+            return EllipticOrbit.getVelocityAtAnomaly(this, t);
+        }
+    }
+
     public Vector2 getVelocityAtTime(float t){
         if(eccentricity >= 1){
             // Hyperbolic
