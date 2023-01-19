@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
@@ -31,6 +32,7 @@ public class MapPanel extends Stage {
 
     private TextureRegion shipIcon;
     private Array<ConicSection> orbits = new Array<>();
+    private Array<PatchedConicSolver> patchedConics = new Array<>();
 
     // Constructor
     public MapPanel(final App game, final Screen previousScreen){
@@ -53,6 +55,7 @@ public class MapPanel extends Stage {
 
             if(parent != null){
                 orbits.add(new ConicSection(parent, e));
+                patchedConics.add(new PatchedConicSolver(u, e));
             }
         }
         for(Celestial c : u.getCelestials()){
@@ -92,6 +95,9 @@ public class MapPanel extends Stage {
         for(ConicSection o : orbits){
             o.calculate();
         }
+        for(PatchedConicSolver cs : patchedConics){
+            cs.recalculate();
+        }
 
         super.act(delta);
     }
@@ -106,12 +112,15 @@ public class MapPanel extends Stage {
         batch.setTransformMatrix(new Matrix4());
 
         batch.end();
-        // game.shapeRenderer.setProjectionMatrix(cam.combined);
-        // game.shapeRenderer.begin(ShapeType.Filled);
-        // for(ConicSection o : orbits){
-        //     o.draw(game.shapeRenderer);
-        // }
-        // game.shapeRenderer.end();
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.begin(ShapeType.Filled);
+        for(ConicSection o : orbits){
+            // o.draw(game.shapeRenderer);
+        }
+        for(PatchedConicSolver cs : patchedConics){
+            cs.draw(game.shapeRenderer);
+        }
+        game.shapeRenderer.end();
         batch.begin();
 
         Vector2 size = new Vector2(1024, 1024);
@@ -133,14 +142,6 @@ public class MapPanel extends Stage {
         super.draw();
 
         spacePanel.draw();
-
-        // TODO: temp placeholder
-        game.shapeRenderer.setProjectionMatrix(cam.combined);
-        game.shapeRenderer.begin(ShapeType.Filled);
-        for(ConicSection o : orbits){
-            o.draw(game.shapeRenderer);
-        }
-        game.shapeRenderer.end();
     }
     
     @Override
