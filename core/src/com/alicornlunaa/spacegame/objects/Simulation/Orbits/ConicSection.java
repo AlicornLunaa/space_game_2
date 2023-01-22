@@ -70,10 +70,10 @@ public class ConicSection {
     public Vector2 getPositionAtAnomaly(float t){
         if(eccentricity > 1){
             // Hyperbolic
-            return HyperbolicOrbit.getVelocityAtAnomaly(this, t);
+            return HyperbolicOrbit.getPositionAtAnomaly(this, t);
         } else {
             // Elliptic
-            return EllipticOrbit.getVelocityAtAnomaly(this, t);
+            return EllipticOrbit.getPositionAtAnomaly(this, t);
         }
     }
 
@@ -94,6 +94,16 @@ public class ConicSection {
         } else {
             // Elliptic
             return EllipticOrbit.getPositionAtTime(this, t);
+        }
+    }
+
+    public float getInitialMeanAnomaly(){
+        if(eccentricity > 1){
+            // Hyperbolic
+            return HyperbolicOrbit.trueAnomalyToMeanAnomaly(this, getInitialTrueAnomaly());
+        } else {
+            // Elliptic
+            return EllipticOrbit.trueAnomalyToMeanAnomaly(this, getInitialTrueAnomaly());
         }
     }
 

@@ -13,16 +13,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- *! Create a planet state interface that holds a radius, position, and velocity
- *! and implement it in the Celestial entity and a fake celestial used for
- *! future simulations
-
-    Simplify to solving an equation for distance to each child.
-    If distance is less or equal to zero, its inside the new sphere of influence
-    Solve this equation with a root solver
- */
-
-/**
  * Solves an entire orbit with the patched conics algorithm, using different conic sections
  * It will take an entity and a universe, allowing it to simulate every body in the system
  */
@@ -36,33 +26,52 @@ public class PatchedConicSolver {
     private ArrayList<ConicSection> conics = new ArrayList<>();
 
     // Private functions
-    private boolean checkSOITransition(Celestial parent, ConicSection section){
+    private void checkSOITransition(final Celestial parent, final ConicSection section, int depth){
         // Checks whether or not the entity in question exits or enters the sphere of influence
-        if(section.getSemiMajorAxis() >= parent.getSphereOfInfluence() / Constants.PPM) return true;
-        if(section.getEccentricity() >= 1.f) return true;
-
-        System.out.print(RootSolver.bisection(-200, 200, new EquationInterface(){
-            @Override
-            public float func(float x){
-                return (x * x * x) - x - 2;
-            }
-        }));
-
-        for(float i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-            double meanAnomaly = (2.0 * Math.PI * (i / (Constants.PATCHED_CONIC_STEPS - 1)));
-            Vector2 entPosAtAnomaly = section.getPositionAtAnomaly((float)meanAnomaly);
-
-            for(Celestial child : parent.getChildren()){
-                ConicSection celestialConic = new ConicSection(child.getCelestialParent(), child);
-                Vector2 celestialPosAtAnomaly = celestialConic.getPositionAtAnomaly((float)meanAnomaly); //! CONVERT TO UNIVERSAL POSITION HERE
-                float distanceToSOI = celestialPosAtAnomaly.dst2(entPosAtAnomaly) - (child.getSphereOfInfluence() * child.getSphereOfInfluence());
-
-                //! Solve distanceToSOI <= 0 here
-                // if(distanceToSOI <= 0) return true;
-            }
+        if(parent == null) return;
+        if(depth > Constants.PATCHED_CONIC_LIMIT) return;
+        if(section.getEccentricity() >= 1.f || section.getSemiMajorAxis() >= parent.getSphereOfInfluence() / Constants.PPM){
+            conics.add(new ConicSection(parent.getCelestialParent(), entity));
+            checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1);
+            return;
         }
 
-        return false;
+        for(final Celestial child : parent.getChildren()){
+            //ඞ
+            ConicSection childConic = new ConicSection(child.getCelestialParent(), child);
+            float roughGuessInside = -1.f;
+            
+            for(float i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
+                // Search entire orbit for an intersection
+                float meanAnomaly = (float)((i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI);
+                Vector2 entPosAtAnomaly = section.getPositionAtAnomaly(meanAnomaly);
+                Vector2 celestialPosAtAnomaly = child.getBody().getPosition();//childConic.getPositionAtAnomaly(meanAnomaly);
+                float distanceToSOI = celestialPosAtAnomaly.dst(entPosAtAnomaly) - (child.getSphereOfInfluence() / Constants.PPM);
+
+                if(distanceToSOI < 0){
+                    roughGuessInside = meanAnomaly;
+                    break;
+                }
+            }
+
+            if(roughGuessInside != -1){
+                float meanAnomalyToIntersection = RootSolver.bisection(section.getInitialMeanAnomaly(), roughGuessInside, new EquationInterface() {
+                    @Override
+                    public float func(float x){
+                        Vector2 entPosAtAnomaly = section.getPositionAtAnomaly(x);
+                        Vector2 celestialPosAtAnomaly = child.getBody().getPosition();//childConic.getPositionAtAnomaly(x);
+                        float distanceToSOI = celestialPosAtAnomaly.dst(entPosAtAnomaly) - (child.getSphereOfInfluence() / Constants.PPM);
+                        return distanceToSOI;
+                    }
+                });
+
+                //! Add new conic section constructor from velocity and position instead
+                // Add new conic relative to the child as a new parent
+                conics.add(new ConicSection(child, entity));
+                checkSOITransition(child, conics.get(conics.size() - 1), depth + 1);
+                return;
+            }
+        }
     }
 
     // Constructor
@@ -82,7 +91,7 @@ public class PatchedConicSolver {
         conics.add(new ConicSection(parent, entity));
 
         // Search the first orbit for an intersection with a new sphere of influence
-        System.out.println(checkSOITransition(parent, conics.get(0)));
+        checkSOITransition(parent, conics.get(0), 0);
     }
 
     public Vector2 positionAtEpoch(float t){

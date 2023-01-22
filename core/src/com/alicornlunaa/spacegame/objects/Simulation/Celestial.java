@@ -99,7 +99,7 @@ public class Celestial extends Entity {
         s.circle(0, 0, getRadius(), 500);
         s.end();
         
-        game.debug.render(influenceWorld, batch.getProjectionMatrix().cpy().scl(Constants.PPM));
+        game.debug.render(influenceWorld, batch.getTransformMatrix().cpy().scl(Constants.PPM));
 
         batch.begin();
     }
