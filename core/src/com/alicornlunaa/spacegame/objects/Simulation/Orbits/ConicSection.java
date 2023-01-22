@@ -6,7 +6,6 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Body;
 
 /** One conic section of an orbit */
 public class ConicSection {
@@ -24,6 +23,12 @@ public class ConicSection {
     private float apoapsis = 0.f;
 
     // Constructor
+    public ConicSection(Celestial parent, Entity child, Vector2 position, Vector2 velocity){
+        this.parent = parent;
+        this.child = child;
+        calculate(position, velocity);
+    }
+
     public ConicSection(Celestial parent, Entity child){
         this.parent = parent;
         this.child = child;
@@ -31,14 +36,12 @@ public class ConicSection {
     }
 
     // Functions
-    public void calculate(){
+    public void calculate(Vector2 position, Vector2 velocity){
         // Calculate orbits based on the passed references
-        Body parentBody = getParent().getBody();
-        Body childBody = getChild().getBody();
-        float mu = Constants.GRAVITY_CONSTANT * parentBody.getMass();
+        float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
 
-        Vector3 pos = new Vector3().set(childBody.getPosition().cpy(), 0.f);
-        Vector3 vel = new Vector3().set(childBody.getLinearVelocity().cpy(), 0.f);
+        Vector3 pos = new Vector3().set(position, 0.f);
+        Vector3 vel = new Vector3().set(velocity, 0.f);
 
         Vector3 h = pos.cpy().crs(vel);
         Vector3 eV = (vel.cpy().crs(h).scl(1 / mu).sub(pos.cpy().nor()));
@@ -55,6 +58,10 @@ public class ConicSection {
         inclination = i;
         periapsis = a * (1 - e);
         apoapsis = a * (1 + e);
+    }
+
+    public void calculate(){
+        calculate(child.getBody().getPosition().cpy(), child.getBody().getLinearVelocity().cpy());
     }
 
     public Vector2 getVelocityAtAnomaly(float t){
