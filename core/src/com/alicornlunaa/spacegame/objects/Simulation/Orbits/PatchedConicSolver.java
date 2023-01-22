@@ -7,6 +7,8 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.alicornlunaa.spacegame.util.RootSolver;
+import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
@@ -38,7 +40,14 @@ public class PatchedConicSolver {
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(section.getSemiMajorAxis() >= parent.getSphereOfInfluence() / Constants.PPM) return true;
         if(section.getEccentricity() >= 1.f) return true;
-        
+
+        System.out.print(RootSolver.bisection(-200, 200, new EquationInterface(){
+            @Override
+            public float func(float x){
+                return (x * x * x) - x - 2;
+            }
+        }));
+
         for(float i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
             double meanAnomaly = (2.0 * Math.PI * (i / (Constants.PATCHED_CONIC_STEPS - 1)));
             Vector2 entPosAtAnomaly = section.getPositionAtAnomaly((float)meanAnomaly);
