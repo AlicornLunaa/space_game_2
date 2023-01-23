@@ -231,6 +231,7 @@ public class Universe extends Actor {
             parent.getEntities().remove(e);
         }
 
+        //! NOT CONVERTED CORRECTLY
         e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().sub(c.getBody().getLinearVelocity()));
         e.setPosition(e.getPosition().sub(c.getPosition()));
 
@@ -330,7 +331,7 @@ public class Universe extends Actor {
                 ConicSection path = paths.get(i);
                 Entity e = path.getChild();
 
-                if(e.getDriver() == null) continue; //! Testing, constrain to ship entity only
+                // if(e.getDriver() == null) continue; //! Testing, constrain to ship entity only
                 if(e.getDriving() != null) continue;
 
                 Vector2 curPos = path.getPositionAtTime(currentFuture);

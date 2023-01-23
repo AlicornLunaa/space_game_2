@@ -142,6 +142,16 @@ public class MapPanel extends Stage {
         super.draw();
 
         spacePanel.draw();
+        
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.begin(ShapeType.Filled);
+        for(ConicSection o : orbits){
+            o.draw(game.shapeRenderer);
+        }
+        for(PatchedConicSolver cs : patchedConics){
+            cs.draw(game.shapeRenderer);
+        }
+        game.shapeRenderer.end();
     }
     
     @Override

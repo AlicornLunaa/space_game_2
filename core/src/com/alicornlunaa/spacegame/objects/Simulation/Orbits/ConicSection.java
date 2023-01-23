@@ -38,6 +38,8 @@ public class ConicSection {
     // Functions
     public void calculate(Vector2 position, Vector2 velocity){
         // Calculate orbits based on the passed references
+        if(parent == null) return;
+
         float mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
 
         Vector3 pos = new Vector3().set(position, 0.f);
@@ -62,6 +64,26 @@ public class ConicSection {
 
     public void calculate(){
         calculate(child.getBody().getPosition().cpy(), child.getBody().getLinearVelocity().cpy());
+    }
+
+    public Vector2 getVelocityAtAnomalyAbsolute(float t){
+        if(eccentricity >= 1){
+            // Hyperbolic
+            return HyperbolicOrbit.getVelocityAtAnomalyAbsolute(this, t);
+        } else {
+            // Elliptic
+            return EllipticOrbit.getVelocityAtAnomalyAbsolute(this, t);
+        }
+    }
+
+    public Vector2 getPositionAtAnomalyAbsolute(float t){
+        if(eccentricity > 1){
+            // Hyperbolic
+            return HyperbolicOrbit.getPositionAtAnomalyAbsolute(this, t);
+        } else {
+            // Elliptic
+            return EllipticOrbit.getPositionAtAnomalyAbsolute(this, t);
+        }
     }
 
     public Vector2 getVelocityAtAnomaly(float t){
@@ -126,6 +148,8 @@ public class ConicSection {
     public float getApoapsis() { return apoapsis; }
 
     public void draw(ShapeRenderer renderer){
+        if(parent == null) return;
+
         if(eccentricity >= 1){
             // Hyperbolic or parabolic
             HyperbolicOrbit.draw(this, renderer);

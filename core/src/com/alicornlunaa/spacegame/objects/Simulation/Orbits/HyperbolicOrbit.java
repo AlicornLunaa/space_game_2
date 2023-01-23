@@ -91,12 +91,10 @@ class HyperbolicOrbit {
         }
     }
 
-    public static Vector2 getVelocityAtAnomaly(ConicSection orbit, float t){
+    public static Vector2 getVelocityAtAnomalyAbsolute(ConicSection orbit, float t){
         // Kepler to cartesian
         float mu = Constants.GRAVITY_CONSTANT * orbit.getParent().getBody().getMass();
-
-        float initialMeanAnomaly = trueAnomalyToMeanAnomaly(orbit, orbit.getInitialTrueAnomaly());
-        float futureTrueAnomaly = meanAnomalyToTrueAnomaly(orbit, initialMeanAnomaly + t);
+        float futureTrueAnomaly = meanAnomalyToTrueAnomaly(orbit, t);
 
         double p = orbit.getSemiMajorAxis() * (1 - orbit.getEccentricity() * orbit.getEccentricity()); // Semilatus rectum
         double v = Math.sqrt(mu / p); // Orbital plane velocity
@@ -108,10 +106,9 @@ class HyperbolicOrbit {
         return new Vector2(velocity.x, velocity.y);
     }
 
-    public static Vector2 getPositionAtAnomaly(ConicSection orbit, float t){
+    public static Vector2 getPositionAtAnomalyAbsolute(ConicSection orbit, float t){
         // Kepler to cartesian
-        float initialMeanAnomaly = trueAnomalyToMeanAnomaly(orbit, orbit.getInitialTrueAnomaly());
-        float futureTrueAnomaly = meanAnomalyToTrueAnomaly(orbit, initialMeanAnomaly + t);
+        float futureTrueAnomaly = meanAnomalyToTrueAnomaly(orbit, t);
 
         double p = orbit.getSemiMajorAxis() * (1 - orbit.getEccentricity() * orbit.getEccentricity()); // Semilatus rectum
         double r = p / (1 + orbit.getEccentricity() * Math.cos(futureTrueAnomaly)); // Orbital plane position
@@ -120,7 +117,19 @@ class HyperbolicOrbit {
         position.rotateRad(orbit.getInclination(), 1, 0, 0);
         position.rotateRad(orbit.getArgumentOfPeriapsis(), 0, 0, 1);
 
-         return new Vector2(position.x, position.y);
+        return new Vector2(position.x, position.y);
+    }
+
+    public static Vector2 getVelocityAtAnomaly(ConicSection orbit, float t){
+        // Kepler to cartesian
+        float initialMeanAnomaly = trueAnomalyToMeanAnomaly(orbit, orbit.getInitialTrueAnomaly());
+        return getVelocityAtAnomalyAbsolute(orbit, initialMeanAnomaly + t);
+    }
+
+    public static Vector2 getPositionAtAnomaly(ConicSection orbit, float t){
+        // Kepler to cartesian
+        float initialMeanAnomaly = trueAnomalyToMeanAnomaly(orbit, orbit.getInitialTrueAnomaly());
+        return getPositionAtAnomalyAbsolute(orbit, initialMeanAnomaly + t);
     }
 
     public static Vector2 getVelocityAtTime(ConicSection orbit, float t){ return getVelocityAtAnomaly(orbit, timeToMeanAnomaly(orbit, t)); }
