@@ -244,6 +244,7 @@ public class ConicSection {
      * @return Vector2 position
      */
     public Vector2 getPosition(float ma){
+        // TODO: Problem here with unprecise calculations
         // Kepler to cartesian
         float futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
         

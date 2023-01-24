@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.scenes.Dev.TestScreen;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
