@@ -79,9 +79,9 @@ public class Celestial extends Entity {
         return radius * 8;
     }
 
-    public Matrix3 getUniverseTransform(){
+    public Matrix3 getUniverseSpaceTransform(){
         if(parent == null) return new Matrix3().translate(getPosition());
-        return parent.getUniverseTransform().mul(new Matrix3().translate(getPosition()));
+        return parent.getUniverseSpaceTransform().mul(new Matrix3().translate(getPosition()));
     }
 
     @Override

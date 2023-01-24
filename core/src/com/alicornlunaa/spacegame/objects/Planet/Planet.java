@@ -11,6 +11,7 @@ import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
@@ -212,8 +213,8 @@ public class Planet extends Celestial {
     public void drawWorld(Batch batch, float parentAlpha){
         // Draws the flat planar world
         Celestial occluder = universe.getParentCelestial(this);
-        Matrix3 globalToLocal = new Matrix3().translate(universe.getUniversalPosition(this)).scl(getRadius()).inv();
-        Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.0f);
+        Matrix3 globalToLocal = new Matrix3().translate(OrbitUtils.getUniverseSpacePosition(universe, this)).scl(getRadius()).inv();
+        Vector3 dirToStar = new Vector3(OrbitUtils.directionToNearestStar(universe, this), 0.0f);
         ShaderProgram cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
 
         batch.setShader(cartesianAtmosShader);
@@ -221,7 +222,7 @@ public class Planet extends Celestial {
         cartesianAtmosShader.setUniformf("u_starDirection", dirToStar);
         cartesianAtmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
         cartesianAtmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
-        cartesianAtmosShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
+        cartesianAtmosShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
         cartesianAtmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         batch.draw(atmosTexture, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
         batch.setShader(null);
@@ -287,8 +288,8 @@ public class Planet extends Celestial {
         
         // Shade the planet in
         Celestial occluder = universe.getParentCelestial(this);
-        Matrix3 globalToLocal = new Matrix3().translate(universe.getUniversalPosition(this)).scl(getRadius()).inv();
-        Vector3 dirToStar = new Vector3(universe.getDirToNearestStar(this), 0.0f);
+        Matrix3 globalToLocal = new Matrix3().translate(OrbitUtils.getUniverseSpacePosition(universe, this)).scl(getRadius()).inv();
+        Vector3 dirToStar = new Vector3(OrbitUtils.directionToNearestStar(universe, this), 0.0f);
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
 
@@ -296,7 +297,7 @@ public class Planet extends Celestial {
         terrainShader.setUniformf("u_planetColor", terrainColor);
         terrainShader.setUniformf("u_starDirection", dirToStar);
         terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
-        terrainShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
+        terrainShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
         terrainShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
 
@@ -305,7 +306,7 @@ public class Planet extends Celestial {
         atmosShader.setUniformf("u_starDirection", dirToStar);
         atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
         atmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
-        atmosShader.setUniformf("u_occluder.pos", universe.getUniversalPosition(occluder).cpy().mul(globalToLocal).scl(1, -1));
+        atmosShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
         atmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         batch.draw(atmosTexture, atmosRadius * -1.05f, atmosRadius * -1.05f, atmosRadius * 2.1f, atmosRadius * 2.1f);
         batch.setShader(null);

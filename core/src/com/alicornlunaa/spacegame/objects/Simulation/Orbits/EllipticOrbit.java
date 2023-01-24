@@ -66,7 +66,7 @@ class EllipticOrbit {
         float semiMinorAxis = (float)(Math.sqrt(Math.pow(orbit.getSemiMajorAxis(), 2.0) - Math.pow(linearE, 2.0)));
         Vector2 center = new Vector2(-linearE, 0);
 
-        render.setTransformMatrix(new Matrix4().set(orbit.getParent().getUniverseTransform()).rotateRad(0, 0, 1, orbit.getArgumentOfPeriapsis()));
+        render.setTransformMatrix(new Matrix4().set(orbit.getParent().getUniverseSpaceTransform()).rotateRad(0, 0, 1, orbit.getArgumentOfPeriapsis()));
         render.setColor(orbit.getEccentricity() <= 1 ? Color.CYAN : Color.RED);
 
         for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){

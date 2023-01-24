@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -124,7 +125,7 @@ public class MapPanel extends Stage {
         batch.begin();
 
         Vector2 size = new Vector2(1024, 1024);
-        Vector2 plyPos = spacePanel.universe.getUniversalPosition(game.player);
+        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(spacePanel.universe, game.player);
         batch.draw(
             shipIcon,
             plyPos.x - size.x / 2.f,
@@ -142,16 +143,6 @@ public class MapPanel extends Stage {
         super.draw();
 
         spacePanel.draw();
-        
-        game.shapeRenderer.setProjectionMatrix(cam.combined);
-        game.shapeRenderer.begin(ShapeType.Filled);
-        for(ConicSection o : orbits){
-            o.draw(game.shapeRenderer);
-        }
-        for(PatchedConicSolver cs : patchedConics){
-            cs.draw(game.shapeRenderer);
-        }
-        game.shapeRenderer.end();
     }
     
     @Override

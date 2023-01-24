@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -42,19 +43,19 @@ public class SpacePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
-        universe.addEntity(ship);
-        universe.addEntity(game.player);
         universe.addCelestial(new Star(game, world, 78000, 0, 15000), null);
         universe.addCelestial(new Planet(game, universe, world, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1.0f, 1.0f)), universe.getCelestial(0));
         universe.addCelestial(new Planet(game, universe, world, 15000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(1));
         universe.addCelestial(new Planet(game, universe, world, -80000, 0, 4000, 6500, new Color(.95f, 0.2f, 0.1f, 1), new Color(0.95f, 0.5f, 0.5f, 1.0f)), universe.getCelestial(0));
+        universe.addEntity(ship);
+        universe.addEntity(game.player);
         // universe.addCelestial(new Planet(game, universe, world, 9000, 0, 500, 2600, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1)), universe.getCelestial(2));
-        universe.createCelestialOrbit(universe.getCelestial(1));
-        universe.createCelestialOrbit(universe.getCelestial(2));
-        universe.createCelestialOrbit(universe.getCelestial(3));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(2));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(3));
         // universe.createCelestialOrbit(universe.getCelestial(4));
-        universe.createEntityOrbit(ship);
-        universe.createEntityOrbit(game.player);
+        OrbitUtils.createOrbit(universe, ship);
+        OrbitUtils.createOrbit(universe, game.player);
         this.addActor(universe);
 
         game.player.drive(ship);
@@ -91,7 +92,7 @@ public class SpacePanel extends Stage {
 
         // Parent camera to the player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(universe.getUniversalPosition(ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
+        cam.position.set(OrbitUtils.getUniverseSpacePosition(universe, ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
         cam.update();
     }
 
