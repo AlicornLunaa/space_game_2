@@ -282,8 +282,8 @@ public class Universe extends Actor {
 
                 if(e.getDriving() != null) continue;
 
-                Vector2 curPos = path.getPositionAtTime(currentFuture);
-                Vector2 curVel = path.getVelocityAtTime(currentFuture);
+                Vector2 curPos = path.getPosition(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+                Vector2 curVel = path.getVelocity(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
 
                 e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
                 e.getBody().setLinearVelocity(curVel.cpy());

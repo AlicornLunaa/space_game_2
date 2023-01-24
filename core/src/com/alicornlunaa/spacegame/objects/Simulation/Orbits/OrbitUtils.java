@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 /** Holds static functions for different orbital actions */
 public class OrbitUtils {
 
+    // Space functions
     /**
      * Returns the position of the entity local to the center of the universe.
      * This will be prone to float point precision errors, use with caution.

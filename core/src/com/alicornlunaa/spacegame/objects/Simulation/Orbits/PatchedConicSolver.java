@@ -45,8 +45,8 @@ public class PatchedConicSolver {
             for(float i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
                 // Search entire orbit for an intersection
                 float meanAnomaly = (float)((i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI);
-                Vector2 entPosAtAnomaly = section.getPositionAtAnomalyAbsolute(meanAnomaly);
-                Vector2 celestialPosAtAnomaly = childConic.getPositionAtAnomalyAbsolute(meanAnomaly); //! Convert mean anomaly for entity to the planet's mean anomaly
+                Vector2 entPosAtAnomaly = section.getPosition(meanAnomaly);
+                Vector2 celestialPosAtAnomaly = childConic.getPosition(meanAnomaly); //! Convert mean anomaly for entity to the planet's mean anomaly
                 float distanceToSOI = celestialPosAtAnomaly.dst(entPosAtAnomaly) - (child.getSphereOfInfluence() / Constants.PPM);
 
                 if(distanceToSOI < 0){
@@ -59,16 +59,16 @@ public class PatchedConicSolver {
                 float meanAnomalyToIntersection = RootSolver.bisection(0.f, roughGuessInside, new EquationInterface() {
                     @Override
                     public float func(float x){
-                        Vector2 entPosAtAnomaly = section.getPositionAtAnomalyAbsolute(x);
-                        Vector2 celestialPosAtAnomaly = childConic.getPositionAtAnomalyAbsolute(x);
+                        Vector2 entPosAtAnomaly = section.getPosition(x);
+                        Vector2 celestialPosAtAnomaly = childConic.getPosition(x);
                         float distanceToSOI = celestialPosAtAnomaly.dst(entPosAtAnomaly) - (child.getSphereOfInfluence() / Constants.PPM);
                         return distanceToSOI;
                     }
                 });
 
                 // Get state vectors at the moment of intersection
-                Vector2 posAtSOITransfer = section.getPositionAtAnomalyAbsolute(meanAnomalyToIntersection);
-                Vector2 velAtSOITransfer = section.getVelocityAtAnomalyAbsolute(meanAnomalyToIntersection);
+                Vector2 posAtSOITransfer = section.getPosition(meanAnomalyToIntersection);
+                Vector2 velAtSOITransfer = section.getVelocity(meanAnomalyToIntersection);
                 intersectionPos.add(posAtSOITransfer);
 
                 // Add new conic relative to the child as a new parent
