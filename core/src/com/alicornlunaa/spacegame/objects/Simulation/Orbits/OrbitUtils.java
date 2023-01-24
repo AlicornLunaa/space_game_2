@@ -100,6 +100,11 @@ public class OrbitUtils {
         return closest;
     }
 
+    /**
+     * Creates a stable orbit for the given object using math equations
+     * @param u Universe to affect
+     * @param e The entity to stablize into a near-circular orbit
+     */
     public static void createOrbit(Universe u, Entity e){
         Celestial parent = u.getParentCelestial(e);
         if(parent == null) return; // Cant create an orbit for no parent
