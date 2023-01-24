@@ -84,6 +84,10 @@ public class Celestial extends Entity {
         return parent.getUniverseSpaceTransform().mul(new Matrix3().translate(getPosition()));
     }
 
+    public Matrix3 getSystemSpaceTransform(){
+        return getUniverseSpaceTransform().inv();
+    }
+
     @Override
     public void draw(Batch batch, float a){
         if(!Constants.DEBUG) return;
