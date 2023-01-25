@@ -5,8 +5,8 @@ public class RootSolver {
     public static interface EquationInterface { public float func(float x); }
 
     public static float bisection(float a, float b, EquationInterface equation){
-        float tolerance = 1e-5f;
-        int maxIter = 64;
+        float tolerance = 1e-6f;
+        int maxIter = 96;
 
         for(int i = 0; i < maxIter; i++){
             float c = (a + b) / 2;

@@ -55,7 +55,6 @@ public class MapPanel extends Stage {
             Celestial parent = u.getParentCelestial(e);
 
             if(parent != null && e.getDriving() == null){
-                orbits.add(new ConicSection(parent, e));
                 patchedConics.add(new PatchedConicSolver(u, e));
             }
         }
@@ -97,7 +96,7 @@ public class MapPanel extends Stage {
             o.calculate();
         }
         for(PatchedConicSolver cs : patchedConics){
-            //!cs.recalculate();
+            cs.recalculate();
         }
 
         super.act(delta);

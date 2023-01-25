@@ -226,7 +226,7 @@ public class ConicSection {
     public Vector2 getVelocity(double ma){
         // Kepler to cartesian
         double mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
-        double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
+        double futureTrueAnomaly = (eccentricity >= 1) ? meanAnomalyToTrueAnomaly(-ma) : meanAnomalyToTrueAnomaly(ma);
         
         double p = semiMajorAxis * (1 - eccentricity * eccentricity); // Semilatus rectum
         double v = Math.sqrt(mu / p); // Orbital plane velocity
@@ -245,7 +245,7 @@ public class ConicSection {
      */
     public Vector2 getPosition(double ma){
         // Kepler to cartesian
-        double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
+        double futureTrueAnomaly = (eccentricity >= 1) ? meanAnomalyToTrueAnomaly(-ma) : meanAnomalyToTrueAnomaly(ma);
         
         double p = semiMajorAxis * (1 - eccentricity * eccentricity); // Semilatus rectum
         double r = p / (1 + eccentricity * Math.cos(futureTrueAnomaly)); // Orbital plane position
@@ -301,7 +301,7 @@ public class ConicSection {
     public double getPeriapsis() { return periapsis; }
     public double getApoapsis() { return apoapsis; }
 
-    public void draw(ShapeRenderer renderer){
+    public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly){
         if(parent == null) return;
 
         renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()).rotateRad(0, 0, 1, (float)argumentOfPeriapsis));
@@ -342,17 +342,20 @@ public class ConicSection {
             double semiMinorAxis = (Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
             Vector2 center = new Vector2(-(float)linearE, 0);
 
-            renderer.setColor(Color.CYAN);
-
             for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-                double ang1 = ((i / (Constants.ORBIT_RESOLUTION - 1.f)) * Math.PI * 2.0);
-                double ang2 = ((((i + 1) % Constants.ORBIT_RESOLUTION) / (Constants.ORBIT_RESOLUTION - 1.f)) * Math.PI * 2.0);
+                double ang1 = ((i / (Constants.ORBIT_RESOLUTION - 1.f)) * (endAnomaly - startAnomaly)) + startAnomaly;
+                double ang2 = (((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * (endAnomaly - startAnomaly)) + startAnomaly;
                 Vector2 p1 = new Vector2((float)(Math.cos(ang1) * semiMajorAxis + center.x), (float)(Math.sin(ang1) * semiMinorAxis + center.y)).scl(Constants.PPM);
                 Vector2 p2 = new Vector2((float)(Math.cos(ang2) * semiMajorAxis + center.x), (float)(Math.sin(ang2) * semiMinorAxis + center.y)).scl(Constants.PPM);
 
                 renderer.rectLine(p1, p2, 100);
             }
         }
+    }
+
+    public void draw(ShapeRenderer renderer){
+        renderer.setColor(Color.CYAN);
+        draw(renderer, 0.0, 2.0 * Math.PI);
     }
 
 }
