@@ -267,7 +267,7 @@ public class Universe extends Actor {
                     
                     Celestial parent = celestialParents.get(c);
                     if(parent != null){
-                        c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
+                        //! c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
                     }
                 }
             }
@@ -280,6 +280,7 @@ public class Universe extends Actor {
                 ConicSection path = paths.get(i);
                 Entity e = path.getChild();
 
+                if(e.getDriver() == null) continue; //! TEMP
                 if(e.getDriving() != null) continue;
 
                 Vector2 curPos = path.getPosition(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));

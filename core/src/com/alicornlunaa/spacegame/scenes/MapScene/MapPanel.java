@@ -97,7 +97,7 @@ public class MapPanel extends Stage {
             o.calculate();
         }
         for(PatchedConicSolver cs : patchedConics){
-            cs.recalculate();
+            //!cs.recalculate();
         }
 
         super.act(delta);

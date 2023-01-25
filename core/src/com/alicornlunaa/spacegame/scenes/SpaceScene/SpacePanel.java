@@ -50,9 +50,9 @@ public class SpacePanel extends Stage {
         universe.addEntity(ship);
         universe.addEntity(game.player);
         // universe.addCelestial(new Planet(game, universe, world, 9000, 0, 500, 2600, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1)), universe.getCelestial(2));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(1));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(2));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(3));
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(2));
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(3));
         // universe.createCelestialOrbit(universe.getCelestial(4));
         OrbitUtils.createOrbit(universe, ship);
         OrbitUtils.createOrbit(universe, game.player);

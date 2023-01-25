@@ -195,7 +195,7 @@ public class ConicSection {
         Vector3 vel = new Vector3().set(velocity, 0.f);
 
         Vector3 h = pos.cpy().crs(vel);
-        Vector3 eV = (vel.cpy().crs(h).scl(1 / (float)mu).sub(pos.cpy().nor()));
+        Vector3 eV = (vel.cpy().crs(h).scl((float)(1 / mu)).sub(pos.cpy().nor()));
         double anomaly = ((pos.cpy().nor().dot(vel) >= 0) ? Math.acos(pos.cpy().nor().dot(eV.cpy().nor())) : (2 * Math.PI - Math.acos(pos.cpy().nor().dot(eV.cpy().nor()))));
         double i = Math.acos(h.cpy().nor().z);
         double e = eV.len();
@@ -244,7 +244,6 @@ public class ConicSection {
      * @return Vector2 position
      */
     public Vector2 getPosition(double ma){
-        // TODO: Problem here with unprecise calculations
         // Kepler to cartesian
         double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
         
@@ -272,13 +271,21 @@ public class ConicSection {
 
             float x = (float)((ma / (2.0 * Math.PI)) * semiMinorAxis);
             float y = (float)Math.sqrt((1 + (x * x) / (semiMinorAxis * semiMinorAxis)) * Math.pow(semiMajorAxis, 2.0));
-            return new Vector2(-y + center.x, x + center.y).rotateRad((float)argumentOfPeriapsis);
+
+            Vector3 v = new Vector3(-y + center.x, x + center.y, 0.f);
+            v.rotateRad((float)inclination, 1, 0, 0);
+            v.rotateRad((float)argumentOfPeriapsis, 0, 0, 1);
+            return new Vector2(v.x, v.y);
         } else {
             // Elliptic or circular
             double linearE = semiMajorAxis - periapsis;
             double semiMinorAxis = (Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
             Vector2 center = new Vector2(-(float)linearE, 0);
-            return new Vector2((float)(Math.cos(ma) * semiMajorAxis + center.x), (float)(Math.sin(ma) * semiMinorAxis + center.y)).rotateRad((float)argumentOfPeriapsis);
+            
+            Vector3 v = new Vector3((float)(Math.cos(ma) * semiMajorAxis + center.x), (float)(Math.sin(ma) * semiMinorAxis + center.y), 0.f);
+            v.rotateRad((float)inclination, 1, 0, 0);
+            v.rotateRad((float)argumentOfPeriapsis, 0, 0, 1);
+            return new Vector2(v.x, v.y);
         }
     }
 
