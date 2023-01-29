@@ -47,26 +47,19 @@ public class ConicSection {
      * @return The eccentric anomaly
      */
     public double meanAnomalyToEccentricAnomaly(double ma){
-        // TODO: Fix bug here
+        final double m = ma;
+        final double e = eccentricity;
+            
         // Mean anomaly => Eccentric anomaly
         if(eccentricity >= 1){
             // Hyperbolic
-            double epsilon = 0.0000001f;
-            double guess = ma;
-
-            for(int i = 0; i < 100; i++){
-                // M = e sinh(F) - F
-                double y = ((guess - eccentricity * Math.sinh(guess) - ma) / (1 - eccentricity * Math.cosh(guess)));
-                guess = guess - y;
-
-                if(Math.abs(y) < epsilon) break;
-            }
-
-            return guess;
+            return RootSolver.newtonian(m, new EquationInterface() {
+                @Override
+                public double func(double x){
+                    return (m - e * Math.sinh(x) + x);
+                }
+            });
         } else {
-            final double m = ma;
-            final double e = eccentricity;
-
             return RootSolver.newtonian(m, new EquationInterface() {
                 @Override
                 public double func(double x){
@@ -222,7 +215,7 @@ public class ConicSection {
     public Vector2 getVelocity(double ma){
         // Kepler to cartesian
         double mu = Constants.GRAVITY_CONSTANT * parent.getBody().getMass();
-        double futureTrueAnomaly = (eccentricity >= 1) ? meanAnomalyToTrueAnomaly(-ma) : meanAnomalyToTrueAnomaly(ma);
+        double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
         
         double p = semiMajorAxis * (1 - eccentricity * eccentricity); // Semilatus rectum
         double v = Math.sqrt(mu / p); // Orbital plane velocity
@@ -241,7 +234,7 @@ public class ConicSection {
      */
     public Vector2 getPosition(double ma){
         // Kepler to cartesian
-        double futureTrueAnomaly = (eccentricity >= 1) ? meanAnomalyToTrueAnomaly(-ma) : meanAnomalyToTrueAnomaly(ma);
+        double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
         
         double p = semiMajorAxis * (1 - eccentricity * eccentricity); // Semilatus rectum
         double r = p / (1 + eccentricity * Math.cos(futureTrueAnomaly)); // Orbital plane position
@@ -307,32 +300,20 @@ public class ConicSection {
         if(eccentricity >= 1){
             // Hyperbolic or parabolic
             double linearE = semiMajorAxis * eccentricity;
-            double semiMinorAxis = Math.sqrt(linearE * linearE - Math.pow(semiMajorAxis, 2.0));
-            Vector2 center = new Vector2(-(float)linearE, 0);
+            double semiMinorAxis = semiMajorAxis * Math.sqrt(eccentricity * eccentricity - 1);
 
             renderer.setColor(Color.YELLOW);
 
             for(double i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-                float x1 = (float)((i / Constants.ORBIT_RESOLUTION) * semiMinorAxis);
-                float y1 = (float)Math.sqrt((1 + (x1 * x1) / (semiMinorAxis * semiMinorAxis)) * Math.pow(semiMajorAxis, 2.0));
-                float x2 = (float)(((i + 1) / Constants.ORBIT_RESOLUTION) * semiMinorAxis);
-                float y2 = (float)Math.sqrt((1 + (x2 * x2) / (semiMinorAxis * semiMinorAxis)) * Math.pow(semiMajorAxis, 2.0));
+                double ang1 = (((i / (Constants.ORBIT_RESOLUTION - 1.f)) * -2.0 * Math.PI) + Math.PI) * ((inclination > Math.PI) ? 1 : -1);
+                double ang2 = ((((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * -2.0 * Math.PI) + Math.PI) * ((inclination > Math.PI) ? 1 : -1);
+                Vector2 p1 = new Vector2(-(float)(linearE - semiMajorAxis * Math.cosh(ang1)), (float)(semiMinorAxis * Math.sinh(ang1))).scl(Constants.PPM);
+                Vector2 p2 = new Vector2(-(float)(linearE - semiMajorAxis * Math.cosh(ang2)), (float)(semiMinorAxis * Math.sinh(ang2))).scl(Constants.PPM);
 
-                renderer.rectLine(
-                    (-y1 + center.x) * Constants.PPM,
-                    (x1 + center.y) * Constants.PPM,
-                    (-y2 + center.x) * Constants.PPM,
-                    (x2 + center.y) * Constants.PPM,
-                    100
-                );
+                if(p1.len() > getParent().getSphereOfInfluence()) continue;
+                if(p2.len() > getParent().getSphereOfInfluence()) continue;
 
-                renderer.rectLine(
-                    (-y1 + center.x) * Constants.PPM,
-                    (-x1 + center.y) * Constants.PPM,
-                    (-y2 + center.x) * Constants.PPM,
-                    (-x2 + center.y) * Constants.PPM,
-                    100
-                );
+                renderer.rectLine(p1, p2, 100);
             }
         } else {
             // Elliptic or circular

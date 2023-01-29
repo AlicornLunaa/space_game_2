@@ -60,7 +60,7 @@ public class SpacePanel extends Stage {
 
         game.player.drive(ship);
 
-        // ship.getBody().applyForceToCenter(10, 6, true);
+        // ship.getBody().applyForceToCenter(0, 20, true);
         // universe.getCelestial(2).getBody().applyLinearImpulse(0, 250, universe.getCelestial(2).getBody().getWorldCenter().x, universe.getCelestial(2).getBody().getWorldCenter().y, true);
 
         // Controls
