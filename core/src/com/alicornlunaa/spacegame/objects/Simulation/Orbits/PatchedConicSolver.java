@@ -73,26 +73,26 @@ public class PatchedConicSolver {
         }
 
         // Refine the guesses into answers using a root finding algorithm
-        float intersection1 = RootSolver.bisection((float)childConic.getInitialMeanAnomaly(), (float)intersectionGuess1, new EquationInterface() {
+        double intersection1 = RootSolver.bisection(childConic.getInitialMeanAnomaly(), intersectionGuess1, new EquationInterface() {
             @Override
-            public float func(float x){
-                return (float)(childConic.getChild().getBody().getPosition().dst2(celestial.getBody().getPosition()) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
+            public double func(double x){
+                return (childConic.getChild().getBody().getPosition().dst2(celestial.getBody().getPosition()) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
             }
         });
-        float intersection2 = RootSolver.bisection((float)intersectionGuess1, (float)intersectionGuess2, new EquationInterface() {
+        double intersection2 = RootSolver.bisection(intersectionGuess1, intersectionGuess2, new EquationInterface() {
             @Override
-            public float func(float x){
-                return (float)(childConic.getChild().getBody().getPosition().dst2(celestial.getBody().getPosition()) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
+            public double func(double x){
+                return (childConic.getChild().getBody().getPosition().dst2(celestial.getBody().getPosition()) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
             }
         });
 
         // Error check
         if(intersectionGuess2 == -1)
-            intersection2 = intersection1 + (float)(2.0 * Math.PI);
+            intersection2 = intersection1 + (2.0 * Math.PI);
 
         // Add to the list
-        anomalies.add(intersection1);
-        anomalies.add(intersection2);
+        anomalies.add((float)intersection1);
+        anomalies.add((float)intersection2);
         return true;
     }
 
@@ -120,11 +120,11 @@ public class PatchedConicSolver {
             }
 
             if(roughGuessInside != -1){
-                float meanAnomalyToIntersection = RootSolver.bisection(0, roughGuessInside, new EquationInterface() {
+                double meanAnomalyToIntersection = RootSolver.bisection(0, roughGuessInside, new EquationInterface() {
                     @Override
-                    public float func(float x){
+                    public double func(double x){
                         Vector2 entPosAtAnomaly = section.getPosition(x);
-                        float distanceToSOI = (parent.getSphereOfInfluence() / Constants.PPM) - entPosAtAnomaly.len();
+                        double distanceToSOI = (parent.getSphereOfInfluence() / Constants.PPM) - entPosAtAnomaly.len();
                         return distanceToSOI;
                     }
                 });

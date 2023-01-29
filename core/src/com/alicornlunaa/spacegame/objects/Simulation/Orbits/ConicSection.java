@@ -3,6 +3,8 @@ package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.alicornlunaa.spacegame.util.RootSolver;
+import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
@@ -45,6 +47,7 @@ public class ConicSection {
      * @return The eccentric anomaly
      */
     public double meanAnomalyToEccentricAnomaly(double ma){
+        // TODO: Fix bug here
         // Mean anomaly => Eccentric anomaly
         if(eccentricity >= 1){
             // Hyperbolic
@@ -61,22 +64,15 @@ public class ConicSection {
 
             return guess;
         } else {
-            // Elliptic
-            double step = 0.0001f;
-            double epsilon = 0.0000001f;
-            double guess = 0;
+            final double m = ma;
+            final double e = eccentricity;
 
-            for(int i = 0; i < 100; i++){
-                double y = (ma - guess + eccentricity * Math.sin(guess));
-
-                if(Math.abs(y) < epsilon) break;
-
-                double slope = ((ma - (guess + step) + eccentricity * Math.sin(guess + step)) - y) / step;
-                double s = y / slope;
-                guess -= s;
-            }
-
-            return guess;
+            return RootSolver.newtonian(m, new EquationInterface() {
+                @Override
+                public double func(double x){
+                    return (m - x + e * Math.sin(x));
+                }
+            });
         }
     }
 
