@@ -267,7 +267,7 @@ public class Universe extends Actor {
                     
                     Celestial parent = celestialParents.get(c);
                     if(parent != null){
-                        //! c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
+                        c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
                     }
                 }
             }
