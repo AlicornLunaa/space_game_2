@@ -76,6 +76,12 @@ public class PatchedConicSolver {
         return true;
     }
 
+    /**
+     * A recursive function to get every conic in the orbital approximation
+     * @param parent The parent celestial
+     * @param section The section being checked
+     * @param depth How deep the approximation has gone
+     */
     private void checkSOITransition(final Celestial parent, final ConicSection section, int depth){
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(parent == null) return;
@@ -84,37 +90,45 @@ public class PatchedConicSolver {
         parents.clear();
         ps.clear();
 
-        if(section.getEccentricity() >= 1.f || section.getSemiMajorAxis() >= parent.getSphereOfInfluence() / Constants.PPM){
-            float roughGuessInside = -1.f;
+        if(section.getEccentricity() >= 1.f || section.getApoapsis() >= parent.getSphereOfInfluence() / 2 / Constants.PPM){
+            if(parent.getCelestialParent() == null) return;
             
-            for(float i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-                // Search entire orbit for an intersection
-                float meanAnomaly = (float)((i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI);
-                Vector2 entPosAtAnomaly = section.getPosition(meanAnomaly);
-                float distanceToSOI = (parent.getSphereOfInfluence() / Constants.PPM) - entPosAtAnomaly.len();
+            ConicSection parentConic = new ConicSection(parent.getCelestialParent(), parent);
+            double intersectionGuess = -1.f;
+            double previousSign = Math.signum(section.getChild().getBody().getPosition().len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
 
-                if(distanceToSOI < 0){
-                    roughGuessInside = meanAnomaly;
+            // Find first intersection by the changing value
+            for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
+                double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI;
+                double childAnomaly = meanAnomaly + section.getInitialMeanAnomaly();
+                double sign = Math.signum(section.getPosition(childAnomaly).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
+
+                if(sign != previousSign){
+                    previousSign = sign;
+                    intersectionGuess = meanAnomaly;
                     break;
                 }
             }
 
-            if(roughGuessInside != -1){
-                double meanAnomalyToIntersection = RootSolver.bisection(0, roughGuessInside, new EquationInterface() {
+            // Error check
+            if(intersectionGuess != -1){
+                // Refine the guesses into answers using a root finding algorithm
+                double intersection = RootSolver.bisection(0, intersectionGuess, new EquationInterface() {
                     @Override
                     public double func(double x){
-                        Vector2 entPosAtAnomaly = section.getPosition(x);
-                        double distanceToSOI = (parent.getSphereOfInfluence() / Constants.PPM) - entPosAtAnomaly.len();
-                        return distanceToSOI;
+                        double childAnomaly = x + section.getInitialMeanAnomaly();
+                        return (section.getPosition(childAnomaly).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
                     }
                 });
 
-                // Get state vectors at the moment of intersection
-                Vector2 posAtSOITransfer = section.getPosition(meanAnomalyToIntersection).add(parent.getBody().getPosition().cpy());
-                Vector2 velAtSOITransfer = section.getVelocity(meanAnomalyToIntersection).add(parent.getBody().getLinearVelocity().cpy());
+                double entityAnomaly = intersection + section.getInitialMeanAnomaly();
+                double celestialAnomaly = parentConic.timeToMeanAnomaly(section.meanAnomalyToTime(intersection)) + parentConic.getInitialMeanAnomaly();
 
-                parents.add(parent);
-                ps.add(section.getPosition(meanAnomalyToIntersection).cpy());
+                anomalies.add(intersection);
+
+                // Get state vectors at the moment of intersection
+                Vector2 posAtSOITransfer = section.getPosition(entityAnomaly).add(parentConic.getPosition(celestialAnomaly));
+                Vector2 velAtSOITransfer = section.getVelocity(entityAnomaly).add(parentConic.getVelocity(celestialAnomaly));
 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
@@ -178,12 +192,7 @@ public class PatchedConicSolver {
             ConicSection c = conics.get(i);
 
             if(anomalies.size() > i){
-                double endAnomaly = anomalies.get(i) + c.getInitialMeanAnomaly();
-                c.draw(renderer, c.getInitialMeanAnomaly(), endAnomaly);
-
-                Vector2 p = c.getPosition(endAnomaly);
-                renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()));
-                renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
+                c.draw(renderer, c.getInitialMeanAnomaly(), anomalies.get(i) + c.getInitialMeanAnomaly());
             } else {
                 c.draw(renderer);
             }
@@ -192,10 +201,9 @@ public class PatchedConicSolver {
         for(int i = 0; i < ps.size(); i++){
             Celestial parent = parents.get(i);
             Vector2 p = ps.get(i);
-
             renderer.setColor(Color.CORAL);
             renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
-            renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
+            renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 2000);
         }
     }
 

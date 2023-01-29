@@ -300,6 +300,8 @@ public class ConicSection {
     public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly){
         if(parent == null) return;
 
+        double eaStart = meanAnomalyToEccentricAnomaly(startAnomaly);
+        double eaEnd = meanAnomalyToEccentricAnomaly(endAnomaly);
         renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()).rotateRad(0, 0, 1, (float)argumentOfPeriapsis));
 
         if(eccentricity >= 1){
@@ -339,11 +341,10 @@ public class ConicSection {
             Vector2 center = new Vector2(-(float)linearE, 0);
 
             for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-                double ang1 = ((i / (Constants.ORBIT_RESOLUTION - 1.f)) * (endAnomaly - startAnomaly)) + startAnomaly;
-                double ang2 = (((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * (endAnomaly - startAnomaly)) + startAnomaly;
+                double ang1 = ((i / (Constants.ORBIT_RESOLUTION - 1.f)) * (eaEnd - eaStart)) + eaStart;
+                double ang2 = (((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * (eaEnd - eaStart)) + eaStart;
                 Vector2 p1 = new Vector2((float)(Math.cos(ang1) * semiMajorAxis + center.x), (float)(Math.sin(ang1) * semiMinorAxis + center.y)).scl(Constants.PPM);
                 Vector2 p2 = new Vector2((float)(Math.cos(ang2) * semiMajorAxis + center.x), (float)(Math.sin(ang2) * semiMinorAxis + center.y)).scl(Constants.PPM);
-
                 renderer.rectLine(p1, p2, 100);
             }
         }
