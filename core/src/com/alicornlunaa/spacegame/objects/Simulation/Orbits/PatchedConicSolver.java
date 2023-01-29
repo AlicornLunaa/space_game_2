@@ -26,7 +26,7 @@ public class PatchedConicSolver {
     private final Universe universe;
     private Entity entity;
     private ArrayList<ConicSection> conics = new ArrayList<>();
-    private ArrayList<Float> anomalies = new ArrayList<>(); // Every two values is the start and end of a conic
+    private ArrayList<Double> anomalies = new ArrayList<>(); // Every two values is the start and end of a conic
 
     private ArrayList<Celestial> parents = new ArrayList<>();
     private ArrayList<Vector2> ps = new ArrayList<>();
@@ -38,65 +38,41 @@ public class PatchedConicSolver {
      * @param parentConic The conic to test against. This is a celestial.
      * @return Successful finding the start
      */
-    private boolean getPatchAnomalies(final ConicSection childConic, final ConicSection parentConic){
+    private boolean getPatchAnomaly(final ConicSection childConic, final ConicSection parentConic){
         // Variables
         final Celestial celestial = (Celestial)parentConic.getChild();
-        double intersectionGuess1 = -1.f;
-        double intersectionGuess2 = -1.f;
+        double intersectionGuess = -1.f;
         double previousSign = Math.signum(childConic.getChild().getBody().getPosition().dst2(celestial.getBody().getPosition()) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
 
         // Find first intersection by the changing value
         for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-            double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI + childConic.getInitialMeanAnomaly();
-            double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(meanAnomaly));
-            double sign = Math.signum(childConic.getPosition(meanAnomaly).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
+            double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI;
+            double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(meanAnomaly)) + parentConic.getInitialMeanAnomaly();
+            double childAnomaly = meanAnomaly + childConic.getInitialMeanAnomaly();
+            double sign = Math.signum(childConic.getPosition(childAnomaly).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
 
             if(sign != previousSign){
                 previousSign = sign;
-                intersectionGuess1 = meanAnomaly;
+                intersectionGuess = meanAnomaly;
                 break;
             }
         }
 
         // Error check
-        if(intersectionGuess1 == -1) return false;
-
-        // Find second intersection by the changing value of intersection 1 to 2
-        for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-            double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI + intersectionGuess1;
-            double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(meanAnomaly));
-            double sign = Math.signum(childConic.getPosition(meanAnomaly).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
-
-            if(sign != previousSign){
-                previousSign = sign;
-                intersectionGuess2 = meanAnomaly;
-                break;
-            }
-        }
+        if(intersectionGuess == -1) return false;
 
         // Refine the guesses into answers using a root finding algorithm
-        double intersection1 = RootSolver.bisection(childConic.getInitialMeanAnomaly(), intersectionGuess1, new EquationInterface() {
+        double intersection = RootSolver.bisection(0, intersectionGuess, new EquationInterface() {
             @Override
             public double func(double x){
-                double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(x));
-                return (childConic.getPosition(x).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
+                double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(x)) + parentConic.getInitialMeanAnomaly();
+                double childAnomaly = x + childConic.getInitialMeanAnomaly();
+                return (childConic.getPosition(childAnomaly).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
             }
         });
-        double intersection2 = RootSolver.bisection(intersectionGuess1, intersectionGuess2, new EquationInterface() {
-            @Override
-            public double func(double x){
-                double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(x));
-                return (childConic.getPosition(x).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
-            }
-        });
-
-        // Error check
-        if(intersectionGuess2 == -1)
-            intersection2 = intersection1 + (2.0 * Math.PI);
 
         // Add to the list
-        anomalies.add((float)intersection1);
-        anomalies.add((float)intersection2);
+        anomalies.add(intersection);
         return true;
     }
 
@@ -151,19 +127,13 @@ public class PatchedConicSolver {
             //ඞ
             ConicSection celestialConic = new ConicSection(parent, child);
 
-            if(getPatchAnomalies(section, celestialConic)){
-                float startAnomaly = anomalies.get(anomalies.size() - 2);
-                float endAnomaly = anomalies.get(anomalies.size() - 1);
-                double celestialAnomaly = celestialConic.timeToMeanAnomaly(section.meanAnomalyToTime(startAnomaly));
+            if(getPatchAnomaly(section, celestialConic)){
+                double endAnomaly = anomalies.get(anomalies.size() - 1);
+                double entityAnomaly = endAnomaly + section.getInitialMeanAnomaly();
+                double celestialAnomaly = celestialConic.timeToMeanAnomaly(section.meanAnomalyToTime(endAnomaly)) + celestialConic.getInitialMeanAnomaly();
 
-                ps.add(section.getPosition(startAnomaly)); parents.add(parent);
-                ps.add(section.getPosition(endAnomaly)); parents.add(parent);
-
-                Vector2 posAtSOITransfer = section.getPosition(startAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
-                Vector2 velAtSOITransfer = section.getVelocity(startAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
-
-                ps.add(celestialConic.getPosition(celestialConic.timeToMeanAnomaly(section.meanAnomalyToTime(startAnomaly))).cpy()); parents.add(parent);
-                ps.add(section.getPosition(startAnomaly).cpy()); parents.add(parent);
+                Vector2 posAtSOITransfer = section.getPosition(entityAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
+                Vector2 velAtSOITransfer = section.getVelocity(entityAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(child, entity, posAtSOITransfer, velAtSOITransfer));
@@ -207,10 +177,13 @@ public class PatchedConicSolver {
         for(int i = 0; i < conics.size(); i++){
             ConicSection c = conics.get(i);
 
-            if(anomalies.size() > (i * 2)){
-                float startAnomaly = anomalies.get((i * 2) + 0);
-                // float endAnomaly = anomalies.get((i * 2) + 1);
-                c.draw(renderer, c.getInitialMeanAnomaly(), startAnomaly);
+            if(anomalies.size() > i){
+                double endAnomaly = anomalies.get(i) + c.getInitialMeanAnomaly();
+                c.draw(renderer, c.getInitialMeanAnomaly(), endAnomaly);
+
+                Vector2 p = c.getPosition(endAnomaly);
+                renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()));
+                renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
             } else {
                 c.draw(renderer);
             }
