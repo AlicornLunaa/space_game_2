@@ -276,20 +276,25 @@ public class Universe extends Actor {
             for(Celestial c : celestials){ c.update(delta); }
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
-            for(int i = 0; i < paths.size; i++){
-                ConicSection path = paths.get(i);
-                Entity e = path.getChild();
+            physAccumulator += Math.min(delta, 0.25f);
+            while(physAccumulator >= Constants.TIME_STEP){
+                physAccumulator -= Constants.TIME_STEP;
 
-                if(e.getDriving() != null) continue;
-
-                Vector2 curPos = path.getPosition(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
-                Vector2 curVel = path.getVelocity(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
-
-                e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
-                e.getBody().setLinearVelocity(curVel.cpy());
+                for(int i = 0; i < paths.size; i++){
+                    ConicSection path = paths.get(i);
+                    Entity e = path.getChild();
+    
+                    if(e.getDriving() != null) continue;
+    
+                    Vector2 curPos = path.getPosition(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+                    Vector2 curVel = path.getVelocity(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+    
+                    e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
+                    e.getBody().setLinearVelocity(curVel.cpy());
+                }
             }
 
-            currentFuture += (timewarp - 1) / 6;
+            currentFuture += (timewarp - 1) * 2;
         }
     }
 
