@@ -5,15 +5,15 @@ public class RootSolver {
     public static interface EquationInterface { public double func(double x); }
 
     public static double bisection(double a, double b, EquationInterface equation){
-        double tolerance = 1e-6f;
-        int maxIter = 96;
+        double tolerance = 1e-8;
+        int maxIter = 128;
 
         for(int i = 0; i < maxIter; i++){
             double c = (a + b) / 2;
             double ea = equation.func(a);
             double ec = equation.func(c);
 
-            if(ec == 0 || (b - a) / 2 < tolerance){
+            if(Math.abs(ec) < tolerance || (b - a) / 2 < tolerance){
                 return c;
             }
 
