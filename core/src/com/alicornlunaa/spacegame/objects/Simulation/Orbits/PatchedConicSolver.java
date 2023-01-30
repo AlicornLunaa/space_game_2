@@ -50,6 +50,7 @@ public class PatchedConicSolver {
      */
     private boolean getPatchAnomaly(final ConicSection childConic, final ConicSection parentConic, final double currentTime){
         // Variables
+        // TODO: Try converting to a periapsis to periapsis approach, then convert that to a from initial
         final Celestial celestial = (Celestial)parentConic.getChild();
         double intersectionGuess = -1.f;
         double previousSign = Math.signum(childConic.getPosition(childConic.getInitialMeanAnomaly()).dst2(parentConic.getPosition(parentConic.timeToMeanAnomaly(currentTime) + parentConic.getInitialMeanAnomaly())) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
@@ -72,6 +73,7 @@ public class PatchedConicSolver {
         if(intersectionGuess == -1) return false;
 
         // Refine the guesses into answers using a root finding algorithm
+        // TODO: Fix bisection root finding
         double intersection = RootSolver.bisection(0, intersectionGuess, new EquationInterface() {
             @Override
             public double func(double x){
@@ -80,9 +82,10 @@ public class PatchedConicSolver {
                 return (childConic.getPosition(childAnomaly).dst2(parentConic.getPosition(parentAnomaly)) - Math.pow(celestial.getSphereOfInfluence() / Constants.PPM, 2.0));
             }
         });
+        // double intersection = intersectionGuess;
 
         // Add to the list
-        anomalies.add(intersectionGuess);
+        anomalies.add(intersection);
         return true;
     }
 
@@ -103,17 +106,18 @@ public class PatchedConicSolver {
             
             ConicSection parentConic = celestialConics.get(parent);
             double intersectionGuess = -1.f;
-            double previousSign = Math.signum(section.getPosition(section.getInitialMeanAnomaly()).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
+            double previousSign = Math.signum(section.getPosition(0).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
             
             // Find first intersection by the changing value
             for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-                double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI;
+                double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * Math.PI;
                 double childAnomaly = meanAnomaly + section.getInitialMeanAnomaly();
                 double sign = Math.signum(section.getPosition(childAnomaly).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
 
                 if(sign != previousSign){
                     previousSign = sign;
                     intersectionGuess = meanAnomaly;
+                    break;
                 }
             }
 
@@ -123,13 +127,13 @@ public class PatchedConicSolver {
                 points.add(section.getPosition(section.getInitialMeanAnomaly() + intersectionGuess)); parents.add(parent);
 
                 // Refine the guesses into answers using a root finding algorithm
-                // double intersection = RootSolver.bisection(0, intersectionGuess, new EquationInterface() {
-                //     @Override
-                //     public double func(double x){
-                //         return (section.getPosition(x + section.getInitialMeanAnomaly()).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
-                //     }
-                // });
-                double intersection = intersectionGuess;
+                double intersection = RootSolver.bisection(0, intersectionGuess, new EquationInterface() {
+                    @Override
+                    public double func(double x){
+                        return (section.getPosition(x + section.getInitialMeanAnomaly()).len2() - Math.pow(section.getParent().getSphereOfInfluence() / Constants.PPM, 2.0));
+                    }
+                });
+                // double intersection = intersectionGuess;
 
                 double entityAnomaly = intersection + section.getInitialMeanAnomaly();
                 double celestialAnomaly = parentConic.timeToMeanAnomaly(section.meanAnomalyToTime(intersection) + currentTime) + parentConic.getInitialMeanAnomaly();
