@@ -284,17 +284,17 @@ public class ConicSection {
     public double getSemiMajorAxis() { return semiMajorAxis; }
     public double getEccentricity() { return eccentricity; }
     public double getArgumentofPeriapsis() { return argumentOfPeriapsis; }
-    public double getInitialTrueAnomaly() { return initialTrueAnomaly; }
+    public double getInitialTrueAnomaly() { return initialTrueAnomaly; } // TODO: Sometimes NaN
     public double getInitialMeanAnomaly(){ return trueAnomalyToMeanAnomaly(initialTrueAnomaly); }
     public double getInclination() { return inclination; }
     public double getPeriapsis() { return periapsis; }
     public double getApoapsis() { return apoapsis; }
 
-    public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly){
+    public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly, Color c1, Color c2){
         if(parent == null) return;
 
-        double eaStart = meanAnomalyToEccentricAnomaly(startAnomaly);
-        double eaEnd = meanAnomalyToEccentricAnomaly(endAnomaly);
+        double eaStart = meanAnomalyToEccentricAnomaly(startAnomaly * (inclination >= Math.PI ? -1 : 1));
+        double eaEnd = meanAnomalyToEccentricAnomaly(endAnomaly * (inclination >= Math.PI ? -1 : 1));
         renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()).rotateRad(0, 0, 1, (float)argumentOfPeriapsis));
 
         if(eccentricity >= 1){
@@ -305,15 +305,15 @@ public class ConicSection {
             renderer.setColor(Color.YELLOW);
 
             for(double i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-                double ang1 = (((i / (Constants.ORBIT_RESOLUTION - 1.f)) * -2.0 * Math.PI) + Math.PI) * ((inclination > Math.PI) ? 1 : -1);
-                double ang2 = ((((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * -2.0 * Math.PI) + Math.PI) * ((inclination > Math.PI) ? 1 : -1);
+                double ang1 = (((i / (Constants.ORBIT_RESOLUTION - 1.f)) * -2.0 * Math.PI) + Math.PI);
+                double ang2 = ((((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * -2.0 * Math.PI) + Math.PI);
                 Vector2 p1 = new Vector2(-(float)(linearE - semiMajorAxis * Math.cosh(ang1)), (float)(semiMinorAxis * Math.sinh(ang1))).scl(Constants.PPM);
                 Vector2 p2 = new Vector2(-(float)(linearE - semiMajorAxis * Math.cosh(ang2)), (float)(semiMinorAxis * Math.sinh(ang2))).scl(Constants.PPM);
 
                 if(p1.len() > getParent().getSphereOfInfluence()) continue;
                 if(p2.len() > getParent().getSphereOfInfluence()) continue;
 
-                renderer.rectLine(p1, p2, 100);
+                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 100, c1, c2);
             }
         } else {
             // Elliptic or circular
@@ -326,14 +326,16 @@ public class ConicSection {
                 double ang2 = (((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * (eaEnd - eaStart)) + eaStart;
                 Vector2 p1 = new Vector2((float)(Math.cos(ang1) * semiMajorAxis + center.x), (float)(Math.sin(ang1) * semiMinorAxis + center.y)).scl(Constants.PPM);
                 Vector2 p2 = new Vector2((float)(Math.cos(ang2) * semiMajorAxis + center.x), (float)(Math.sin(ang2) * semiMinorAxis + center.y)).scl(Constants.PPM);
-                renderer.rectLine(p1, p2, 100);
+                Color mC1 = c1.cpy().lerp(c2, i / (Constants.ORBIT_RESOLUTION - 1.f));
+                Color mC2 = c1.cpy().lerp(c2, (i + 1) / (Constants.ORBIT_RESOLUTION - 1.f));
+                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 100, mC1, mC2);
             }
         }
     }
 
     public void draw(ShapeRenderer renderer){
         renderer.setColor(Color.CYAN);
-        draw(renderer, 0.0, 2.0 * Math.PI);
+        draw(renderer, 0.0, 2.0 * Math.PI, Color.CYAN, Color.CYAN);
     }
 
 }

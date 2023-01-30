@@ -11,7 +11,6 @@ import com.alicornlunaa.spacegame.util.RootSolver;
 import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -26,7 +25,7 @@ public class PatchedConicSolver {
     private final Universe universe;
     private Entity entity;
     private ArrayList<ConicSection> conics = new ArrayList<>();
-    private ArrayList<Double> anomalies = new ArrayList<>(); // Every two values is the start and end of a conic
+    private ArrayList<Double> anomalies = new ArrayList<>();
 
     // Private functions
     /**
@@ -128,7 +127,7 @@ public class PatchedConicSolver {
 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
-                checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, intersection);
+                checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, currentMeanAnomaly);
                 return;
             }
         }
@@ -147,7 +146,7 @@ public class PatchedConicSolver {
 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(child, entity, posAtSOITransfer, velAtSOITransfer));
-                checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, endAnomaly);
+                checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, currentMeanAnomaly);
             }
         }
     }
@@ -184,18 +183,22 @@ public class PatchedConicSolver {
     public void draw(ShapeRenderer renderer){
         renderer.setColor(Color.GOLD);
 
+        Color lastColor = Color.RED.cpy();
+        float a = 1.f / (conics.size() + 1.f);
+        float b = 0.f;
+
         for(int i = 0; i < conics.size(); i++){
             ConicSection c = conics.get(i);
+            Color color = lastColor.cpy().lerp(Color.GREEN, b + a);
 
             if(anomalies.size() > i){
-                c.draw(renderer, c.getInitialMeanAnomaly(), anomalies.get(i) + c.getInitialMeanAnomaly());
-        
-                Vector2 p = c.getPosition(anomalies.get(i) + c.getInitialMeanAnomaly());
-                renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()).scl(Constants.PPM));
-                renderer.circle(p.x, p.y, 5);
+                c.draw(renderer, c.getInitialMeanAnomaly(), anomalies.get(i) + c.getInitialMeanAnomaly(), lastColor, color);
             } else {
                 c.draw(renderer);
             }
+
+            lastColor = color.cpy();
+            b += a;
         }
     }
 

@@ -76,7 +76,7 @@ public class Celestial extends Entity {
 
     public float getSphereOfInfluence(){
         if(parent == null) return radius * 20;
-        return radius * 8;
+        return radius * 6;
     }
 
     public Matrix3 getUniverseSpaceTransform(){

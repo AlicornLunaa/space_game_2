@@ -17,7 +17,7 @@ public class DesktopLauncher {
 
 		// Load game
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.useVsync(false);
+		config.useVsync(true);
 		config.setTitle("SpaceGame2");
 		config.setWindowedMode(1280, 720);
 		new Lwjgl3Application(new App(), config);
