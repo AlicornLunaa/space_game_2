@@ -317,7 +317,7 @@ public class ConicSection {
             }
         } else {
             // Elliptic or circular
-            double linearE = semiMajorAxis - periapsis;
+            double linearE = semiMajorAxis * eccentricity;
             double semiMinorAxis = (Math.sqrt(Math.pow(semiMajorAxis, 2.0) - Math.pow(linearE, 2.0)));
             Vector2 center = new Vector2(-(float)linearE, 0);
 
