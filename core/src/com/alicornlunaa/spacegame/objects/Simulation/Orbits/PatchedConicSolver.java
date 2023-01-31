@@ -122,10 +122,7 @@ public class PatchedConicSolver {
                     }
                 });
                 double celestialAnomaly = parentConic.timeToMeanAnomaly(section.meanAnomalyToTime(intersection - section.getInitialMeanAnomaly()) + currentTime) + parentConic.getInitialMeanAnomaly();
-
                 anomalies.add(intersection);
-                points.add(section.getPosition(intersection)); parents.add(parent);
-                points.add(section.getPosition(0)); parents.add(parent);
 
                 // Get state vectors at the moment of intersection
                 Vector2 posAtSOITransfer = section.getPosition(intersection).add(parentConic.getPosition(celestialAnomaly));
@@ -133,7 +130,7 @@ public class PatchedConicSolver {
 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
-                checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(intersection * 2));
+                checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(intersection - section.getInitialMeanAnomaly()));
                 return;
             }
         }
@@ -151,7 +148,7 @@ public class PatchedConicSolver {
                 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(child, entity, posAtSOITransfer, velAtSOITransfer));
-                checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(endAnomaly));
+                checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(endAnomaly - section.getInitialMeanAnomaly()));
                 return;
             }
         }
