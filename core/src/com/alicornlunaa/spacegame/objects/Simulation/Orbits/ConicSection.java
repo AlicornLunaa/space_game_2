@@ -293,8 +293,8 @@ public class ConicSection {
     public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly, Color c1, Color c2){
         if(parent == null) return;
 
-        double eaStart = meanAnomalyToEccentricAnomaly(startAnomaly * (inclination >= Math.PI ? -1 : 1));
-        double eaEnd = meanAnomalyToEccentricAnomaly(endAnomaly * (inclination >= Math.PI ? -1 : 1));
+        double eaStart = meanAnomalyToEccentricAnomaly(startAnomaly * (inclination > Math.PI / 2 ? -1.0 : 1.0));
+        double eaEnd = meanAnomalyToEccentricAnomaly(endAnomaly * (inclination > Math.PI / 2 ? -1.0 : 1.0));
         renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()).rotateRad(0, 0, 1, (float)argumentOfPeriapsis));
 
         if(eccentricity >= 1){
