@@ -1,11 +1,14 @@
 package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 
+import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.RootSolver;
 import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -26,17 +29,22 @@ public class ConicSection {
     private double periapsis = 0.f;
     private double apoapsis = 0.f;
 
+    private TextureRegion apoapsisMarker;
+    private TextureRegion periapsisMarker;
+
     // Constructor
-    public ConicSection(Celestial parent, Entity child, Vector2 position, Vector2 velocity){
+    public ConicSection(final App game, Celestial parent, Entity child, Vector2 position, Vector2 velocity){
         this.parent = parent;
         this.child = child;
+
+        apoapsisMarker = game.atlas.findRegion("ui/apoapsis");
+        periapsisMarker = game.atlas.findRegion("ui/periapsis");
+
         calculate(position, velocity);
     }
 
-    public ConicSection(Celestial parent, Entity child){
-        this.parent = parent;
-        this.child = child;
-        calculate();
+    public ConicSection(final App game, Celestial parent, Entity child){
+        this(game, parent, child, child.getBody().getPosition(), child.getBody().getLinearVelocity());
     }
 
     // Anomaly functions
@@ -289,6 +297,40 @@ public class ConicSection {
     public double getInclination() { return inclination; }
     public double getPeriapsis() { return periapsis; }
     public double getApoapsis() { return apoapsis; }
+
+    public void draw(Batch batch, double startAnomaly, double endAnomaly){
+        batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()).rotateRad(0, 0, 1, (float)argumentOfPeriapsis));
+
+        if(startAnomaly <= 0 && endAnomaly >= 0){
+            batch.draw(
+                periapsisMarker,
+                756 / -2 + (float)getPeriapsis() * Constants.PPM,
+                0,
+                0,
+                0,
+                756,
+                756,
+                1,
+                1,
+                -(float)Math.toDegrees(argumentOfPeriapsis)
+            );
+        }
+
+        if(startAnomaly <= Math.PI && endAnomaly >= Math.PI){
+            batch.draw(
+                apoapsisMarker,
+                756 / -2 - (float)getApoapsis() * Constants.PPM,
+                0,
+                0,
+                0,
+                756,
+                756,
+                1,
+                1,
+                -(float)Math.toDegrees(argumentOfPeriapsis)
+            );
+        }
+    }
 
     public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly, Color c1, Color c2){
         if(parent == null) return;

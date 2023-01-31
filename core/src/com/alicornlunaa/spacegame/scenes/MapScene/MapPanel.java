@@ -55,14 +55,14 @@ public class MapPanel extends Stage {
             Celestial parent = u.getParentCelestial(e);
 
             if(parent != null && e.getDriving() == null){
-                patchedConics.add(new PatchedConicSolver(u, e));
+                patchedConics.add(new PatchedConicSolver(game, u, e));
             }
         }
         for(Celestial c : u.getCelestials()){
             Celestial parent = u.getParentCelestial(c);
 
             if(parent != null){
-                orbits.add(new ConicSection(parent, c));
+                orbits.add(new ConicSection(game, parent, c));
             }
         }
 
@@ -123,8 +123,13 @@ public class MapPanel extends Stage {
         game.shapeRenderer.end();
         batch.begin();
 
+        for(PatchedConicSolver cs : patchedConics){
+            cs.draw(batch);
+        }
+
         Vector2 size = new Vector2(1024, 1024);
         Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(spacePanel.universe, game.player);
+        batch.setTransformMatrix(new Matrix4());
         batch.draw(
             shipIcon,
             plyPos.x - size.x / 2.f,

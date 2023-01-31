@@ -174,7 +174,7 @@ public class Universe extends Actor {
                 Celestial parent = getParentCelestial(e);
                 if(parent == null) continue;
 
-                ConicSection path = new ConicSection(parent, e);
+                ConicSection path = new ConicSection(game, parent, e);
                 paths.add(path);
             }
 
@@ -182,7 +182,7 @@ public class Universe extends Actor {
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
                 
-                ConicSection path = new ConicSection(parent, c);
+                ConicSection path = new ConicSection(game, parent, c);
                 paths.add(path);
             }
         }

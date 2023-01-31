@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
@@ -10,6 +11,7 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.RootSolver;
 import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -23,6 +25,7 @@ public class PatchedConicSolver {
     // Variables
     private static final HashMap<Entity, PatchedConicSolver> entities = new HashMap<>();
 
+    private final App game;
     private final Universe universe;
     private Entity entity;
     private HashMap<Celestial, ConicSection> celestialConics = new HashMap<>();
@@ -38,7 +41,7 @@ public class PatchedConicSolver {
      */
     private void integrateCelestialConics(){
         for(Celestial child : universe.getCelestials()){
-            celestialConics.put(child, new ConicSection(child.getCelestialParent(), child));
+            celestialConics.put(child, new ConicSection(game, child.getCelestialParent(), child));
         }
     }
 
@@ -129,7 +132,7 @@ public class PatchedConicSolver {
                 Vector2 velAtSOITransfer = section.getVelocity(intersection).add(parentConic.getVelocity(celestialAnomaly));
 
                 // Add new conic relative to the child as a new parent
-                conics.add(new ConicSection(parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
+                conics.add(new ConicSection(game, parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
                 checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(intersection - section.getInitialMeanAnomaly()));
                 return;
             }
@@ -147,7 +150,7 @@ public class PatchedConicSolver {
                 Vector2 velAtSOITransfer = section.getVelocity(endAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
                 
                 // Add new conic relative to the child as a new parent
-                conics.add(new ConicSection(child, entity, posAtSOITransfer, velAtSOITransfer));
+                conics.add(new ConicSection(game, child, entity, posAtSOITransfer, velAtSOITransfer));
                 checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(endAnomaly - section.getInitialMeanAnomaly()));
                 return;
             }
@@ -155,7 +158,8 @@ public class PatchedConicSolver {
     }
 
     // Constructor
-    public PatchedConicSolver(final Universe universe, Entity entity){
+    public PatchedConicSolver(final App game, final Universe universe, Entity entity){
+        this.game = game;
         this.universe = universe;
         this.entity = entity;
         recalculate();
@@ -171,7 +175,7 @@ public class PatchedConicSolver {
 
         // Get first orbit line
         Celestial parent = universe.getParentCelestial(entity);
-        conics.add(new ConicSection(parent, entity));
+        conics.add(new ConicSection(game, parent, entity));
 
         // Search the first orbit for an intersection with a new sphere of influence
         integrateCelestialConics();
@@ -184,6 +188,18 @@ public class PatchedConicSolver {
 
     public Vector2 velocityAtEpoch(float t){
         return null;
+    }
+
+    public void draw(Batch batch){
+        for(int i = 0; i < conics.size(); i++){
+            ConicSection c = conics.get(i);
+
+            if(anomalies.size() > i){
+                c.draw(batch, c.getInitialMeanAnomaly(), anomalies.get(i));
+            } else {
+                c.draw(batch, 0, 2.0 * Math.PI);
+            }
+        }
     }
 
     public void draw(ShapeRenderer renderer){
@@ -224,8 +240,8 @@ public class PatchedConicSolver {
         return entities.get(e);
     }
 
-    public static PatchedConicSolver solveEntity(final Universe universe, Entity e){
-        return entities.put(e, new PatchedConicSolver(universe, e));
+    public static PatchedConicSolver solveEntity(final App game, final Universe universe, Entity e){
+        return entities.put(e, new PatchedConicSolver(game, universe, e));
     }
     
 }
