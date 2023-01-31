@@ -81,7 +81,7 @@ public class MapPanel extends Stage {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY * 5), 20.0f), 1500.0f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY * 50), 20.0f), 35000.0f);
                 return true;
             }
         });
@@ -123,11 +123,7 @@ public class MapPanel extends Stage {
         game.shapeRenderer.end();
         batch.begin();
 
-        for(PatchedConicSolver cs : patchedConics){
-            cs.draw(batch);
-        }
-
-        Vector2 size = new Vector2(1024, 1024);
+        Vector2 size = new Vector2(512, 512).scl(1.f / 20).scl(cam.zoom);
         Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(spacePanel.universe, game.player);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(

@@ -76,7 +76,7 @@ public class Celestial extends Entity {
     public void setCelestialParent(Celestial c){ parent = c; }
 
     public float getSphereOfInfluence(){
-        if(getCelestialParent() == null) return radius * 20; // Star radius
+        if(getCelestialParent() == null) return radius * 200; // Star radius
 
         ConicSection c = new ConicSection(game, getCelestialParent(), this);
         return (float)(c.getSemiMajorAxis() * Math.pow(getBody().getMass() / getCelestialParent().getBody().getMass(), 2.0 / 5.0)) * Constants.PPM;

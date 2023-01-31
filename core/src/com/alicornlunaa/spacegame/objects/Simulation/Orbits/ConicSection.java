@@ -357,7 +357,7 @@ public class ConicSection {
                 if(p1.len() > getParent().getSphereOfInfluence()) continue;
                 if(p2.len() > getParent().getSphereOfInfluence()) continue;
 
-                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 100, c1, c2);
+                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 1000, c1, c2);
             }
         } else {
             // Elliptic or circular
@@ -372,7 +372,7 @@ public class ConicSection {
                 Vector2 p2 = new Vector2((float)(Math.cos(ang2) * semiMajorAxis + center.x), (float)(Math.sin(ang2) * semiMinorAxis + center.y)).scl(Constants.PPM);
                 Color mC1 = c1.cpy().lerp(c2, i / (Constants.ORBIT_RESOLUTION - 1.f));
                 Color mC2 = c1.cpy().lerp(c2, (i + 1) / (Constants.ORBIT_RESOLUTION - 1.f));
-                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 100, mC1, mC2);
+                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 1000, mC1, mC2);
             }
         }
     }
