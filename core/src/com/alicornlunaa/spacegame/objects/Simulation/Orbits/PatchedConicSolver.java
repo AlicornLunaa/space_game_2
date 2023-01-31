@@ -80,7 +80,7 @@ public class PatchedConicSolver {
         });
 
         // Add to the list
-        anomalies.add(intersection);
+        anomalies.add(intersection + childConic.getInitialMeanAnomaly());
         return true;
     }
 
@@ -95,10 +95,9 @@ public class PatchedConicSolver {
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(parent == null) return;
         if(depth > Constants.PATCHED_CONIC_LIMIT) return;
+        if(section.getPeriapsis() < section.getParent().getRadius() / Constants.PPM) return;
 
-        if(section.getEccentricity() >= 1.f || Math.abs(section.getApoapsis()) >= parent.getSphereOfInfluence() / 2 / Constants.PPM){
-            if(parent.getCelestialParent() == null) return;
-            
+        if((section.getEccentricity() >= 1.f || Math.abs(section.getApoapsis()) >= parent.getSphereOfInfluence() / 2 / Constants.PPM) && parent.getCelestialParent() != null){
             ConicSection parentConic = celestialConics.get(parent);
             double intersectionGuess = -1.f;
             
@@ -122,11 +121,11 @@ public class PatchedConicSolver {
                         return (section.getPosition(x).len() - (section.getParent().getSphereOfInfluence() / Constants.PPM));
                     }
                 });
-                intersection = intersectionGuess;
                 double celestialAnomaly = parentConic.timeToMeanAnomaly(section.meanAnomalyToTime(intersection - section.getInitialMeanAnomaly()) + currentTime) + parentConic.getInitialMeanAnomaly();
 
                 anomalies.add(intersection);
                 points.add(section.getPosition(intersection)); parents.add(parent);
+                points.add(section.getPosition(0)); parents.add(parent);
 
                 // Get state vectors at the moment of intersection
                 Vector2 posAtSOITransfer = section.getPosition(intersection).add(parentConic.getPosition(celestialAnomaly));
@@ -145,15 +144,15 @@ public class PatchedConicSolver {
 
             if(getPatchAnomaly(section, celestialConic, currentTime)){
                 double endAnomaly = anomalies.get(anomalies.size() - 1);
-                double entityAnomaly = endAnomaly + section.getInitialMeanAnomaly(); 
-                double celestialAnomaly = celestialConic.timeToMeanAnomaly(section.meanAnomalyToTime(endAnomaly) + currentTime) + celestialConic.getInitialMeanAnomaly();
+                double celestialAnomaly = celestialConic.timeToMeanAnomaly(section.meanAnomalyToTime(endAnomaly - section.getInitialMeanAnomaly()) + currentTime) + celestialConic.getInitialMeanAnomaly();
 
-                Vector2 posAtSOITransfer = section.getPosition(entityAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
-                Vector2 velAtSOITransfer = section.getVelocity(entityAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
+                Vector2 posAtSOITransfer = section.getPosition(endAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
+                Vector2 velAtSOITransfer = section.getVelocity(endAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
                 
                 // Add new conic relative to the child as a new parent
                 conics.add(new ConicSection(child, entity, posAtSOITransfer, velAtSOITransfer));
                 checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(endAnomaly));
+                return;
             }
         }
     }
@@ -202,7 +201,11 @@ public class PatchedConicSolver {
             Color color = lastColor.cpy().lerp(Color.GREEN, b + a);
 
             if(anomalies.size() > i){
-                c.draw(renderer, c.getInitialMeanAnomaly(), anomalies.get(i) + c.getInitialMeanAnomaly(), lastColor, color);
+                c.draw(renderer, c.getInitialMeanAnomaly(), anomalies.get(i), lastColor, color);
+
+                Vector2 p = c.getPosition(anomalies.get(i));
+                renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()));
+                renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
             } else {
                 c.draw(renderer);
             }
@@ -214,6 +217,7 @@ public class PatchedConicSolver {
         for(int i = 0; i < points.size(); i++){
             Celestial parent = parents.get(i);
             renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
+            renderer.setColor(Color.MAGENTA);
             renderer.circle(points.get(i).x * Constants.PPM, points.get(i).y * Constants.PPM, 400);
         }
     }
