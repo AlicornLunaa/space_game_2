@@ -46,14 +46,12 @@ public class SpacePanel extends Stage {
         universe.addCelestial(new Star(game, world, 78000, 0, 15000), null);
         universe.addCelestial(new Planet(game, universe, world, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1.0f, 1.0f)), universe.getCelestial(0));
         universe.addCelestial(new Planet(game, universe, world, 15000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(1));
-        universe.addCelestial(new Planet(game, universe, world, -80000, 0, 4000, 6500, new Color(.95f, 0.2f, 0.1f, 1), new Color(0.95f, 0.5f, 0.5f, 1.0f)), universe.getCelestial(0));
+        universe.addCelestial(new Planet(game, universe, world, -180000, 0, 4000, 6500, new Color(.95f, 0.2f, 0.1f, 1), new Color(0.95f, 0.5f, 0.5f, 1.0f)), universe.getCelestial(0));
         universe.addEntity(ship);
         universe.addEntity(game.player);
-        // universe.addCelestial(new Planet(game, universe, world, 9000, 0, 500, 2600, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1)), universe.getCelestial(2));
         OrbitUtils.createOrbit(universe, universe.getCelestial(1));
         OrbitUtils.createOrbit(universe, universe.getCelestial(2));
         OrbitUtils.createOrbit(universe, universe.getCelestial(3));
-        // universe.createCelestialOrbit(universe.getCelestial(4));
         OrbitUtils.createOrbit(universe, ship);
         OrbitUtils.createOrbit(universe, game.player);
         this.addActor(universe);

@@ -292,13 +292,15 @@ public class ConicSection {
     public double getSemiMajorAxis() { return semiMajorAxis; }
     public double getEccentricity() { return eccentricity; }
     public double getArgumentofPeriapsis() { return argumentOfPeriapsis; }
-    public double getInitialTrueAnomaly() { return initialTrueAnomaly; } // TODO: Sometimes NaN
+    public double getInitialTrueAnomaly() { return initialTrueAnomaly; }
     public double getInitialMeanAnomaly(){ return trueAnomalyToMeanAnomaly(initialTrueAnomaly); }
     public double getInclination() { return inclination; }
     public double getPeriapsis() { return periapsis; }
     public double getApoapsis() { return apoapsis; }
 
     public void draw(Batch batch, double startAnomaly, double endAnomaly){
+        if(parent == null) return;
+
         batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()).rotateRad(0, 0, 1, (float)argumentOfPeriapsis));
 
         if(startAnomaly <= 0 && endAnomaly >= 0){

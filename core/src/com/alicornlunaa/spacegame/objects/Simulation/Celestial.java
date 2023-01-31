@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -75,12 +76,14 @@ public class Celestial extends Entity {
     public void setCelestialParent(Celestial c){ parent = c; }
 
     public float getSphereOfInfluence(){
-        if(parent == null) return radius * 20;
-        return radius * 6;
+        if(getCelestialParent() == null) return radius * 20; // Star radius
+
+        ConicSection c = new ConicSection(game, getCelestialParent(), this);
+        return (float)(c.getSemiMajorAxis() * Math.pow(getBody().getMass() / getCelestialParent().getBody().getMass(), 2.0 / 5.0)) * Constants.PPM;
     }
 
     public Matrix3 getUniverseSpaceTransform(){
-        if(parent == null) return new Matrix3().translate(getPosition());
+        if(parent == null) return new Matrix3().    translate(getPosition());
         return parent.getUniverseSpaceTransform().mul(new Matrix3().translate(getPosition()));
     }
 
