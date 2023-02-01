@@ -6,7 +6,7 @@ public class Constants {
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 2;
     public static final int MAX_PREDICTION_STEPS = 2;
-    public static final int PATCHED_CONIC_LIMIT = 1;
+    public static final int PATCHED_CONIC_LIMIT = 3;
     public static final int PATCHED_CONIC_STEPS = 256;
     
     public static final int ORBIT_RESOLUTION = 512;

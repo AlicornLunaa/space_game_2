@@ -32,9 +32,6 @@ public class PatchedConicSolver {
     private ArrayList<ConicSection> conics = new ArrayList<>();
     private ArrayList<Double> anomalies = new ArrayList<>();
 
-    private ArrayList<Celestial> parents = new ArrayList<>();
-    private ArrayList<Vector2> points = new ArrayList<>();
-
     // Private functions
     /**
      * Gets conics for every celestial in the system
@@ -170,8 +167,6 @@ public class PatchedConicSolver {
         // Reset
         conics.clear();
         anomalies.clear();
-        points.clear();
-        parents.clear();
 
         // Get first orbit line
         Celestial parent = universe.getParentCelestial(entity);
@@ -182,13 +177,89 @@ public class PatchedConicSolver {
         checkSOITransition(parent, conics.get(0), 0, 0);
     }
 
-    public Vector2 positionAtEpoch(float t){
-        return null;
+    public ConicSection getConicAtEpoch(float t){
+        if(conics.size() == 0) return null;
+
+        // Get which conic will be intercepted at this time
+        double timeIntoFuture = 0.0;
+        int conicIndex = 0;
+        while(anomalies.size() > conicIndex){
+            ConicSection c = conics.get(conicIndex);
+            double normalizedInitAnomaly = (2.0 * Math.PI) + (c.getInitialMeanAnomaly() % (2.0 * Math.PI));
+            double normalizedAnomaly = (2.0 * Math.PI) + (anomalies.get(conicIndex) % (2.0 * Math.PI));
+            double timeToIntersection = c.meanAnomalyToTime(Math.abs(normalizedInitAnomaly - normalizedAnomaly));
+
+            if(t - timeIntoFuture > timeToIntersection){
+                // Not this conic, try the next
+                timeIntoFuture += timeToIntersection;
+                conicIndex++;
+            } else {
+                break;
+            }
+        }
+
+        return conics.get(conicIndex);
     }
 
-    public Vector2 velocityAtEpoch(float t){
-        return null;
+    public Celestial getParentAtEpoch(float t){
+        if(conics.size() == 0) return null;
+        return getConicAtEpoch(t).getParent();
     }
+
+    public Vector2 getPositionAtEpoch(float t){
+        if(conics.size() == 0) return null;
+
+        // Get which conic will be intercepted at this time
+        double timeIntoFuture = 0.0;
+        int conicIndex = 0;
+        while(anomalies.size() > conicIndex){
+            ConicSection c = conics.get(conicIndex);
+            double normalizedInitAnomaly = (2.0 * Math.PI) + (c.getInitialMeanAnomaly() % (2.0 * Math.PI));
+            double normalizedAnomaly = (2.0 * Math.PI) + (anomalies.get(conicIndex) % (2.0 * Math.PI));
+            double timeToIntersection = c.meanAnomalyToTime(Math.abs(normalizedInitAnomaly - normalizedAnomaly));
+
+            if(t - timeIntoFuture > timeToIntersection){
+                // Not this conic, try the next
+                timeIntoFuture += timeToIntersection;
+                conicIndex++;
+            } else {
+                break;
+            }
+        }
+
+        ConicSection c = conics.get(conicIndex);
+        double anomalyForConic = c.timeToMeanAnomaly(t - timeIntoFuture) + c.getInitialMeanAnomaly();
+        return c.getPosition(anomalyForConic);
+    }
+
+    public Vector2 getVelocityAtEpoch(float t){
+        if(conics.size() == 0) return null;
+
+        // Get which conic will be intercepted at this time
+        double timeIntoFuture = 0.0;
+        int conicIndex = 0;
+        while(anomalies.size() > conicIndex){
+            ConicSection c = conics.get(conicIndex);
+            double normalizedInitAnomaly = (2.0 * Math.PI) + (c.getInitialMeanAnomaly() % (2.0 * Math.PI));
+            double normalizedAnomaly = (2.0 * Math.PI) + (anomalies.get(conicIndex) % (2.0 * Math.PI));
+            double timeToIntersection = c.meanAnomalyToTime(Math.abs(normalizedInitAnomaly - normalizedAnomaly));
+
+            if(t - timeIntoFuture > timeToIntersection){
+                // Not this conic, try the next
+                timeIntoFuture += timeToIntersection;
+                conicIndex++;
+            } else {
+                break;
+            }
+        }
+        
+        // Start at the first conic
+        ConicSection c = conics.get(conicIndex);
+        double anomalyForConic = c.timeToMeanAnomaly(t - timeIntoFuture) + c.getInitialMeanAnomaly();
+        return c.getVelocity(anomalyForConic);
+    }
+
+    public Entity getEntity(){ return entity; }
 
     public void draw(Batch batch){
         for(int i = 0; i < conics.size(); i++){
@@ -225,13 +296,6 @@ public class PatchedConicSolver {
 
             lastColor = color.cpy();
             b += a;
-        }
-
-        for(int i = 0; i < points.size(); i++){
-            Celestial parent = parents.get(i);
-            renderer.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
-            renderer.setColor(Color.MAGENTA);
-            renderer.circle(points.get(i).x * Constants.PPM, points.get(i).y * Constants.PPM, 400);
         }
     }
 

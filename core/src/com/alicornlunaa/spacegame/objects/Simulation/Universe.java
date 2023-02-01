@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
@@ -33,7 +34,8 @@ public class Universe extends Actor {
 
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
-    private Array<ConicSection> paths = new Array<>();
+    private Array<ConicSection> celestialPaths = new Array<>();
+    private Array<PatchedConicSolver> entityPaths = new Array<>();
 
     // Private functions
     /**
@@ -163,7 +165,8 @@ public class Universe extends Actor {
     public void setTimewarp(float warp){
         // Reset timewarp
         if(warp == 1){
-            paths.clear();
+            celestialPaths.clear();
+            entityPaths.clear();
             currentFuture = 0.0f;
         }
 
@@ -173,17 +176,14 @@ public class Universe extends Actor {
             for(Entity e : ents){
                 Celestial parent = getParentCelestial(e);
                 if(parent == null) continue;
-
-                ConicSection path = new ConicSection(game, parent, e);
-                paths.add(path);
+                entityPaths.add(new PatchedConicSolver(game, this, e));
             }
 
             for(Celestial c : celestials){
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
-                
                 ConicSection path = new ConicSection(game, parent, c);
-                paths.add(path);
+                celestialPaths.add(path);
             }
         }
 
@@ -280,8 +280,8 @@ public class Universe extends Actor {
             while(physAccumulator >= Constants.TIME_STEP){
                 physAccumulator -= Constants.TIME_STEP;
 
-                for(int i = 0; i < paths.size; i++){
-                    ConicSection path = paths.get(i);
+                for(int i = 0; i < celestialPaths.size; i++){
+                    ConicSection path = celestialPaths.get(i);
                     Entity e = path.getChild();
     
                     if(e.getDriving() != null) continue;
@@ -292,9 +292,34 @@ public class Universe extends Actor {
                     e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
                     e.getBody().setLinearVelocity(curVel.cpy());
                 }
+
+                for(int i = 0; i < entityPaths.size; i++){
+                    PatchedConicSolver path = entityPaths.get(i);
+                    Entity e = path.getEntity();
+    
+                    if(e.getDriving() != null) continue;
+    
+                    Celestial parent = path.getParentAtEpoch(currentFuture);
+                    Vector2 curPos = path.getPositionAtEpoch(currentFuture);
+                    Vector2 curVel = path.getVelocityAtEpoch(currentFuture);
+
+                    if(parent != getParentCelestial(e)){
+                        // Transfer to new world
+                        if(parent == getParentCelestial(e).getCelestialParent()){
+                            // Tranferring to the parent
+                            removeFromCelestial(e);
+                        } else {
+                            // Transferring to a child
+                            addToCelestial(parent, e);
+                        }
+                    }
+    
+                    e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
+                    e.getBody().setLinearVelocity(curVel.cpy());
+                }
             }
 
-            currentFuture += (timewarp - 1) * 2;
+            currentFuture += (timewarp - 1) * 4;
         }
     }
 
