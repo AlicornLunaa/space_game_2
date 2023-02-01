@@ -32,6 +32,9 @@ public class MapPanel extends Stage {
     private final OrthographicCamera cam;
     private float oldZoom = 0.0f;
 
+    private float celestialOpacity = 0.f;
+    private float entityOpacity = 0.f;
+
     private TextureRegion shipIcon;
     private Array<ConicSection> orbits = new Array<>();
     private Array<PatchedConicSolver> patchedConics = new Array<>();
@@ -131,13 +134,18 @@ public class MapPanel extends Stage {
         }
         game.shapeRenderer.end();
 
+        // Get value dictating the opacity of simplified icons
+        celestialOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
+        entityOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
+
         // Begin a batch renderer pass
         Batch batch = getBatch();
         batch.setProjectionMatrix(cam.combined);
         batch.setTransformMatrix(new Matrix4());
         batch.begin();
+        batch.setColor(1, 1, 1, entityOpacity);
 
-        Vector2 size = new Vector2(512, 512).scl(1.f / 20).scl(cam.zoom);
+        Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(cam.zoom);
         Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(spacePanel.universe, game.player);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(

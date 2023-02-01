@@ -129,5 +129,5 @@ void main() {
     // Shadow shading
     float inShadow = shadowCast(vec3(uv, 0.0), u_starDirection);
 
-    gl_FragColor = vec4(color, length(color)) * (1.0 - inShadow);
+    gl_FragColor = vec4(color, length(color)) * (1.0 - inShadow) * u_atmosColor.a;
 }

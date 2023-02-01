@@ -334,9 +334,8 @@ public class Universe extends Actor {
             batch.setTransformMatrix(oldMat);
 
             Celestial parent = entParents.get(e);
-            if(parent != null){
+            if(parent != null)
                 batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
-            }
 
             e.draw(batch, a);
         }

@@ -294,7 +294,7 @@ public class Planet extends Celestial {
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
 
         batch.setShader(terrainShader);
-        terrainShader.setUniformf("u_planetColor", terrainColor);
+        terrainShader.setUniformf("u_planetColor", terrainColor.cpy().mul(parentAlpha));
         terrainShader.setUniformf("u_starDirection", dirToStar);
         terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
         terrainShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
@@ -302,7 +302,7 @@ public class Planet extends Celestial {
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
 
         batch.setShader(atmosShader);
-        atmosShader.setUniformf("u_atmosColor", atmosColor);
+        atmosShader.setUniformf("u_atmosColor", atmosColor.cpy().mul(parentAlpha));
         atmosShader.setUniformf("u_starDirection", dirToStar);
         atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
         atmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));

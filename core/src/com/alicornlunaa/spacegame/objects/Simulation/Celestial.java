@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -106,7 +107,7 @@ public class Celestial extends Entity {
         s.circle(0, 0, getRadius(), 500);
         s.end();
         
-        game.debug.render(influenceWorld, batch.getTransformMatrix().cpy().scl(Constants.PPM));
+        game.debug.render(influenceWorld, new Matrix4().set(getUniverseSpaceTransform().scl(Constants.PPM)));
 
         batch.begin();
     }

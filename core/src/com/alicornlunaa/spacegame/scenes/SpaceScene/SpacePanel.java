@@ -108,7 +108,7 @@ public class SpacePanel extends Stage {
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
         batch.setTransformMatrix(new Matrix4());
-        backgroundTexture.setOffset(cam.position.x / 100000, cam.position.y / 100000);
+        backgroundTexture.setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
         backgroundTexture.draw(batch, -1, -1, 2, 2);
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
