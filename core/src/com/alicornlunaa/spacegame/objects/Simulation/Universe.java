@@ -319,7 +319,7 @@ public class Universe extends Actor {
                 }
             }
 
-            currentFuture += (timewarp - 1) * 4;
+            currentFuture += (timewarp - 1) * 8;
         }
     }
 

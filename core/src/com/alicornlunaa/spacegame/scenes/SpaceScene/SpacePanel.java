@@ -44,10 +44,10 @@ public class SpacePanel extends Stage {
 
         universe = new Universe(game);
         universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
-        universe.addCelestial(new Planet(game, universe, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 24400 * Constants.CONVERSION_FACTOR, new Color(.67f, 0.65f, 0.64f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mercury
-        universe.addCelestial(new Planet(game, universe, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 60700 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Venus
-        universe.addCelestial(new Planet(game, universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 64000 * Constants.CONVERSION_FACTOR, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1.0f, 1.0f)), universe.getCelestial(0)); // Earth
-        universe.addCelestial(new Planet(game, universe, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 34890 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mars
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 26400 * Constants.CONVERSION_FACTOR, new Color(.67f, 0.65f, 0.64f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mercury
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Venus
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1.0f, 1.0f)), universe.getCelestial(0)); // Earth
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mars
         universe.addCelestial(new Planet(game, universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, new Color(.88f, 0.88f, 0.88f, 1), new Color(.88f, 0.88f, 0.88f, 1.0f)), universe.getCelestial(3)); // Moon
         universe.addEntity(ship);
         universe.addEntity(game.player);
