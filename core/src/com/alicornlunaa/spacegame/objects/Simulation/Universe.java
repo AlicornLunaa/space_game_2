@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
@@ -32,67 +34,63 @@ public class Universe extends Actor {
 
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
-    private Array<Vector2> initPos = new Array<>();
-    private Array<OrbitPath> paths = new Array<>();
+    private Array<ConicSection> celestialPaths = new Array<>();
+    private Array<PatchedConicSolver> entityPaths = new Array<>();
 
     // Private functions
+    /**
+     * Transfers the parent of one celestial to another celestial
+     * @param target The celestial to reparent
+     * @param parent The new parent of the celestial
+     */
     private void parentCelestial(Celestial target, Celestial parent){
+        // Remove target from existing celestial parent
         Celestial curParent = celestialParents.get(target);
         if(curParent != null){
             curParent.getChildren().remove(target);
         }
 
+        // Update the target's parent to be the parent celestial
         target.setCelestialParent(parent);
         parent.getChildren().add(target);
         celestialParents.put(target, parent);
 
-        target.setPosition(target.getPosition().mul(parent.getUniverseTransform().inv()));
+        // Convert the target celestial's body to the new Box2D world
+        target.setPosition(target.getPosition().mul(parent.getUniverseSpaceTransform().inv()));
         target.loadBodyToWorld(parent.getWorld(), Constants.PPM);
     }
 
-    private void checkTransfer(Entity e){
-        // Checks if the entity can transfer to a smaller sphere of influence
+    /**
+     * Checks if the entity supplied is either within or outside a sphere
+     * of influence. If it is outside, transfer to the parent celestial or universe.
+     * If it is inside a new SOI, transfer to the appropriate child.
+     * @param e The entity to check
+     */
+    private boolean checkTransfer(Entity e){
+        // Check whether or not this entity has a celestial parent or not
         Celestial parent = entParents.get(e);
+        ArrayList<Celestial> celestialsToCheck = (parent == null) ? celestials : parent.getChildren();
 
-        if(parent == null){
-            // No parent, check every celestial that doesnt have a parent
-            Celestial closest = null;
-            float minDist = Float.MAX_VALUE;
+        // Find closest celestial with proper SOI parameters
+        Celestial closest = null;
+        float minDist = Float.MAX_VALUE;
 
-            for(Celestial c : celestials){
-                if(c.getCelestialParent() != null) continue;
+        for(Celestial c : celestialsToCheck){
+            // Only transfer to next-level celestials.
+            if(parent == null && c.getCelestialParent() != null) continue;
 
-                float curDist = c.getPosition().dst2(e.getPosition());
-                if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
-                    closest = c;
-                    minDist = curDist;
-                }
-            }
-
-            // Add to celestial if it has a parent
-            if(closest != null){
-                this.addToCelestial(closest, e);
-            }
-        } else {
-            // Has a parent, only check the children or for an exit
-            Celestial closest = null;
-            float minDist = Float.MAX_VALUE;
-
-            for(Celestial c : parent.getChildren()){
-                float curDist = c.getPosition().dst2(e.getPosition());
-                if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
-                    closest = c;
-                    minDist = curDist;
-                }
-            }
-
-            // Add to celestial if it has a parent
-            if(closest != null){
-                this.addToCelestial(closest, e);
-            } else if(e.getPosition().len2() > Math.pow(parent.getSphereOfInfluence(), 2)){
-                this.removeFromCelestial(e);
+            float curDist = c.getPosition().dst2(e.getPosition());
+            if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
+                closest = c;
+                minDist = curDist;
             }
         }
+
+        // Add to celestial if a suitable target was found.
+        if(closest != null){ addToCelestial(closest, e); return true; }
+        if(parent != null && e.getPosition().len2() > Math.pow(parent.getSphereOfInfluence(), 2)){ removeFromCelestial(e); return true; }
+
+        return false;
     }
 
     // Constructor
@@ -103,25 +101,23 @@ public class Universe extends Actor {
     }
 
     // Functions
-    public Vector2 getUniversalPosition(Entity e){
-        Celestial parent = entParents.get(e);
-        if(parent != null) return e.getPosition().mul(parent.getUniverseTransform());
-        return e.getPosition();
-    }
-
-    public Vector2 getUniversalPosition(Entity e, Vector2 pos){
-        Celestial parent = entParents.get(e);
-        if(parent != null) return pos.mul(parent.getUniverseTransform());
-        return pos;
-    }
-
-    public Vector2 getUniversalPosition(Celestial c){ return c.getUniverseTransform().getTranslation(new Vector2()); }
-
+    /**
+     * Adds a new entity to this universe
+     * @param e The entity to add
+     */
     public void addEntity(Entity e){
         e.loadBodyToWorld(universalWorld, Constants.PPM);
         ents.add(e);
+
+        boolean res = false;
+        do { res = checkTransfer(e); } while(res == true);
     }
 
+    /**
+     * Adds a new celestial to this universe
+     * @param c The celestial to add
+     * @param parent The celestial to parent it to
+     */
     public void addCelestial(Celestial c, Celestial parent){
         c.loadBodyToWorld(universalWorld, Constants.PPM);
         celestials.add(c);
@@ -129,71 +125,65 @@ public class Universe extends Actor {
         if(parent != null) parentCelestial(c, parent);
     }
 
+    /**
+     * Gets all the entities in the simulation. This does not
+     * include celestials.
+     * @return ArrayList of Entity
+     */
     public ArrayList<Entity> getEntities(){ return ents; }
 
+    /**
+     * Gets all the celestials in the simulation.
+     * @return ArrayList of Celestial
+     */
     public ArrayList<Celestial> getCelestials(){ return celestials; }
 
+    /**
+     * Shorthand to get one specific celestial
+     * @param i Celestial index
+     * @return Celestial or null
+     */
     public Celestial getCelestial(int i){ return celestials.get(i); }
 
-    public Celestial getParentCelestial(Entity e){ return entParents.get(e); }
+    /**
+     * Gets the celestial that is the parent of this entity or celestial
+     * @param e The entity to check. This supports celestials.
+     * @return The celestial parent
+     */
+    public Celestial getParentCelestial(Entity e){
+        if(e instanceof Celestial){
+            return celestialParents.get((Celestial)e);
+        }
+
+        return entParents.get(e);
+    }
     
-    public Celestial getParentCelestial(Celestial c){ return celestialParents.get(c); }
-
-    public Celestial getCelestialFromUniversalPos(Vector2 pos){
-        Celestial closest = null;
-        float minDist = Float.MAX_VALUE;
-
-        for(Celestial c : celestials){
-            float curDist = c.getPosition().dst2(pos);
-            if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
-                closest = c;
-                minDist = curDist;
-            }
-        }
-        
-        return closest;
-    }
-
-    public Vector2 getDirToNearestStar(Entity e){
-        float minDist = Float.MAX_VALUE;
-        Vector2 dir = new Vector2();
-        Vector2 absPos = getUniversalPosition(e);
-
-        for(Celestial c : celestials){
-            Vector2 cAbsPos = getUniversalPosition(c);
-            float curDist = cAbsPos.dst2(absPos);
-            if(curDist < minDist && c instanceof Star){
-                minDist = curDist;
-                dir = cAbsPos.cpy().sub(absPos);
-            }
-        }
-
-        return dir;
-    }
-
+    /**
+     * Sets the timewarp speed. If set to 1, resumes the normal simulation.
+     * @param warp The speed to set. (0-100)
+     */
     public void setTimewarp(float warp){
-        paths.clear();
-        initPos.clear();
-        currentFuture = 0.0f;
+        // Reset timewarp
+        if(warp == 1){
+            celestialPaths.clear();
+            entityPaths.clear();
+            currentFuture = 0.0f;
+        }
 
-        if(warp != 1){
+        // Starting the timewarp for first time
+        if(warp != 1 && timewarp == 1){
+            // Get conic sections for projected positions using keplerian transforms
             for(Entity e : ents){
                 Celestial parent = getParentCelestial(e);
                 if(parent == null) continue;
-
-                OrbitPath path = new OrbitPath(game, this, parent, e);
-                path.simulate(2048);
-                paths.add(path);
-                initPos.add(e.getBody().getPosition());
+                entityPaths.add(new PatchedConicSolver(game, this, e));
             }
+
             for(Celestial c : celestials){
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
-                
-                OrbitPath path = new OrbitPath(game, this, parent, c);
-                path.simulate(2048);
-                paths.add(path);
-                initPos.add(c.getBody().getPosition());
+                ConicSection path = new ConicSection(game, parent, c);
+                celestialPaths.add(path);
             }
         }
 
@@ -247,31 +237,6 @@ public class Universe extends Actor {
         parent.getEntities().remove(e);
     }
 
-    public void createCelestialOrbit(Celestial c){
-        // Creates a stable orbital velocity
-        if(c.getCelestialParent() == null) return;
-
-        Vector2 tangent = c.getBody().getPosition().cpy().nor().rotateDeg(90);
-        float radius = c.getBody().getPosition().len();
-        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * c.getCelestialParent().getBody().getMass()) / radius);
-
-        c.getBody().setLinearVelocity(tangent.scl(velScl));
-    }
-
-    public void createEntityOrbit(Entity e){
-        // Creates a stable orbital velocity
-        for(int i = 0; i < 10; i++)
-            checkTransfer(e);
-
-        Celestial parent = entParents.get(e);
-        if(parent == null) return;
-
-        float radius = e.getBody().getPosition().len();
-        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getBody().getMass()) / radius);
-
-        e.getBody().setLinearVelocity(0, velScl);
-    }
-
     /**
      * Steps the physics worlds
      * @param delta
@@ -283,45 +248,78 @@ public class Universe extends Actor {
             while(physAccumulator >= Constants.TIME_STEP){
                 universalWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
                 physAccumulator -= Constants.TIME_STEP;
-            }
 
-            for(int i = 0; i < ents.size(); i++){
-                Entity e = ents.get(i);
-                e.act(delta);
-                checkTransfer(e);
-                
-                Celestial parent = entParents.get(e);
-                if(parent != null){
-                    e.getBody().applyForceToCenter(parent.applyPhysics(delta, e), true);
+                // Update every entity
+                for(int i = 0; i < ents.size(); i++){
+                    Entity e = ents.get(i);
+                    e.fixedUpdate(Constants.TIME_STEP);
+                    checkTransfer(e);
+                    
+                    Celestial parent = entParents.get(e);
+                    if(parent != null){
+                        e.getBody().applyForceToCenter(parent.applyPhysics(delta, e), true);
+                    }
+                }
+
+                // Update every celestial
+                for(Celestial c : celestials){
+                    c.fixedUpdate(Constants.TIME_STEP);
+                    
+                    Celestial parent = celestialParents.get(c);
+                    if(parent != null){
+                        c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
+                    }
                 }
             }
 
-            for(Celestial c : celestials){
-                c.update(delta);
-                
-                Celestial parent = celestialParents.get(c);
-                if(parent != null){
-                    c.getBody().applyForceToCenter(parent.applyPhysics(delta, c), true);
-                }
-            }
+            for(Entity e : ents){ e.update(delta); }
+            for(Celestial c : celestials){ c.update(delta); }
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
-            for(int i = 0; i < paths.size; i++){
-                OrbitPath path = paths.get(i);
-                Entity e = path.getEntity();
+            physAccumulator += Math.min(delta, 0.25f);
+            while(physAccumulator >= Constants.TIME_STEP){
+                physAccumulator -= Constants.TIME_STEP;
 
-                if(e.getDriving() != null) continue;
+                for(int i = 0; i < celestialPaths.size; i++){
+                    ConicSection path = celestialPaths.get(i);
+                    Entity e = path.getChild();
+    
+                    if(e.getDriving() != null) continue;
+    
+                    Vector2 curPos = path.getPosition(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+                    Vector2 curVel = path.getVelocity(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+    
+                    e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
+                    e.getBody().setLinearVelocity(curVel.cpy());
+                }
 
-                Vector2 curPos = path.getAbsolute(((int)currentFuture) % path.getPoints().size());
-                Vector2 curVel = path.getVelocity(((int)currentFuture) % path.getPoints().size());
-                Vector2 nextPos = path.getAbsolute(((int)currentFuture + 1) % path.getPoints().size());
-                Vector2 nextVel = path.getVelocity(((int)currentFuture + 1) % path.getPoints().size());
+                for(int i = 0; i < entityPaths.size; i++){
+                    PatchedConicSolver path = entityPaths.get(i);
+                    Entity e = path.getEntity();
+    
+                    if(e.getDriving() != null) continue;
+    
+                    Celestial parent = path.getParentAtEpoch(currentFuture);
+                    Vector2 curPos = path.getPositionAtEpoch(currentFuture);
+                    Vector2 curVel = path.getVelocityAtEpoch(currentFuture);
 
-                e.getBody().setTransform(curPos.cpy().lerp(nextPos, currentFuture % 1.0f), e.getBody().getAngle());
-                e.getBody().setLinearVelocity(curVel.cpy().lerp(nextVel, currentFuture % 1.0f));
+                    if(parent != getParentCelestial(e)){
+                        // Transfer to new world
+                        if(parent == getParentCelestial(e).getCelestialParent()){
+                            // Tranferring to the parent
+                            removeFromCelestial(e);
+                        } else {
+                            // Transferring to a child
+                            addToCelestial(parent, e);
+                        }
+                    }
+    
+                    e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
+                    e.getBody().setLinearVelocity(curVel.cpy());
+                }
             }
 
-            currentFuture += (timewarp - 1);
+            currentFuture += (timewarp - 1) * 8;
         }
     }
 
@@ -337,14 +335,14 @@ public class Universe extends Actor {
 
             Celestial parent = entParents.get(e);
             if(parent != null){
-                batch.setTransformMatrix(new Matrix4().set(parent.getUniverseTransform()));
+                batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
             }
 
             e.draw(batch, a);
         }
         
         for(Celestial c : celestials){
-            batch.setTransformMatrix(new Matrix4().set(c.getUniverseTransform()));
+            batch.setTransformMatrix(new Matrix4().set(c.getUniverseSpaceTransform()));
             c.draw(batch, a);
         }
 

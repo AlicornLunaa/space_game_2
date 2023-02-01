@@ -40,6 +40,9 @@ public class Assets extends AssetManager {
         load("shaders/planet", ShaderProgram.class);
         load("shaders/starfield", ShaderProgram.class);
         load("shaders/atmosphere", ShaderProgram.class);
+        load("shaders/cartesian_atmosphere", ShaderProgram.class);
+        load("shaders/shadow_map", ShaderProgram.class);
+        load("shaders/light", ShaderProgram.class);
 
         // Load the texture atlases
         load("textures_packed/textures.atlas", TextureAtlas.class);

@@ -3,6 +3,8 @@
 precision mediump float;
 #endif
 
+#define PI 3.141592654
+
 #define WAVELENGTHS vec3(700, 530, 440)
 #define SCATTER_DIVISOR 400.0
 #define SCATTER_STRENGTH 2.0
@@ -96,8 +98,19 @@ float shadowCast(vec3 rayOrigin, vec3 rayDir){
     return (rayToStar.x > 0.0 && u_occlusionEnabled > 0.5) ? 1.0 : 0.0;
 }
 
+vec2 cartesianToPolar(vec2 uv){
+    float atmosphereRadiusOverTerrain = (u_atmosRadius - u_planetRadius);
+
+    float theta = uv.x * 2.0 * PI;
+    float radius = u_planetRadius + (atmosphereRadiusOverTerrain * max(1.0 - uv.y - u_planetRadius, 0.0));
+    float x = cos(theta) * radius;
+    float y = sin(theta) * radius;
+    return vec2(x, y);
+}
+
 void main() {
-    vec2 uv = (v_texcoord * 2.0 - 1.0);
+    // vec2 uv = (v_texcoord * 2.0 - 1.0);
+    vec2 uv = cartesianToPolar(v_texcoord);
     vec3 cameraZ = vec3(0, 0, 1);
     vec3 cameraX = vec3(1, 0, 0);
     vec3 cameraY = vec3(0, 1, 0);

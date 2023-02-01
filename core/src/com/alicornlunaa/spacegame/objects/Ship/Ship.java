@@ -158,15 +158,7 @@ public class Ship extends Entity {
     }
 
     @Override
-    public void act(float delta){
-        if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
-        if(driver == null) return;
-
-        // Update parts
-        for(Part p : parts){
-            p.update(delta);
-        }
-
+    public void update(float delta){
         // Ship controls
         if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
             state.throttle = Math.min(state.throttle + 0.01f, 1);
@@ -197,8 +189,17 @@ public class Ship extends Entity {
         } else {
             state.horizontal = 0;
         }
-        
-        super.act(delta);
+    }
+
+    @Override
+    public void fixedUpdate(float timeStep){
+        if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
+        if(driver == null) return;
+
+        // Update parts
+        for(Part p : parts){
+            p.update(timeStep);
+        }
     }
 
     @Override

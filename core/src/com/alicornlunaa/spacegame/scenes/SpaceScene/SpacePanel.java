@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -42,20 +43,24 @@ public class SpacePanel extends Stage {
         ship.load("./saves/ships/null.ship");
 
         universe = new Universe(game);
+        universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 26400 * Constants.CONVERSION_FACTOR, new Color(.67f, 0.65f, 0.64f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mercury
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Venus
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1.0f, 1.0f)), universe.getCelestial(0)); // Earth
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mars
+        universe.addCelestial(new Planet(game, universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, new Color(.88f, 0.88f, 0.88f, 1), new Color(.88f, 0.88f, 0.88f, 1.0f)), universe.getCelestial(3)); // Moon
         universe.addEntity(ship);
         universe.addEntity(game.player);
-        universe.addCelestial(new Star(game, world, 78000, 0, 15000), null);
-        universe.addCelestial(new Planet(game, universe, world, -18000, 0, 12000, 15000, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1, 0.5f)), universe.getCelestial(0));
-        universe.addCelestial(new Planet(game, universe, world, 5000, 0, 1000, 1500, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.26f, 1.0f, 0.1f, 0.5f)), universe.getCelestial(1));
-        universe.createCelestialOrbit(universe.getCelestial(1));
-        universe.createCelestialOrbit(universe.getCelestial(2));
-        universe.createEntityOrbit(ship);
-        universe.createEntityOrbit(game.player);
+        OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(2));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(3));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(4));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(5));
+        OrbitUtils.createOrbit(universe, ship);
+        OrbitUtils.createOrbit(universe, game.player);
         this.addActor(universe);
 
         game.player.drive(ship);
-
-        universe.getCelestial(2).getBody().applyLinearImpulse(0, 350, universe.getCelestial(2).getBody().getWorldCenter().x, universe.getCelestial(2).getBody().getWorldCenter().y, true);
 
         // Controls
         this.addListener(new InputListener(){
@@ -83,20 +88,19 @@ public class SpacePanel extends Stage {
         }
         
         universe.update(delta);
-        ship.act(delta);
 
         // Parent camera to the player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(universe.getUniversalPosition(ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
+        cam.position.set(OrbitUtils.getUniverseSpacePosition(universe, ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
         cam.update();
     }
 
-    @Override
-    public void draw(){
+    public void drawSkybox(){
         Batch batch = getBatch();
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
         OrthographicCamera cam = (OrthographicCamera)getCamera();
+        
         float oldZoom = cam.zoom;
         cam.zoom = 1;
         cam.update();
@@ -112,7 +116,10 @@ public class SpacePanel extends Stage {
 
         cam.zoom = oldZoom;
         cam.update();
+    }
 
+    @Override
+    public void draw(){
         super.draw();
 
         if(Constants.DEBUG){

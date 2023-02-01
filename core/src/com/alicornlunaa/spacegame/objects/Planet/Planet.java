@@ -6,22 +6,27 @@ import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * The World object will hold the data for the world's tiles
@@ -48,8 +53,6 @@ public class Planet extends Celestial {
     private float physAccumulator;
     private HashMap<Vector2, Chunk> map = new HashMap<>();
     private TerrainGenerator generator;
-    private Texture atmosTexturePlanet;
-    private TextureRegionDrawable atmosSpritePlanet;
     private ArrayList<Entity> planetEnts = new ArrayList<>(); // Entities on the rectangular planet
     private Stack<Entity> leavingEnts = new Stack<>(); // Entities leaving the rectangular world
 
@@ -83,25 +86,10 @@ public class Planet extends Celestial {
     }
     
     private void generateAtmosphereSprite(){
-        pixmap = new Pixmap(500, 500, Format.RGBA8888);
+        pixmap = new Pixmap(1, 1, Format.RGBA8888);
         pixmap.setColor(atmosColor);
         pixmap.fill();
         atmosTexture = new Texture(pixmap);
-        pixmap.dispose();
-    }
-
-    private void generateAtmospherePlanetSprite(){
-        int imgRad = Math.min((int)atmosRadius * 2, 100);
-        pixmap = new Pixmap(imgRad, imgRad, Format.RGBA8888);
-
-        for(int y = 0; y < pixmap.getHeight(); y++){
-            Color c = new Color(atmosColor.r, atmosColor.g, atmosColor.b, atmosDensity * (y / (float)pixmap.getHeight()));
-            pixmap.setColor(c);
-            pixmap.drawLine(0, y, pixmap.getWidth(), y);
-        }
-
-        atmosTexturePlanet = new Texture(pixmap);
-        atmosSpritePlanet = new TextureRegionDrawable(atmosTexturePlanet);
         pixmap.dispose();
     }
 
@@ -122,7 +110,6 @@ public class Planet extends Celestial {
         // Create textures
         generateTerrainSprite();
         generateAtmosphereSprite();
-        generateAtmospherePlanetSprite();
     }
 
     // Constructor
@@ -225,9 +212,22 @@ public class Planet extends Celestial {
 
     public void drawWorld(Batch batch, float parentAlpha){
         // Draws the flat planar world
-        atmosSpritePlanet.draw(batch, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
+        Celestial occluder = universe.getParentCelestial(this);
+        Matrix3 globalToLocal = new Matrix3().translate(OrbitUtils.getUniverseSpacePosition(universe, this)).scl(getRadius()).inv();
+        Vector3 dirToStar = new Vector3(OrbitUtils.directionToNearestStar(universe, this), 0.0f);
+        ShaderProgram cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
 
-        // Draw each chunk rotated around, theta = x, r = y
+        batch.setShader(cartesianAtmosShader);
+        cartesianAtmosShader.setUniformf("u_atmosColor", atmosColor);
+        cartesianAtmosShader.setUniformf("u_starDirection", dirToStar);
+        cartesianAtmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
+        cartesianAtmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        cartesianAtmosShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
+        cartesianAtmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
+        batch.draw(atmosTexture, 0, 0, generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE, atmosRadius);
+        batch.setShader(null);
+
+        // Draw each chunk
         for(Chunk chunk : map.values()){
             chunk.draw(batch);
         }
@@ -247,49 +247,68 @@ public class Planet extends Celestial {
         while(physAccumulator >= Constants.TIME_STEP){
             planetWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
             physAccumulator -= Constants.TIME_STEP;
-        }
         
-        // Constrain entities to the world
-        float worldWidthPixels = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+            // Constrain entities to the world
+            float worldWidthPixels = generator.getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+    
+            for(Entity e : planetEnts){
+                if(e.getX() > worldWidthPixels){
+                    e.setX(e.getX() - worldWidthPixels);
+                } else if(e.getX() < 0){
+                    e.setX(e.getX() + worldWidthPixels);
+                }
+    
+                e.fixedUpdate(Constants.TIME_STEP);
+                applyDrag(e.getBody());
+                this.checkLeavePlanet(e);
+                
+                // Taken from Celestial.java to correctly apply the right force
+                float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
+                float force = Constants.GRAVITY_CONSTANT * ((e.getBody().getMass() * body.getMass()) / (orbitRadius * orbitRadius));
+                e.getBody().applyForceToCenter(0, -0.75f * force, true);
+            }
+        }
 
         for(Entity e : planetEnts){
-            if(e.getX() > worldWidthPixels){
-                e.setX(e.getX() - worldWidthPixels);
-            } else if(e.getX() < 0){
-                e.setX(e.getX() + worldWidthPixels);
-            }
-
-            e.act(delta);
-            applyDrag(e.getBody());
-            this.checkLeavePlanet(e);
-            
-            // Taken from Celestial.java to correctly apply the right force
-            float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
-            float force = Constants.GRAVITY_CONSTANT * ((e.getBody().getMass() * body.getMass()) / (orbitRadius * orbitRadius));
-            e.getBody().applyForceToCenter(0, -1 * force, true);
+            e.update(delta);
         }
 
         while(leavingEnts.size() > 0){
             Entity e  = leavingEnts.pop();
             this.delEntityWorld(e);
-            game.setScreen(game.spaceScene);
+
+            if(e instanceof Player || e instanceof Ship)
+                game.setScreen(game.spaceScene);
         }
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
-
+        
+        // Shade the planet in
+        Celestial occluder = universe.getParentCelestial(this);
+        Matrix3 globalToLocal = new Matrix3().translate(OrbitUtils.getUniverseSpacePosition(universe, this)).scl(getRadius()).inv();
+        Vector3 dirToStar = new Vector3(OrbitUtils.directionToNearestStar(universe, this), 0.0f);
         ShaderProgram atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
-        Vector2 dirToNearestStar = universe.getDirToNearestStar(this);
 
+        batch.setShader(terrainShader);
+        terrainShader.setUniformf("u_planetColor", terrainColor);
+        terrainShader.setUniformf("u_starDirection", dirToStar);
+        terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        terrainShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
+        terrainShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
+
         batch.setShader(atmosShader);
-        atmosShader.setUniformf("atmosColor", atmosColor.r, atmosColor.g, atmosColor.b);
-        atmosShader.setUniformf("starDirection", dirToNearestStar.x, -dirToNearestStar.y, 0);
-        atmosShader.setUniformf("atmosPlanetRatio", 0.42f);
-        batch.draw(atmosTexture, atmosRadius * -1, atmosRadius * -1, atmosRadius * 2, atmosRadius * 2);
+        atmosShader.setUniformf("u_atmosColor", atmosColor);
+        atmosShader.setUniformf("u_starDirection", dirToStar);
+        atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
+        atmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        atmosShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
+        atmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
+        batch.draw(atmosTexture, atmosRadius * -1.05f, atmosRadius * -1.05f, atmosRadius * 2.1f, atmosRadius * 2.1f);
         batch.setShader(null);
     }
 
@@ -328,7 +347,9 @@ public class Planet extends Celestial {
         if(dist < atmosRadius * 0.95f){
             // Move it into this world
             this.addEntityWorld(e);
-            game.setScreen(new PlanetScene(game, this));
+
+            if(e instanceof Player || e instanceof Ship)
+                game.setScreen(new PlanetScene(game, this));
 
             return true;
         }

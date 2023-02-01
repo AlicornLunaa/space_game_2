@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -20,7 +21,7 @@ public class PlanetPanel extends Stage {
     private final App game;
 
     public Planet planet;
-    // private float worldWidthPixels;
+    private float worldWidthPixels;
 
     // Constructor
     public PlanetPanel(final App game, final Planet planet){
@@ -28,7 +29,7 @@ public class PlanetPanel extends Stage {
         this.game = game;
 
         this.planet = planet;
-        // worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
+        worldWidthPixels = planet.getGenerator().getWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
         // Controls
         this.addListener(new InputListener(){
@@ -40,7 +41,7 @@ public class PlanetPanel extends Stage {
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 OrthographicCamera cam = (OrthographicCamera)getCamera();
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 1.5f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 10.5f);
 
                 return true;
             }
@@ -67,7 +68,7 @@ public class PlanetPanel extends Stage {
     private void setActiveChunks(){
         // Get player position, convert it to chunk coordinates
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        Vector2 playerPos = new Vector2(game.player.getPosition());
+        Vector2 playerPos = game.player.getPosition().cpy();
         float chunkWorldSize = (Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
 
         int chunkX = (int)Math.ceil(playerPos.x / chunkWorldSize) - 1;
@@ -86,7 +87,8 @@ public class PlanetPanel extends Stage {
                     chunk = planet.createChunk(chunkXWrapped, chunkYWrapped);
                 }
                 
-                chunk.setVisible(isChunkVisible(chunk));
+                // chunk.setVisible(isChunkVisible(chunk));
+                chunk.setVisible(true);
                 chunk.setActive(Math.abs(x) <= Chunk.ACTIVE_DISTANCE && Math.abs(y) <= Chunk.ACTIVE_DISTANCE);
             }
         }
@@ -113,15 +115,16 @@ public class PlanetPanel extends Stage {
 
         // Draw every map tile
         Batch batch = getBatch();
-        batch.begin();
         batch.setProjectionMatrix(getCamera().combined);
+        batch.setTransformMatrix(new Matrix4());
+
+        batch.begin();
+        batch.setTransformMatrix(new Matrix4().translate(-worldWidthPixels, 0, 0));
         planet.drawWorld(batch, batch.getColor().a);
-        // batch.setProjectionMatrix(getCamera().combined.cpy().translate(worldWidthPixels, 0, 0).scl(1, 1, 1));
-        // planet.drawWorld(batch, batch.getColor().a);
-        // batch.setProjectionMatrix(getCamera().combined.cpy().translate(-worldWidthPixels, 0, 0).scl(1, 1, 1));
-        // planet.drawWorld(batch, batch.getColor().a);
-        // batch.setProjectionMatrix(getCamera().combined);
-        game.player.draw(batch, batch.getColor().a);
+        batch.setTransformMatrix(new Matrix4().translate(worldWidthPixels, 0, 0));
+        planet.drawWorld(batch, batch.getColor().a);
+        batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
+        planet.drawWorld(batch, batch.getColor().a);
         batch.end();
 
         // Debug rendering

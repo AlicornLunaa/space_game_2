@@ -43,6 +43,7 @@ public class SpaceScene implements Screen {
         spacePanel.act(delta);
         uiPanel.act(delta);
 
+        spacePanel.drawSkybox();
         spacePanel.draw();
         uiPanel.draw();
     }

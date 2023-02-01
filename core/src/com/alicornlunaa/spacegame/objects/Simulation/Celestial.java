@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -75,13 +76,19 @@ public class Celestial extends Entity {
     public void setCelestialParent(Celestial c){ parent = c; }
 
     public float getSphereOfInfluence(){
-        if(parent == null) return radius * 12;
-        return radius * 8;
+        if(getCelestialParent() == null) return radius * 200; // Star radius
+
+        ConicSection c = new ConicSection(game, getCelestialParent(), this);
+        return (float)(c.getSemiMajorAxis() * Math.pow(getBody().getMass() / getCelestialParent().getBody().getMass(), 2.0 / 5.0)) * Constants.PPM;
     }
 
-    public Matrix3 getUniverseTransform(){
-        if(parent == null) return new Matrix3().translate(getPosition());
-        return parent.getUniverseTransform().mul(new Matrix3().translate(getPosition()));
+    public Matrix3 getUniverseSpaceTransform(){
+        if(parent == null) return new Matrix3().    translate(getPosition());
+        return parent.getUniverseSpaceTransform().mul(new Matrix3().translate(getPosition()));
+    }
+
+    public Matrix3 getSystemSpaceTransform(){
+        return getUniverseSpaceTransform().inv();
     }
 
     @Override
@@ -99,17 +106,18 @@ public class Celestial extends Entity {
         s.circle(0, 0, getRadius(), 500);
         s.end();
         
-        game.debug.render(influenceWorld, batch.getProjectionMatrix().cpy().scl(Constants.PPM));
+        game.debug.render(influenceWorld, batch.getTransformMatrix().cpy().scl(Constants.PPM));
 
         batch.begin();
     }
 
+    @Override
     public void update(float delta){
         // Step the physics on the world
-        physAccumulator += Math.min(delta, 0.25f) + Constants.TIME_WARP;
-        while(physAccumulator >= Constants.TIME_STEP + Constants.TIME_WARP){
-            influenceWorld.step(Constants.TIME_STEP + Constants.TIME_WARP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP + Constants.TIME_WARP;
+        physAccumulator += Math.min(delta, 0.25f);
+        while(physAccumulator >= Constants.TIME_STEP){
+            influenceWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+            physAccumulator -= Constants.TIME_STEP;
         }
     }
 
@@ -119,7 +127,6 @@ public class Celestial extends Entity {
         float orbitRadius = b.getPosition().len(); // Entity radius in physics scale
         Vector2 direction = b.getPosition().cpy().nor().scl(-1);
         float force = Constants.GRAVITY_CONSTANT * ((b.getMass() * body.getMass()) / (orbitRadius * orbitRadius));
-
         return direction.scl(force);
     }
 

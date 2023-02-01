@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.Dev.PartEditor.PartEditor;
 import com.alicornlunaa.spacegame.scenes.Dev.PhysicsEditor.PhysicsEditor;
 import com.badlogic.gdx.Gdx;
@@ -40,7 +41,7 @@ public class ConsoleWidget extends VisWindow {
             game.spaceScene.spacePanel.ship.setRotation(Integer.parseInt(args[1]));
         } else if(args[0].equals("orbit")){
             game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
-            game.spaceScene.spacePanel.universe.createEntityOrbit(game.spaceScene.spacePanel.ship);
+            OrbitUtils.createOrbit(game.spaceScene.spacePanel.universe, game.spaceScene.spacePanel.ship);
         } else if(args[0].equals("set_timewarp")){
             game.spaceScene.spacePanel.universe.setTimewarp(Float.parseFloat(args[1]));
         } else if(args[0].equals("reload_shaders")){

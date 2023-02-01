@@ -4,6 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Ship.interior.Interior;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -35,6 +36,21 @@ public class TestScreen implements Screen {
         world = new World(new Vector2(), true);
         ship = new Ship(game, world, 0, 0, 0);
         interior = new Interior(game, ship);
+
+        System.out.println("");
+        // Orbit o = new Orbit(
+        //     new Vector3(-5060f, 549f, -4419f),
+        //     new Vector3(-3.53f, -5.97f, 3.3f),
+        //     (float)(5.97219e24)
+        // );
+        // Orbit o = new Orbit(
+        //     new Vector3(154.252550f, 105.699660f, 0.f),
+        //     new Vector3(-4.779790f, 9.428806f, 0),
+        //     (float)(27611.654000f)
+        // );
+        // System.out.println(o);
+
+        Gdx.app.exit();
     }
 
     @Override
