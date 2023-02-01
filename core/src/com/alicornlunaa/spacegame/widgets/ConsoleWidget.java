@@ -4,6 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.Dev.PartEditor.PartEditor;
 import com.alicornlunaa.spacegame.scenes.Dev.PhysicsEditor.PhysicsEditor;
+import com.alicornlunaa.spacegame.scenes.EditorScene.EditorScene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
@@ -49,6 +50,8 @@ public class ConsoleWidget extends VisWindow {
             game.setScreen(new PartEditor(game));
         } else if(args[0].equals("phys_editor")){
             game.setScreen(new PhysicsEditor(game));
+        } else if(args[0].equals("ship_editor")){
+            game.setScreen(new EditorScene(game));
         }
 
         commandBar.setText("");

@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -35,6 +36,30 @@ public class MapPanel extends Stage {
     private Array<ConicSection> orbits = new Array<>();
     private Array<PatchedConicSolver> patchedConics = new Array<>();
 
+    // Private functoins
+    /**
+     * Creates the paths to show the predicted location of something going
+     */
+    private void initiatePaths(){
+        Universe u = game.spaceScene.spacePanel.universe;
+        
+        for(Entity e : u.getEntities()){
+            Celestial parent = u.getParentCelestial(e);
+
+            if(parent != null && e.getDriving() == null){
+                patchedConics.add(new PatchedConicSolver(game, u, e));
+            }
+        }
+
+        for(Celestial c : u.getCelestials()){
+            Celestial parent = u.getParentCelestial(c);
+
+            if(parent != null){
+                orbits.add(new ConicSection(game, parent, c));
+            }
+        }
+    }
+
     // Constructor
     public MapPanel(final App game, final Screen previousScreen){
         super(new ScreenViewport());
@@ -49,22 +74,8 @@ public class MapPanel extends Stage {
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
 
-        // Create paths from entities
-        Universe u = game.spaceScene.spacePanel.universe;
-        for(Entity e : u.getEntities()){
-            Celestial parent = u.getParentCelestial(e);
-
-            if(parent != null && e.getDriving() == null){
-                patchedConics.add(new PatchedConicSolver(game, u, e));
-            }
-        }
-        for(Celestial c : u.getCelestials()){
-            Celestial parent = u.getParentCelestial(c);
-
-            if(parent != null){
-                orbits.add(new ConicSection(game, parent, c));
-            }
-        }
+        // Initializations
+        initiatePaths();
 
         // Controls
         this.addListener(new InputListener(){
@@ -81,7 +92,8 @@ public class MapPanel extends Stage {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY * 50), 20.0f), 35000.0f);
+                float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * cam.zoom * amountY;
+                cam.zoom = Math.min(Math.max(cam.zoom + speed, Constants.MAP_VIEW_MIN_ZOOM), Constants.MAP_VIEW_MAX_ZOOM);
                 return true;
             }
         });
@@ -92,6 +104,7 @@ public class MapPanel extends Stage {
     public void act(float delta){
         spacePanel.act();
 
+        // Keep the predicted paths up to date
         for(ConicSection o : orbits){
             o.calculate();
         }
@@ -104,14 +117,10 @@ public class MapPanel extends Stage {
 
     @Override
     public void draw(){
+        // Draw stars in the map view
         spacePanel.drawSkybox();
 
-        Batch batch = getBatch();
-        batch.begin();
-        batch.setProjectionMatrix(cam.combined);
-        batch.setTransformMatrix(new Matrix4());
-
-        batch.end();
+        // Begin a shape drawing pass
         game.shapeRenderer.setProjectionMatrix(cam.combined);
         game.shapeRenderer.begin(ShapeType.Filled);
         for(ConicSection o : orbits){
@@ -121,6 +130,11 @@ public class MapPanel extends Stage {
             cs.draw(game.shapeRenderer);
         }
         game.shapeRenderer.end();
+
+        // Begin a batch renderer pass
+        Batch batch = getBatch();
+        batch.setProjectionMatrix(cam.combined);
+        batch.setTransformMatrix(new Matrix4());
         batch.begin();
 
         Vector2 size = new Vector2(512, 512).scl(1.f / 20).scl(cam.zoom);
@@ -140,9 +154,9 @@ public class MapPanel extends Stage {
         );
 
         batch.end();
-        super.draw();
 
-        spacePanel.draw();
+        super.draw();
+        spacePanel.draw(); // Draw planets
     }
     
     @Override
