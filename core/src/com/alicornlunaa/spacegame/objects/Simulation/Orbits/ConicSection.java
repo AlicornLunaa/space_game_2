@@ -334,7 +334,7 @@ public class ConicSection {
         }
     }
 
-    public void draw(ShapeRenderer renderer, double startAnomaly, double endAnomaly, Color c1, Color c2){
+    public void draw(ShapeRenderer renderer, float zoom, double startAnomaly, double endAnomaly, Color c1, Color c2){
         if(parent == null) return;
 
         double eaStart = meanAnomalyToEccentricAnomaly(startAnomaly * (inclination > Math.PI / 2 ? -1.0 : 1.0));
@@ -357,7 +357,7 @@ public class ConicSection {
                 if(p1.len() > getParent().getSphereOfInfluence()) continue;
                 if(p2.len() > getParent().getSphereOfInfluence()) continue;
 
-                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 1000, c1, c2);
+                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 1.5f * zoom, c1, c2);
             }
         } else {
             // Elliptic or circular
@@ -372,14 +372,14 @@ public class ConicSection {
                 Vector2 p2 = new Vector2((float)(Math.cos(ang2) * semiMajorAxis + center.x), (float)(Math.sin(ang2) * semiMinorAxis + center.y)).scl(Constants.PPM);
                 Color mC1 = c1.cpy().lerp(c2, i / (Constants.ORBIT_RESOLUTION - 1.f));
                 Color mC2 = c1.cpy().lerp(c2, (i + 1) / (Constants.ORBIT_RESOLUTION - 1.f));
-                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 1000, mC1, mC2);
+                renderer.rectLine(p1.x, p1.y, p2.x, p2.y, 1.5f * zoom, mC1, mC2);
             }
         }
     }
 
-    public void draw(ShapeRenderer renderer){
+    public void draw(ShapeRenderer renderer, float zoom){
         renderer.setColor(Color.CYAN);
-        draw(renderer, 0.0, 2.0 * Math.PI, Color.CYAN, Color.CYAN);
+        draw(renderer, zoom, 0.0, 2.0 * Math.PI, Color.CYAN, Color.CYAN);
     }
 
 }

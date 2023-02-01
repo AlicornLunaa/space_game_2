@@ -124,10 +124,10 @@ public class MapPanel extends Stage {
         game.shapeRenderer.setProjectionMatrix(cam.combined);
         game.shapeRenderer.begin(ShapeType.Filled);
         for(ConicSection o : orbits){
-            o.draw(game.shapeRenderer);
+            o.draw(game.shapeRenderer, cam.zoom);
         }
         for(PatchedConicSolver cs : patchedConics){
-            cs.draw(game.shapeRenderer);
+            cs.draw(game.shapeRenderer, cam.zoom);
         }
         game.shapeRenderer.end();
 

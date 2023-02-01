@@ -273,7 +273,7 @@ public class PatchedConicSolver {
         }
     }
 
-    public void draw(ShapeRenderer renderer){
+    public void draw(ShapeRenderer renderer, float zoom){
         renderer.setColor(Color.GOLD);
 
         Color lastColor = Color.RED.cpy();
@@ -285,13 +285,13 @@ public class PatchedConicSolver {
             Color color = lastColor.cpy().lerp(Color.GREEN, b + a);
 
             if(anomalies.size() > i){
-                c.draw(renderer, c.getInitialMeanAnomaly(), anomalies.get(i), lastColor, color);
+                c.draw(renderer, zoom, c.getInitialMeanAnomaly(), anomalies.get(i), lastColor, color);
 
                 Vector2 p = c.getPosition(anomalies.get(i));
                 renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()));
                 renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
             } else {
-                c.draw(renderer);
+                c.draw(renderer, zoom);
             }
 
             lastColor = color.cpy();
