@@ -323,6 +323,12 @@ public class Universe extends Actor {
         }
     }
 
+    public void setCelestialOpacity(float a){
+        for(Celestial c : getCelestials()){
+            c.setCelestialOpacity(a);
+        }
+    }
+
     /**
      * Render everything at universal scale
      */

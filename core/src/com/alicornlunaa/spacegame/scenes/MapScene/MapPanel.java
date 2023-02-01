@@ -135,7 +135,7 @@ public class MapPanel extends Stage {
         game.shapeRenderer.end();
 
         // Get value dictating the opacity of simplified icons
-        celestialOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
+        celestialOpacity = 1 - Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
         entityOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
 
         // Begin a batch renderer pass
@@ -164,6 +164,7 @@ public class MapPanel extends Stage {
         batch.end();
 
         super.draw();
+        spacePanel.universe.setCelestialOpacity(celestialOpacity);
         spacePanel.draw(); // Draw planets
     }
     

@@ -31,6 +31,7 @@ public class Celestial extends Entity {
 
     // Planet variables
     protected float radius;
+    protected float opacity = 1.f;
 
     // Physics variables
     protected final World influenceWorld;
@@ -75,6 +76,7 @@ public class Celestial extends Entity {
     public ArrayList<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }
     public void setCelestialParent(Celestial c){ parent = c; }
+    public void setCelestialOpacity(float a){ opacity = a; }
 
     public float getSphereOfInfluence(){
         if(getCelestialParent() == null) return radius * 200; // Star radius
