@@ -25,8 +25,8 @@ public class Constants {
     public static final float MAP_VIEW_ZOOM_SENSITIVITY = 0.2f;
     public static final float MAP_VIEW_MIN_ZOOM = 1;
     public static final float MAP_VIEW_MAX_ZOOM = 3000;
-    public static final float MAP_VIEW_SIMPLE_ICONS_CELESTIAL = 1400;
-    public static final float MAP_VIEW_SIMPLE_ICONS_ENTS = 500;
+    public static final float MAP_VIEW_SIMPLE_ICONS_CELESTIAL = 1000;
+    public static final float MAP_VIEW_SIMPLE_ICONS_ENTS = 20;
 
     // Debug constants
     public static boolean DEBUG = true;

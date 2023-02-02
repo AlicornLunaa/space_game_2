@@ -11,6 +11,7 @@ import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -123,20 +124,25 @@ public class MapPanel extends Stage {
         // Draw stars in the map view
         spacePanel.drawSkybox();
 
+        // Get value dictating the opacity of simplified icons
+        celestialOpacity = 1 - Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
+        entityOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
+
         // Begin a shape drawing pass
         game.shapeRenderer.setProjectionMatrix(cam.combined);
         game.shapeRenderer.begin(ShapeType.Filled);
         for(ConicSection o : orbits){
             o.draw(game.shapeRenderer, cam.zoom);
+
+            if(celestialOpacity > 0.5f) continue;
+            game.shapeRenderer.setTransformMatrix(new Matrix4().set(((Celestial)o.getChild()).getUniverseSpaceTransform()));
+            game.shapeRenderer.setColor(Color.TEAL);
+            game.shapeRenderer.circle(0, 0, ((Celestial)o.getChild()).getRadius() * 3);
         }
         for(PatchedConicSolver cs : patchedConics){
             cs.draw(game.shapeRenderer, cam.zoom);
         }
         game.shapeRenderer.end();
-
-        // Get value dictating the opacity of simplified icons
-        celestialOpacity = 1 - Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
-        entityOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
 
         // Begin a batch renderer pass
         Batch batch = getBatch();
@@ -164,7 +170,6 @@ public class MapPanel extends Stage {
         batch.end();
 
         super.draw();
-        spacePanel.universe.setCelestialOpacity(celestialOpacity);
         spacePanel.draw(); // Draw planets
     }
     
