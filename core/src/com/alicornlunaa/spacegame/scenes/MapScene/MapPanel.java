@@ -136,7 +136,7 @@ public class MapPanel extends Stage {
 
             if(celestialOpacity > 0.5f) continue;
             game.shapeRenderer.setTransformMatrix(new Matrix4().set(((Celestial)o.getChild()).getUniverseSpaceTransform()));
-            game.shapeRenderer.setColor(Color.TEAL);
+            game.shapeRenderer.setColor(Color.CYAN);
             game.shapeRenderer.circle(0, 0, ((Celestial)o.getChild()).getRadius() * 3);
         }
         for(PatchedConicSolver cs : patchedConics){
