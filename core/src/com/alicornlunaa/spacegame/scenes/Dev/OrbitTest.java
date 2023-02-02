@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.Dev;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSectionOld;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.EllipticalConic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -27,7 +28,7 @@ public class OrbitTest implements Screen {
     private OrthographicCamera cam;
     private Stage stage;
 
-    private ConicSectionOld testConic;
+    private EllipticalConic testConic;
 
     public OrbitTest(final App game) {
         this.game = game;
@@ -35,6 +36,8 @@ public class OrbitTest implements Screen {
         cam = (OrthographicCamera) stage.getCamera();
         cam.position.set(0, 0, 0);
         cam.update();
+
+        testConic = new EllipticalConic(100, 70, 0.01, 0.1, 0, 0);
 
         stage.addListener(new InputListener() {
             private float dx = 0;
@@ -97,6 +100,7 @@ public class OrbitTest implements Screen {
         renderer.set(ShapeType.Line);
         renderer.setColor(Color.LIME);
         renderer.circle(0, 0, 55);
+        testConic.draw(renderer, 5);
 
         renderer.end();
         renderer.setAutoShapeType(false);

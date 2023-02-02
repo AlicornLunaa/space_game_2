@@ -239,6 +239,7 @@ public abstract class GenericConic {
         }
 
         // No shape defined, its generic. Do a circle
+        renderer.setColor(startColor);
         renderer.circle(0, 0, (float)a);
     }
 
