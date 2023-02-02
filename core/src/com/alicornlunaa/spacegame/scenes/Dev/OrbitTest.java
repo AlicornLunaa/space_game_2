@@ -97,10 +97,7 @@ public class OrbitTest implements Screen {
         renderer.setColor(Color.RED);
         renderer.circle(0, 0, 50);
 
-        renderer.set(ShapeType.Line);
-        renderer.setColor(Color.LIME);
-        renderer.circle(0, 0, 55);
-        testConic.draw(renderer, 5);
+        testConic.draw(renderer, 1);
 
         renderer.end();
         renderer.setAutoShapeType(false);

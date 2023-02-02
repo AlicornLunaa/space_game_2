@@ -2,8 +2,11 @@ package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.RootSolver;
 import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public class EllipticalConic extends GenericConic {
@@ -46,6 +49,28 @@ public class EllipticalConic extends GenericConic {
     @Override
     public double meanAnomalyToTime(double ma) {
         return (ma / Math.sqrt(mu / Math.pow(Math.abs(a), 3.0)));
+    }
+
+    @Override
+    public void draw(ShapeRenderer renderer, float lineWidth){
+        super.draw(renderer, lineWidth);
+        
+        // Elliptic or circular
+        double linearE = a * e;
+        double semiMinorAxis = (Math.sqrt(Math.pow(a, 2.0) - Math.pow(linearE, 2.0)));
+
+        for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
+            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
+            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
+
+            Vector2 p1 = new Vector2((float)(Math.cos(ang1) * a - linearE), (float)(Math.sin(ang1) * semiMinorAxis));//.scl(Constants.PPM);
+            Vector2 p2 = new Vector2((float)(Math.cos(ang2) * a - linearE), (float)(Math.sin(ang2) * semiMinorAxis));//.scl(Constants.PPM);
+
+            Color segmentStartColor = startColor.cpy().lerp(endColor, (float)ang1);
+            Color segmentEndColor = startColor.cpy().lerp(endColor, (float)ang2);
+
+            renderer.rectLine(p1.x, p1.y, p2.x, p2.y, lineWidth, segmentStartColor, segmentEndColor);
+        }
     }
 
 }

@@ -39,7 +39,7 @@ public abstract class GenericConic {
 
     protected boolean dashed = false;
     protected Color startColor = Color.CYAN;
-    protected Color endColor = Color.CYAN;
+    protected Color endColor = Color.LIME;
 
     // Constructor
     public GenericConic(double parentMass, double a, double e, double w, double v, double i){
@@ -237,10 +237,6 @@ public abstract class GenericConic {
         } else {
             renderer.setTransformMatrix(new Matrix4());
         }
-
-        // No shape defined, its generic. Do a circle
-        renderer.setColor(startColor);
-        renderer.circle(0, 0, (float)a);
     }
 
     // Getters
