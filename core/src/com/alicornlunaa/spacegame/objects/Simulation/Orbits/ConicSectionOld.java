@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 /** One conic section of an orbit */
-public class ConicSection {
+public class ConicSectionOld {
 
     // Variables
     private Celestial parent;
@@ -33,7 +33,7 @@ public class ConicSection {
     private TextureRegion periapsisMarker;
 
     // Constructor
-    public ConicSection(final App game, Celestial parent, Entity child, Vector2 position, Vector2 velocity){
+    public ConicSectionOld(final App game, Celestial parent, Entity child, Vector2 position, Vector2 velocity){
         this.parent = parent;
         this.child = child;
 
@@ -43,7 +43,7 @@ public class ConicSection {
         calculate(position, velocity);
     }
 
-    public ConicSection(final App game, Celestial parent, Entity child){
+    public ConicSectionOld(final App game, Celestial parent, Entity child){
         this(game, parent, child, child.getBody().getPosition(), child.getBody().getLinearVelocity());
     }
 

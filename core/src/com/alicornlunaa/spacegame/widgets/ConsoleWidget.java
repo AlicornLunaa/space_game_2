@@ -34,23 +34,23 @@ public class ConsoleWidget extends VisWindow {
     private void handleCmd(String cmd){
         String[] args = cmd.split("\\s+");
         
-        if(args[0].equals("load_ship")){
+        if(args[0].equals("loadship")){
             game.spaceScene.spacePanel.ship.load(args[1]);
-        } else if(args[0].equals("set_pos")){
+        } else if(args[0].equals("setpos")){
             game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-        } else if(args[0].equals("set_rot")){
+        } else if(args[0].equals("setrot")){
             game.spaceScene.spacePanel.ship.setRotation(Integer.parseInt(args[1]));
         } else if(args[0].equals("orbit")){
             game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
             OrbitUtils.createOrbit(game.spaceScene.spacePanel.universe, game.spaceScene.spacePanel.ship);
-        } else if(args[0].equals("set_timewarp")){
+        } else if(args[0].equals("settimewarp")){
             game.spaceScene.spacePanel.universe.setTimewarp(Float.parseFloat(args[1]));
-        } else if(args[0].equals("reload_shaders")){
-        } else if(args[0].equals("part_editor")){
+        } else if(args[0].equals("reloadshaders")){
+        } else if(args[0].equals("parteditor")){
             game.setScreen(new PartEditor(game));
-        } else if(args[0].equals("phys_editor")){
+        } else if(args[0].equals("physeditor")){
             game.setScreen(new PhysicsEditor(game));
-        } else if(args[0].equals("ship_editor")){
+        } else if(args[0].equals("shipeditor")){
             game.setScreen(new EditorScene(game));
         }
 

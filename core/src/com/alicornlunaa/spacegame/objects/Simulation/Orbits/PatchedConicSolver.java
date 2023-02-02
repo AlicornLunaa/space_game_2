@@ -28,8 +28,8 @@ public class PatchedConicSolver {
     private final App game;
     private final Universe universe;
     private Entity entity;
-    private HashMap<Celestial, ConicSection> celestialConics = new HashMap<>();
-    private ArrayList<ConicSection> conics = new ArrayList<>();
+    private HashMap<Celestial, ConicSectionOld> celestialConics = new HashMap<>();
+    private ArrayList<ConicSectionOld> conics = new ArrayList<>();
     private ArrayList<Double> anomalies = new ArrayList<>();
 
     // Private functions
@@ -38,7 +38,7 @@ public class PatchedConicSolver {
      */
     private void integrateCelestialConics(){
         for(Celestial child : universe.getCelestials()){
-            celestialConics.put(child, new ConicSection(game, child.getCelestialParent(), child));
+            celestialConics.put(child, new ConicSectionOld(game, child.getCelestialParent(), child));
         }
     }
 
@@ -48,7 +48,7 @@ public class PatchedConicSolver {
      * @param parentConic The conic to test against. This is a celestial.
      * @return Successful finding the start
      */
-    private boolean getPatchAnomaly(final ConicSection childConic, final ConicSection parentConic, final double currentTime){
+    private boolean getPatchAnomaly(final ConicSectionOld childConic, final ConicSectionOld parentConic, final double currentTime){
         // Variables
         final Celestial celestial = (Celestial)parentConic.getChild();
         double intersectionGuess = -1.f;
@@ -91,14 +91,14 @@ public class PatchedConicSolver {
      * @param depth How deep the approximation has gone
      * @param currentTime Current time for this iteration
      */
-    private void checkSOITransition(final Celestial parent, final ConicSection section, int depth, double currentTime){
+    private void checkSOITransition(final Celestial parent, final ConicSectionOld section, int depth, double currentTime){
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(parent == null) return;
         if(depth > Constants.PATCHED_CONIC_LIMIT) return;
         if(section.getPeriapsis() < section.getParent().getRadius() / Constants.PPM) return;
 
         if((section.getEccentricity() >= 1.f || Math.abs(section.getApoapsis()) >= parent.getSphereOfInfluence() / 2 / Constants.PPM) && parent.getCelestialParent() != null){
-            ConicSection parentConic = celestialConics.get(parent);
+            ConicSectionOld parentConic = celestialConics.get(parent);
             double intersectionGuess = -1.f;
             
             // Find first intersection by the changing value
@@ -129,7 +129,7 @@ public class PatchedConicSolver {
                 Vector2 velAtSOITransfer = section.getVelocity(intersection).add(parentConic.getVelocity(celestialAnomaly));
 
                 // Add new conic relative to the child as a new parent
-                conics.add(new ConicSection(game, parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
+                conics.add(new ConicSectionOld(game, parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
                 checkSOITransition(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(intersection - section.getInitialMeanAnomaly()));
                 return;
             }
@@ -137,7 +137,7 @@ public class PatchedConicSolver {
 
         for(final Celestial child : parent.getChildren()){
             //ඞ
-            ConicSection celestialConic = celestialConics.get(child);
+            ConicSectionOld celestialConic = celestialConics.get(child);
 
             if(getPatchAnomaly(section, celestialConic, currentTime)){
                 double endAnomaly = anomalies.get(anomalies.size() - 1);
@@ -147,7 +147,7 @@ public class PatchedConicSolver {
                 Vector2 velAtSOITransfer = section.getVelocity(endAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
                 
                 // Add new conic relative to the child as a new parent
-                conics.add(new ConicSection(game, child, entity, posAtSOITransfer, velAtSOITransfer));
+                conics.add(new ConicSectionOld(game, child, entity, posAtSOITransfer, velAtSOITransfer));
                 checkSOITransition(child, conics.get(conics.size() - 1), depth + 1, currentTime + section.meanAnomalyToTime(endAnomaly - section.getInitialMeanAnomaly()));
                 return;
             }
@@ -170,21 +170,21 @@ public class PatchedConicSolver {
 
         // Get first orbit line
         Celestial parent = universe.getParentCelestial(entity);
-        conics.add(new ConicSection(game, parent, entity));
+        conics.add(new ConicSectionOld(game, parent, entity));
 
         // Search the first orbit for an intersection with a new sphere of influence
         integrateCelestialConics();
         checkSOITransition(parent, conics.get(0), 0, 0);
     }
 
-    public ConicSection getConicAtEpoch(float t){
+    public ConicSectionOld getConicAtEpoch(float t){
         if(conics.size() == 0) return null;
 
         // Get which conic will be intercepted at this time
         double timeIntoFuture = 0.0;
         int conicIndex = 0;
         while(anomalies.size() > conicIndex){
-            ConicSection c = conics.get(conicIndex);
+            ConicSectionOld c = conics.get(conicIndex);
             double normalizedInitAnomaly = (2.0 * Math.PI) + (c.getInitialMeanAnomaly() % (2.0 * Math.PI));
             double normalizedAnomaly = (2.0 * Math.PI) + (anomalies.get(conicIndex) % (2.0 * Math.PI));
             double timeToIntersection = c.meanAnomalyToTime(Math.abs(normalizedInitAnomaly - normalizedAnomaly));
@@ -213,7 +213,7 @@ public class PatchedConicSolver {
         double timeIntoFuture = 0.0;
         int conicIndex = 0;
         while(anomalies.size() > conicIndex){
-            ConicSection c = conics.get(conicIndex);
+            ConicSectionOld c = conics.get(conicIndex);
             double normalizedInitAnomaly = (2.0 * Math.PI) + (c.getInitialMeanAnomaly() % (2.0 * Math.PI));
             double normalizedAnomaly = (2.0 * Math.PI) + (anomalies.get(conicIndex) % (2.0 * Math.PI));
             double timeToIntersection = c.meanAnomalyToTime(Math.abs(normalizedInitAnomaly - normalizedAnomaly));
@@ -227,7 +227,7 @@ public class PatchedConicSolver {
             }
         }
 
-        ConicSection c = conics.get(conicIndex);
+        ConicSectionOld c = conics.get(conicIndex);
         double anomalyForConic = c.timeToMeanAnomaly(t - timeIntoFuture) + c.getInitialMeanAnomaly();
         return c.getPosition(anomalyForConic);
     }
@@ -239,7 +239,7 @@ public class PatchedConicSolver {
         double timeIntoFuture = 0.0;
         int conicIndex = 0;
         while(anomalies.size() > conicIndex){
-            ConicSection c = conics.get(conicIndex);
+            ConicSectionOld c = conics.get(conicIndex);
             double normalizedInitAnomaly = (2.0 * Math.PI) + (c.getInitialMeanAnomaly() % (2.0 * Math.PI));
             double normalizedAnomaly = (2.0 * Math.PI) + (anomalies.get(conicIndex) % (2.0 * Math.PI));
             double timeToIntersection = c.meanAnomalyToTime(Math.abs(normalizedInitAnomaly - normalizedAnomaly));
@@ -254,7 +254,7 @@ public class PatchedConicSolver {
         }
         
         // Start at the first conic
-        ConicSection c = conics.get(conicIndex);
+        ConicSectionOld c = conics.get(conicIndex);
         double anomalyForConic = c.timeToMeanAnomaly(t - timeIntoFuture) + c.getInitialMeanAnomaly();
         return c.getVelocity(anomalyForConic);
     }
@@ -263,7 +263,7 @@ public class PatchedConicSolver {
 
     public void draw(Batch batch){
         for(int i = 0; i < conics.size(); i++){
-            ConicSection c = conics.get(i);
+            ConicSectionOld c = conics.get(i);
 
             if(anomalies.size() > i){
                 c.draw(batch, c.getInitialMeanAnomaly(), anomalies.get(i));
@@ -281,7 +281,7 @@ public class PatchedConicSolver {
         float b = 0.f;
 
         for(int i = 0; i < conics.size(); i++){
-            ConicSection c = conics.get(i);
+            ConicSectionOld c = conics.get(i);
             Color color = lastColor.cpy().lerp(Color.GREEN, b + a);
 
             if(anomalies.size() > i){

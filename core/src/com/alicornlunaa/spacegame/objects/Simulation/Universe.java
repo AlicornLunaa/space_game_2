@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSectionOld;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -34,7 +34,7 @@ public class Universe extends Actor {
 
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
-    private Array<ConicSection> celestialPaths = new Array<>();
+    private Array<ConicSectionOld> celestialPaths = new Array<>();
     private Array<PatchedConicSolver> entityPaths = new Array<>();
 
     // Private functions
@@ -182,7 +182,7 @@ public class Universe extends Actor {
             for(Celestial c : celestials){
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
-                ConicSection path = new ConicSection(game, parent, c);
+                ConicSectionOld path = new ConicSectionOld(game, parent, c);
                 celestialPaths.add(path);
             }
         }
@@ -281,7 +281,7 @@ public class Universe extends Actor {
                 physAccumulator -= Constants.TIME_STEP;
 
                 for(int i = 0; i < celestialPaths.size; i++){
-                    ConicSection path = celestialPaths.get(i);
+                    ConicSectionOld path = celestialPaths.get(i);
                     Entity e = path.getChild();
     
                     if(e.getDriving() != null) continue;

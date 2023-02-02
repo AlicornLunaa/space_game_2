@@ -4,7 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSection;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSectionOld;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
@@ -37,7 +37,7 @@ public class MapPanel extends Stage {
     private float entityOpacity = 0.f;
 
     private TextureRegion shipIcon;
-    private Array<ConicSection> orbits = new Array<>();
+    private Array<ConicSectionOld> orbits = new Array<>();
     private Array<PatchedConicSolver> patchedConics = new Array<>();
 
     // Private functoins
@@ -59,7 +59,7 @@ public class MapPanel extends Stage {
             Celestial parent = u.getParentCelestial(c);
 
             if(parent != null){
-                orbits.add(new ConicSection(game, parent, c));
+                orbits.add(new ConicSectionOld(game, parent, c));
             }
         }
     }
@@ -109,7 +109,7 @@ public class MapPanel extends Stage {
         spacePanel.act();
 
         // Keep the predicted paths up to date
-        for(ConicSection o : orbits){
+        for(ConicSectionOld o : orbits){
             o.calculate();
         }
         for(PatchedConicSolver cs : patchedConics){
@@ -131,7 +131,7 @@ public class MapPanel extends Stage {
         // Begin a shape drawing pass
         game.shapeRenderer.setProjectionMatrix(cam.combined);
         game.shapeRenderer.begin(ShapeType.Filled);
-        for(ConicSection o : orbits){
+        for(ConicSectionOld o : orbits){
             o.draw(game.shapeRenderer, cam.zoom);
 
             if(celestialOpacity > 0.5f) continue;
