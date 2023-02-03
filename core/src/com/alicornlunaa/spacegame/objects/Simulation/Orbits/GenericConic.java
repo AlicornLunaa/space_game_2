@@ -229,14 +229,37 @@ public abstract class GenericConic {
             m.set(parent.getUniverseSpaceTransform());
 
         // Render position at initial anomaly
-        Vector2 p = getPosition(getMeanAnomaly());
+        Vector2 p = getPosition(getMeanAnomaly()).scl(Constants.PPM);
         renderer.setTransformMatrix(m);
         renderer.setColor(Color.GOLD);
-        renderer.circle(p.x, p.y, 2);
+        renderer.circle(p.x, p.y, 400);
+
+        p = getPosition(endMeanAnomaly).scl(Constants.PPM);
+        renderer.setColor(Color.RED);
+        renderer.circle(p.x, p.y, 800);
         
         // Final rotation
         m.rotateRad(0, 0, 1, (float)w);
         renderer.setTransformMatrix(m);
+    }
+
+    // Setters
+    /**
+     * Sets the starting mean anomaly and time
+     * @param ma The mean anomaly
+     */
+    public void setStart(double ma){
+        startMeanAnomaly = ma;
+        startTime = meanAnomalyToTime(ma);
+    }
+
+    /**
+     * Sets the ending mean anomaly and time
+     * @param ma The mean anomaly
+     */
+    public void setEnd(double ma){
+        endMeanAnomaly = ma;
+        endTime = meanAnomalyToTime(ma);
     }
 
     // Getters
@@ -251,5 +274,9 @@ public abstract class GenericConic {
     public double getInclination() { return i; }
     public double getPeriapsis() { return pa; }
     public double getApoapsis() { return ap; }
+    public double getStartAnomaly(){ return startMeanAnomaly; }
+    public double getStartTime(){ return startTime; }
+    public double getEndAnomaly(){ return endMeanAnomaly; }
+    public double getEndTime(){ return endTime; }
 
 }

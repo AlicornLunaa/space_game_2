@@ -4,14 +4,14 @@ public class RootSolver {
 
     public static interface EquationInterface { public double func(double x); }
 
-    public static double bisection(double a, double b, EquationInterface equation){
+    public static double bisection(double a, double b, EquationInterface equationInterface){
         double tolerance = 1e-8;
-        int maxIter = 128;
+        int maxIter = 256;
 
         for(int i = 0; i < maxIter; i++){
             double c = (a + b) / 2;
-            double ea = equation.func(a);
-            double ec = equation.func(c);
+            double ea = equationInterface.func(a);
+            double ec = equationInterface.func(c);
 
             if(Math.abs(ec) < tolerance || (b - a) / 2 < tolerance){
                 return c;

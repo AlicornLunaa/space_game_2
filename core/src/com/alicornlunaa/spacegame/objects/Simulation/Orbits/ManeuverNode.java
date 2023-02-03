@@ -7,7 +7,7 @@ package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 public class ManeuverNode {
 
     // Variables
-    private ConicSectionOld targetConic;
+    private GenericConic targetConic;
     private PatchedConicSolver predictedPath;
 
     // Constructor

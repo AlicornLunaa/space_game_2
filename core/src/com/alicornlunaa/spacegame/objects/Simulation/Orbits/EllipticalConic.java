@@ -18,7 +18,9 @@ public class EllipticalConic extends GenericConic {
 
     @Override
     public double meanAnomalyToEccentricAnomaly(final double ma) {
-        return RootSolver.newtonian(ma, new EquationInterface() {
+        final double initialGuess = (e > 0.8) ? Math.PI : ma;
+
+        return RootSolver.newtonian(initialGuess, new EquationInterface() {
             @Override
             public double func(double x){
                 return (ma - x + e * Math.sin(x));

@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
@@ -39,7 +40,7 @@ public class MapPanel extends Stage {
 
     private TextureRegion shipIcon;
     private Array<GenericConic> orbits = new Array<>();
-    private Array<PatchedConicSolver> patchedConics = new Array<>();
+    private Array<Orbit> patchedConics = new Array<>();
 
     // Private functoins
     /**
@@ -52,7 +53,7 @@ public class MapPanel extends Stage {
             Celestial parent = u.getParentCelestial(e);
 
             if(parent != null && e.getDriving() == null){
-                patchedConics.add(new PatchedConicSolver(game, u, e));
+                patchedConics.add(new Orbit(u, e));
             }
         }
 
@@ -120,7 +121,7 @@ public class MapPanel extends Stage {
             }
         }
         
-        for(PatchedConicSolver cs : patchedConics){
+        for(Orbit cs : patchedConics){
             cs.recalculate();
         }
 
@@ -147,8 +148,8 @@ public class MapPanel extends Stage {
             game.shapeRenderer.setColor(Color.CYAN);
             game.shapeRenderer.circle(0, 0, ((Celestial)o.getChild()).getRadius() * 3);
         }
-        for(PatchedConicSolver cs : patchedConics){
-            cs.draw(game.shapeRenderer, cam.zoom);
+        for(Orbit cs : patchedConics){
+            cs.draw(game.shapeRenderer, 1.5f * cam.zoom);
         }
         game.shapeRenderer.end();
 
