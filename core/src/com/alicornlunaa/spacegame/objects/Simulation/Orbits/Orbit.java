@@ -50,7 +50,8 @@ public class Orbit {
         // Find first intersection by the changing value
         for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
             double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS)) * 2.0 * Math.PI;
-            double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(meanAnomaly) + currentTime) + parentConic.getMeanAnomaly();
+            double futureTime = childConic.meanAnomalyToTime(meanAnomaly) + currentTime;
+            double parentAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
             double childAnomaly = meanAnomaly + childConic.getMeanAnomaly();
             double distInsideSOI = childConic.getPosition(childAnomaly).dst(parentConic.getPosition(parentAnomaly)) - (celestial.getSphereOfInfluence() / Constants.PPM);
 
@@ -71,11 +72,13 @@ public class Orbit {
         double intersection = RootSolver.bisection(startIntersectionGuess, endIntersectionGuess, new EquationInterface() {
             @Override
             public double func(double x){
-                double parentAnomaly = parentConic.timeToMeanAnomaly(childConic.meanAnomalyToTime(x) + currentTime) + parentConic.getMeanAnomaly();
+                double futureTime = childConic.meanAnomalyToTime(x) + currentTime;
+                double parentAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
                 double childAnomaly = x + childConic.getMeanAnomaly();
                 return (childConic.getPosition(childAnomaly).dst(parentConic.getPosition(parentAnomaly)) - (celestial.getSphereOfInfluence() / Constants.PPM));
             }
         });
+        intersection += childConic.getMeanAnomaly(); // Convert to periapsis-based anomaly
 
         // Set intersection on the orbit
         childConic.setEnd(intersection);

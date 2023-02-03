@@ -62,8 +62,8 @@ public class HyperbolicColic extends GenericConic {
         double b = (a * Math.sqrt(e * e - 1));
 
         for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
-            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
+            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI - Math.PI;
+            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI - Math.PI;
             
             Vector2 p1 = new Vector2((float)(linearE - a * Math.cosh(ang1)) * -1, (float)(b * Math.sinh(ang1))).scl(Constants.PPM);
             Vector2 p2 = new Vector2((float)(linearE - a * Math.cosh(ang2)) * -1, (float)(b * Math.sinh(ang2))).scl(Constants.PPM);
