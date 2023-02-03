@@ -26,8 +26,6 @@ public abstract class GenericConic {
     protected double e; // Eccentricity
     protected double w; // Argument of periapsis
     protected double v; // True anomaly
-    protected double E; // Eccentric anomaly
-    protected double M; // Mean anomaly
     protected double i; // Inclination
     protected double pa; // Periapsis height
     protected double ap; // Apoapsis height
@@ -41,8 +39,6 @@ public abstract class GenericConic {
     protected Color startColor = Color.CYAN;
     protected Color endColor = Color.MAGENTA;
 
-    protected ConicSectionOld test;
-
     // Constructor
     public GenericConic(double parentMass, double a, double e, double w, double v, double i){
         // Calculate the orbital variables
@@ -51,8 +47,6 @@ public abstract class GenericConic {
         this.e = e;
         this.w = w;
         this.v = v;
-        E = trueAnomalyToEccentricAnomaly(v);
-        M = eccentricAnomalyToMeanAnomaly(E);
         this.i = i;
 
         pa = a * (1 - e);
@@ -73,12 +67,10 @@ public abstract class GenericConic {
 
         // Convert from cartesian ECI frame to keplerian orbital elements
         Vector3 h = p3d.cpy().crs(v3d);
-        Vector3 ev = (v3d.cpy().crs(h).scl((float) (1 / mu)).sub(p3d.cpy().nor()));
+        Vector3 ev = (v3d.cpy().crs(h).scl((float)(1 / mu)).sub(p3d.cpy().nor()));
 
         v = ((p3d.cpy().nor().dot(v3d) >= 0) ? Math.acos(p3d.cpy().nor().dot(ev.cpy().nor()))
                 : (2 * Math.PI - Math.acos(p3d.cpy().nor().dot(ev.cpy().nor()))));
-        E = trueAnomalyToEccentricAnomaly(v);
-        M = eccentricAnomalyToMeanAnomaly(E);
         i = Math.acos(h.cpy().nor().z);
         e = ev.len();
         w = Math.atan2(ev.y, ev.x);
@@ -95,8 +87,6 @@ public abstract class GenericConic {
         this(parent.getBody().getMass(), child.getBody().getPosition(), child.getBody().getLinearVelocity());
         this.parent = parent;
         this.child = child;
-
-        test = new ConicSectionOld(parent, child);
     }
 
     public GenericConic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) {
@@ -239,7 +229,7 @@ public abstract class GenericConic {
             m.set(parent.getUniverseSpaceTransform());
 
         // Render position at initial anomaly
-        Vector2 p = getPosition(M);
+        Vector2 p = getPosition(getMeanAnomaly());
         renderer.setTransformMatrix(m);
         renderer.setColor(Color.GOLD);
         renderer.circle(p.x, p.y, 2);
@@ -256,8 +246,8 @@ public abstract class GenericConic {
     public double getEccentricity() { return e; }
     public double getArgumentofPeriapsis() { return w; }
     public double getTrueAnomaly() { return v; }
-    public double getEccentricAnomaly() { return E; }
-    public double getMeanAnomaly() { return M; }
+    public double getEccentricAnomaly() { return trueAnomalyToEccentricAnomaly(v); }
+    public double getMeanAnomaly() { return trueAnomalyToMeanAnomaly(v); }
     public double getInclination() { return i; }
     public double getPeriapsis() { return pa; }
     public double getApoapsis() { return ap; }

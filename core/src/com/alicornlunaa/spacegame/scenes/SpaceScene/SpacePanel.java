@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -59,6 +60,9 @@ public class SpacePanel extends Stage {
         OrbitUtils.createOrbit(universe, ship);
         OrbitUtils.createOrbit(universe, game.player);
         this.addActor(universe);
+        
+        Body b = universe.getCelestial(1).getBody();
+        b.applyForceToCenter(0, 100000, true);
 
         game.player.drive(ship);
 

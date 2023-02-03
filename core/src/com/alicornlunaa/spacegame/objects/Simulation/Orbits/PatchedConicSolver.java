@@ -226,7 +226,7 @@ public class PatchedConicSolver {
 
         GenericConic c = conics.get(conicIndex);
         double anomalyForConic = c.timeToMeanAnomaly(t - timeIntoFuture) + c.getMeanAnomaly();
-        return c.getPosition(c.getMeanAnomaly());
+        return c.getPosition(anomalyForConic);
     }
 
     public Vector2 getVelocityAtEpoch(float t){
@@ -253,7 +253,7 @@ public class PatchedConicSolver {
         // Start at the first conic
         GenericConic c = conics.get(conicIndex);
         double anomalyForConic = c.timeToMeanAnomaly(t - timeIntoFuture) + c.getMeanAnomaly();
-        return c.getVelocity(c.getMeanAnomaly());
+        return c.getVelocity(anomalyForConic);
     }
 
     public Entity getEntity(){ return entity; }

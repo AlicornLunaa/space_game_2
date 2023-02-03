@@ -18,7 +18,7 @@ public class OrbitPropagator {
 
         // Convert from cartesian ECI frame to keplerian orbital elements
         Vector3 h = p3d.cpy().crs(v3d);
-        Vector3 ev = (v3d.cpy().crs(h).scl((float) (1 / (parentMass * Constants.GRAVITY_CONSTANT))).sub(p3d.cpy().nor()));
+        Vector3 ev = (v3d.cpy().crs(h).scl((float)(1 / (parentMass * Constants.GRAVITY_CONSTANT))).sub(p3d.cpy().nor()));
 
         // Returns
         if(ev.len() >= 1.f){

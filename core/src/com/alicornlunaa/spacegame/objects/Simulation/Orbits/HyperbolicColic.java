@@ -40,7 +40,7 @@ public class HyperbolicColic extends GenericConic {
 
     @Override
     public double eccentricAnomalyToTrueAnomaly(double ea) {
-        return 2.0 * Math.atan(Math.tanh(E / 2) / Math.sqrt((e - 1) / (e + 1)));
+        return 2.0 * Math.atan(Math.tanh(ea / 2) / Math.sqrt((e - 1) / (e + 1)));
     }
 
     @Override
