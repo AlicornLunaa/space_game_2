@@ -5,7 +5,8 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.ConicSectionOld;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -34,7 +35,7 @@ public class Universe extends Actor {
 
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
-    private Array<ConicSectionOld> celestialPaths = new Array<>();
+    private Array<GenericConic> celestialPaths = new Array<>();
     private Array<PatchedConicSolver> entityPaths = new Array<>();
 
     // Private functions
@@ -182,7 +183,7 @@ public class Universe extends Actor {
             for(Celestial c : celestials){
                 Celestial parent = getParentCelestial(c);
                 if(parent == null) continue;
-                ConicSectionOld path = new ConicSectionOld(game, parent, c);
+                GenericConic path = OrbitPropagator.getConic(parent, c);
                 celestialPaths.add(path);
             }
         }
@@ -281,13 +282,13 @@ public class Universe extends Actor {
                 physAccumulator -= Constants.TIME_STEP;
 
                 for(int i = 0; i < celestialPaths.size; i++){
-                    ConicSectionOld path = celestialPaths.get(i);
+                    GenericConic path = celestialPaths.get(i);
                     Entity e = path.getChild();
     
                     if(e.getDriving() != null) continue;
     
-                    Vector2 curPos = path.getPosition(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
-                    Vector2 curVel = path.getVelocity(path.getInitialMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+                    Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+                    Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
     
                     e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
                     e.getBody().setLinearVelocity(curVel.cpy());

@@ -1,6 +1,5 @@
 package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 
-import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -33,18 +32,37 @@ public class ConicSectionOld {
     private TextureRegion periapsisMarker;
 
     // Constructor
-    public ConicSectionOld(final App game, Celestial parent, Entity child, Vector2 position, Vector2 velocity){
+    public ConicSectionOld(Celestial parent, Entity child, Vector2 position, Vector2 velocity){
         this.parent = parent;
         this.child = child;
-
-        apoapsisMarker = game.atlas.findRegion("ui/apoapsis");
-        periapsisMarker = game.atlas.findRegion("ui/periapsis");
 
         calculate(position, velocity);
     }
 
-    public ConicSectionOld(final App game, Celestial parent, Entity child){
-        this(game, parent, child, child.getBody().getPosition(), child.getBody().getLinearVelocity());
+    public ConicSectionOld(Celestial parent, Entity child){
+        this(parent, child, child.getBody().getPosition(), child.getBody().getLinearVelocity());
+    }
+    public static double meanAnomalyToEccentricAnomaly(double ma, double eccentricity){
+        final double m = ma;
+        final double e = eccentricity;
+            
+        // Mean anomaly => Eccentric anomaly
+        if(eccentricity >= 1){
+            // Hyperbolic
+            return RootSolver.newtonian(m, new EquationInterface() {
+                @Override
+                public double func(double x){
+                    return (m - e * Math.sinh(x) + x);
+                }
+            });
+        } else {
+            return RootSolver.newtonian(m, new EquationInterface() {
+                @Override
+                public double func(double x){
+                    return (m - x + e * Math.sin(x));
+                }
+            });
+        }
     }
 
     // Anomaly functions

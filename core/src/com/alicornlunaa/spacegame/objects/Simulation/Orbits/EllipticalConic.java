@@ -43,12 +43,12 @@ public class EllipticalConic extends GenericConic {
 
     @Override
     public double timeToMeanAnomaly(double t) {
-        return (Math.sqrt(mu / Math.pow(Math.abs(a), 3.0)) * t);
+        return (Math.sqrt(mu / Math.pow(a, 3.0)) * t);
     }
 
     @Override
     public double meanAnomalyToTime(double ma) {
-        return (ma / Math.sqrt(mu / Math.pow(Math.abs(a), 3.0)));
+        return (ma / Math.sqrt(mu / Math.pow(a, 3.0)));
     }
 
     @Override
@@ -63,11 +63,11 @@ public class EllipticalConic extends GenericConic {
             double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
             double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
 
-            Vector2 p1 = new Vector2((float)(Math.cos(ang1) * a - linearE), (float)(Math.sin(ang1) * semiMinorAxis));//.scl(Constants.PPM);
-            Vector2 p2 = new Vector2((float)(Math.cos(ang2) * a - linearE), (float)(Math.sin(ang2) * semiMinorAxis));//.scl(Constants.PPM);
+            Vector2 p1 = new Vector2((float)(Math.cos(ang1) * a - linearE), (float)(Math.sin(ang1) * semiMinorAxis)).scl(Constants.PPM);
+            Vector2 p2 = new Vector2((float)(Math.cos(ang2) * a - linearE), (float)(Math.sin(ang2) * semiMinorAxis)).scl(Constants.PPM);
 
-            Color segmentStartColor = startColor.cpy().lerp(endColor, (float)ang1);
-            Color segmentEndColor = startColor.cpy().lerp(endColor, (float)ang2);
+            Color segmentStartColor = startColor.cpy().lerp(endColor, (float)(ang1 / (2.0 * Math.PI)));
+            Color segmentEndColor = startColor.cpy().lerp(endColor, (float)(ang2 / (2.0 * Math.PI)));
 
             renderer.rectLine(p1.x, p1.y, p2.x, p2.y, lineWidth, segmentStartColor, segmentEndColor);
         }

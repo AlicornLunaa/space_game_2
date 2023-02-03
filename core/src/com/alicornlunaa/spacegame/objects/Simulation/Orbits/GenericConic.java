@@ -39,7 +39,9 @@ public abstract class GenericConic {
 
     protected boolean dashed = false;
     protected Color startColor = Color.CYAN;
-    protected Color endColor = Color.LIME;
+    protected Color endColor = Color.MAGENTA;
+
+    protected ConicSectionOld test;
 
     // Constructor
     public GenericConic(double parentMass, double a, double e, double w, double v, double i){
@@ -93,6 +95,8 @@ public abstract class GenericConic {
         this(parent.getBody().getMass(), child.getBody().getPosition(), child.getBody().getLinearVelocity());
         this.parent = parent;
         this.child = child;
+
+        test = new ConicSectionOld(parent, child);
     }
 
     public GenericConic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) {
@@ -191,12 +195,12 @@ public abstract class GenericConic {
      */
     public Vector2 getPosition(double ma){
         // Kepler to cartesian
-        double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
+        double ta = meanAnomalyToTrueAnomaly(ma);
         
-        double p = a * (1 - e * e); // Semilatus rectum
-        double r = p / (1 + e * Math.cos(futureTrueAnomaly)); // Orbital plane position
+        double p = Math.abs(a) * (1 - e * e); // Semilatus rectum
+        double r = p / (1 + e * Math.cos(ta));
 
-        Vector3 position = new Vector3((float)(r * Math.cos(futureTrueAnomaly)), (float)(r * Math.sin(futureTrueAnomaly)), 0.f);
+        Vector3 position = new Vector3((float)(r * Math.cos(ta)), (float)(r * Math.sin(ta)), 0.f);
         position.rotateRad((float)i, 1, 0, 0);
         position.rotateRad((float)w, 0, 0, 1);
 
@@ -210,12 +214,12 @@ public abstract class GenericConic {
      */
     public Vector2 getVelocity(double ma){
         // Kepler to cartesian
-        double futureTrueAnomaly = meanAnomalyToTrueAnomaly(ma);
+        double ta = meanAnomalyToTrueAnomaly(ma);
         
-        double p = a * (1 - e * e); // Semilatus rectum
+        double p = Math.abs(a) * (1 - e * e); // Semilatus rectum
         double v = Math.sqrt(mu / p); // Orbital plane velocity
         
-        Vector3 velocity = new Vector3((float)(-v * Math.sin(futureTrueAnomaly)), (float)(v * (e + Math.cos(futureTrueAnomaly))), 0.f);
+        Vector3 velocity = new Vector3((float)(-v * Math.sin(ta)), (float)(v * (e + Math.cos(ta))), 0.f);
         velocity.rotateRad((float)i, 1, 0, 0);
         velocity.rotateRad((float)w, 0, 0, 1);
 
@@ -229,14 +233,20 @@ public abstract class GenericConic {
      */
     public void draw(ShapeRenderer renderer, float lineWidth){
         // Set drawing transform
-        if(parent != null){
-            Matrix4 m = new Matrix4();
+        Matrix4 m = new Matrix4();
+
+        if(parent != null)
             m.set(parent.getUniverseSpaceTransform());
-            m.rotateRad(0, 0, 1, (float)w);
-            renderer.setTransformMatrix(m);
-        } else {
-            renderer.setTransformMatrix(new Matrix4());
-        }
+
+        // Render position at initial anomaly
+        Vector2 p = getPosition(M);
+        renderer.setTransformMatrix(m);
+        renderer.setColor(Color.GOLD);
+        renderer.circle(p.x, p.y, 2);
+        
+        // Final rotation
+        m.rotateRad(0, 0, 1, (float)w);
+        renderer.setTransformMatrix(m);
     }
 
     // Getters

@@ -27,10 +27,10 @@ public class RootSolver {
         return 0.0;
     }
 
-    public static double newtonian(double meanAnomaly, EquationInterface equation){
+    public static double newtonian(double initial, EquationInterface equation){
         double stepSize = 1e-3;
         double epsilon = 1e-8;
-        double guess = meanAnomaly;
+        double guess = initial;
         int maxIter = 128;
 
         for(int i = 0; i < maxIter; i++){
