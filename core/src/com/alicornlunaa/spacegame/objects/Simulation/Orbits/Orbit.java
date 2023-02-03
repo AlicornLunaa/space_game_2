@@ -169,12 +169,13 @@ public class Orbit {
 
             if(enterAnomaly != null){
                 // Get state vectors at the moment of intersection
-                double futureTime = currentTime + section.meanAnomalyToTime(enterAnomaly - section.getMeanAnomaly());
+                double futureTime = currentTime + section.meanAnomalyToTime(enterAnomaly - section.getMeanAnomaly()); // Subject anomaly to get distance travelled
                 double celestialAnomaly = celestialConic.timeToMeanAnomaly(futureTime) + celestialConic.getMeanAnomaly();
                 Vector2 posAtSOITransfer = section.getPosition(enterAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
                 Vector2 velAtSOITransfer = section.getVelocity(enterAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
                 
                 // Add new conic relative to the child as a new parent
+                // TODO: Set start anomaly for new conic
                 conics.add(OrbitPropagator.getConic(child, entity, posAtSOITransfer, velAtSOITransfer));
                 patchConics(child, conics.get(conics.size() - 1), depth + 1, futureTime);
                 return;
