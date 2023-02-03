@@ -10,7 +10,6 @@ import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.RootSolver;
 import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -259,28 +258,16 @@ public class PatchedConicSolver {
     public Entity getEntity(){ return entity; }
 
     public void draw(ShapeRenderer renderer, float zoom){
-        renderer.setColor(Color.GOLD);
-
-        Color lastColor = Color.RED.cpy();
-        float a = 1.f / (conics.size() + 1.f);
-        float b = 0.f;
-
         for(int i = 0; i < conics.size(); i++){
             GenericConic c = conics.get(i);
-            Color color = lastColor.cpy().lerp(Color.GREEN, b + a);
 
             if(anomalies.size() > i){
-                c.draw(renderer, 1.5f * zoom);
-
                 Vector2 p = c.getPosition(anomalies.get(i));
                 renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()));
                 renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
-            } else {
-                c.draw(renderer, zoom);
             }
 
-            lastColor = color.cpy();
-            b += a;
+            c.draw(renderer, 1.5f * zoom);
         }
     }
     

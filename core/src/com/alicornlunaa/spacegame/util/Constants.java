@@ -20,7 +20,7 @@ public class Constants {
     
     // Map constants
     public static final int ORBIT_RESOLUTION = 512;
-    public static final int PATCHED_CONIC_LIMIT = -1;//3;
+    public static final int PATCHED_CONIC_LIMIT = 3;
     public static final int PATCHED_CONIC_STEPS = 256;
     public static final float MAP_VIEW_ZOOM_SENSITIVITY = 0.2f;
     public static final float MAP_VIEW_MIN_ZOOM = 1;
