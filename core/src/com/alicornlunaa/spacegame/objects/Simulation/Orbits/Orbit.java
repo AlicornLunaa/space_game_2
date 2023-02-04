@@ -146,7 +146,6 @@ public class Orbit {
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(parent == null) return;
         if(depth > Constants.PATCHED_CONIC_LIMIT) return;
-        if(section.getPeriapsis() < section.getParent().getRadius() / Constants.PPM) return;
 
         GenericConic parentConic = celestialConics.get(parent);
         Double exitAnomaly = getExitAnomaly(section, parentConic, currentTime);
