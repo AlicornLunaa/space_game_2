@@ -107,7 +107,7 @@ public class Orbit {
             double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI;
 
             if(childConic instanceof HyperbolicConic)
-                meanAnomaly = (Math.pow(childConic.getSemiMajorAxis(), 2.0) * meanAnomaly) / 2.0;
+                meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI * 30;
 
             double distInsideSOI = childConic.getPosition(meanAnomaly).len() - (parent.getSphereOfInfluence() / Constants.PPM);
 
@@ -183,8 +183,14 @@ public class Orbit {
                 section.setEnd(enterAnomaly);
                 
                 // Add new conic relative to the child as a new parent
-                conics.add(OrbitPropagator.getConic(child, entity, posAtSOITransfer, velAtSOITransfer));
-                patchConics(child, conics.get(conics.size() - 1), depth + 1, futureTime);
+                GenericConic c = OrbitPropagator.getConic(child, entity, posAtSOITransfer, velAtSOITransfer);
+                c.setStart(c.getMeanAnomaly());
+
+                if(c instanceof HyperbolicConic)
+                    c.setEnd(c.getMeanAnomaly() * -1);
+
+                conics.add(c);
+                patchConics(child, c, depth + 1, futureTime);
                 return;
             }
         }
@@ -217,5 +223,63 @@ public class Orbit {
             c.draw(renderer, lineWidth);
         }
     }
+
+    public Entity getEntity(){ return entity; }
+
+    private Vector2 getPosition(float t, int conicIndex, double timeIntoFuture){
+        if(conicIndex == conics.size())
+            return conics.get(conics.size() - 1).getPosition(conics.get(conics.size() - 1).timeToMeanAnomaly(t - timeIntoFuture) + conics.get(conics.size() - 1).getMeanAnomaly());
+
+        GenericConic c = conics.get(conicIndex);
+        double deltaT = c.meanAnomalyToTime(Math.abs(c.getEndAnomaly() - c.getStartAnomaly()));
+
+        if(t - timeIntoFuture > deltaT){
+            return getPosition(t, conicIndex + 1, timeIntoFuture + deltaT);
+        }
+
+        return c.getPosition(c.timeToMeanAnomaly(t - timeIntoFuture) + c.getMeanAnomaly());
+    }
     
+    public Vector2 getPosition(float t){
+        if(conics.size() == 0) return null;
+        return getPosition(t, 0, 0);    
+    }
+
+    private Vector2 getVelocity(float t, int conicIndex, double timeIntoFuture){
+        if(conicIndex == conics.size())
+            return conics.get(conics.size() - 1).getVelocity(conics.get(conics.size() - 1).timeToMeanAnomaly(t - timeIntoFuture) + conics.get(conics.size() - 1).getMeanAnomaly());
+        
+        GenericConic c = conics.get(conicIndex);
+        double deltaT = c.meanAnomalyToTime(Math.abs(c.getEndAnomaly() - c.getStartAnomaly()));
+
+        if(t - timeIntoFuture > deltaT){
+            return getVelocity(t, conicIndex + 1, timeIntoFuture + deltaT);
+        }
+
+        return c.getVelocity(c.timeToMeanAnomaly(t - timeIntoFuture) + c.getMeanAnomaly());
+    }
+    
+    public Vector2 getVelocity(float t){
+        if(conics.size() == 0) return null;
+        return getVelocity(t, 0, 0);    
+    }
+    
+    private Celestial getParent(float t, int conicIndex, double timeIntoFuture){
+        if(conicIndex == conics.size()) return conics.get(conics.size() - 1).getParent();
+
+        GenericConic c = conics.get(conicIndex);
+        double deltaT = c.meanAnomalyToTime(Math.abs(c.getEndAnomaly() - c.getStartAnomaly()));
+
+        if(t - timeIntoFuture > deltaT){
+            return getParent(t, conicIndex + 1, timeIntoFuture + deltaT);
+        }
+
+        return c.getParent();
+    }
+    
+    public Celestial getParent(float t){
+        if(conics.size() == 0) return null;
+        return getParent(t, 0, 0);    
+    }
+
 }

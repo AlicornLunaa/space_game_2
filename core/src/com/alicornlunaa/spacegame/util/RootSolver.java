@@ -5,7 +5,7 @@ public class RootSolver {
     public static interface EquationInterface { public double func(double x); }
 
     public static double bisection(double a, double b, EquationInterface equationInterface){
-        double tolerance = 1e-8;
+        double tolerance = 1e-9;
         int maxIter = 256;
 
         for(int i = 0; i < maxIter; i++){
@@ -28,10 +28,10 @@ public class RootSolver {
     }
 
     public static double newtonian(double initial, EquationInterface equation){
-        double stepSize = 1e-3;
-        double epsilon = 1e-8;
+        double stepSize = 1e-6;
+        double epsilon = 1e-9;
         double guess = initial;
-        int maxIter = 128;
+        int maxIter = 256;
 
         for(int i = 0; i < maxIter; i++){
             double y = equation.func(guess);
@@ -41,6 +41,22 @@ public class RootSolver {
             double slope = (equation.func(guess + stepSize) - y) / stepSize;
             double step = y / slope;
             guess -= step;
+        }
+
+        return guess;
+    }
+
+    public static double newtonian(double initial, EquationInterface equation, EquationInterface derivation){
+        double epsilon = 1e-8;
+        double guess = initial;
+        int maxIter = 128;
+
+        for(int i = 0; i < maxIter; i++){
+            double next = guess - (equation.func(guess) / derivation.func(guess));
+            double difference = Math.abs(guess - next);
+            guess = next;
+            
+            if(difference < epsilon) break;
         }
 
         return guess;

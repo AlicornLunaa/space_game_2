@@ -63,7 +63,7 @@ public class SpacePanel extends Stage {
         
         Body b = universe.getCelestial(1).getBody();
         b.applyForceToCenter(0, 100000, true);
-
+        
         b = ship.getBody();
         b.applyForceToCenter(0, 40, true);
 

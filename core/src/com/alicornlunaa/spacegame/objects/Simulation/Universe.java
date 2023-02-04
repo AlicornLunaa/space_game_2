@@ -6,8 +6,8 @@ import java.util.HashMap;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
@@ -36,7 +36,7 @@ public class Universe extends Actor {
     private float currentFuture = 0.0f;
     private float timewarp = 1.0f;
     private Array<GenericConic> celestialPaths = new Array<>();
-    private Array<PatchedConicSolver> entityPaths = new Array<>();
+    private Array<Orbit> entityPaths = new Array<>();
 
     // Private functions
     /**
@@ -177,7 +177,7 @@ public class Universe extends Actor {
             for(Entity e : ents){
                 Celestial parent = getParentCelestial(e);
                 if(parent == null) continue;
-                entityPaths.add(new PatchedConicSolver(game, this, e));
+                entityPaths.add(new Orbit(this, e));
             }
 
             for(Celestial c : celestials){
@@ -295,14 +295,14 @@ public class Universe extends Actor {
                 }
 
                 for(int i = 0; i < entityPaths.size; i++){
-                    PatchedConicSolver path = entityPaths.get(i);
+                    Orbit path = entityPaths.get(i);
                     Entity e = path.getEntity();
     
                     if(e.getDriving() != null) continue;
     
-                    Celestial parent = path.getParentAtEpoch(currentFuture);
-                    Vector2 curPos = path.getPositionAtEpoch(currentFuture);
-                    Vector2 curVel = path.getVelocityAtEpoch(currentFuture);
+                    Celestial parent = path.getParent(currentFuture);
+                    Vector2 curPos = path.getPosition(currentFuture);
+                    Vector2 curVel = path.getVelocity(currentFuture);
 
                     if(parent != getParentCelestial(e)){
                         // Transfer to new world
@@ -320,7 +320,7 @@ public class Universe extends Actor {
                 }
             }
 
-            currentFuture += (timewarp - 1) * 8;
+            currentFuture += (timewarp - 1) / 8;
         }
     }
 
