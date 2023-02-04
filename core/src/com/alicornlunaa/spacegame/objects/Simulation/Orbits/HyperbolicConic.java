@@ -9,12 +9,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-public class HyperbolicColic extends GenericConic {
+public class HyperbolicConic extends GenericConic {
     
-    public HyperbolicColic(double parentMass, double a, double e, double w, double v, double i) { super(parentMass, a, e, w, v, i); }
-    public HyperbolicColic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
-    public HyperbolicColic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
-    public HyperbolicColic(Celestial parent, Entity child) { super(parent, child); }
+    public HyperbolicConic(double parentMass, double a, double e, double w, double v, double i) { super(parentMass, a, e, w, v, i); }
+    public HyperbolicConic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
+    public HyperbolicConic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
+    public HyperbolicConic(Celestial parent, Entity child) { super(parent, child); }
 
     private double atanh(double x){ return 0.5 * Math.log((1 + x) / (1 - x)); }
 
@@ -61,9 +61,12 @@ public class HyperbolicColic extends GenericConic {
         double linearE = a * e;
         double b = (a * Math.sqrt(e * e - 1));
 
+        double startEccentricAnomaly = meanAnomalyToEccentricAnomaly(startMeanAnomaly * (i > Math.PI / 2 ? 1.0 : -1.0));
+        double endEccentricAnomaly = meanAnomalyToEccentricAnomaly(endMeanAnomaly * (i > Math.PI / 2 ? 1.0 : -1.0));
+
         for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI - Math.PI;
-            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI - Math.PI;
+            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * (endEccentricAnomaly - startEccentricAnomaly) + startEccentricAnomaly;
+            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * (endEccentricAnomaly - startEccentricAnomaly) + startEccentricAnomaly;
             
             Vector2 p1 = new Vector2((float)(linearE - a * Math.cosh(ang1)) * -1, (float)(b * Math.sinh(ang1))).scl(Constants.PPM);
             Vector2 p2 = new Vector2((float)(linearE - a * Math.cosh(ang2)) * -1, (float)(b * Math.sinh(ang2))).scl(Constants.PPM);

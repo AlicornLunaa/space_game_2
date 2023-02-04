@@ -187,7 +187,7 @@ public abstract class GenericConic {
         // Kepler to cartesian
         double ta = meanAnomalyToTrueAnomaly(ma);
         
-        double p = Math.abs(a) * (1 - e * e); // Semilatus rectum
+        double p = a * (1 - e * e); // Semilatus rectum
         double r = p / (1 + e * Math.cos(ta));
 
         Vector3 position = new Vector3((float)(r * Math.cos(ta)), (float)(r * Math.sin(ta)), 0.f);
@@ -206,7 +206,7 @@ public abstract class GenericConic {
         // Kepler to cartesian
         double ta = meanAnomalyToTrueAnomaly(ma);
         
-        double p = Math.abs(a) * (1 - e * e); // Semilatus rectum
+        double p = a * (1 - e * e); // Semilatus rectum
         double v = Math.sqrt(mu / p); // Orbital plane velocity
         
         Vector3 velocity = new Vector3((float)(-v * Math.sin(ta)), (float)(v * (e + Math.cos(ta))), 0.f);
@@ -234,8 +234,16 @@ public abstract class GenericConic {
         renderer.setColor(Color.GOLD);
         renderer.circle(p.x, p.y, 400);
 
-        p = getPosition(endMeanAnomaly).scl(Constants.PPM);
+        p = getPosition(getMeanAnomaly()).scl(Constants.PPM);
+        renderer.setColor(Color.MAGENTA);
+        renderer.circle(p.x, p.y, 800);
+
+        p = getPosition(startMeanAnomaly).scl(Constants.PPM);
         renderer.setColor(Color.RED);
+        renderer.circle(p.x, p.y, 800);
+
+        p = getPosition(endMeanAnomaly).scl(Constants.PPM);
+        renderer.setColor(Color.LIME);
         renderer.circle(p.x, p.y, 800);
         
         // Final rotation

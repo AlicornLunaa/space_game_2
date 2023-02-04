@@ -50,6 +50,10 @@ public class Orbit {
         // Find first intersection by the changing value
         for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
             double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS)) * 2.0 * Math.PI;
+
+            if(childConic instanceof HyperbolicConic)
+                meanAnomaly = (Math.pow(childConic.getSemiMajorAxis(), 2.0) * meanAnomaly) / 2.0;
+
             double futureTime = childConic.meanAnomalyToTime(meanAnomaly) + currentTime;
             double parentAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
             double childAnomaly = meanAnomaly + childConic.getMeanAnomaly();
@@ -79,9 +83,6 @@ public class Orbit {
             }
         });
         intersection += childConic.getMeanAnomaly(); // Convert to periapsis-based anomaly
-
-        // Set intersection on the orbit
-        childConic.setEnd(intersection);
         return intersection;
     }
 
@@ -104,6 +105,10 @@ public class Orbit {
 
         for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
             double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI;
+
+            if(childConic instanceof HyperbolicConic)
+                meanAnomaly = (Math.pow(childConic.getSemiMajorAxis(), 2.0) * meanAnomaly) / 2.0;
+
             double distInsideSOI = childConic.getPosition(meanAnomaly).len() - (parent.getSphereOfInfluence() / Constants.PPM);
 
             if(distInsideSOI < -0.05){
@@ -126,9 +131,6 @@ public class Orbit {
                 return (childConic.getPosition(x).len() - (childConic.getParent().getSphereOfInfluence() / Constants.PPM));
             }
         });
-
-        // Set intersection on the orbit
-        childConic.setEnd(intersection);
 
         return intersection;
     }
@@ -156,6 +158,9 @@ public class Orbit {
             Vector2 posAtSOITransfer = section.getPosition(exitAnomaly).add(parentConic.getPosition(celestialAnomaly));
             Vector2 velAtSOITransfer = section.getVelocity(exitAnomaly).add(parentConic.getVelocity(celestialAnomaly));
 
+            section.setStart(section.getMeanAnomaly());
+            section.setEnd(exitAnomaly);
+
             // Add new conic relative to the child as a new parent
             conics.add(OrbitPropagator.getConic(parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
             patchConics(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, futureTime);
@@ -173,9 +178,11 @@ public class Orbit {
                 double celestialAnomaly = celestialConic.timeToMeanAnomaly(futureTime) + celestialConic.getMeanAnomaly();
                 Vector2 posAtSOITransfer = section.getPosition(enterAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
                 Vector2 velAtSOITransfer = section.getVelocity(enterAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
+
+                section.setStart(section.getMeanAnomaly());
+                section.setEnd(enterAnomaly);
                 
                 // Add new conic relative to the child as a new parent
-                // TODO: Set start anomaly for new conic
                 conics.add(OrbitPropagator.getConic(child, entity, posAtSOITransfer, velAtSOITransfer));
                 patchConics(child, conics.get(conics.size() - 1), depth + 1, futureTime);
                 return;
@@ -207,13 +214,6 @@ public class Orbit {
     public void draw(ShapeRenderer renderer, float lineWidth){
         for(int i = 0; i < conics.size(); i++){
             GenericConic c = conics.get(i);
-
-            // if(anomalies.size() > i){
-            //     Vector2 p = c.getPosition(anomalies.get(i));
-            //     renderer.setTransformMatrix(new Matrix4().set(c.getParent().getUniverseSpaceTransform()));
-            //     renderer.circle(p.x * Constants.PPM, p.y * Constants.PPM, 500);
-            // }
-
             c.draw(renderer, lineWidth);
         }
     }

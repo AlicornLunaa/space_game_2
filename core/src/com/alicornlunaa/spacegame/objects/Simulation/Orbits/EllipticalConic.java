@@ -61,9 +61,12 @@ public class EllipticalConic extends GenericConic {
         double linearE = a * e;
         double semiMinorAxis = (Math.sqrt(Math.pow(a, 2.0) - Math.pow(linearE, 2.0)));
 
+        double startEccentricAnomaly = meanAnomalyToEccentricAnomaly(startMeanAnomaly * (i > Math.PI / 2 ? -1.0 : 1.0));
+        double endEccentricAnomaly = meanAnomalyToEccentricAnomaly(endMeanAnomaly * (i > Math.PI / 2 ? -1.0 : 1.0));
+
         for(int i = 0; i < Constants.ORBIT_RESOLUTION; i++){
-            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
-            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * 2.0 * Math.PI;
+            double ang1 = (i / (Constants.ORBIT_RESOLUTION - 1.f)) * (endEccentricAnomaly - startEccentricAnomaly) + startEccentricAnomaly;
+            double ang2 = ((i + 1) / (Constants.ORBIT_RESOLUTION - 1.f)) * (endEccentricAnomaly - startEccentricAnomaly) + startEccentricAnomaly;
 
             Vector2 p1 = new Vector2((float)(Math.cos(ang1) * a - linearE), (float)(Math.sin(ang1) * semiMinorAxis)).scl(Constants.PPM);
             Vector2 p2 = new Vector2((float)(Math.cos(ang2) * a - linearE), (float)(Math.sin(ang2) * semiMinorAxis)).scl(Constants.PPM);

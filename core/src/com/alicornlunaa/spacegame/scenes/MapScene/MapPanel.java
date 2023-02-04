@@ -8,7 +8,6 @@ import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.PatchedConicSolver;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;

@@ -21,7 +21,6 @@ import com.badlogic.gdx.math.Vector2;
 public class PatchedConicSolver {
 
     // Variables
-    private final App game;
     private final Universe universe;
     private Entity entity;
     private HashMap<Celestial, GenericConic> celestialConics = new HashMap<>();
@@ -152,7 +151,6 @@ public class PatchedConicSolver {
 
     // Constructor
     public PatchedConicSolver(final App game, final Universe universe, Entity entity){
-        this.game = game;
         this.universe = universe;
         this.entity = entity;
         recalculate();

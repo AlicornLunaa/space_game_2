@@ -30,7 +30,7 @@ public class OrbitPropagator {
 
     public static GenericConic getConic(double parentMass, double a, double e, double w, double v, double i){
         if(e >= 1.f){
-            return new HyperbolicColic(parentMass, a, e, w, v, i);
+            return new HyperbolicConic(parentMass, a, e, w, v, i);
         }
 
         return new EllipticalConic(parentMass, a, e, w, v, i);
@@ -38,7 +38,7 @@ public class OrbitPropagator {
 
     public static GenericConic getConic(double parentMass, Vector2 position, Vector2 velocity){
         if(getConicType(parentMass, position, velocity) == ConicType.HYPERBOLIC){
-            return new HyperbolicColic(parentMass, position, velocity);
+            return new HyperbolicConic(parentMass, position, velocity);
         }
 
         return new EllipticalConic(parentMass, position, velocity);
@@ -48,7 +48,7 @@ public class OrbitPropagator {
         if(parent == null) return null;
         
         if(getConicType(parent.getBody().getMass(), position, velocity) == ConicType.HYPERBOLIC){
-            return new HyperbolicColic(parent, child, position, velocity);
+            return new HyperbolicConic(parent, child, position, velocity);
         }
 
         return new EllipticalConic(parent, child, position, velocity);
@@ -58,7 +58,7 @@ public class OrbitPropagator {
         if(parent == null) return null;
 
         if(getConicType(parent.getBody().getMass(), child.getBody().getPosition(), child.getBody().getLinearVelocity()) == ConicType.HYPERBOLIC){
-            return new HyperbolicColic(parent, child);
+            return new HyperbolicConic(parent, child);
         }
 
         return new EllipticalConic(parent, child);
