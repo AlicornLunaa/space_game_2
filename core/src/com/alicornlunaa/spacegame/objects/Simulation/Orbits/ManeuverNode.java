@@ -8,7 +8,7 @@ public class ManeuverNode {
 
     // Variables
     private GenericConic targetConic;
-    private PatchedConicSolver predictedPath;
+    private Orbit predictedPath;
 
     // Constructor
     public ManeuverNode(){

@@ -3,44 +3,36 @@ package com.alicornlunaa.spacegame.objects.Simulation.Orbits;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.alicornlunaa.spacegame.util.RootSolver;
-import com.alicornlunaa.spacegame.util.RootSolver.EquationInterface;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 
-public class EllipticalConic extends GenericConic {
+public class CircularConic extends GenericConic {
 
-    public EllipticalConic(double parentMass, double a, double e, double w, double v, double i) { super(parentMass, a, e, w, v, i); }
-    public EllipticalConic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
-    public EllipticalConic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
-    public EllipticalConic(Celestial parent, Entity child) { super(parent, child); }
+    public CircularConic(double parentMass, double a, double e, double w, double v, double i) { super(parentMass, a, e, w, v, i); }
+    public CircularConic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
+    public CircularConic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
+    public CircularConic(Celestial parent, Entity child) { super(parent, child); }
 
     @Override
-    public double meanAnomalyToEccentricAnomaly(final double ma) {
-        double initialGuess = (ma + ((e * Math.sin(ma)) / (1 - Math.sin(ma + e) + Math.sin(ma))));
-
-        return RootSolver.newtonian(initialGuess, new EquationInterface() {
-            @Override
-            public double func(double x){
-                return (ma - x + e * Math.sin(x));
-            }
-        });
+    public double meanAnomalyToEccentricAnomaly(double ma) {
+        return ma;
     }
 
     @Override
     public double trueAnomalyToEccentricAnomaly(double ta) {
-        return Math.atan2(Math.sqrt(1 - Math.pow(e, 2)) * Math.sin(ta), e + Math.cos(ta));
+        return ta;
     }
 
     @Override
     public double eccentricAnomalyToMeanAnomaly(double ea) {
-        return (ea - e * Math.sin(ea));
+        return ea;
     }
 
     @Override
     public double eccentricAnomalyToTrueAnomaly(double ea) {
-        return (2.0 * Math.atan(Math.sqrt((1 + e) / (1 - e)) * Math.tan(ea / 2.0)));
+        return ea;
     }
 
     @Override
@@ -52,10 +44,17 @@ public class EllipticalConic extends GenericConic {
     public double meanAnomalyToTime(double ma) {
         return (ma / Math.sqrt(mu / Math.pow(a, 3.0)));
     }
-
+    
     @Override
     public void draw(ShapeRenderer renderer, float lineWidth){
-        super.draw(renderer, lineWidth);
+        // Set drawing transform
+        Matrix4 m = new Matrix4();
+
+        if(parent != null)
+            m.set(parent.getUniverseSpaceTransform());
+
+        // Render position at initial anomaly
+        renderer.setTransformMatrix(m);
         
         // Elliptic or circular
         double linearE = a * e;
