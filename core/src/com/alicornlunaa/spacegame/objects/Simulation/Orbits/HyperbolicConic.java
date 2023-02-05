@@ -23,7 +23,12 @@ public class HyperbolicConic extends GenericConic {
         return RootSolver.newtonian(ma, new EquationInterface() {
             @Override
             public double func(double x){
-                return (ma - e * Math.sinh(x) + x);
+                return (e * Math.sinh(x) - x) - ma;
+            }
+        }, new EquationInterface() {
+            @Override
+            public double func(double x){
+                return (e * Math.cosh(x) - 1);
             }
         });
     }

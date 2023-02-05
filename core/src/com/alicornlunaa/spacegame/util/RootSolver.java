@@ -47,16 +47,16 @@ public class RootSolver {
     }
 
     public static double newtonian(double initial, EquationInterface equation, EquationInterface derivation){
-        double epsilon = 1e-8;
+        double epsilon = 1e-9;
         double guess = initial;
-        int maxIter = 128;
+        int maxIter = 256;
 
         for(int i = 0; i < maxIter; i++){
-            double next = guess - (equation.func(guess) / derivation.func(guess));
-            double difference = Math.abs(guess - next);
-            guess = next;
-            
-            if(difference < epsilon) break;
+            double step = equation.func(guess) / derivation.func(guess);
+
+            if(Math.abs(step) < epsilon) break;
+
+            guess -= step;
         }
 
         return guess;

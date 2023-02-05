@@ -23,7 +23,12 @@ public class EllipticalConic extends GenericConic {
         return RootSolver.newtonian(initialGuess, new EquationInterface() {
             @Override
             public double func(double x){
-                return (ma - x + e * Math.sin(x));
+                return (x - e * Math.sin(x)) - ma;
+            }
+        }, new EquationInterface() {
+            @Override
+            public double func(double x){
+                return (1 - e * Math.cos(x));
             }
         });
     }
