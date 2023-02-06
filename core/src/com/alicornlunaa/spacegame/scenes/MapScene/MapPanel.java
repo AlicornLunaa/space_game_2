@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.MapScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
@@ -141,11 +142,6 @@ public class MapPanel extends Stage {
         game.shapeRenderer.begin(ShapeType.Filled);
         for(GenericConic o : orbits){
             o.draw(game.shapeRenderer, cam.zoom);
-
-            if(celestialOpacity > 0.5f) continue;
-            game.shapeRenderer.setTransformMatrix(new Matrix4().set(((Celestial)o.getChild()).getUniverseSpaceTransform()));
-            game.shapeRenderer.setColor(Color.CYAN);
-            game.shapeRenderer.circle(0, 0, ((Celestial)o.getChild()).getRadius() * 3);
         }
         for(Orbit cs : patchedConics){
             cs.draw(game.shapeRenderer, 1.5f * cam.zoom);
@@ -179,6 +175,22 @@ public class MapPanel extends Stage {
 
         super.draw();
         spacePanel.draw(); // Draw planets
+
+        if(celestialOpacity < 0.5){
+            game.shapeRenderer.begin(ShapeType.Filled);
+            for(GenericConic o : orbits){
+                Color c = Color.CYAN;
+
+                if(o.getChild() instanceof Planet){
+                    c = ((Planet)o.getChild()).getAtmosColor();
+                }
+
+                game.shapeRenderer.setTransformMatrix(new Matrix4().set(((Celestial)o.getChild()).getUniverseSpaceTransform()));
+                game.shapeRenderer.setColor(c);
+                game.shapeRenderer.circle(0, 0, ((Celestial)o.getChild()).getRadius() * 3);
+            }
+            game.shapeRenderer.end();
+        }
     }
     
     @Override

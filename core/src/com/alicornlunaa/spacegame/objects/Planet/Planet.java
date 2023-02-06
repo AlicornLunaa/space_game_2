@@ -144,6 +144,8 @@ public class Planet extends Celestial {
     public final World getPlanetWorld(){ return planetWorld; }
     public float getAtmosRadius(){ return atmosRadius; }
     public float getAtmosDensity(){ return atmosDensity; }
+    public Color getAtmosColor(){ return atmosColor; }
+    public Color getTerrainColor(){ return terrainColor; }
     public long getSeed(){ return seed; }
 
     /**
