@@ -225,6 +225,8 @@ public class Orbit {
 
     public Entity getEntity(){ return entity; }
 
+    public ArrayList<GenericConic> getConics(){ return conics; }
+
     private Vector2 getPosition(float t, int conicIndex, double timeIntoFuture){
         if(conicIndex == conics.size())
             return conics.get(conics.size() - 1).getPosition(conics.get(conics.size() - 1).timeToMeanAnomaly(t - timeIntoFuture) + conics.get(conics.size() - 1).getMeanAnomaly());

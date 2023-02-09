@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -41,6 +42,7 @@ public class MapPanel extends Stage {
     private TextureRegion shipIcon;
     private Array<GenericConic> orbits = new Array<>();
     private Array<Orbit> patchedConics = new Array<>();
+    private Group markers = new Group();
 
     // Private functoins
     /**
@@ -82,6 +84,7 @@ public class MapPanel extends Stage {
 
         // Initializations
         initiatePaths();
+        addActor(markers);
 
         // Controls
         this.addListener(new InputListener(){
@@ -108,11 +111,13 @@ public class MapPanel extends Stage {
     // Functions
     @Override
     public void act(float delta){
+        Universe u = game.spaceScene.spacePanel.universe;
         spacePanel.act();
 
         // Keep the predicted paths up to date
         orbits.clear();
-        Universe u = game.spaceScene.spacePanel.universe;
+        markers.clear();
+
         for(Celestial c : u.getCelestials()){
             Celestial parent = u.getParentCelestial(c);
 
@@ -123,6 +128,15 @@ public class MapPanel extends Stage {
         
         for(Orbit cs : patchedConics){
             cs.recalculate();
+
+            // Add apoapsis and periapsis markers
+            for(GenericConic conic : cs.getConics()){
+                Celestial parent = conic.getParent();
+                Vector2 apoapsis = conic.getPosition(Math.PI);
+                Vector2 periapsis = conic.getPosition(0.0);
+                markers.addActor(new Marker(game, parent, periapsis, game.atlas.findRegion("ui/periapsis"), 15.6f * cam.zoom, String.valueOf(Math.round(conic.getPeriapsis()))));
+                markers.addActor(new Marker(game, parent, apoapsis, game.atlas.findRegion("ui/apoapsis"), 15.6f * cam.zoom, String.valueOf(Math.round(conic.getApoapsis()))));
+            }
         }
 
         super.act(delta);
@@ -173,6 +187,7 @@ public class MapPanel extends Stage {
 
         batch.end();
 
+        this.getViewport().setCamera(cam);
         super.draw();
         spacePanel.draw(); // Draw planets
 
