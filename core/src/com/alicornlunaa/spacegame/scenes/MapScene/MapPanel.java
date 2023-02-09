@@ -12,6 +12,7 @@ import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpacePanel;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -161,6 +162,21 @@ public class MapPanel extends Stage {
         game.shapeRenderer.begin(ShapeType.Filled);
         for(GenericConic o : orbits){
             o.draw(game.shapeRenderer, cam.zoom);
+
+            // Render a circle to the closest point on the orbit by taking the angle to the mouse
+            // TODO: Mouse point on orbit
+            // Vector2 mouseUniversalSpace = this.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            // Vector2 celestialUniversalSpace = o.getParent().getUniverseSpaceTransform().getTranslation(new Vector2());
+            // float ang = (mouseUniversalSpace.cpy().sub(celestialUniversalSpace)).nor().angleRad();
+            // Vector2 p = o.getPosition(o.trueAnomalyToMeanAnomaly(ang)).scl(Constants.PPM);
+            
+            // game.shapeRenderer.setTransformMatrix(new Matrix4());
+            // game.shapeRenderer.circle(mouseUniversalSpace.x, mouseUniversalSpace.y, 5000);
+            // game.shapeRenderer.circle(celestialUniversalSpace.x, celestialUniversalSpace.y, 5000);
+            // game.shapeRenderer.rectLine(mouseUniversalSpace, celestialUniversalSpace, 500);
+
+            // game.shapeRenderer.setTransformMatrix(new Matrix4().set(o.getParent().getUniverseSpaceTransform()));
+            // game.shapeRenderer.circle(p.x, p.y, 5000);
         }
         for(Orbit cs : patchedConics){
             cs.draw(game.shapeRenderer, 1.5f * cam.zoom);

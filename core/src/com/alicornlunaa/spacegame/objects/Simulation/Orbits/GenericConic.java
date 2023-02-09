@@ -229,22 +229,24 @@ public abstract class GenericConic {
             m.set(parent.getUniverseSpaceTransform());
 
         // Render position at initial anomaly
-        Vector2 p = getPosition(getMeanAnomaly()).scl(Constants.PPM);
-        renderer.setTransformMatrix(m);
-        renderer.setColor(Color.GOLD);
-        renderer.circle(p.x, p.y, 400);
+        if(Constants.DEBUG){
+            Vector2 p = getPosition(getMeanAnomaly()).scl(Constants.PPM);
+            renderer.setTransformMatrix(m);
+            renderer.setColor(Color.GOLD);
+            renderer.circle(p.x, p.y, 400);
 
-        p = getPosition(getMeanAnomaly()).scl(Constants.PPM);
-        renderer.setColor(Color.MAGENTA);
-        renderer.circle(p.x, p.y, 800);
+            p = getPosition(getMeanAnomaly()).scl(Constants.PPM);
+            renderer.setColor(Color.MAGENTA);
+            renderer.circle(p.x, p.y, 800);
 
-        p = getPosition(startMeanAnomaly).scl(Constants.PPM);
-        renderer.setColor(Color.RED);
-        renderer.circle(p.x, p.y, 800);
+            p = getPosition(startMeanAnomaly).scl(Constants.PPM);
+            renderer.setColor(Color.RED);
+            renderer.circle(p.x, p.y, 800);
 
-        p = getPosition(endMeanAnomaly).scl(Constants.PPM);
-        renderer.setColor(Color.LIME);
-        renderer.circle(p.x, p.y, 800);
+            p = getPosition(endMeanAnomaly).scl(Constants.PPM);
+            renderer.setColor(Color.LIME);
+            renderer.circle(p.x, p.y, 800);
+        }
         
         // Final rotation
         m.rotateRad(0, 0, 1, (float)w);
