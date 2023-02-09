@@ -40,6 +40,9 @@ public class MapPanel extends Stage {
     private float entityOpacity = 0.f;
 
     private TextureRegion shipIcon;
+    private TextureRegion apoapsisMarkerTexture;
+    private TextureRegion periapsisMarkerTexture;
+
     private Array<GenericConic> orbits = new Array<>();
     private Array<Orbit> patchedConics = new Array<>();
     private Group markers = new Group();
@@ -81,6 +84,8 @@ public class MapPanel extends Stage {
 
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
+        apoapsisMarkerTexture = game.atlas.findRegion("ui/apoapsis");
+        periapsisMarkerTexture = game.atlas.findRegion("ui/periapsis");
 
         // Initializations
         initiatePaths();
@@ -134,8 +139,8 @@ public class MapPanel extends Stage {
                 Celestial parent = conic.getParent();
                 Vector2 apoapsis = conic.getPosition(Math.PI);
                 Vector2 periapsis = conic.getPosition(0.0);
-                markers.addActor(new Marker(game, parent, periapsis, game.atlas.findRegion("ui/periapsis"), 15.6f * cam.zoom, String.valueOf(Math.round(conic.getPeriapsis()))));
-                markers.addActor(new Marker(game, parent, apoapsis, game.atlas.findRegion("ui/apoapsis"), 15.6f * cam.zoom, String.valueOf(Math.round(conic.getApoapsis()))));
+                markers.addActor(new Marker(game, parent, periapsis, periapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getPeriapsis()))));
+                markers.addActor(new Marker(game, parent, apoapsis, apoapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getApoapsis()))));
             }
         }
 
