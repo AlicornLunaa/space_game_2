@@ -16,12 +16,14 @@ import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -40,6 +42,7 @@ public class Planet extends Celestial {
 
     @SuppressWarnings("unused")
     private final Box2DDebugRenderer debug = new Box2DDebugRenderer();
+    private OrthographicCamera cam;
 
     // Planet variables
     private float atmosRadius;
@@ -113,9 +116,11 @@ public class Planet extends Celestial {
     }
 
     // Constructor
-    public Planet(final App game, final Universe universe, final World world, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
+    public Planet(final App game, OrthographicCamera cam, final Universe universe, final World world, float x, float y, float radius, float atmosRad, Color terrain, Color atmos){
         super(game, world, radius);
         this.universe = universe;
+
+        this.cam = cam;
         
         atmosRadius = atmosRad;
         terrainColor = terrain;
@@ -287,6 +292,10 @@ public class Planet extends Celestial {
     @Override
     public void draw(Batch batch, float parentAlpha){
         super.draw(batch, parentAlpha);
+
+        // Save state
+        Matrix4 proj = batch.getProjectionMatrix().cpy();
+        Matrix4 trans = batch.getTransformMatrix().cpy();
         
         // Shade the planet in
         Celestial occluder = universe.getParentCelestial(this);
@@ -296,22 +305,36 @@ public class Planet extends Celestial {
         ShaderProgram terrainShader = game.manager.get("shaders/planet", ShaderProgram.class);
 
         batch.setShader(terrainShader);
+        // terrainShader.setUniformMatrix("u_camTrans", cam.invProjectionView);
         terrainShader.setUniformf("u_planetColor", terrainColor.cpy().mul(opacity));
         terrainShader.setUniformf("u_starDirection", dirToStar);
         terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
         terrainShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
         terrainShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
+        // terrainShader.setUniformf("u_cameraWorldPos", cam.position);
+        // terrainShader.setUniformf("u_planetWorldPos", OrbitUtils.getUniverseSpacePosition(universe, this));
+        // terrainShader.setUniformf("u_planetRad", getRadius());
         batch.draw(terrainTexture, radius * -1, radius * -1, radius * 2, radius * 2);
 
+        // batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
+        // batch.setTransformMatrix(new Matrix4());
+        // batch.draw(terrainTexture, 0, 0, 1280, 720);
+
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
+        batch.setTransformMatrix(new Matrix4());
         batch.setShader(atmosShader);
-        atmosShader.setUniformf("u_atmosColor", atmosColor.cpy().mul(opacity));
+        atmosShader.setUniformMatrix("u_invCamTrans", cam.invProjectionView);
+        atmosShader.setUniformf("u_cameraWorldPos", cam.position);
         atmosShader.setUniformf("u_starDirection", dirToStar);
-        atmosShader.setUniformf("u_planetRadius", getRadius() / getAtmosRadius());
-        atmosShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
-        atmosShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
-        atmosShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
-        batch.draw(atmosTexture, atmosRadius * -1.05f, atmosRadius * -1.05f, atmosRadius * 2.1f, atmosRadius * 2.1f);
+        atmosShader.setUniformf("u_planetWorldPos", OrbitUtils.getUniverseSpacePosition(universe, this));
+        atmosShader.setUniformf("u_planetRadius", getRadius());
+        atmosShader.setUniformf("u_atmosRadius", getAtmosRadius());
+        atmosShader.setUniformf("u_atmosColor", Color.CYAN);
+        batch.draw(atmosTexture, 0, 0, 1280, 720);
+
         batch.setShader(null);
+        batch.setProjectionMatrix(proj);
+        batch.setTransformMatrix(trans);
     }
 
     @Override

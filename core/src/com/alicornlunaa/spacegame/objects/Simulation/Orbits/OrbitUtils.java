@@ -75,7 +75,7 @@ public class OrbitUtils {
             }
         }
 
-        return dir.nor().scl(1, -1);
+        return dir.nor();
     }
  
     /**
