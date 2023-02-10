@@ -330,6 +330,8 @@ public class Universe extends Actor {
         }
     }
 
+    public World getUniversalWorld(){ return universalWorld; }
+
     /**
      * Render everything at universal scale
      */

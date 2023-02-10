@@ -306,11 +306,11 @@ public class Planet extends Celestial {
 
         batch.setShader(terrainShader);
         // terrainShader.setUniformMatrix("u_camTrans", cam.invProjectionView);
-        terrainShader.setUniformf("u_planetColor", terrainColor.cpy().mul(opacity));
-        terrainShader.setUniformf("u_starDirection", dirToStar);
-        terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
-        terrainShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
-        terrainShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
+        // terrainShader.setUniformf("u_planetColor", terrainColor.cpy().mul(opacity));
+        // terrainShader.setUniformf("u_starDirection", dirToStar);
+        // terrainShader.setUniformf("u_occlusionEnabled", ((occluder instanceof Star) ? 0.0f : 1.0f));
+        // terrainShader.setUniformf("u_occluder.pos", OrbitUtils.getUniverseSpacePosition(universe, occluder).mul(globalToLocal).scl(1, -1));
+        // terrainShader.setUniformf("u_occluder.radius", occluder.getRadius() * (1.f / getRadius()));
         // terrainShader.setUniformf("u_cameraWorldPos", cam.position);
         // terrainShader.setUniformf("u_planetWorldPos", OrbitUtils.getUniverseSpacePosition(universe, this));
         // terrainShader.setUniformf("u_planetRad", getRadius());
