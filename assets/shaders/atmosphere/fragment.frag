@@ -23,9 +23,7 @@ varying vec2 v_worldcoord;
 
 uniform sampler2D u_texture;
 
-uniform vec3 u_cameraWorldPos;
 uniform vec2 u_planetWorldPos;
-
 uniform float u_planetRadius;
 uniform float u_atmosRadius;
 uniform vec4 u_atmosColor;

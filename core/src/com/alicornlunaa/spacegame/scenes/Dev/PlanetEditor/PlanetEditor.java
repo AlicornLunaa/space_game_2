@@ -1,14 +1,16 @@
 package com.alicornlunaa.spacegame.scenes.Dev.PlanetEditor;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Planet.Planet;
+import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -40,10 +42,47 @@ public class PlanetEditor implements Screen {
         cam.update();
 
         universe = new Universe(game);
-        planet = new Planet(game, (OrthographicCamera)stage.getCamera(), universe, universe.getUniversalWorld(), 0, 0, 100, 150, Color.GREEN, Color.CYAN);
+        planet = new Planet(game, universe.getUniversalWorld(), 0, 0, 300, 350, 1.f);
         universe.addCelestial(planet, null);
         universe.addCelestial(new Star(game, universe.getUniversalWorld(), 10000, 0, 100), null);
         stage.addActor(universe);
+
+        // Controls
+        stage.addListener(new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, int keycode){
+                if(keycode == Keys.F5){
+                    game.manager.reloadShaders("shaders/atmosphere");
+                    game.manager.reloadShaders("shaders/planet");
+                    return true;
+                } else if(keycode == Keys.A){
+                    cam.position.x += 10.f;
+                    cam.update();
+                    return true;
+                } else if(keycode == Keys.D){
+                    cam.position.x -= 10.f;
+                    cam.update();
+                    return true;
+                } else if(keycode == Keys.W){
+                    cam.position.y -= 10.f;
+                    cam.update();
+                    return true;
+                } else if(keycode == Keys.S){
+                    cam.position.y += 10.f;
+                    cam.update();
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                cam.zoom = Math.min(Math.max(cam.zoom + amountY * 0.05f, 0.05f), 100.f);
+                cam.update();
+                return true;
+            }
+        });
 
         Gdx.input.setInputProcessor(new InputMultiplexer(uiStage, stage));
     }

@@ -49,7 +49,7 @@ public class Planet extends Celestial {
     private float atmosDensity = 1.0f;
     private Color terrainColor = new Color(.72f, 0.7f, 0.9f, 1);
     private Color atmosColor = new Color(0.6f, 0.6f, 1, 1);
-    private long seed = 123;
+    private long terrainSeed = 123;
 
     // World variables
     private World planetWorld;
@@ -68,21 +68,22 @@ public class Planet extends Celestial {
     private void generateTerrainSprite(){
         pixmap = new Pixmap(Math.min((int)radius * 2, 50), Math.min((int)radius * 2, 50), Format.RGBA8888);
 
-        for(int x = 0; x < pixmap.getWidth(); x++){
-            for(int y = 0; y < pixmap.getHeight(); y++){
-                int mX = x - pixmap.getWidth() / 2;
-                int mY = y - pixmap.getHeight() / 2;
-                int radSqr = mX * mX + mY * mY;
-                float rand = (float)noise.eval(mX * 0.1f, mY * 0.1f);
-                Color c = terrainColor.cpy();
+        // for(int x = 0; x < pixmap.getWidth(); x++){
+        //     for(int y = 0; y < pixmap.getHeight(); y++){
+        //         int mX = x - pixmap.getWidth() / 2;
+        //         int mY = y - pixmap.getHeight() / 2;
+        //         int radSqr = mX * mX + mY * mY;
+        //         float rand = (float)noise.eval(mX * 0.1f, mY * 0.1f);
+        //         Color c = terrainColor.cpy();
 
-                if(radSqr > (float)Math.pow(pixmap.getWidth() / 2, 2)) c.a = 0;
-                if(rand < 0){ c.mul(0.9f); c.a *= 1.1; }
+        //         if(radSqr > (float)Math.pow(pixmap.getWidth() / 2, 2)) c.a = 0;
+        //         if(rand < 0){ c.mul(0.9f); c.a *= 1.1; }
 
-                pixmap.setColor(c);
-                pixmap.drawPixel(x, y);
-            }
-        }
+        //         pixmap.setColor(c);
+        //         pixmap.drawPixel(x, y);
+        //     }
+        // }
+        pixmap.fill();
 
         terrainTexture = new Texture(pixmap);
         pixmap.dispose();
@@ -127,10 +128,10 @@ public class Planet extends Celestial {
         atmosColor = atmos;
 
         // Initialize generators
-        noise = new OpenSimplexNoise(seed);
+        noise = new OpenSimplexNoise(terrainSeed);
         generator = new TerrainGenerator(
             game,
-            seed,
+            terrainSeed,
             (int)(2 * Math.PI * radius / Chunk.CHUNK_SIZE / Tile.TILE_SIZE),
             (int)(radius / Chunk.CHUNK_SIZE / Tile.TILE_SIZE),
             radius
@@ -151,7 +152,7 @@ public class Planet extends Celestial {
     public float getAtmosDensity(){ return atmosDensity; }
     public Color getAtmosColor(){ return atmosColor; }
     public Color getTerrainColor(){ return terrainColor; }
-    public long getSeed(){ return seed; }
+    public long getSeed(){ return terrainSeed; }
 
     /**
      * Converts the entity to 2d planet planar coordinates
