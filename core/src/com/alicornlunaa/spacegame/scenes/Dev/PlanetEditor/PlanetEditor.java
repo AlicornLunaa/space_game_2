@@ -50,6 +50,16 @@ public class PlanetEditor implements Screen {
             }
         });
         ui.add(s);
+        ui.row();
+        s = new VisSlider(1, 50, 1, false);
+        s.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent e, Actor a){
+                VisSlider slider = (VisSlider)a;
+                planet.setSlice((int)slider.getValue());
+            }
+        });
+        ui.add(s);
 
         cam.position.set(0, 0, 0);
         cam.update();
