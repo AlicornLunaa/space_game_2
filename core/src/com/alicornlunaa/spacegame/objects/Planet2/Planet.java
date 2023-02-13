@@ -1,5 +1,7 @@
 package com.alicornlunaa.spacegame.objects.Planet2;
 
+import java.util.HashMap;
+
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
@@ -9,6 +11,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -18,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 public class Planet extends Celestial {
 
     // Variables
+    private float terrestrialSize;
     private float atmosphereRadius;
     private float atmosphereDensity = 1.0f;
     private Array<Color> atmosComposition = new Array<>();
@@ -31,6 +36,11 @@ public class Planet extends Celestial {
 
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
 
+    private HashMap<Vector3, Float> pointCloud = new HashMap<>();
+    private int slice = 1;
+    private float frequency = 8.f;
+    private float amplitude = 1.f;
+
     // Private functions
     private void generateTexture(){
         Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
@@ -40,9 +50,34 @@ public class Planet extends Celestial {
         p.dispose();
     }
 
+    private Vector3 cartesianToSpherical(Vector3 c){
+        float theta = (float)Math.atan2(c.y, c.x);
+        float phi = (float)Math.acos(c.z / c.len());
+        float p = c.len();
+
+        return new Vector3(p, theta, phi);
+    }
+
+    private Vector3 sphericalToCartesian(Vector3 c){
+        float x = (float)(c.x * Math.sin(c.z) * Math.cos(c.y));
+        float y = (float)(c.x * Math.sin(c.z) * Math.sin(c.y));
+        float z = (float)(c.x * Math.cos(c.z));
+
+        return new Vector3(x, y, z);
+    }
+
     private void generateSurface(){
         // Generate a surface texture for the planet using 3d noise
-        
+        for(int z = 1; z <= terrestrialSize; z++){
+            for(int y = 1; y <= terrestrialSize; y++){
+                for(int x = 1; x <= terrestrialSize; x++){
+                    if(Math.sqrt((x - terrestrialSize / 2) * (x - terrestrialSize / 2) + (y - terrestrialSize / 2) * (y - terrestrialSize / 2) + (z - terrestrialSize / 2) * (z - terrestrialSize / 2)) > Math.pow(radius / terrestrialSize, 2.0)) continue;
+
+                    float val = (float)(noise.eval(x / frequency, y / frequency, z / frequency) + 1) / 2.f * amplitude;
+                    pointCloud.put(new Vector3(x, y, z), val);
+                }
+            }
+        }
     }
 
     // Constructor
@@ -51,7 +86,10 @@ public class Planet extends Celestial {
 
         setPosition(x, y);
 
-        noise = new OpenSimplexNoise(terrainSeed);
+        // TODO: Create planet but as a flat plane first, then convert to a sphere/circle
+
+        noise = new OpenSimplexNoise(0);
+        terrestrialSize = 50;//!(float)Math.floor(radius / 1000);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
 
@@ -98,6 +136,11 @@ public class Planet extends Celestial {
 
     public void setStarDirection(Vector3 v){ starDirection.set(v); }
 
+    public void setSurface(float frequency){
+        this.frequency = frequency;
+        generateSurface();
+    }
+
     @Override
     public void draw(Batch batch, float a){
         // Save rendering state
@@ -130,6 +173,24 @@ public class Planet extends Celestial {
         batch.setShader(null);
         batch.setProjectionMatrix(proj);
         batch.setTransformMatrix(trans);
+
+        //! Debug
+        batch.end();
+        ShapeRenderer renderer = game.shapeRenderer;
+        renderer.setProjectionMatrix(proj);
+        renderer.setTransformMatrix(trans);
+        renderer.begin(ShapeType.Filled);
+
+        for(Vector3 p : pointCloud.keySet()){
+            if(p.z != slice) continue;
+
+            float val = pointCloud.get(p);
+            renderer.setColor(val, val, val, 1.f);
+            renderer.rect(p.x / terrestrialSize * radius * 2 - radius, p.y / terrestrialSize * radius * 2 - radius, radius * 2 / terrestrialSize, radius * 2 / terrestrialSize);
+        }
+
+        renderer.end();
+        batch.begin();
     }
     
     @Override

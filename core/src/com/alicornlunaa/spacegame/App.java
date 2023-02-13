@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.Planet2.Biomes;
 import com.alicornlunaa.spacegame.scenes.Dev.PlanetEditor.PlanetEditor;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
@@ -78,6 +79,7 @@ public class App extends Game {
 
 				// Get all the particle effects
 				manager.initEffects(this);
+				Biomes.init();
 
 				// Initialize VisUI for dev screens
 				VisUI.load();
