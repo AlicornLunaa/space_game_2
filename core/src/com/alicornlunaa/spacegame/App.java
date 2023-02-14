@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.Planet2.Biomes;
+import com.alicornlunaa.spacegame.objects.Planet2.Biome;
 import com.alicornlunaa.spacegame.scenes.Dev.PlanetEditor.PlanetEditor;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
@@ -10,6 +10,7 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -79,7 +80,9 @@ public class App extends Game {
 
 				// Get all the particle effects
 				manager.initEffects(this);
-				Biomes.init();
+				Biome.register("Desert", Color.YELLOW, 100, 0.2f);
+				Biome.register("Forest", Color.GREEN, 40, 0.8f);
+				Biome.register("Ocean", Color.BLUE, 1, 0.05f);
 
 				// Initialize VisUI for dev screens
 				VisUI.load();

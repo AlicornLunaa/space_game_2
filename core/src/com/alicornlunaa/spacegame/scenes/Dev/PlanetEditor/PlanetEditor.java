@@ -46,7 +46,7 @@ public class PlanetEditor implements Screen {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 VisSlider slider = (VisSlider)a;
-                planet.setSurface(slider.getValue());
+                // planet.setSurface(slider.getValue());
             }
         });
         ui.add(s);
@@ -56,7 +56,7 @@ public class PlanetEditor implements Screen {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 VisSlider slider = (VisSlider)a;
-                planet.setSlice((int)slider.getValue());
+                // planet.setSlice((int)slider.getValue());
             }
         });
         ui.add(s);

@@ -23,7 +23,6 @@ import com.badlogic.gdx.utils.Array;
 public class Universe extends Actor {
 
     // Variables
-    private final App game;
     private ArrayList<Entity> ents = new ArrayList<>();
     private ArrayList<Celestial> celestials = new ArrayList<>();
 
@@ -97,7 +96,6 @@ public class Universe extends Actor {
     // Constructor
     public Universe(final App game){
         super();
-        this.game = game;
         universalWorld = new World(new Vector2(), true);
     }
 
