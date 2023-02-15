@@ -45,7 +45,7 @@ public class PlanetEditor implements Screen {
         s.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                VisSlider slider = (VisSlider)a;
+                // VisSlider slider = (VisSlider)a;
                 // planet.setSurface(slider.getValue());
             }
         });
@@ -55,7 +55,7 @@ public class PlanetEditor implements Screen {
         s.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                VisSlider slider = (VisSlider)a;
+                // VisSlider slider = (VisSlider)a;
                 // planet.setSlice((int)slider.getValue());
             }
         });
@@ -79,11 +79,11 @@ public class PlanetEditor implements Screen {
                     game.manager.reloadShaders("shaders/planet");
                     return true;
                 } else if(keycode == Keys.A){
-                    cam.position.x -= 10.f;
+                    cam.position.x += 10.f;
                     cam.update();
                     return true;
                 } else if(keycode == Keys.D){
-                    cam.position.x += 10.f;
+                    cam.position.x -= 10.f;
                     cam.update();
                     return true;
                 } else if(keycode == Keys.W){

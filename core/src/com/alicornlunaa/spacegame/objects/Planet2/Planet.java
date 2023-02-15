@@ -50,7 +50,6 @@ public class Planet extends Celestial {
         float theta = (float)Math.atan2(c.y, c.x);
         float phi = (float)Math.acos(c.z / c.len());
         float p = c.len();
-
         return new Vector3(p, theta, phi);
     }
 
@@ -58,7 +57,20 @@ public class Planet extends Celestial {
         float x = (float)(c.x * Math.sin(c.z) * Math.cos(c.y));
         float y = (float)(c.x * Math.sin(c.z) * Math.sin(c.y));
         float z = (float)(c.x * Math.cos(c.z));
+        return new Vector3(x, y, z);
+    }
 
+    private Vector3 rectToSphere(Vector3 r){
+        float theta = (float)(r.x * 2.0 * Math.PI);
+        float radius = r.y;
+        float phi = (float)(r.z * 2.0 * Math.PI);
+        return new Vector3(radius, theta, phi);
+    }
+
+    private Vector3 sphereToRect(Vector3 s){
+        float x = (float)(s.y / (2.0 * Math.PI));
+        float y = s.x;
+        float z = (float)(s.z / (2.0 * Math.PI));
         return new Vector3(x, y, z);
     }
 
@@ -70,17 +82,17 @@ public class Planet extends Celestial {
         p.setColor(Color.WHITE);
         p.fill();
 
-        for(int y = 0; y < surfaceRenderResolution; y++){
-            for(int x = 0; x < surfaceRenderResolution; x++){
+        for(float z = 0; z < surfaceRenderResolution; z++){
+            for(float x = 0; x < surfaceRenderResolution; x++){
                 // Convert to spherical and grab closest
-                float theta = (float)(((float)y / surfaceRenderResolution) * Math.PI);
-                float phi = (float)(((float)x / surfaceRenderResolution) * Math.PI);
-                Vector3 coord = sphericalToCartesian(new Vector3(terrestrialWidth, theta, phi));
-                coord.set((int)coord.x, (int)coord.y, (int)coord.z);
+                Vector3 sphereCoord = rectToSphere(new Vector3(x, 1, z).scl(1.f / surfaceRenderResolution / 2, 1, 1.f / surfaceRenderResolution / 2));
+                Vector3 coord = sphericalToCartesian(sphereCoord);
+                coord.add(1, 1, 1);
+                coord.scl(1 / 2.f);
+                coord.scl(terrestrialWidth);
 
-                Color c = new Color(biomeMap.getPixel((int)coord.x, (int)coord.y));
-                p.setColor(c);
-                p.drawPixel(x, y);
+                p.setColor(new Color(biomeMap.getPixel((int)coord.x, (int)coord.z)));
+                p.drawPixel((int)x, (int)z);
             }
         }
 
@@ -94,7 +106,7 @@ public class Planet extends Celestial {
 
         setPosition(x, y);
 
-        terrestrialHeight = 10;//!(float)Math.floor(radius / 1000);
+        terrestrialHeight = 35;//!(float)Math.floor(radius / 1000);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
@@ -155,13 +167,14 @@ public class Planet extends Celestial {
         super.draw(batch, a);
         
         // Shade the planet in
-        // batch.setShader(terraShader);
+        batch.setShader(terraShader);
         terraShader.setUniformMatrix("u_invCamTrans", invProj);
         terraShader.setUniformf("u_starDirection", starDirection);
         terraShader.setUniformf("u_planetWorldPos", worldPos);
         terraShader.setUniformf("u_planetRadius", getRadius());
         batch.draw(surfaceRender, radius * -1, radius * -1, radius * 2, radius * 2);
 
+        batch.setShader(null);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
         batch.setTransformMatrix(new Matrix4());
         batch.draw(debugRender, 10, 10, 256, 256);

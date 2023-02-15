@@ -23,7 +23,7 @@ public class TerrainGenerator {
 
     private Pixmap biomeMap;
     private float biomeAmplitude = 0.5f;
-    private float biomeFrequency = 10.f;
+    private float biomeFrequency = 40.f;
 
     // Functions
     private void generateBiomeMap(){

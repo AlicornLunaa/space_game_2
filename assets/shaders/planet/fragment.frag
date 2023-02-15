@@ -3,8 +3,6 @@ precision mediump float;
 #endif
 
 #define EPSILON 1e-4
-#define u_planetCenter vec3(0.0, 0.0, 2.235)
-#define u_planetRadius 1.0
 
 struct Celestial {
     vec2 pos;
@@ -12,12 +10,13 @@ struct Celestial {
 };
 
 varying vec2 v_texcoord;
+varying vec2 v_worldcoord;
 
 uniform sampler2D u_texture;
-uniform vec4 u_planetColor;
+
 uniform vec3 u_starDirection;
-uniform Celestial u_occluder;
-uniform float u_occlusionEnabled;
+uniform vec2 u_planetWorldPos;
+uniform float u_planetRadius;
 
 vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     vec3 offset = rayOrigin - center;
@@ -39,35 +38,26 @@ vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
     return vec2(0.0);
 }
 
-float shadowCast(vec3 rayOrigin, vec3 rayDir){
-    vec3 pos = vec3(u_occluder.pos, 0.0);
-    float rad = u_occluder.radius;
-    vec2 rayToStar = sphereRaycast(pos, rad, rayOrigin, rayDir);
-    return (rayToStar.x > 0.0 && u_occlusionEnabled > 0.5) ? 1.0 : 0.0;
-}
-
 void main() {
-    vec2 uv = (v_texcoord * 2.0 - 1.0);
-    vec3 cameraZ = vec3(0, 0, 1);
-    vec3 cameraX = vec3(1, 0, 0);
-    vec3 cameraY = vec3(0, 1, 0);
+    vec4 color = texture2D(u_texture, v_texcoord);
 
-    vec4 color = vec4(0, 0, 0, 0);
-    vec3 rayOrigin = vec3(0, 0, 0);
-    vec3 rayDir = normalize(uv.x * cameraX + uv.y * cameraY + 2.0 * cameraZ);
+    vec3 rayOrigin = vec3(v_worldcoord, u_planetRadius * -2.0);
+    vec3 rayDir = vec3(0, 0, 1);
+    vec2 surfaceRay = sphereRaycast(vec3(u_planetWorldPos, 0.0), u_planetRadius, rayOrigin, rayDir);
 
-    vec2 surfaceRay = sphereRaycast(u_planetCenter, u_planetRadius, rayOrigin, rayDir);
-    float distToSurface = surfaceRay.x;
-    float distThruSurface = surfaceRay.y;
+    color *= vec4(vec3(surfaceRay.y / (u_planetRadius * 2.0)), 1.0);
 
-    float tMin = 1e19;
-    if(distThruSurface > 0.0 && tMin > distToSurface) {
-        vec3 sN = normalize((normalize(rayOrigin + rayDir * distToSurface) - u_planetCenter));
-        tMin = surfaceRay.x;
-        color = u_planetColor.rgba * vec4(vec3(max(0.0, dot(sN, u_starDirection))), 1.0);
+    if(distance(v_worldcoord, u_planetWorldPos) > u_planetRadius){
+        color *= 0.0;
     }
 
-    float inShadow = shadowCast(vec3(uv, 0.0), u_starDirection);
+    rayOrigin = rayOrigin + rayDir * (surfaceRay.x - EPSILON);
+    rayDir = u_starDirection;
+    vec2 lightingRay = sphereRaycast(vec3(u_planetWorldPos, 0.0), u_planetRadius, rayOrigin, rayDir);
 
-    gl_FragColor = color * vec4(vec3(1.0 - inShadow), 1.0);
+    if(lightingRay.y > 0.0){
+        color *= 1.0 - (lightingRay.y / (u_planetRadius * 2.0));
+    }
+
+    gl_FragColor = color;
 }
