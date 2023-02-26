@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.MapScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Planet.Planet;
+import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
@@ -217,7 +217,7 @@ public class MapPanel extends Stage {
                 Color c = Color.CYAN;
 
                 if(o.getChild() instanceof Planet){
-                    c = ((Planet)o.getChild()).getAtmosColor();
+                    c = ((Planet)o.getChild()).getAtmosphereColor();
                 }
 
                 game.shapeRenderer.setTransformMatrix(new Matrix4().set(((Celestial)o.getChild()).getUniverseSpaceTransform()));

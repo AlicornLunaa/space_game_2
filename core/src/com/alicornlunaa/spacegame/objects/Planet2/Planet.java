@@ -1,18 +1,26 @@
 package com.alicornlunaa.spacegame.objects.Planet2;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
@@ -28,14 +36,18 @@ public class Planet extends Celestial {
     private long terrainSeed = 123;
     private TerrainGenerator generator;
 
-    private Texture texture; // Used for rendering, just 1x1 white
-    private Texture debugRender;
+    private Texture texture;
     private Texture surfaceRender;
-    private int surfaceRenderResolution = 100;
+    private int surfaceRenderResolution = 256;
     private ShaderProgram atmosShader;
     private ShaderProgram terraShader;
 
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
+
+    private World physWorld;
+    private float physAccumulator = 0.f;
+    private ArrayList<Entity> planetEnts = new ArrayList<>();
+    private Stack<Entity> leavingEnts = new Stack<>();
 
     // Private functions
     private void generateTexture(){
@@ -85,13 +97,13 @@ public class Planet extends Celestial {
         for(float z = 0; z < surfaceRenderResolution; z++){
             for(float x = 0; x < surfaceRenderResolution; x++){
                 // Convert to spherical and grab closest
-                Vector3 sphereCoord = rectToSphere(new Vector3(x, 1, z).scl(1.f / surfaceRenderResolution / 2, 1, 1.f / surfaceRenderResolution / 2));
-                Vector3 coord = sphericalToCartesian(sphereCoord);
+                Vector3 sphereCoord = rectToSphere(new Vector3(x, 1, z).scl(1.f / surfaceRenderResolution / (float)Math.PI, 1, 1.f / surfaceRenderResolution / (float)Math.PI));
+                Vector3 coord = sphericalToCartesian(sphereCoord.add(0, 0, 0));
                 coord.add(1, 1, 1);
                 coord.scl(1 / 2.f);
                 coord.scl(terrestrialWidth);
 
-                p.setColor(new Color(biomeMap.getPixel((int)coord.x, (int)coord.z)));
+                p.setColor(new Color(biomeMap.getPixel(biomeMap.getWidth() - (int)coord.x, biomeMap.getHeight() - (int)coord.z)));
                 p.drawPixel((int)x, (int)z);
             }
         }
@@ -100,13 +112,17 @@ public class Planet extends Celestial {
         p.dispose();
     }
 
+    private void generatePhysWorld(){
+        physWorld = new World(new Vector2(), true);
+    }
+
     // Constructor
     public Planet(App game, World world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
         super(game, world, terraRadius);
 
         setPosition(x, y);
 
-        terrestrialHeight = 35;//!(float)Math.floor(radius / 1000);
+        terrestrialHeight = 35;//(float)Math.floor(radius / 10);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
@@ -117,7 +133,7 @@ public class Planet extends Celestial {
 
         generateTexture();
         generateSurface();
-        debugRender = new Texture(generator.getBiomeMap());
+        generatePhysWorld();
 
         atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         terraShader = game.manager.get("shaders/planet", ShaderProgram.class);
@@ -129,6 +145,7 @@ public class Planet extends Celestial {
     public Array<Color> getAtmosphereComposition(){ return atmosComposition; }
     public Array<Float> getAtmospherePercentages(){ return atmosPercentages; }
     public long getTerrainSeed(){ return terrainSeed; }
+    public World getPhysWorld(){ return physWorld; }
 
     public Color getAtmosphereColor(){
         float r = 0.f;
@@ -156,6 +173,124 @@ public class Planet extends Celestial {
 
     public void setStarDirection(Vector3 v){ starDirection.set(v); }
 
+    /**
+     * Converts the entity to 2d planet planar coordinates
+     * @param e Entity to be converted
+     */
+    public void addEntityWorld(Entity e){
+        if(planetEnts.contains(e)) return;
+        if(e.getDriver() != null) this.addEntityWorld(e.getDriver());
+
+        // Formula: x = theta, y = radius
+        Vector2 localPos = e.getPosition();
+        float x = (localPos.angleRad() / (float)Math.PI / 2.f * terrestrialWidth);
+        float y = localPos.len();
+        e.setPosition(x, y);
+
+        // Load space angle relative to the world
+        float theta = localPos.angleDeg();
+        float omega = e.getRotation();
+        e.setRotation(omega - theta + 90);
+
+        // Convert orbital velocity to world
+        Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
+        Vector2 tangent = localPos.cpy().nor().rotateDeg(-90);
+        float velToPlanet = vel.dot(localPos.cpy().nor());
+        float tangentVel = vel.dot(tangent);
+        e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
+
+        // Add body
+        e.loadBodyToWorld(physWorld, Constants.PLANET_PPM);
+        planetEnts.add(e);
+    }
+
+    /**
+     * Convert the entity to the space planet circular coordinates
+     * @param e Entity to be converted
+     */
+    public void delEntityWorld(Entity e){
+        // Formula: theta = x, radius = y
+        double theta = ((e.getX() / terrestrialWidth) * Math.PI * 2);
+        float radius = e.getY();
+
+        // Convert to space angles, spaceAngle = worldAngle + theta - 90
+        float worldAngle = e.getRotation();
+        e.setRotation(worldAngle + (float)Math.toDegrees(theta) - 90);
+
+        // Convet to space position
+        float x = (float)(Math.cos(theta) * radius);
+        float y = (float)(Math.sin(theta) * radius);
+        e.setPosition(x, y);
+
+        // Convert to space velocity, tangent = x, planetToEntity = y
+        Vector2 tangent = new Vector2(0, -1).rotateRad((float)theta);
+        Vector2 planetToEnt = e.getPosition().nor();
+        Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
+        e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
+
+        // Remove body
+        e.loadBodyToWorld(this.getWorld(), Constants.PPM);
+        planetEnts.remove(e);
+    }
+
+    public ArrayList<Entity> getPlanetEntities(){ return planetEnts; }
+
+    public boolean checkTransferPlanet(Entity e){
+        // This function checks if the entity supplied
+        // is within range to change its physics system to the planet's
+        float dist = e.getPosition().len();
+
+        if(dist < atmosphereRadius * 0.95f){
+            // Move it into this world
+            this.addEntityWorld(e);
+
+            if(e instanceof Player || e instanceof Ship)
+                // TODO: CONVERT TO PLANET2
+                game.setScreen(new PlanetScene(game, null));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkLeavePlanet(Entity e){
+        // This function checks if the entity supplied
+        // is far enough to leave the planet's physics world
+        if(e.getY() > atmosphereRadius){
+            // Move it into this world
+            leavingEnts.push(e);
+            return true;
+        }
+
+        return false;
+    }
+
+    public Vector2 applyDrag(Body b){
+        // Newtons gravitational law: F = 1/2(density * velocity^2 * dragCoefficient * Area)
+        float planetRadPhys = radius / physScale; // Planet radius in physics scale
+        float atmosRadPhys = atmosphereRadius / physScale; // Atmosphere radius in physics scale
+        float entRadPhys = b.getPosition().len(); // Entity radius in physics scale
+
+        float atmosSurface = atmosRadPhys - planetRadPhys; // Atmosphere radius above surface
+        float entSurface = entRadPhys - planetRadPhys; // Entity radius above surface
+        float atmosDepth = Math.max(atmosSurface - entSurface, 0) / atmosSurface; // How far the entity is in the atmosphere, where zero is outside and 1 is submerged
+        float density = atmosphereDensity * atmosDepth;
+
+        Vector2 relVel = body.getLinearVelocity().cpy().sub(b.getLinearVelocity());
+        Vector2 velDir = b.getLinearVelocity().cpy().nor();
+        float velSqr = relVel.len2();
+        float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
+
+        return velDir.scl(-1 * force);
+    }
+
+    @Override
+    protected Vector2 applyPhysics(float delta, Entity e){
+        checkTransferPlanet(e);
+        return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
+    }
+
     @Override
     public void draw(Batch batch, float a){
         // Save rendering state
@@ -174,11 +309,8 @@ public class Planet extends Celestial {
         terraShader.setUniformf("u_planetRadius", getRadius());
         batch.draw(surfaceRender, radius * -1, radius * -1, radius * 2, radius * 2);
 
-        batch.setShader(null);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
         batch.setTransformMatrix(new Matrix4());
-        batch.draw(debugRender, 10, 10, 256, 256);
-
         batch.setShader(atmosShader);
         atmosShader.setUniformMatrix("u_invCamTrans", invProj);
         atmosShader.setUniformf("u_starDirection", starDirection);
@@ -191,16 +323,6 @@ public class Planet extends Celestial {
         batch.setShader(null);
         batch.setProjectionMatrix(proj);
         batch.setTransformMatrix(trans);
-
-        //! Debug
-        batch.end();
-        ShapeRenderer renderer = game.shapeRenderer;
-        renderer.setProjectionMatrix(proj);
-        renderer.setTransformMatrix(trans);
-        renderer.begin(ShapeType.Filled);
-
-        renderer.end();
-        batch.begin();
     }
     
     @Override

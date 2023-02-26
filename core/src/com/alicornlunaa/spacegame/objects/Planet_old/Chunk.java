@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects.Planet;
+package com.alicornlunaa.spacegame.objects.Planet_old;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.graphics.g2d.Batch;

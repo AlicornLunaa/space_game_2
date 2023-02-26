@@ -2,13 +2,12 @@ package com.alicornlunaa.spacegame.scenes.SpaceScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.Planet.Planet;
+import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
@@ -43,15 +42,13 @@ public class SpacePanel extends Stage {
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
 
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
-
         universe = new Universe(game);
         universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
-        universe.addCelestial(new Planet(game, cam, universe, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, new Color(.67f, 0.65f, 0.64f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mercury
-        universe.addCelestial(new Planet(game, cam,universe, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Venus
-        universe.addCelestial(new Planet(game, cam,universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, new Color(.72f, 0.7f, 0.9f, 1), new Color(0.6f, 0.6f, 1.0f, 1.0f)), universe.getCelestial(0)); // Earth
-        universe.addCelestial(new Planet(game, cam,universe, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, new Color(.22f, 1.0f, 0.1f, 1), new Color(0.6f, 1.0f, 0.6f, 1.0f)), universe.getCelestial(0)); // Mars
-        universe.addCelestial(new Planet(game, cam,universe, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, new Color(.88f, 0.88f, 0.88f, 1), new Color(.88f, 0.88f, 0.88f, 1.0f)), universe.getCelestial(3)); // Moon
+        universe.addCelestial(new Planet(game, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Mercury
+        universe.addCelestial(new Planet(game, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Venus
+        universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Earth
+        universe.addCelestial(new Planet(game, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Mars
+        universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0), universe.getCelestial(3)); // Moon
         universe.addEntity(ship);
         universe.addEntity(game.player);
         OrbitUtils.createOrbit(universe, universe.getCelestial(1));

@@ -9,6 +9,10 @@ public class Biome {
 
     private String name;
     private Color color;
+    private float maxTemp = 0.f;
+    private float minTemp = 0.f;
+    private float maxHumidity = 0.f;
+    private float minHumidity = 0.f;
     private Array<Float> frequencies = new Array<>();
     private Array<Float> amplitudes = new Array<>();
 
@@ -22,9 +26,10 @@ public class Biome {
      * @param frequency
      * @param amplitude
      */
-    public void newLayer(float frequency, float amplitude){
+    public Biome newLayer(float frequency, float amplitude){
         frequencies.add(frequency);
         amplitudes.add(amplitude);
+        return this;
     }
 
     public String getName(){

@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects.Planet;
+package com.alicornlunaa.spacegame.objects.Planet_old;
 
 import java.util.ArrayList;
 import java.util.HashMap;

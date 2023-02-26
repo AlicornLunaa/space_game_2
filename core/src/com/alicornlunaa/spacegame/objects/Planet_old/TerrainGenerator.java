@@ -1,7 +1,7 @@
-package com.alicornlunaa.spacegame.objects.Planet;
+package com.alicornlunaa.spacegame.objects.Planet_old;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Planet.Tile.TileType;
+import com.alicornlunaa.spacegame.objects.Planet_old.Tile.TileType;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.physics.box2d.Body;
 

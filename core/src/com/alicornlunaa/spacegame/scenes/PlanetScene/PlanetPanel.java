@@ -1,9 +1,9 @@
 package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Planet.Chunk;
-import com.alicornlunaa.spacegame.objects.Planet.Planet;
-import com.alicornlunaa.spacegame.objects.Planet.Tile;
+import com.alicornlunaa.spacegame.objects.Planet_old.Chunk;
+import com.alicornlunaa.spacegame.objects.Planet_old.Planet;
+import com.alicornlunaa.spacegame.objects.Planet_old.Tile;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
