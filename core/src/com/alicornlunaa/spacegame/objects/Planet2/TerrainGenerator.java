@@ -16,26 +16,31 @@ public class TerrainGenerator {
     // Variables
     private HashMap<Vector3, Color> tiles = new HashMap<>();
     private OpenSimplexNoise noise;
-    private BiomeClassifier classifier;
     private int width;
     private int height;
     private long seed;
 
     private Pixmap biomeMap;
-    private float biomeAmplitude = 0.5f;
-    private float biomeFrequency = 40.f;
+    private float tempFrequency = 40;
+    private float tempAmplitude = 1;
+    private float humidityFrequency = 80;
+    private float humidityAmplitude = 1;
+    private float heightFrequency = 120;
+    private float heightAmplitude = 1;
 
     // Functions
-    private void generateBiomeMap(){
+    private void generateBiomeMaps(){
         // Its width*width here because the biome on the 2d world is 1 dimensional.
         // the two dimensions here are only used for the space-view of the planet
         biomeMap = new Pixmap(width, width, Format.RGBA8888);
 
         for(int y = 0; y < width; y++){
             for(int x = 0; x < width; x++){
-                float val = (float)(noise.eval(x / biomeFrequency, y / biomeFrequency) + 1.f) / 2.f * biomeAmplitude;
+                float temp = (float)(noise.eval(x / tempFrequency, y / tempFrequency) + 1.f) / 2.f * tempAmplitude;
+                float humidity = (float)(noise.eval(x / humidityFrequency, y / humidityFrequency) + 1.f) / 2.f * humidityAmplitude;
+                float height = (float)(noise.eval(x / heightFrequency, y / heightFrequency) + 1.f) / 2.f * heightAmplitude;
 
-                biomeMap.setColor(val, val, val, 1.f);
+                biomeMap.setColor(temp, humidity, height, 1.f);
                 biomeMap.drawPixel(x, y);
             }
         }
@@ -45,8 +50,15 @@ public class TerrainGenerator {
         // Convert map colors to biomes
         for(int y = 0; y < width; y++){
             for(int x = 0; x < width; x++){
-                float val = new Color(biomeMap.getPixel(x, y)).r;
-                Biome biome = classifier.getBiome(val);
+                Color val = new Color(biomeMap.getPixel(x, y));
+                float temp = val.r;
+                float humidity = val.g;
+                float height = val.b;
+                
+                Biome biome = Biome.getBiome(temp, humidity, height);
+                
+                if(biome == null) continue;
+
                 biomeMap.setColor(biome.getColor());
                 biomeMap.drawPixel(x, y);
             }
@@ -58,9 +70,8 @@ public class TerrainGenerator {
         this.height = height;
         this.seed = seed;
         noise = new OpenSimplexNoise(seed);
-        classifier = new BiomeClassifier(seed);
 
-        generateBiomeMap();
+        generateBiomeMaps();
         classifyBiomes();
     }
 

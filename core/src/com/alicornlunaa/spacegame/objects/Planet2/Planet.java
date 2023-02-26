@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -37,6 +36,7 @@ public class Planet extends Celestial {
     private TerrainGenerator generator;
 
     private Texture texture;
+    private Texture debugTexture;
     private Texture surfaceRender;
     private int surfaceRenderResolution = 256;
     private ShaderProgram atmosShader;
@@ -134,6 +134,8 @@ public class Planet extends Celestial {
         generateTexture();
         generateSurface();
         generatePhysWorld();
+
+        debugTexture = new Texture(generator.getBiomeMap());
 
         atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
         terraShader = game.manager.get("shaders/planet", ShaderProgram.class);
@@ -311,6 +313,10 @@ public class Planet extends Celestial {
 
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
         batch.setTransformMatrix(new Matrix4());
+
+        batch.setShader(null);
+        batch.draw(debugTexture, 10, 10, 256, 256);
+
         batch.setShader(atmosShader);
         atmosShader.setUniformMatrix("u_invCamTrans", invProj);
         atmosShader.setUniformf("u_starDirection", starDirection);
