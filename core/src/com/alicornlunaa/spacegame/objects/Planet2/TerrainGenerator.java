@@ -56,9 +56,6 @@ public class TerrainGenerator {
                 float height = val.b;
                 
                 Biome biome = Biome.getBiome(temp, humidity, height);
-                
-                if(biome == null) continue;
-
                 biomeMap.setColor(biome.getColor());
                 biomeMap.drawPixel(x, y);
             }

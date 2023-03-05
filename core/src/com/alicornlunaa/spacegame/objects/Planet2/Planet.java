@@ -48,6 +48,7 @@ public class Planet extends Celestial {
     private float physAccumulator = 0.f;
     private ArrayList<Entity> planetEnts = new ArrayList<>();
     private Stack<Entity> leavingEnts = new Stack<>();
+    private WorldBody worldBlocks;
 
     // Private functions
     private void generateTexture(){
@@ -127,6 +128,7 @@ public class Planet extends Celestial {
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
         generator = new TerrainGenerator((int)terrestrialWidth, (int)terrestrialHeight, terrainSeed);
+        worldBlocks = new WorldBody(game, (int)terrestrialWidth, (int)terrestrialHeight);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
@@ -148,6 +150,7 @@ public class Planet extends Celestial {
     public Array<Float> getAtmospherePercentages(){ return atmosPercentages; }
     public long getTerrainSeed(){ return terrainSeed; }
     public World getPhysWorld(){ return physWorld; }
+    public WorldBody getWorldBody(){ return worldBlocks; }
 
     public Color getAtmosphereColor(){
         float r = 0.f;
