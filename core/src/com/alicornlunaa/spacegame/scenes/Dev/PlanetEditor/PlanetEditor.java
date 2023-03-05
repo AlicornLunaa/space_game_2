@@ -4,6 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -22,6 +23,8 @@ import com.kotcrab.vis.ui.widget.VisTable;
 public class PlanetEditor implements Screen {
 
     // Variables
+    private final App game;
+    
     private Stage stage;
     private Stage uiStage;
     private VisTable ui;
@@ -32,6 +35,8 @@ public class PlanetEditor implements Screen {
 
     // Constructor
     public PlanetEditor(final App game){
+        this.game = game;
+
         stage = new Stage(new ScreenViewport());
         uiStage = new Stage(new ScreenViewport());
         cam = (OrthographicCamera)stage.getCamera();
@@ -112,7 +117,9 @@ public class PlanetEditor implements Screen {
 
     // Functions
     @Override
-    public void show() {}
+    public void show() {
+        game.setScreen(new PlanetScene(game, planet));
+    }
 
     @Override
     public void render(float delta) {

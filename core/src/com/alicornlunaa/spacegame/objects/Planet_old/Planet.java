@@ -375,7 +375,7 @@ public class Planet extends Celestial {
             this.addEntityWorld(e);
 
             if(e instanceof Player || e instanceof Ship)
-                game.setScreen(new PlanetScene(game, this));
+                // game.setScreen(new PlanetScene(game, this));
 
             return true;
         }

@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Planet_old.Planet;
+import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -40,8 +40,8 @@ public class PlanetScene implements Screen {
         // Initialize UI
         uiShip.shipCompass.setTarget(game.player);
 
-        // planetPanel.setDebugAll(true);
-        // uiPanel.setDebugAll(true);
+        planetPanel.setDebugAll(true);
+        uiPanel.setDebugAll(true);
     }
 
     // Functions

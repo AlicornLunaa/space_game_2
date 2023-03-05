@@ -36,6 +36,9 @@ public class Tile extends Actor {
         this.y = y;
         this.id = id;
         region = getTexture(game.atlas, id);
+
+        setSize(TILE_SIZE, TILE_SIZE);
+        setPosition(x, y);
     }
 
     // Functions

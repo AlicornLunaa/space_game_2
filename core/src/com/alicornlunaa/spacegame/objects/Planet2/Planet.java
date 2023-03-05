@@ -151,6 +151,8 @@ public class Planet extends Celestial {
     public long getTerrainSeed(){ return terrainSeed; }
     public World getPhysWorld(){ return physWorld; }
     public WorldBody getWorldBody(){ return worldBlocks; }
+    public float getTerrestrialWidth(){ return terrestrialWidth; }
+    public float getTerrestrialHeight(){ return terrestrialHeight; }
 
     public Color getAtmosphereColor(){
         float r = 0.f;
@@ -250,8 +252,7 @@ public class Planet extends Celestial {
             this.addEntityWorld(e);
 
             if(e instanceof Player || e instanceof Ship)
-                // TODO: CONVERT TO PLANET2
-                game.setScreen(new PlanetScene(game, null));
+                game.setScreen(new PlanetScene(game, this));
 
             return true;
         }

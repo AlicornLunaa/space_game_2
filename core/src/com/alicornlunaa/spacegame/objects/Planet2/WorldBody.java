@@ -12,6 +12,8 @@ public class WorldBody extends Group {
     private Tile[][] tiles;
 
     public WorldBody(final App game, int width, int height){
+        this.setTransform(false);
+
         tiles = new Tile[width][height];
 
         for(int y = 0; y < height; y++){
