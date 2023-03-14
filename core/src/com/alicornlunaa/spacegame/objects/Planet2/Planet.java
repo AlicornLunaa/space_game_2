@@ -359,10 +359,8 @@ public class Planet extends Celestial {
                 this.checkLeavePlanet(e);
                 
                 // Taken from Celestial.java to correctly apply the right force
-                float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
-                float force = Constants.GRAVITY_CONSTANT * (body.getMass() / (orbitRadius * orbitRadius));
-                e.getBody().applyForceToCenter(0, -0.00075f * force, true);
-                // TODO: Problem here when descending ot the bottom of the planet
+                float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (terrestrialHeight * terrestrialHeight));
+                e.getBody().applyForceToCenter(0, force * -1.f, true);
             }
         }
 

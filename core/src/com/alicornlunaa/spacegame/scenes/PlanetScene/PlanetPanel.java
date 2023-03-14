@@ -2,9 +2,9 @@ package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.objects.Blocks.Tile;
 import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.objects.Planet2.WorldBody;
-import com.alicornlunaa.spacegame.objects.Planet_old.Tile;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -72,9 +72,9 @@ public class PlanetPanel extends Stage {
 
         batch.begin();
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * -1.01f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        // worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * 1.01f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        // worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
 
