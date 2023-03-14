@@ -14,7 +14,7 @@ public class Constants {
     public static final float SHIP_PPM = 16.0f;
 
     // Math constants
-    public static final float GRAVITY_CONSTANT = 10;//1.0f;
+    public static final float GRAVITY_CONSTANT = 2;//1.0f;
     public static final float DRAG_COEFFICIENT = 0.004f;
     public static final float CONVERSION_FACTOR = (1.f / 3.125f) * 0.2f;
     

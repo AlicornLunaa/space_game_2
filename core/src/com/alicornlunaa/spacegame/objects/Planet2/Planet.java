@@ -6,6 +6,7 @@ import java.util.Stack;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.Blocks.Tile;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
@@ -59,6 +60,7 @@ public class Planet extends Celestial {
         p.dispose();
     }
 
+    @SuppressWarnings("unused")
     private Vector3 cartesianToSpherical(Vector3 c){
         float theta = (float)Math.atan2(c.y, c.x);
         float phi = (float)Math.acos(c.z / c.len());
@@ -80,6 +82,7 @@ public class Planet extends Celestial {
         return new Vector3(radius, theta, phi);
     }
 
+    @SuppressWarnings("unused")
     private Vector3 sphereToRect(Vector3 s){
         float x = (float)(s.y / (2.0 * Math.PI));
         float y = s.x;
@@ -115,6 +118,7 @@ public class Planet extends Celestial {
 
     private void generatePhysWorld(){
         physWorld = new World(new Vector2(), true);
+        worldBlocks = new WorldBody(game, physWorld, (int)terrestrialWidth, (int)terrestrialHeight);
     }
 
     // Constructor
@@ -128,7 +132,6 @@ public class Planet extends Celestial {
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
         generator = new TerrainGenerator((int)terrestrialWidth, (int)terrestrialHeight, terrainSeed);
-        worldBlocks = new WorldBody(game, (int)terrestrialWidth, (int)terrestrialHeight);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
@@ -247,7 +250,7 @@ public class Planet extends Celestial {
         // is within range to change its physics system to the planet's
         float dist = e.getPosition().len();
 
-        if(dist < atmosphereRadius * 0.95f){
+        if(dist < radius * 1.2f){
             // Move it into this world
             this.addEntityWorld(e);
 
@@ -263,7 +266,7 @@ public class Planet extends Celestial {
     public boolean checkLeavePlanet(Entity e){
         // This function checks if the entity supplied
         // is far enough to leave the planet's physics world
-        if(e.getY() > atmosphereRadius){
+        if(e.getY() > radius * 1.3f){
             // Move it into this world
             leavingEnts.push(e);
             return true;
@@ -335,6 +338,47 @@ public class Planet extends Celestial {
         batch.setTransformMatrix(trans);
     }
     
+    public void updateWorld(float delta){
+        // Step the physics on the world
+        physAccumulator += Math.min(delta, 0.25f);
+        while(physAccumulator >= Constants.TIME_STEP){
+            physWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
+            physAccumulator -= Constants.TIME_STEP;
+        
+            // Constrain entities to the world
+            float worldWidthPixels = terrestrialWidth * Tile.TILE_SIZE;
+            for(Entity e : planetEnts){
+                if(e.getX() > worldWidthPixels){
+                    e.setX(e.getX() - worldWidthPixels);
+                } else if(e.getX() < 0){
+                    e.setX(e.getX() + worldWidthPixels);
+                }
+    
+                e.fixedUpdate(Constants.TIME_STEP);
+                applyDrag(e.getBody());
+                this.checkLeavePlanet(e);
+                
+                // Taken from Celestial.java to correctly apply the right force
+                float orbitRadius = e.getBody().getPosition().y; // Entity radius in physics scale
+                float force = Constants.GRAVITY_CONSTANT * (body.getMass() / (orbitRadius * orbitRadius));
+                e.getBody().applyForceToCenter(0, -0.00075f * force, true);
+                // TODO: Problem here when descending ot the bottom of the planet
+            }
+        }
+
+        for(Entity e : planetEnts){
+            e.update(delta);
+        }
+
+        while(leavingEnts.size() > 0){
+            Entity e  = leavingEnts.pop();
+            this.delEntityWorld(e);
+
+            if(e instanceof Player || e instanceof Ship)
+                game.setScreen(game.spaceScene);
+        }
+    }
+
     @Override
     public boolean remove(){
         texture.dispose();

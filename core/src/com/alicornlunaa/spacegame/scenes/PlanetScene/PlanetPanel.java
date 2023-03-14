@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.PlanetScene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Planet2.Planet;
 import com.alicornlunaa.spacegame.objects.Planet2.WorldBody;
 import com.alicornlunaa.spacegame.objects.Planet_old.Tile;
@@ -27,9 +28,6 @@ public class PlanetPanel extends Stage {
         this.planet = planet;
         this.cam = (OrthographicCamera)getCamera();
 
-        // TODO: TEMP
-        game.player.getDriving().setPosition(0, 0);
-
         // Controls
         this.addListener(new InputListener(){
             @Override
@@ -55,7 +53,7 @@ public class PlanetPanel extends Stage {
         super.act(delta);
 
         // Physics updates
-        // planet.updateWorld(delta);
+        planet.updateWorld(delta);
 
         // Parent camera to player
         game.player.updateCamera(cam);
@@ -79,6 +77,11 @@ public class PlanetPanel extends Stage {
         worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
+
+        for(Entity e : planet.getPlanetEntities()){
+            e.draw(batch, 1.f);
+        }
+
         batch.end();
 
         // Debug rendering
@@ -97,6 +100,8 @@ public class PlanetPanel extends Stage {
             //     game.shapeRenderer.rect(pos.x * size, pos.y * size, size, size);
             // }
             game.shapeRenderer.end();
+
+            // game.debug.render(planet.getPhysWorld(), batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
         }
     }
 
