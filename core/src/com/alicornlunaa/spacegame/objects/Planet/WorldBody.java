@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects.Planet2;
+package com.alicornlunaa.spacegame.objects.Planet;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Blocks.Tile;

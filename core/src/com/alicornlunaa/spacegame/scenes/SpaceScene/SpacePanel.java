@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.SpaceScene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.Planet2.Planet;
+import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;

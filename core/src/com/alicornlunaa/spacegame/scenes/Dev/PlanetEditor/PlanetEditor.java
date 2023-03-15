@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.Dev.PlanetEditor;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Planet2.Planet;
+import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;

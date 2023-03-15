@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects.Planet2;
+package com.alicornlunaa.spacegame.objects.Planet;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -359,7 +359,8 @@ public class Planet extends Celestial {
                 this.checkLeavePlanet(e);
                 
                 // Taken from Celestial.java to correctly apply the right force
-                float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (terrestrialHeight * terrestrialHeight));
+                float height = Math.max(e.getBody().getPosition().y * e.getPhysScale(), terrestrialHeight * Tile.TILE_SIZE);
+                float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (height * height));
                 e.getBody().applyForceToCenter(0, force * -1.f, true);
             }
         }

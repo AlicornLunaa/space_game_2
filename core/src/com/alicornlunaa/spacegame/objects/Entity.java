@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects;
 
+import com.alicornlunaa.spacegame.interfaces.IEntity;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
@@ -16,7 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Null;
 
-public class Entity extends Actor implements Disposable {
+public class Entity extends Actor implements Disposable, IEntity {
 
     // Variables
     protected @Null Body body = null;
@@ -244,5 +245,8 @@ public class Entity extends Actor implements Disposable {
 
     @Override
     public void dispose() {}
+
+    public boolean onLeftClick(){ return false; }
+    public boolean onRightClick(){ return false; }
 
 }

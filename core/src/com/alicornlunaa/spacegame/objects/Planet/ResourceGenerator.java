@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects.Planet2;
+package com.alicornlunaa.spacegame.objects.Planet;
 
 /**
  * Generates resources for a planet such as natural deposits
