@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
-import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -26,7 +25,6 @@ public class SpacePanel extends Stage {
     private PhysWorld world;
     private Starfield backgroundTexture;
 
-    public Universe universe;
     public Ship ship;
 
     // Constructor
@@ -40,25 +38,24 @@ public class SpacePanel extends Stage {
         ship = new Ship(game, world, 0, 0, 0);
         ship.load("./saves/ships/null.ship");
 
-        universe = new Universe(game);
-        universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
-        universe.addCelestial(new Planet(game, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Mercury
-        universe.addCelestial(new Planet(game, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Venus
-        universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Earth
-        universe.addCelestial(new Planet(game, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Mars
-        universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0), universe.getCelestial(3)); // Moon
-        universe.addEntity(ship);
-        universe.addEntity(game.player);
-        OrbitUtils.createOrbit(universe, universe.getCelestial(1));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(2));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(3));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(4));
-        OrbitUtils.createOrbit(universe, universe.getCelestial(5));
-        OrbitUtils.createOrbit(universe, ship);
-        OrbitUtils.createOrbit(universe, game.player);
-        this.addActor(universe);
+        game.universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
+        game.universe.addCelestial(new Planet(game, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Mercury
+        game.universe.addCelestial(new Planet(game, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Venus
+        game.universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Earth
+        game.universe.addCelestial(new Planet(game, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Mars
+        game.universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0), game.universe.getCelestial(3)); // Moon
+        game.universe.addEntity(ship);
+        game.universe.addEntity(game.player);
+        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(1));
+        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(2));
+        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(3));
+        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(4));
+        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(5));
+        OrbitUtils.createOrbit(game.universe, ship);
+        OrbitUtils.createOrbit(game.universe, game.player);
+        this.addActor(game.universe);
         
-        Body b = universe.getCelestial(1).getBody();
+        Body b = game.universe.getCelestial(1).getBody();
         b.applyForceToCenter(0, 100000, true);
         
         b = ship.getBody();
@@ -85,11 +82,11 @@ public class SpacePanel extends Stage {
         super.act(delta);
 
         // Physics updates
-        universe.update(delta);
+        game.universe.update(delta);
 
         // Parent camera to the player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(OrbitUtils.getUniverseSpacePosition(universe, ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
+        cam.position.set(OrbitUtils.getUniverseSpacePosition(game.universe, ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
         cam.update();
     }
 

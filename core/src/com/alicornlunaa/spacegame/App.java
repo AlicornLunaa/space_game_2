@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Biome;
+import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.phys.Simulation;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
@@ -31,6 +32,7 @@ public class App extends Game {
 	public SpaceScene spaceScene;
 
 	public Simulation simulation;
+	public Universe universe;
 	public Player player;
 
 	public boolean loaded = false;
@@ -96,6 +98,7 @@ public class App extends Game {
 
 				// Start new scene
 				simulation = new Simulation();
+				universe = new Universe(this);
 				player = new Player(this, -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
 				this.setScreen(spaceScene);

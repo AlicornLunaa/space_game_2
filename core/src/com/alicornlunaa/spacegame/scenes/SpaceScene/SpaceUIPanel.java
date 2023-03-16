@@ -61,7 +61,7 @@ public class SpaceUIPanel extends Stage {
         warpSlider.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.spaceScene.spacePanel.universe.setTimewarp(warpSlider.getValue());
+                game.universe.setTimewarp(warpSlider.getValue());
             }
         });
 
