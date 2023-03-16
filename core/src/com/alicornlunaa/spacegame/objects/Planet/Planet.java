@@ -9,6 +9,7 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Blocks.Tile;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -21,12 +22,13 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 public class Planet extends Celestial {
 
     // Variables
+    private final App game;
+
     private float terrestrialWidth;
     private float terrestrialHeight;
     private float atmosphereRadius;
@@ -45,8 +47,7 @@ public class Planet extends Celestial {
 
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
 
-    private World physWorld;
-    private float physAccumulator = 0.f;
+    private PhysWorld physWorld;
     private ArrayList<Entity> planetEnts = new ArrayList<>();
     private Stack<Entity> leavingEnts = new Stack<>();
     private WorldBody worldBlocks;
@@ -117,13 +118,43 @@ public class Planet extends Celestial {
     }
 
     private void generatePhysWorld(){
-        physWorld = new World(new Vector2(), true);
+        physWorld = game.simulation.addWorld(new PhysWorld(Constants.PPM){
+            @Override
+            public void onEntityUpdate(Entity e) {
+                // Constrain entities to the world
+                float worldWidthPixels = terrestrialWidth * Tile.TILE_SIZE;
+
+                if(e.getX() > worldWidthPixels){
+                    e.setX(e.getX() - worldWidthPixels);
+                } else if(e.getX() < 0){
+                    e.setX(e.getX() + worldWidthPixels);
+                }
+    
+                applyDrag(e.getBody());
+                checkLeavePlanet(e);
+                
+                // Taken from Celestial.java to correctly apply the right force
+                float height = Math.max(e.getBody().getPosition().y * e.getPhysScale(), terrestrialHeight * Tile.TILE_SIZE);
+                float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (height * height));
+                e.getBody().applyForceToCenter(0, force * -1.f, true);
+            }
+
+            @Override
+            public void onAfterUpdate() {
+                // Remove entities in the world still
+                while(leavingEnts.size() > 0){
+                    delEntityWorld(leavingEnts.pop());
+                }
+            }
+        });
+
         worldBlocks = new WorldBody(game, physWorld, (int)terrestrialWidth, (int)terrestrialHeight);
     }
 
     // Constructor
-    public Planet(App game, World world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
+    public Planet(App game, PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
         super(game, world, terraRadius);
+        this.game = game;
 
         setPosition(x, y);
 
@@ -152,7 +183,7 @@ public class Planet extends Celestial {
     public Array<Color> getAtmosphereComposition(){ return atmosComposition; }
     public Array<Float> getAtmospherePercentages(){ return atmosPercentages; }
     public long getTerrainSeed(){ return terrainSeed; }
-    public World getPhysWorld(){ return physWorld; }
+    public PhysWorld getPhysWorld(){ return physWorld; }
     public WorldBody getWorldBody(){ return worldBlocks; }
     public float getTerrestrialWidth(){ return terrestrialWidth; }
     public float getTerrestrialHeight(){ return terrestrialHeight; }
@@ -338,46 +369,6 @@ public class Planet extends Celestial {
         batch.setTransformMatrix(trans);
     }
     
-    public void updateWorld(float delta){
-        // Step the physics on the world
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            physWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        
-            // Constrain entities to the world
-            float worldWidthPixels = terrestrialWidth * Tile.TILE_SIZE;
-            for(Entity e : planetEnts){
-                if(e.getX() > worldWidthPixels){
-                    e.setX(e.getX() - worldWidthPixels);
-                } else if(e.getX() < 0){
-                    e.setX(e.getX() + worldWidthPixels);
-                }
-    
-                e.fixedUpdate(Constants.TIME_STEP);
-                applyDrag(e.getBody());
-                this.checkLeavePlanet(e);
-                
-                // Taken from Celestial.java to correctly apply the right force
-                float height = Math.max(e.getBody().getPosition().y * e.getPhysScale(), terrestrialHeight * Tile.TILE_SIZE);
-                float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (height * height));
-                e.getBody().applyForceToCenter(0, force * -1.f, true);
-            }
-        }
-
-        for(Entity e : planetEnts){
-            e.update(delta);
-        }
-
-        while(leavingEnts.size() > 0){
-            Entity e  = leavingEnts.pop();
-            this.delEntityWorld(e);
-
-            if(e instanceof Player || e instanceof Ship)
-                game.setScreen(game.spaceScene);
-        }
-    }
-
     @Override
     public boolean remove(){
         texture.dispose();

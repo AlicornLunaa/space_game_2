@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -19,7 +20,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
@@ -39,15 +39,15 @@ public class Ship extends Entity {
     public ShipState state = new ShipState(); // Ship controls and stuff
     
     // Private functions
-    private void generateExterior(World world){
+    private void generateExterior(PhysWorld world){
         // Create exterior body for the real-world scenes
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        setBody(world.createBody(def));
+        setBody(world.getBox2DWorld().createBody(def));
     }
 
     // Constructor
-    public Ship(final App game, World world, float x, float y, float rotation){
+    public Ship(final App game, PhysWorld world, float x, float y, float rotation){
         this.game = game;
         generateExterior(world);
         interior = new Interior(game, this);
@@ -64,11 +64,10 @@ public class Ship extends Entity {
 
     public void updateWorld(float delta){
         // Step the physics world inside the ship
-        interior.update(delta);
         game.player.act(delta);
     }
 
-    public World getInteriorWorld(){ return interior.getWorld(); }
+    public PhysWorld getInteriorWorld(){ return interior.getWorld(); }
 
     // Space functions
     public void assemble(){

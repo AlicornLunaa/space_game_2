@@ -28,6 +28,11 @@ public class PhysWorld {
     // Functions
     public float getPhysScale(){ return physScale; }
     public Array<Entity> getEntities(){ return entities; }
+    public World getBox2DWorld(){ return box2DWorld; }
+
+    public void onEntityUpdate(Entity e){}
+    public void onUpdate(){}
+    public void onAfterUpdate(){}
 
     public void update(){
         // Step the physics on the world
@@ -38,8 +43,13 @@ public class PhysWorld {
             
             for(Entity e : entities){
                 e.fixedUpdate(Constants.TIME_STEP);
+                onEntityUpdate(e);
             }
+
+            onUpdate();
         }
+
+        onAfterUpdate();
     }
     
 }

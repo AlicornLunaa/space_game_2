@@ -3,12 +3,11 @@ package com.alicornlunaa.spacegame.objects.Ship.interior;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
@@ -21,8 +20,7 @@ public class Interior {
     private final App game;
     private final Ship ship;
     private Array<InteriorCell> cells = new Array<>();
-    private World internalWorld;
-    private float physAccumulator = 0.0f;
+    private PhysWorld internalWorld;
     private Body internalBody;
 
     // Constructor
@@ -30,11 +28,11 @@ public class Interior {
         // Construct interior cells based on the ship
         this.game = game;
         this.ship = ship;
-        internalWorld = new World(new Vector2(), true);
+        internalWorld = game.simulation.addWorld(Constants.SHIP_PPM);
 
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
-		internalBody = internalWorld.createBody(def);
+		internalBody = internalWorld.getBox2DWorld().createBody(def);
     }
     
     // Functions
@@ -108,15 +106,7 @@ public class Interior {
         }
     }
     
-    public World getWorld(){ return internalWorld; }
-
-    public void update(float delta){
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            internalWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        }
-    }
+    public PhysWorld getWorld(){ return internalWorld; }
 
     public void draw(Batch batch){
         for(InteriorCell c : cells){

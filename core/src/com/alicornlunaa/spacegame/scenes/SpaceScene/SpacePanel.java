@@ -7,13 +7,12 @@ import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Simulation.Star;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,8 +23,7 @@ public class SpacePanel extends Stage {
     // Variables
     final App game;
 
-    private World world;
-    private float physAccumulator = 0.0f;
+    private PhysWorld world;
     private Starfield backgroundTexture;
 
     public Universe universe;
@@ -36,7 +34,7 @@ public class SpacePanel extends Stage {
         super(new FillViewport(1280, 720));
         this.game = game;
 
-        world = new World(new Vector2(), true);
+        world = game.simulation.addWorld(Constants.PPM);
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
 
         ship = new Ship(game, world, 0, 0, 0);
@@ -80,19 +78,13 @@ public class SpacePanel extends Stage {
     }
 
     // Functions
-    public World getWorld(){ return world; }
+    public PhysWorld getWorld(){ return world; }
 
     @Override
     public void act(float delta){
         super.act(delta);
 
         // Physics updates
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            world.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        }
-        
         universe.update(delta);
 
         // Parent camera to the player
@@ -129,7 +121,7 @@ public class SpacePanel extends Stage {
         super.draw();
 
         if(Constants.DEBUG){
-            game.debug.render(world, getCamera().combined.cpy().scl(Constants.PPM));
+            game.debug.render(world.getBox2DWorld(), getCamera().combined.cpy().scl(Constants.PPM));
         }
     }
     

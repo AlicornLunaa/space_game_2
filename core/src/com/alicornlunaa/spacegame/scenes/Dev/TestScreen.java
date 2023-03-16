@@ -3,13 +3,12 @@ package com.alicornlunaa.spacegame.scenes.Dev;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Ship.interior.Interior;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -21,7 +20,7 @@ public class TestScreen implements Screen {
     private OrthographicCamera cam;
     private Stage stage;
 
-    private World world;
+    private PhysWorld world;
     private Ship ship;
     private Interior interior;
 
@@ -33,7 +32,7 @@ public class TestScreen implements Screen {
         cam.position.set(0, 0, 0);
         cam.update();
 
-        world = new World(new Vector2(), true);
+        world = game.simulation.addWorld(Constants.PPM);
         ship = new Ship(game, world, 0, 0, 0);
         interior = new Interior(game, ship);
 
@@ -65,7 +64,7 @@ public class TestScreen implements Screen {
 
         batch.end();
         
-        game.debug.render(interior.getWorld(), batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
+        game.debug.render(interior.getWorld().getBox2DWorld(), batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
     }
 
     @Override

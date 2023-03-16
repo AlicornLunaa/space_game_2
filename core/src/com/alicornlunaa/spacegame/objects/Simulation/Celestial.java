@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -16,7 +17,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Null;
 
@@ -35,8 +35,7 @@ public class Celestial extends Entity {
     protected float opacity = 1.f;
 
     // Physics variables
-    protected final World influenceWorld;
-    private float physAccumulator;
+    protected PhysWorld influenceWorld;
     private Body localBody;
 
     private @Null Celestial parent = null;
@@ -44,10 +43,10 @@ public class Celestial extends Entity {
     private ArrayList<Entity> ents = new ArrayList<>();
     
     // Constructor
-    public Celestial(final App game, final World parentWorld, float radius){
+    public Celestial(App game, PhysWorld parentWorld, float radius){
         this.game = game;
         this.radius = radius;
-        influenceWorld = new World(new Vector2(), true);
+        influenceWorld = game.simulation.addWorld(new PhysWorld(Constants.PPM));
 
         setSize(radius * 2, radius * 2);
         
@@ -58,13 +57,13 @@ public class Celestial extends Entity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
-        setBody(parentWorld.createBody(def));
+        setBody(parentWorld.getBox2DWorld().createBody(def));
         body.createFixture(shape, 1.0f);
 
         def = new BodyDef();
         def.type = BodyType.StaticBody;
         def.position.set(0, 0);
-        localBody = influenceWorld.createBody(def);
+        localBody = influenceWorld.getBox2DWorld().createBody(def);
         localBody.createFixture(shape, 1.0f);
 
         shape.dispose();
@@ -72,7 +71,7 @@ public class Celestial extends Entity {
 
     // Functions
     public float getRadius(){ return radius; }
-    public World getWorld(){ return influenceWorld; }
+    public PhysWorld getWorld(){ return influenceWorld; }
     public ArrayList<Entity> getEntities(){ return ents; }
     public ArrayList<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }
@@ -110,19 +109,9 @@ public class Celestial extends Entity {
         s.circle(0, 0, getRadius(), 500);
         s.end();
         
-        game.debug.render(influenceWorld, new Matrix4().set(getUniverseSpaceTransform().scl(Constants.PPM)));
+        game.debug.render(influenceWorld.getBox2DWorld(), new Matrix4().set(getUniverseSpaceTransform().scl(Constants.PPM)));
 
         batch.begin();
-    }
-
-    @Override
-    public void update(float delta){
-        // Step the physics on the world
-        physAccumulator += Math.min(delta, 0.25f);
-        while(physAccumulator >= Constants.TIME_STEP){
-            influenceWorld.step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
-            physAccumulator -= Constants.TIME_STEP;
-        }
     }
 
     // Physics functions

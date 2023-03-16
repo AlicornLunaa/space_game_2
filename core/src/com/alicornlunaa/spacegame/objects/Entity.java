@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects;
 
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
@@ -10,7 +11,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -66,7 +66,7 @@ public class Entity extends Actor implements Disposable {
      * Loads a new body to the entity for this world
      * @param e The entity to be loaded
      */
-    public void loadBodyToWorld(World world, float newPhysScale){
+    public void loadBodyToWorld(PhysWorld world, float newPhysScale){
         if(driver != null) driver.loadBodyToWorld(world, newPhysScale);
         if(body == null) return;
         
@@ -133,7 +133,7 @@ public class Entity extends Actor implements Disposable {
 
         // Delete body from world and recreate it in the new one
         body.getWorld().destroyBody(body);
-        setBody(world.createBody(def));
+        setBody(world.getBox2DWorld().createBody(def));
 
         // Recreate the fixtures
         for(FixtureDef fixtureDef : fixtures){

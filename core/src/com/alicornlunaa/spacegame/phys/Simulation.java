@@ -1,6 +1,5 @@
 package com.alicornlunaa.spacegame.phys;
 
-import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.utils.Array;
 
 /** Holds every PhysWorld and coordinates them */
@@ -11,14 +10,20 @@ public class Simulation {
 
     // Constructor
     public Simulation(){
-        // Initialize world 0
-        physWorlds.add(new PhysWorld(Constants.PPM));
+        // // Initialize world 0
+        // physWorlds.add(new PhysWorld(Constants.PPM));
     }
 
     // Functions
     public PhysWorld getWorld(int index){ return physWorlds.get(index); }
+
     public PhysWorld addWorld(float physScale){
         physWorlds.add(new PhysWorld(physScale));
+        return physWorlds.peek();
+    }
+
+    public PhysWorld addWorld(PhysWorld world){
+        physWorlds.add(world);
         return physWorlds.peek();
     }
 

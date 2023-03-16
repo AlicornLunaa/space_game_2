@@ -3,8 +3,10 @@ package com.alicornlunaa.spacegame.scenes.EditorScene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Ship.Ship;
 import com.alicornlunaa.spacegame.objects.Ship.parts.Part;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.scenes.Transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.PauseScene;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.ConsoleWidget;
 import com.badlogic.gdx.Gdx;
@@ -18,7 +20,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -60,7 +61,7 @@ public class EditorScene implements Screen {
     private Vector2 cursor = new Vector2();
     private Vector2 camOffset = new Vector2();
     private Part ghostPart;
-    private World editorWorld;
+    private PhysWorld editorWorld;
     private Ship editorShip;
     private String shipName = "";
     private String selectedCategory = "AERO";
@@ -212,7 +213,7 @@ public class EditorScene implements Screen {
         cam.position.set(0, 0, 0);
         cam.update();
 
-        editorWorld = new World(new Vector2(), true);
+        editorWorld = game.simulation.addWorld(Constants.PPM);
         editorShip = new Ship(game, editorWorld, 0, 0, 0);
         editor.addActor(editorShip);
 

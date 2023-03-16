@@ -1,13 +1,13 @@
 package com.alicornlunaa.spacegame.objects.Simulation;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.physics.box2d.World;
 
 public class Star extends Celestial {
 
@@ -29,7 +29,7 @@ public class Star extends Celestial {
     }
 
     // Constructor
-    public Star(final App game, final World world, float x, float y, float radius){
+    public Star(App game, PhysWorld world, float x, float y, float radius){
         super(game, world, radius);
         generateSprite();
         setPosition(x, y);

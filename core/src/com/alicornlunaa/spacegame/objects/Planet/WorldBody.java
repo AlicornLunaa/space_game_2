@@ -2,12 +2,12 @@ package com.alicornlunaa.spacegame.objects.Planet;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Blocks.Tile;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.Group;
 
@@ -19,13 +19,13 @@ public class WorldBody extends Group {
     private Tile[][] tiles;
     private Body body;
 
-    public WorldBody(final App game, World world, int width, int height){
+    public WorldBody(final App game, PhysWorld world, int width, int height){
         this.setTransform(false);
 
         PolygonShape shape = new PolygonShape();
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyType.StaticBody;
-        body = world.createBody(bodyDef);
+        body = world.getBox2DWorld().createBody(bodyDef);
 
         tiles = new Tile[width][height];
 
