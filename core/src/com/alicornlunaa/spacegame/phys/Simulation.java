@@ -1,20 +1,24 @@
 package com.alicornlunaa.spacegame.phys;
 
+import java.util.HashMap;
+
+import com.alicornlunaa.spacegame.objects.Entity;
 import com.badlogic.gdx.utils.Array;
 
 /** Holds every PhysWorld and coordinates them */
 public class Simulation {
     
     // Variables
+    private Array<Entity> entities = new Array<>();
     private Array<PhysWorld> physWorlds = new Array<>();
+    private HashMap<Entity, PhysWorld> containers = new HashMap<>();
 
     // Constructor
-    public Simulation(){
-        // // Initialize world 0
-        // physWorlds.add(new PhysWorld(Constants.PPM));
-    }
+    public Simulation(){}
 
     // Functions
+    public Array<Entity> getEntities(){ return entities; }
+
     public PhysWorld getWorld(int index){ return physWorlds.get(index); }
 
     public PhysWorld addWorld(float physScale){
@@ -25,6 +29,21 @@ public class Simulation {
     public PhysWorld addWorld(PhysWorld world){
         physWorlds.add(world);
         return physWorlds.peek();
+    }
+
+    public void addEntity(int index, Entity e){ addEntity(physWorlds.get(index), e); }
+
+    public void addEntity(PhysWorld world, Entity e){
+        if(!entities.contains(e, true)){
+            // Initialize new entity
+            containers.put(e, world);
+            entities.add(e);
+        }
+
+        containers.get(e).getEntities().removeValue(e, true);
+        containers.put(e, world);
+        world.getEntities().add(e);
+        e.loadBodyToWorld(world, world.getPhysScale());
     }
 
     public void update(){

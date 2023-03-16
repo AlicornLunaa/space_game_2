@@ -1,7 +1,5 @@
 package com.alicornlunaa.spacegame.objects.Simulation;
 
-import java.util.ArrayList;
-
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
@@ -18,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
 /**
@@ -39,8 +38,8 @@ public class Celestial extends Entity {
     private Body localBody;
 
     private @Null Celestial parent = null;
-    private ArrayList<Celestial> children = new ArrayList<>();
-    private ArrayList<Entity> ents = new ArrayList<>();
+    private Array<Celestial> children = new Array<>();
+    private Array<Entity> ents = new Array<>();
     
     // Constructor
     public Celestial(App game, PhysWorld parentWorld, float radius){
@@ -72,8 +71,8 @@ public class Celestial extends Entity {
     // Functions
     public float getRadius(){ return radius; }
     public PhysWorld getWorld(){ return influenceWorld; }
-    public ArrayList<Entity> getEntities(){ return ents; }
-    public ArrayList<Celestial> getChildren(){ return children; }
+    public Array<Entity> getEntities(){ return ents; }
+    public Array<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }
     public void setCelestialParent(Celestial c){ parent = c; }
     public void setCelestialOpacity(float a){ opacity = a; }
