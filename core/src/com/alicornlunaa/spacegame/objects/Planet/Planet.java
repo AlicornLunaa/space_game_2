@@ -326,7 +326,7 @@ public class Planet extends Celestial {
     }
 
     @Override
-    protected Vector2 applyPhysics(float delta, Entity e){
+    public Vector2 applyPhysics(float delta, Entity e){
         checkTransferPlanet(e);
         return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
     }

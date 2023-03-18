@@ -4,6 +4,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
+import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -34,7 +35,7 @@ public class Celestial extends Entity {
     protected float opacity = 1.f;
 
     // Physics variables
-    protected PhysWorld influenceWorld;
+    protected CelestialPhysWorld influenceWorld;
     private Body localBody;
 
     private @Null Celestial parent = null;
@@ -45,7 +46,9 @@ public class Celestial extends Entity {
     public Celestial(App game, PhysWorld parentWorld, float radius){
         this.game = game;
         this.radius = radius;
-        influenceWorld = game.simulation.addWorld(new PhysWorld(Constants.PPM));
+
+        influenceWorld = new CelestialPhysWorld(game, Constants.PPM);
+        game.simulation.addWorld(influenceWorld);
 
         setSize(radius * 2, radius * 2);
         
@@ -122,7 +125,7 @@ public class Celestial extends Entity {
         return direction.scl(force);
     }
 
-    protected Vector2 applyPhysics(float delta, Entity e){
+    public Vector2 applyPhysics(float delta, Entity e){
         return applyGravity(delta, e.getBody());
     }
 

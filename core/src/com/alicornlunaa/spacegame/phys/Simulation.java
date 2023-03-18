@@ -36,8 +36,11 @@ public class Simulation {
     public void addEntity(PhysWorld world, Entity e){
         if(!entities.contains(e, true)){
             // Initialize new entity
-            containers.put(e, world);
             entities.add(e);
+            containers.put(e, world);
+            world.getEntities().add(e);
+            e.loadBodyToWorld(world, world.getPhysScale());
+            return;
         }
 
         containers.get(e).getEntities().removeValue(e, true);

@@ -13,7 +13,6 @@ public class PhysWorld {
     // Variables
     private World box2DWorld;
     private float accumulator;
-
     private float physScale;
     private Array<Entity> entities = new Array<>();
 
