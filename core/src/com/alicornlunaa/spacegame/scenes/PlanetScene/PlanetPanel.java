@@ -52,6 +52,8 @@ public class PlanetPanel extends Stage {
     public void act(float delta){
         super.act(delta);
 
+        game.universe.update(delta);
+
         // Parent camera to player
         game.player.updateCamera(cam);
     }

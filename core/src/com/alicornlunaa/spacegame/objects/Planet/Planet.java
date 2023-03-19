@@ -118,7 +118,7 @@ public class Planet extends Celestial {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.simulation.addWorld(new PhysWorld(Constants.PPM){
+        physWorld = game.simulation.addWorld(new PhysWorld(Constants.PLANET_PPM){
             @Override
             public void onEntityUpdate(Entity e) {
                 // Constrain entities to the world
@@ -241,7 +241,7 @@ public class Planet extends Celestial {
         e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
         // Add body
-        e.loadBodyToWorld(physWorld, Constants.PLANET_PPM);
+        game.simulation.addEntity(physWorld, e);
         planetEnts.add(e);
     }
 
@@ -270,7 +270,7 @@ public class Planet extends Celestial {
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
-        e.loadBodyToWorld(this.getWorld(), Constants.PPM);
+        game.simulation.addEntity(getWorld(), e);
         planetEnts.remove(e);
     }
 
