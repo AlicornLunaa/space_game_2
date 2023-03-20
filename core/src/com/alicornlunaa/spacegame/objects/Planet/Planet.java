@@ -269,6 +269,9 @@ public class Planet extends Celestial {
         Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
+        if(e instanceof Player || e instanceof Ship)
+            game.setScreen(game.spaceScene);
+
         // Remove body
         game.simulation.addEntity(getWorld(), e);
         planetEnts.remove(e);
