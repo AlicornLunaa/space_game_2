@@ -14,6 +14,6 @@
     "coneAngle": 5,
     "effect": "effects/rocket",
     "fuelUsage": 1,
-    "power": 2000
+    "power": 4000
   }
 }]

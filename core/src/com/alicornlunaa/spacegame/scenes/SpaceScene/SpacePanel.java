@@ -76,6 +76,7 @@ public class SpacePanel extends Stage {
 
     // Functions
     public PhysWorld getWorld(){ return world; }
+    public Starfield getStarfield(){ return backgroundTexture; }
 
     @Override
     public void act(float delta){

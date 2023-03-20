@@ -66,13 +66,31 @@ public class PlanetPanel extends Stage {
         Batch batch = getBatch();
         batch.setProjectionMatrix(getCamera().combined);
         batch.setTransformMatrix(new Matrix4());
-
-        WorldBody worldBody = planet.getWorldBody();
+        
+        // Skybox rendering
+        Matrix4 oldProj = batch.getProjectionMatrix().cpy();
+        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        
+        float oldZoom = cam.zoom;
+        cam.zoom = 1;
+        cam.update();
 
         batch.begin();
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * -1.01f, 0, 0));
+        batch.setProjectionMatrix(new Matrix4());
+        batch.setTransformMatrix(new Matrix4());
+        game.spaceScene.spacePanel.getStarfield().setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
+        game.spaceScene.spacePanel.getStarfield().draw(batch, -1, -1, 2, 2);
+
+        cam.zoom = oldZoom;
+        cam.update();
+
+        // World rendering
+        WorldBody worldBody = planet.getWorldBody();
+
+        batch.setProjectionMatrix(oldProj);
+        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * -1.001f, 0, 0));
         // worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * 1.01f, 0, 0));
+        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * 1.001f, 0, 0));
         // worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
         worldBody.draw(batch, batch.getColor().a);

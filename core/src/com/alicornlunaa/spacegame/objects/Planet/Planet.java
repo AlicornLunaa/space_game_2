@@ -130,13 +130,13 @@ public class Planet extends Celestial {
                     e.setX(e.getX() + worldWidthPixels);
                 }
     
-                applyDrag(e.getBody());
                 checkLeavePlanet(e);
                 
                 // Taken from Celestial.java to correctly apply the right force
-                float height = Math.max(e.getBody().getPosition().y * e.getPhysScale(), terrestrialHeight * Tile.TILE_SIZE);
+                Vector2 dragForce = applyDrag(e.getBody());
+                float height = Math.max(e.getBody().getPosition().y, getRadius() / getPhysScale());
                 float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (height * height));
-                e.getBody().applyForceToCenter(0, force * -1.f, true);
+                e.getBody().applyForceToCenter(dragForce.x, force * -0.5f + dragForce.y, true);
             }
 
             @Override
@@ -318,7 +318,7 @@ public class Planet extends Celestial {
         float atmosSurface = atmosRadPhys - planetRadPhys; // Atmosphere radius above surface
         float entSurface = entRadPhys - planetRadPhys; // Entity radius above surface
         float atmosDepth = Math.max(atmosSurface - entSurface, 0) / atmosSurface; // How far the entity is in the atmosphere, where zero is outside and 1 is submerged
-        float density = atmosphereDensity * atmosDepth;
+        float density = atmosphereDensity * atmosDepth * 0.001f;
 
         Vector2 relVel = body.getLinearVelocity().cpy().sub(b.getLinearVelocity());
         Vector2 velDir = b.getLinearVelocity().cpy().nor();
