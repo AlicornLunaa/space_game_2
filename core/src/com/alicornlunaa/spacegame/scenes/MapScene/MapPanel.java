@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.HyperbolicConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
