@@ -5,7 +5,9 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.GenericConic;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.HyperbolicConic;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
@@ -139,8 +141,17 @@ public class MapPanel extends Stage {
                 Celestial parent = conic.getParent();
                 Vector2 apoapsis = conic.getPosition(Math.PI);
                 Vector2 periapsis = conic.getPosition(0.0);
+
+                if(conic.getEccentricity() <= 0.01f){
+                    apoapsis.set((float)conic.getApoapsis(), 0);
+                    periapsis.set((float)conic.getPeriapsis() * -1, 0);
+                }
+
                 markers.addActor(new Marker(game, parent, periapsis, periapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getPeriapsis()))));
-                markers.addActor(new Marker(game, parent, apoapsis, apoapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getApoapsis()))));
+
+                if(!(conic instanceof HyperbolicConic)){
+                    markers.addActor(new Marker(game, parent, apoapsis, apoapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getApoapsis()))));
+                }
             }
         }
 
