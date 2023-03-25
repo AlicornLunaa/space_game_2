@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.objects;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class Player extends Entity {
 
     // Variables
+    private final App game;
     private final World world;
 
     private float vertical = 0.0f;
@@ -39,6 +41,7 @@ public class Player extends Entity {
 
     // Constructor
     public Player(final App game, float x, float y, float physScale){
+        this.game = game;
         this.world = new World(new Vector2(), true);
 
         setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
@@ -77,14 +80,21 @@ public class Player extends Entity {
     }
 
     // Functions
-    public void updateCamera(OrthographicCamera cam){
-        cam.position.set((drivingEnt == null) ? this.getPosition() : drivingEnt.getBody().getWorldCenter().cpy().scl(getPhysScale()), 0);
+    public void updateCamera(OrthographicCamera cam, boolean localToPhysWorld){
+        Entity e = (drivingEnt == null) ? this : drivingEnt;
+        Vector2 pos = (e.getBody() != null) ? e.getBody().getWorldCenter().cpy().scl(getPhysScale()) : e.getPosition();
+
+        if(!localToPhysWorld){
+            pos = OrbitUtils.getUniverseSpacePosition(game.universe, this);
+        }
+
+        cam.position.set(pos, 0);
         cam.update();
     }
 
     // Overrides
     @Override
-    public void act(float delta){
+    public void update(float delta){
         // Groundchecking
         grounded = false;
         world.rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (getHeight() / 2 + 0.5f) / getPhysScale())));
@@ -94,6 +104,7 @@ public class Player extends Entity {
             body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta).scl(1 / getPhysScale()), body.getWorldCenter(), true);
         }
 
+        // Controls
         if(drivingEnt == null){
             // Controls for player
             if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){

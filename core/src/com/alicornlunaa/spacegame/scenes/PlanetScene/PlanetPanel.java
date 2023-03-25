@@ -55,7 +55,7 @@ public class PlanetPanel extends Stage {
         game.universe.update(delta);
 
         // Parent camera to player
-        game.player.updateCamera(cam);
+        game.player.updateCamera(cam, true);
     }
 
     @Override

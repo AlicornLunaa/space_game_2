@@ -61,7 +61,7 @@ public class SpacePanel extends Stage {
         b = ship.getBody();
         // b.applyForceToCenter(0, 40, true);
 
-        game.player.drive(ship);
+        // game.player.drive(ship);
 
         // Controls
         this.addListener(new InputListener(){
@@ -87,8 +87,7 @@ public class SpacePanel extends Stage {
 
         // Parent camera to the player
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(OrbitUtils.getUniverseSpacePosition(game.universe, ship, ship.getBody().getWorldCenter().cpy().scl(ship.getPhysScale())), 0);
-        cam.update();
+        game.player.updateCamera(cam, false);
     }
 
     public void drawSkybox(){

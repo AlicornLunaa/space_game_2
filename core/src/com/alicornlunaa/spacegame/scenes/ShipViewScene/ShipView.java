@@ -33,7 +33,7 @@ public class ShipView extends Stage {
 
         Batch batch = getBatch();
         batch.begin();
-        game.player.updateCamera(cam);
+        game.player.updateCamera(cam, true);
         ship.drawWorld(batch, 1);
         batch.end();
     }
