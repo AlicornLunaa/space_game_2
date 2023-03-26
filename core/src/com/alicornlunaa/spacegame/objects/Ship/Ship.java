@@ -202,7 +202,7 @@ public class Ship extends Entity {
     }
 
     @Override
-    protected void afterWorldChange(){
+    protected void afterWorldChange(PhysWorld world){
         for(Part p : parts){
             p.setParent(body, getPhysScale());
         }

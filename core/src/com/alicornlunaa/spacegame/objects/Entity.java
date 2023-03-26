@@ -61,6 +61,7 @@ public class Entity extends Actor implements Disposable {
 
     public Entity getDriving(){ return drivingEnt; }
     public Entity getDriver(){ return driver; }
+    public boolean isDriving(){ return drivingEnt != null; }
 
     /**
      * Loads a new body to the entity for this world
@@ -145,10 +146,10 @@ public class Entity extends Actor implements Disposable {
             s.dispose();
         }
 
-        afterWorldChange();
+        afterWorldChange(world);
     }
     
-    protected void afterWorldChange(){}
+    protected void afterWorldChange(PhysWorld world){}
 
     public void setPhysScale(float s){ physScale = s; }
     public float getPhysScale(){ return physScale; }

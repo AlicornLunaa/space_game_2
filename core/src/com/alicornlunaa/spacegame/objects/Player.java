@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -19,7 +20,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
@@ -34,7 +34,7 @@ public class Player extends Entity {
 
     // Variables
     private final App game;
-    private final World world;
+    private PhysWorld world;
 
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
@@ -48,7 +48,7 @@ public class Player extends Entity {
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
     private static final float MOVEMENT_SPEED = 25.0f;
-    private static final float JUMP_FORCE = 700000.0f;
+    private static final float JUMP_FORCE = 70.0f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
@@ -79,9 +79,8 @@ public class Player extends Entity {
     }
 
     // Constructor
-    public Player(final App game, float x, float y, float physScale){
+    public Player(final App game, PhysWorld world, float x, float y, float physScale){
         this.game = game;
-        this.world = new World(new Vector2(), true);
 
         setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
         setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
@@ -90,7 +89,7 @@ public class Player extends Entity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
-        setBody(world.createBody(def));
+        setBody(world.getBox2DWorld().createBody(def));
         setPosition(x, y);
 
         PolygonShape shape = new PolygonShape();
@@ -130,13 +129,17 @@ public class Player extends Entity {
         cam.position.set(pos, 0);
         cam.update();
     }
+    
+    @Override
+    protected void afterWorldChange(PhysWorld world){
+        this.world = world;
+    }
 
-    // Overrides
     @Override
     public void update(float delta){
         // Groundchecking
         grounded = false;
-        world.rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (getHeight() / 2 + 0.5f) / getPhysScale())));
+        world.getBox2DWorld().rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (getHeight() / 2 + 4.5f) / getPhysScale())));
 
         // Movement
         if(vertical != 0 || horizontal != 0){

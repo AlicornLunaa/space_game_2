@@ -99,7 +99,7 @@ public class App extends Game {
 				// Start new scene
 				simulation = new Simulation();
 				universe = new Universe(this);
-				player = new Player(this, -50, 0, Constants.PPM);
+				player = new Player(this, universe.getUniversalWorld(), -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
 				this.setScreen(spaceScene);
 				// this.setScreen(new MapScene(this, spaceScene, player));
