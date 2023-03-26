@@ -2,8 +2,10 @@ package com.alicornlunaa.spacegame;
 
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Planet.Biome;
+import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Simulation.Universe;
 import com.alicornlunaa.spacegame.phys.Simulation;
+import com.alicornlunaa.spacegame.scenes.PlanetScene.PlanetScene;
 import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
@@ -102,6 +104,11 @@ public class App extends Game {
 				player = new Player(this, universe.getUniversalWorld(), -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
 				this.setScreen(spaceScene);
+				
+				Planet p = ((Planet)universe.getCelestial(3));
+				p.addEntityWorld(player);
+				player.setPosition(0, 2.5f * p.getWorld().getPhysScale());
+				this.setScreen(new PlanetScene(this, p));
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
