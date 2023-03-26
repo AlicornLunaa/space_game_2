@@ -1,11 +1,17 @@
 package com.alicornlunaa.spacegame.objects;
 
+import java.util.HashMap;
+
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -15,13 +21,16 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Player controller class, will handle inputs and other
  * player related events.
  */
 public class Player extends Entity {
+
+    // Enums
+    public enum State { IDLE, MOVE_LEFT, MOVE_RIGHT, JUMP };
 
     // Variables
     private final App game;
@@ -32,12 +41,42 @@ public class Player extends Entity {
     private boolean grounded = false;
 
     private RayCastCallback jumpCallback;
-    private TextureRegionDrawable idleTexture;
+    private float animationTimer = 0.f;
+    private State animationState = State.IDLE;
+    private HashMap<State, Animation<TextureRegion>> animations = new HashMap<>();
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
     private static final float MOVEMENT_SPEED = 25.0f;
     private static final float JUMP_FORCE = 700000.0f;
+
+    // Private functions
+    private Array<TextureRegion> getTextureRegions(String path){
+        Array<TextureRegion> out = new Array<>();
+        Array<AtlasRegion> arr = game.atlas.findRegions(path);
+
+        for(AtlasRegion a : arr){
+            out.add(new TextureRegion(a));
+        }
+
+        return out;
+    }
+
+    private void initializeAnims(){
+        animations.put(State.IDLE, new Animation<>(1 / 12.f, getTextureRegions("player/idle"), PlayMode.LOOP));
+        animations.put(State.MOVE_LEFT, new Animation<>(1 / 12.f, getTextureRegions("player/move_left"), PlayMode.LOOP));
+        animations.put(State.MOVE_RIGHT, new Animation<>(1 / 12.f, getTextureRegions("player/move_right"), PlayMode.LOOP));
+    }
+
+    private void resolveAnimState(){
+        if(horizontal == 0){
+            animationState = State.IDLE;
+        } else if(horizontal == 1){
+            animationState = State.MOVE_RIGHT;
+        } else if(horizontal == -1){
+            animationState = State.MOVE_LEFT;
+        }
+    }
 
     // Constructor
     public Player(final App game, float x, float y, float physScale){
@@ -76,7 +115,7 @@ public class Player extends Entity {
             }
         };
 
-        idleTexture = new TextureRegionDrawable(game.atlas.findRegion("player/idle"));
+        initializeAnims();
     }
 
     // Functions
@@ -122,6 +161,8 @@ public class Player extends Entity {
             } else {
                 horizontal = 0;
             }
+
+            resolveAnimState();
         } else {
             drivingEnt.act(delta);
             setPosition(drivingEnt.getPosition());
@@ -134,10 +175,23 @@ public class Player extends Entity {
     public void draw(Batch batch, float parentAlpha){
         if(drivingEnt != null) return;
 
+        animationTimer += Gdx.graphics.getDeltaTime();
+
         super.draw(batch, parentAlpha);
         Matrix3 transform = getTransform();
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
-        idleTexture.draw(batch, 0, 0, 0, 0, getWidth(), getHeight(), 1, 1, 0);
+
+        Animation<TextureRegion> curAnimation = animations.get(animationState);
+        TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
+        batch.draw(
+            animFrame,
+            0, 0,
+            0, 0,
+            getWidth(), getHeight(),
+            1, 1,
+            0
+        );
+
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 
