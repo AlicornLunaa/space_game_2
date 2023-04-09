@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.Entity;
 import com.alicornlunaa.spacegame.objects.Blocks.Tile;
 import com.alicornlunaa.spacegame.objects.Planet.Planet;
 import com.alicornlunaa.spacegame.objects.Planet.WorldBody;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -118,7 +119,7 @@ public class PlanetPanel extends Stage {
             // }
             game.shapeRenderer.end();
 
-            // game.debug.render(planet.getPhysWorld(), batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
+            game.debug.render(planet.getPhysWorld().getBox2DWorld(), batch.getProjectionMatrix().cpy().scl(Constants.PLANET_PPM));
         }
     }
 
