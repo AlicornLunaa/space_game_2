@@ -1,7 +1,3 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic",
-    "glsl-canvas.uniforms": {
-        "starDirection": [1.0, 0.0, 0.0],
-        "atmosPlanetRatio": 0.9
-    }
+    "java.configuration.updateBuildConfiguration": "automatic"
 }
