@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
@@ -36,6 +37,7 @@ public class SpaceUIPanel extends Stage {
     private ProgressBar throttleBar;
     private Slider warpSlider;
     public Compass shipCompass;
+    public TextButton pilotButton;
 
     private Label positionLabel;
     private Label velocityLabel;
@@ -86,6 +88,20 @@ public class SpaceUIPanel extends Stage {
                 game.setScreen(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, (Ship)game.player.getDriving()), 0.15f));
             }
         });
+
+        // Pilot button
+        pilotButton = new TextButton("PILOT", game.skin);
+        pilotButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                if(game.player.isDriving()){
+                    game.player.stopDriving();
+                } else {
+                    game.player.drive(game.spaceScene.spacePanel.ship);
+                }
+            }
+        });
+        this.addActor(pilotButton);
 
         // Navigation compass
         shipCompass = new Compass(game);

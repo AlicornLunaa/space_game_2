@@ -106,6 +106,8 @@ public class App extends Game {
 				this.setScreen(spaceScene);
 				
 				Planet p = ((Planet)universe.getCelestial(3));
+				p.addEntityWorld(spaceScene.spacePanel.ship);
+				spaceScene.spacePanel.ship.setPosition(500, 2.5f * p.getWorld().getPhysScale());
 				p.addEntityWorld(player);
 				player.setPosition(0, 2.5f * p.getWorld().getPhysScale());
 				this.setScreen(new PlanetScene(this, p));

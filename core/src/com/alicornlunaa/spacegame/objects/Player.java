@@ -47,7 +47,7 @@ public class Player extends Entity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 25.0f;
+    private static final float MOVEMENT_SPEED = 0.5f;
     private static final float JUMP_FORCE = 1.0f;
 
     // Private functions
@@ -143,7 +143,7 @@ public class Player extends Entity {
 
         // Movement
         if(vertical != 0 || horizontal != 0){
-            body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta).scl(128.f / this.getPhysScale() * 16.f), body.getWorldCenter(), true);
+            body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(delta).scl(128.f / this.getPhysScale() * 1.f), body.getWorldCenter(), true);
         }
 
         // Controls
