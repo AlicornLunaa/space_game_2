@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.objects;
 
 import org.json.JSONArray;
 
-import com.alicornlunaa.spacegame.scenes.Dev.PhysicsEditor.Collider;
+import com.alicornlunaa.spacegame.scenes.dev.physics_editor.Collider;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;

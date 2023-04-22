@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.phys;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.badlogic.gdx.Gdx;
 
 public class CelestialPhysWorld extends PhysWorld {

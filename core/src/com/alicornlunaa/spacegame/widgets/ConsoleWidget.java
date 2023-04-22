@@ -1,10 +1,10 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Simulation.Orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.scenes.Dev.PartEditor.PartEditor;
-import com.alicornlunaa.spacegame.scenes.Dev.PhysicsEditor.PhysicsEditor;
-import com.alicornlunaa.spacegame.scenes.EditorScene.EditorScene;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.scenes.dev.part_editor.PartEditor;
+import com.alicornlunaa.spacegame.scenes.dev.physics_editor.PhysicsEditor;
+import com.alicornlunaa.spacegame.scenes.editor_scene.EditorScene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;

@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.util;
 import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.util.AssetLoaders.ShaderAssetLoader;
+import com.alicornlunaa.spacegame.util.asset_loaders.ShaderAssetLoader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
