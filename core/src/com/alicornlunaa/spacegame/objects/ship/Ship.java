@@ -5,7 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
@@ -28,7 +28,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  * The ship class will hold the physical ship in space as well as
  * a tilemap and physics world for the player inside the ship
  */
-public class Ship extends BaseEntity implements Disposable {
+public class Ship extends DriveableEntity implements Disposable {
     
     // Variables
     private final App game;

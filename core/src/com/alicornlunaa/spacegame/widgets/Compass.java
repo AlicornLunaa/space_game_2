@@ -81,7 +81,7 @@ public class Compass extends Widget {
         // Draw the ball with the angle relative to the target and parent
         theta = 0;
         if(targetEnt != null){
-            theta = targetEnt.getRotation();
+            theta = (float)Math.toDegrees(targetEnt.getRotation());
         }
         batch.draw(
             arrowTexture,

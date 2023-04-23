@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -23,6 +25,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 
 /**
  * Player controller class, will handle inputs and other
@@ -39,6 +42,8 @@ public class Player extends BaseEntity {
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
     private boolean grounded = false;
+
+    private @Null DriveableEntity vehicle = null;
 
     private RayCastCallback jumpCallback;
     private float animationTimer = 0.f;
@@ -120,9 +125,13 @@ public class Player extends BaseEntity {
     }
 
     // Functions
+    public boolean isDriving(){ return (vehicle != null); }
+
+    public void setVehicle(DriveableEntity de){ vehicle = de; }
+
     public void updateCamera(OrthographicCamera cam, boolean localToPhysWorld){
-        // Entity e = (drivingEnt == null) ? this : drivingEnt;
-        Vector2 pos = (getBody() != null) ? getBody().getWorldCenter().cpy().scl(getPhysScale()) : getPosition();
+        BaseEntity e = (vehicle == null) ? this : vehicle;
+        Vector2 pos = (e.getBody() != null) ? e.getBody().getWorldCenter().cpy().scl(getPhysScale()) : e.getPosition();
 
         if(!localToPhysWorld){
             pos = OrbitUtils.getUniverseSpacePosition(game.universe, this);
@@ -140,37 +149,39 @@ public class Player extends BaseEntity {
 
         // Movement
         if(vertical != 0 || horizontal != 0){
-            getBody().applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(128.f / this.getPhysScale() * 1.f), getBody().getWorldCenter(), true);
+            getBody().applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / this.getPhysScale() * 1.f), getBody().getWorldCenter(), true);
         }
 
         // Controls
-        // if(drivingEnt == null){
-        // Controls for player
-        if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
-            vertical = 1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
-            vertical = -1;
-        } else {
-            vertical = 0;
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
-            horizontal = 1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
-            horizontal = -1;
-        } else {
-            horizontal = 0;
-        }
+        if(vehicle == null){
+            // Controls for player
+            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
+                vertical = 1;
+            } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
+                vertical = -1;
+            } else {
+                vertical = 0;
+            }
+            
+            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
+                horizontal = 1;
+            } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
+                horizontal = -1;
+            } else {
+                horizontal = 0;
+            }
 
-        resolveAnimState();
-        // } else {
-        //     drivingEnt.act(delta);
-        //     setPosition(drivingEnt.getPosition());
-        // }
+            resolveAnimState();
+        } else {
+            vehicle.update();
+            setPosition(vehicle.getPosition());
+        }
     }
 
     @Override
     public void render(Batch batch){
+        if(vehicle != null) return;
+
         animationTimer += Gdx.graphics.getDeltaTime();
 
         Matrix3 transform = getTransform();
@@ -180,7 +191,7 @@ public class Player extends BaseEntity {
         TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
         batch.draw(
             animFrame,
-            0, 0,
+            -PLAYER_WIDTH / 2, -PLAYER_HEIGHT / 2,
             0, 0,
             PLAYER_WIDTH, PLAYER_HEIGHT,
             1, 1,
@@ -188,6 +199,19 @@ public class Player extends BaseEntity {
         );
 
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
+    }
+
+    // Overrides
+    @Override
+    public Vector2 getPosition(){
+        if(isDriving()) return vehicle.getCenter();
+        return super.getPosition();
+    }
+
+    @Override
+    public float getRotation(){
+        if(isDriving()) return vehicle.getRotation();
+        return super.getRotation();
     }
 
 }

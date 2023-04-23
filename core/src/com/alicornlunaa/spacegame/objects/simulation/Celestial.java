@@ -112,7 +112,7 @@ public class Celestial extends BaseEntity {
         s.circle(0, 0, getRadius(), 500);
         s.end();
         
-        game.debug.render(influenceWorld.getBox2DWorld(), new Matrix4().set(getUniverseSpaceTransform().scl(Constants.PPM)));
+        game.debug.render(influenceWorld.getBox2DWorld(), batch.getProjectionMatrix().cpy().mul(new Matrix4().set(this.getUniverseSpaceTransform())).scl(Constants.PPM));
 
         batch.begin();
     }

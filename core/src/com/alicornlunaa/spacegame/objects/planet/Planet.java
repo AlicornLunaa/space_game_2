@@ -229,7 +229,7 @@ public class Planet extends Celestial {
 
         // Load space angle relative to the world
         float theta = localPos.angleDeg();
-        float omega = e.getRotation();
+        float omega = (float)Math.toDegrees(e.getRotation());
         e.setRotation(omega - theta + 90);
 
         // Convert orbital velocity to world
@@ -254,7 +254,7 @@ public class Planet extends Celestial {
         float radius = e.getY();
 
         // Convert to space angles, spaceAngle = worldAngle + theta - 90
-        float worldAngle = e.getRotation();
+        float worldAngle = (float)Math.toDegrees(e.getRotation());
         e.setRotation(worldAngle + (float)Math.toDegrees(theta) - 90);
 
         // Convet to space position

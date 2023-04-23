@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
@@ -193,7 +195,13 @@ public class Universe extends Actor {
      * @param e Entity to be converted
      */
     public void addToCelestial(Celestial c, BaseEntity e){
-        // TODO: if(e.getDriver() != null) this.addToCelestial(c, e.getDriver());
+        if(e instanceof DriveableEntity){
+            DriveableEntity de = (DriveableEntity)e;
+
+            if(de.getDriver() != null){
+                this.addToCelestial(c, de.getDriver());
+            }
+        }
 
         Celestial parent = entityParents.get(e);
         if(parent != null){
@@ -214,7 +222,13 @@ public class Universe extends Actor {
      * @param e Entity to be converted
      */
     public void removeFromCelestial(BaseEntity e){
-        // TODO: if(e.getDriver() != null) this.removeFromCelestial(e.getDriver());
+        if(e instanceof DriveableEntity){
+            DriveableEntity de = (DriveableEntity)e;
+
+            if(de.getDriver() != null){
+                this.removeFromCelestial(de.getDriver());
+            }
+        }
 
         // Raise up a level
         Celestial parent = entityParents.get(e);
@@ -250,8 +264,8 @@ public class Universe extends Actor {
                 for(int i = 0; i < celestialPaths.size; i++){
                     GenericConic path = celestialPaths.get(i);
                     BaseEntity e = path.getChild();
-    
-                    // TODO: if(e.getDriving() != null) continue;
+
+                    if(e instanceof Player && ((Player)e).isDriving()) continue;
     
                     Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
                     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
@@ -264,7 +278,7 @@ public class Universe extends Actor {
                     Orbit path = entityPaths.get(i);
                     BaseEntity e = path.getEntity();
     
-                    // TODO: if(e.getDriving() != null) continue;
+                    if(e instanceof Player && ((Player)e).isDriving()) continue;
     
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);

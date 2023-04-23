@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.map_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -48,7 +49,7 @@ public class MapPanel extends Stage {
     private Array<Orbit> patchedConics = new Array<>();
     private Group markers = new Group();
 
-    // Private functoins
+    // Private functions
     /**
      * Creates the paths to show the predicted location of something going
      */
@@ -58,7 +59,8 @@ public class MapPanel extends Stage {
         for(BaseEntity e : u.getEntities()){
             Celestial parent = u.getParentCelestial(e);
 
-            // TODO: Dont initiate drivers :(
+            if(e instanceof Player && ((Player)e).isDriving()) continue;
+
             if(parent != null){
                 patchedConics.add(new Orbit(u, e));
             }
@@ -213,7 +215,7 @@ public class MapPanel extends Stage {
             size.y,
             1,
             1,
-            game.player.getRotation()
+            (float)Math.toDegrees(game.player.getRotation())
         );
 
         batch.end();

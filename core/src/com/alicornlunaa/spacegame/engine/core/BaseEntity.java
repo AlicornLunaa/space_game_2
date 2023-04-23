@@ -50,6 +50,14 @@ public abstract class BaseEntity implements IEntity {
         return getTransform().getTranslation(position);
     }
 
+    public Vector2 getCenter(){
+        if(body != null){
+            return body.getWorldCenter().cpy().scl(physScale);
+        }
+
+        return getPosition();
+    }
+
     public float getRotation(){
         return getTransform().getRotationRad();
     }
