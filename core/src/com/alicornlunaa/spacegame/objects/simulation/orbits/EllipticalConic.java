@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.RootSolver;
@@ -13,8 +13,8 @@ public class EllipticalConic extends GenericConic {
 
     public EllipticalConic(double parentMass, double a, double e, double w, double v, double i) { super(parentMass, a, e, w, v, i); }
     public EllipticalConic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
-    public EllipticalConic(Celestial parent, Entity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
-    public EllipticalConic(Celestial parent, Entity child) { super(parent, child); }
+    public EllipticalConic(Celestial parent, BaseEntity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
+    public EllipticalConic(Celestial parent, BaseEntity child) { super(parent, child); }
 
     @Override
     public double meanAnomalyToEccentricAnomaly(final double ma) {

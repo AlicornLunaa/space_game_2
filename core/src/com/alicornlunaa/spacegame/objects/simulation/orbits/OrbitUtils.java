@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -18,7 +18,7 @@ public class OrbitUtils {
      * @param e The entity to transform into universe-space
      * @return A 2d vector containing the universe space coordinates
      */
-    public static Vector2 getUniverseSpacePosition(Universe u, Entity e){
+    public static Vector2 getUniverseSpacePosition(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
         Vector2 systemSpacePosition = e/*.getBody()*/.getPosition().cpy(); // TODO: Refactor everything ot use the correct coordinate space
 
@@ -40,7 +40,7 @@ public class OrbitUtils {
      * @param localPos The local position to transform to this entity's parent
      * @return A 2d vector containing the universe space coordinates
      */
-    public static Vector2 getUniverseSpacePosition(Universe u, Entity e, Vector2 localPos){
+    public static Vector2 getUniverseSpacePosition(Universe u, BaseEntity e, Vector2 localPos){
         Celestial parentOfEntity = u.getParentCelestial(e);
 
         if(parentOfEntity == null) return localPos; // No parent, its in the universe world.
@@ -60,7 +60,7 @@ public class OrbitUtils {
      * @param e The entity being focused on
      * @return A direction to the nearest star
      */
-    public static Vector2 directionToNearestStar(Universe u, Entity e){
+    public static Vector2 directionToNearestStar(Universe u, BaseEntity e){
         float minDist = Float.MAX_VALUE;
         Vector2 dir = new Vector2();
         Vector2 absPos = getUniverseSpacePosition(u, e);
@@ -106,7 +106,7 @@ public class OrbitUtils {
      * @param u Universe to affect
      * @param e The entity to stablize into a near-circular orbit
      */
-    public static void createOrbit(Universe u, Entity e){
+    public static void createOrbit(Universe u, BaseEntity e){
         Celestial parent = u.getParentCelestial(e);
         if(parent == null) return; // Cant create an orbit for no parent
 

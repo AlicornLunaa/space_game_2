@@ -1,9 +1,9 @@
 package com.alicornlunaa.spacegame.scenes.editor_scene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.scenes.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -63,6 +63,7 @@ public class EditorScene implements Screen {
     private Part ghostPart;
     private PhysWorld editorWorld;
     private Ship editorShip;
+    private EntityActorWrapper shipWrapper;
     private String shipName = "";
     private String selectedCategory = "AERO";
     private boolean snapped = false;
@@ -88,7 +89,7 @@ public class EditorScene implements Screen {
     }
 
     private VerticalGroup addPartList(final String category){
-        ScrollPane pane = new ScrollPane(editorShip, game.skin);
+        ScrollPane pane = new ScrollPane(shipWrapper, game.skin);
         VerticalGroup group = new VerticalGroup();
         group.expand().fill();
         group.pad(10, 0, 10, 0);
@@ -215,7 +216,8 @@ public class EditorScene implements Screen {
 
         editorWorld = game.simulation.addWorld(Constants.PPM);
         editorShip = new Ship(game, editorWorld, 0, 0, 0);
-        editor.addActor(editorShip);
+        shipWrapper = new EntityActorWrapper(editorShip);
+        editor.addActor(shipWrapper);
 
         editor.addListener(new InputListener(){
             Vector2 prevDrag = new Vector2();
@@ -368,7 +370,7 @@ public class EditorScene implements Screen {
             batch.setColor(1, 1, 1, 1);
         }
         
-        editorShip.draw(batch, 1);
+        editorShip.render(batch);
         batch.end();
         
         game.shapeRenderer.begin(ShapeType.Filled);

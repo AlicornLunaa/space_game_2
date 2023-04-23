@@ -3,12 +3,12 @@ package com.alicornlunaa.spacegame.objects.simulation;
 import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
-import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
@@ -26,7 +26,7 @@ public class Universe extends Actor {
     private final App game;
 
     private Array<Celestial> celestials = new Array<>();
-    private HashMap<Entity, Celestial> entityParents = new HashMap<>();
+    private HashMap<BaseEntity, Celestial> entityParents = new HashMap<>();
     
     private Array<GenericConic> celestialPaths = new Array<>();
     private Array<Orbit> entityPaths = new Array<>();
@@ -57,7 +57,7 @@ public class Universe extends Actor {
 
         // Convert the target celestial's body to the new Box2D world
         target.setPosition(target.getPosition().mul(parent.getUniverseSpaceTransform().inv()));
-        target.loadBodyToWorld(parent.getWorld(), Constants.PPM);
+        target.setWorld(parent.getWorld());
     }
 
     // Constructor
@@ -73,7 +73,7 @@ public class Universe extends Actor {
      * Adds a new entity to this universe
      * @param e The entity to add
      */
-    public void addEntity(Entity e){
+    public void addEntity(BaseEntity e){
         game.simulation.addEntity(universalWorld, e);
 
         boolean res = false;
@@ -98,7 +98,7 @@ public class Universe extends Actor {
      * If it is inside a new SOI, transfer to the appropriate child.
      * @param e The entity to check
      */
-    public boolean checkTransfer(Entity e){
+    public boolean checkTransfer(BaseEntity e){
         // Check whether or not this entity has a celestial parent or not
         Celestial parent = entityParents.get(e);
         Array<Celestial> celestialsToCheck = (parent == null) ? celestials : parent.getChildren();
@@ -130,9 +130,9 @@ public class Universe extends Actor {
      * include celestials.
      * @return Array of Entity
      */
-    public Array<Entity> getEntities(){ return game.simulation.getEntities(); }
+    public Array<BaseEntity> getEntities(){ return game.simulation.getEntities(); }
 
-    public HashMap<Entity, Celestial> getEntityParents(){ return entityParents; }
+    public HashMap<BaseEntity, Celestial> getEntityParents(){ return entityParents; }
 
     /**
      * Gets all the celestials in the simulation.
@@ -152,7 +152,7 @@ public class Universe extends Actor {
      * @param e The entity to check. This supports celestials.
      * @return The celestial parent
      */
-    public Celestial getParentCelestial(Entity e){ return entityParents.get(e); }
+    public Celestial getParentCelestial(BaseEntity e){ return entityParents.get(e); }
     
     /**
      * Sets the timewarp speed. If set to 1, resumes the normal simulation.
@@ -169,7 +169,7 @@ public class Universe extends Actor {
         // Starting the timewarp for first time
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
-            for(Entity e : game.simulation.getEntities()){
+            for(BaseEntity e : game.simulation.getEntities()){
                 if(e instanceof Celestial){
                     Celestial parent = getParentCelestial(e);
                     if(parent == null) continue;
@@ -192,8 +192,8 @@ public class Universe extends Actor {
      * @param c Celestial target
      * @param e Entity to be converted
      */
-    public void addToCelestial(Celestial c, Entity e){
-        if(e.getDriver() != null) this.addToCelestial(c, e.getDriver());
+    public void addToCelestial(Celestial c, BaseEntity e){
+        // TODO: if(e.getDriver() != null) this.addToCelestial(c, e.getDriver());
 
         Celestial parent = entityParents.get(e);
         if(parent != null){
@@ -213,8 +213,8 @@ public class Universe extends Actor {
      * Raises the entity up a level in terms of worlds
      * @param e Entity to be converted
      */
-    public void removeFromCelestial(Entity e){
-        if(e.getDriver() != null) this.removeFromCelestial(e.getDriver());
+    public void removeFromCelestial(BaseEntity e){
+        // TODO: if(e.getDriver() != null) this.removeFromCelestial(e.getDriver());
 
         // Raise up a level
         Celestial parent = entityParents.get(e);
@@ -241,7 +241,6 @@ public class Universe extends Actor {
         if(timewarp == 1){
             // Step the physics on the world
             game.simulation.update();
-            for(Entity e : game.simulation.getEntities()){ e.update(delta); }
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             timeWarpAccumulator += Math.min(delta, 0.25f);
@@ -250,9 +249,9 @@ public class Universe extends Actor {
 
                 for(int i = 0; i < celestialPaths.size; i++){
                     GenericConic path = celestialPaths.get(i);
-                    Entity e = path.getChild();
+                    BaseEntity e = path.getChild();
     
-                    if(e.getDriving() != null) continue;
+                    // TODO: if(e.getDriving() != null) continue;
     
                     Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
                     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
@@ -263,9 +262,9 @@ public class Universe extends Actor {
 
                 for(int i = 0; i < entityPaths.size; i++){
                     Orbit path = entityPaths.get(i);
-                    Entity e = path.getEntity();
+                    BaseEntity e = path.getEntity();
     
-                    if(e.getDriving() != null) continue;
+                    // TODO: if(e.getDriving() != null) continue;
     
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);
@@ -306,10 +305,10 @@ public class Universe extends Actor {
     public void draw(Batch batch, float a){
         Matrix4 oldMat = batch.getTransformMatrix().cpy();
 
-        for(Entity e : game.simulation.getEntities()){
+        for(BaseEntity e : game.simulation.getEntities()){
             if(e instanceof Celestial){
                 batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
-                e.draw(batch, a);
+                e.render(batch);
             } else {
                 batch.setTransformMatrix(oldMat);
 
@@ -317,7 +316,7 @@ public class Universe extends Actor {
                 if(parent != null)
                     batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
 
-                e.draw(batch, a);
+                e.render(batch);
             }
         }
 

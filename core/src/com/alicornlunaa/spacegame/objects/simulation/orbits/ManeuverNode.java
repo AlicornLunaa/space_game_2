@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
  * Maneuver nodes allow the player to experiment with orbital burns before
  * actually performing them
  */
+@SuppressWarnings("unused")
 public class ManeuverNode {
 
     // Variables

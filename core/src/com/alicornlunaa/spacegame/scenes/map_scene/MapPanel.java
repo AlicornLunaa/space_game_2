@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.map_scene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -55,10 +55,11 @@ public class MapPanel extends Stage {
     private void initiatePaths(){
         Universe u = game.universe;
         
-        for(Entity e : u.getEntities()){
+        for(BaseEntity e : u.getEntities()){
             Celestial parent = u.getParentCelestial(e);
 
-            if(parent != null && e.getDriving() == null){
+            // TODO: Dont initiate drivers :(
+            if(parent != null){
                 patchedConics.add(new Orbit(u, e));
             }
         }

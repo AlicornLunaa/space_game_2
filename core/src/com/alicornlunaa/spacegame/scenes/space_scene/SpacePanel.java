@@ -1,12 +1,12 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -34,7 +34,7 @@ public class SpacePanel extends Stage {
         world = game.simulation.addWorld(Constants.PPM);
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
 
-        ship = new Ship(game, world, 0, 0, 0);
+        ship = new Ship(game, world, -49, 0, 0);
         ship.load("./saves/ships/null.ship");
 
         game.universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
@@ -50,8 +50,8 @@ public class SpacePanel extends Stage {
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(3));
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(4));
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(5));
-        // OrbitUtils.createOrbit(game.universe, ship);
-        // OrbitUtils.createOrbit(game.universe, game.player);
+        OrbitUtils.createOrbit(game.universe, ship);
+        OrbitUtils.createOrbit(game.universe, game.player);
         this.addActor(game.universe);
 
         // Controls

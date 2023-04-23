@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -48,8 +48,8 @@ public class Planet extends Celestial {
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
 
     private PhysWorld physWorld;
-    private ArrayList<Entity> planetEnts = new ArrayList<>();
-    private Stack<Entity> leavingEnts = new Stack<>();
+    private ArrayList<BaseEntity> planetEnts = new ArrayList<>();
+    private Stack<BaseEntity> leavingEnts = new Stack<>();
     private WorldBody worldBlocks;
 
     // Private functions
@@ -120,7 +120,7 @@ public class Planet extends Celestial {
     private void generatePhysWorld(){
         physWorld = game.simulation.addWorld(new PhysWorld(Constants.PLANET_PPM){
             @Override
-            public void onEntityUpdate(Entity e) {
+            public void onEntityUpdate(BaseEntity e) {
                 // Constrain entities to the world
                 float worldWidthPixels = terrestrialWidth * Tile.TILE_SIZE;
 
@@ -135,7 +135,7 @@ public class Planet extends Celestial {
                 // Taken from Celestial.java to correctly apply the right force
                 Vector2 dragForce = applyDrag(e.getBody());
                 float height = Math.max(e.getBody().getPosition().y, getRadius() / getPhysScale());
-                float force = Constants.GRAVITY_CONSTANT * ((body.getMass() * e.getBody().getMass()) / (height * height));
+                float force = Constants.GRAVITY_CONSTANT * ((getBody().getMass() * e.getBody().getMass()) / (height * height));
                 e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
             }
 
@@ -218,9 +218,8 @@ public class Planet extends Celestial {
      * Converts the entity to 2d planet planar coordinates
      * @param e Entity to be converted
      */
-    public void addEntityWorld(Entity e){
+    public void addEntityWorld(BaseEntity e){
         if(planetEnts.contains(e)) return;
-        if(e.getDriver() != null) this.addEntityWorld(e.getDriver());
 
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getPosition();
@@ -249,8 +248,8 @@ public class Planet extends Celestial {
      * Convert the entity to the space planet circular coordinates
      * @param e Entity to be converted
      */
-    public void delEntityWorld(Entity e){
-        // Formula: theta = x, radius = y
+    public void delEntityWorld(BaseEntity e){
+        // Formula: BaseEntityheta = x, radius = y
         double theta = ((e.getX() / terrestrialWidth) * Math.PI * 2);
         float radius = e.getY();
 
@@ -277,9 +276,9 @@ public class Planet extends Celestial {
         planetEnts.remove(e);
     }
 
-    public ArrayList<Entity> getPlanetEntities(){ return planetEnts; }
+    public ArrayList<BaseEntity> getPlanetEntities(){ return planetEnts; }
 
-    public boolean checkTransferPlanet(Entity e){
+    public boolean checkTransferPlanet(BaseEntity e){
         // This function checks if the entity supplied
         // is within range to change its physics system to the planet's
         float dist = e.getPosition().len();
@@ -297,7 +296,7 @@ public class Planet extends Celestial {
         return false;
     }
 
-    public boolean checkLeavePlanet(Entity e){
+    public boolean checkLeavePlanet(BaseEntity e){
         // This function checks if the entity supplied
         // is far enough to leave the planet's physics world
         if(e.getY() > radius * 1.3f){
@@ -311,8 +310,8 @@ public class Planet extends Celestial {
 
     public Vector2 applyDrag(Body b){
         // Newtons gravitational law: F = 1/2(density * velocity^2 * dragCoefficient * Area)
-        float planetRadPhys = radius / physScale; // Planet radius in physics scale
-        float atmosRadPhys = atmosphereRadius / physScale; // Atmosphere radius in physics scale
+        float planetRadPhys = radius / getPhysScale(); // Planet radius in physics scale
+        float atmosRadPhys = atmosphereRadius / getPhysScale(); // Atmosphere radius in physics scale
         float entRadPhys = b.getPosition().len(); // Entity radius in physics scale
 
         float atmosSurface = atmosRadPhys - planetRadPhys; // Atmosphere radius above surface
@@ -320,7 +319,7 @@ public class Planet extends Celestial {
         float atmosDepth = Math.max(atmosSurface - entSurface, 0) / atmosSurface; // How far the entity is in the atmosphere, where zero is outside and 1 is submerged
         float density = atmosphereDensity * atmosDepth * 0.001f;
 
-        Vector2 relVel = body.getLinearVelocity().cpy().sub(b.getLinearVelocity());
+        Vector2 relVel = getBody().getLinearVelocity().cpy().sub(b.getLinearVelocity());
         Vector2 velDir = b.getLinearVelocity().cpy().nor();
         float velSqr = relVel.len2();
         float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
@@ -329,20 +328,20 @@ public class Planet extends Celestial {
     }
 
     @Override
-    public Vector2 applyPhysics(float delta, Entity e){
+    public Vector2 applyPhysics(float delta, BaseEntity e){
         checkTransferPlanet(e);
         return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
     }
 
     @Override
-    public void draw(Batch batch, float a){
+    public void render(Batch batch){
         // Save rendering state
         Matrix4 proj = batch.getProjectionMatrix().cpy();
         Matrix4 trans = batch.getTransformMatrix().cpy();
         Matrix4 invProj = proj.cpy().inv();
         Vector2 worldPos = getUniverseSpaceTransform().getTranslation(new Vector2());
 
-        super.draw(batch, a);
+        super.render(batch);
         
         // Shade the planet in
         batch.setShader(terraShader);
@@ -372,10 +371,11 @@ public class Planet extends Celestial {
         batch.setTransformMatrix(trans);
     }
     
-    @Override
-    public boolean remove(){
-        texture.dispose();
-        return super.remove();
-    }
+    // TODO: Reimplement
+    // @Override
+    // public boolean remove(){
+    //     texture.dispose();
+    //     return super.remove();
+    // }
 
 }

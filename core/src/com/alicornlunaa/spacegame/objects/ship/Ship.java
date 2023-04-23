@@ -5,10 +5,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -21,13 +21,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
  * The ship class will hold the physical ship in space as well as
  * a tilemap and physics world for the player inside the ship
  */
-public class Ship extends Entity {
+public class Ship extends BaseEntity implements Disposable {
     
     // Variables
     private final App game;
@@ -44,6 +45,7 @@ public class Ship extends Entity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         setBody(world.getBox2DWorld().createBody(def));
+        setWorld(world);
     }
 
     // Constructor
@@ -59,12 +61,12 @@ public class Ship extends Entity {
     // Interior functions
     public void drawWorld(Batch batch, float parentAlpha){
         interior.draw(batch);
-        game.player.draw(batch, parentAlpha);
+        game.player.render(batch);
     }
 
     public void updateWorld(float delta){
         // Step the physics world inside the ship
-        game.player.act(delta);
+        game.player.update();
     }
 
     public PhysWorld getInteriorWorld(){ return interior.getWorld(); }
@@ -73,7 +75,7 @@ public class Ship extends Entity {
     public void assemble(){
         // Puts all the parts together with their respective physics bodies
         for(Part p : parts){
-            p.setParent(body, Constants.PPM);
+            p.setParent(getBody(), Constants.PPM);
         }
 
         interior.assemble();
@@ -121,12 +123,12 @@ public class Ship extends Entity {
             JSONObject data = new JSONObject(file.readString());
 
             // Reset body
-            for(Fixture f : body.getFixtureList()){
-                body.destroyFixture(f);
+            for(Fixture f : getBody().getFixtureList()){
+                getBody().destroyFixture(f);
             }
 
-            body.setLinearVelocity(0, 0);
-            body.setAngularVelocity(0);
+            getBody().setLinearVelocity(0, 0);
+            getBody().setAngularVelocity(0);
 
             // Load body data
             JSONArray partArray = data.getJSONArray("assembly");
@@ -148,7 +150,7 @@ public class Ship extends Entity {
 
     private void computeSAS(){
         // Reduce angular velocity with controls
-        float angVel = body.getAngularVelocity();
+        float angVel = getBody().getAngularVelocity();
         angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
 
         if(Math.abs(angVel) <= 0.005f) angVel = 0;
@@ -157,7 +159,7 @@ public class Ship extends Entity {
     }
 
     @Override
-    public void update(float delta){
+    public void update(){
         // Ship controls
         if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
             state.throttle = Math.min(state.throttle + 0.01f, 1);
@@ -191,42 +193,36 @@ public class Ship extends Entity {
     }
 
     @Override
-    public void fixedUpdate(float timeStep){
+    public void render(Batch batch){
+        // Update SAS
         if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
-        if(driver == null) return;
 
         // Update parts
         for(Part p : parts){
-            p.update(timeStep);
+            p.update(Gdx.graphics.getDeltaTime());
         }
-    }
 
-    @Override
-    protected void afterWorldChange(PhysWorld world){
-        for(Part p : parts){
-            p.setParent(body, getPhysScale());
-        }
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha){
+        // Finish rendering
         Matrix3 transform = getTransform();
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
-
         for(Part p : parts){
             p.draw(batch, Gdx.graphics.getDeltaTime());
         }
-        
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 
     @Override
-    public boolean remove(){
+    public void afterWorldChange(PhysWorld world){
+        for(Part p : parts){
+            p.setParent(getBody(), getPhysScale());
+        }
+    }
+
+    @Override
+    public void dispose(){
         for(Part p : parts){
             p.dispose();
         }
-
-        return super.remove();
     }
 
 }

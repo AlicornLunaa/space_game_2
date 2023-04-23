@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.objects;
 
-import com.alicornlunaa.spacegame.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;

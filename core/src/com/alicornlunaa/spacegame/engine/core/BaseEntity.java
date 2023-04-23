@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.engine.core;
 
-import com.alicornlunaa.spacegame.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
@@ -11,62 +11,70 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
-public abstract class Entity extends Actor implements IEntity {
+public abstract class BaseEntity implements IEntity {
 
     // Variables
-    private @Null PhysWorld currentWorld = null;
+    private Matrix3 transform = new Matrix3();
+    private Vector2 position = new Vector2();
+    private Vector2 velocity = new Vector2();
+
+    private @Null PhysWorld world = null;
     private @Null Body body = null;
     private float physScale = Constants.PPM;
-
-    // Overrides
-    public void afterWorldChange(PhysWorld world){}
-
-    // Private functions
-    private void updateTransform(){
-        // Update the transform of the object
-        if(body != null){
-            // A physics body exists, move the entity
-            setPosition(body.getPosition().cpy().scl(physScale));
-            setRotation((float)Math.toDegrees(body.getAngle()));
-        }
-    }
+    
+    // Constructor
+    public BaseEntity(){}
 
     // Getters
-    public PhysWorld currentWorld(){ return currentWorld; }
     public Body getBody(){ return body; }
+
+    public PhysWorld getWorld(){ return world; }
+    
     public float getPhysScale(){ return physScale; }
 
     public Matrix3 getTransform(){
-        updateTransform();
+        if(body != null){
+            transform.idt();
+            // TODO: TEMP
+            transform.translate(body.getPosition().cpy().scl(physScale));
+            transform.rotateRad(body.getAngle());
+        }
 
-        Matrix3 trans = new Matrix3();
-        trans.idt();
-        trans.translate(getX(), getY());
-        trans.rotate(getRotation());
-        trans.scale(getScaleX(), getScaleY());
-        trans.translate(-getOriginX(), -getOriginY());
+        return transform;
+    }
 
-        return trans;
+    public Vector2 getPosition(){
+        return getTransform().getTranslation(position);
+    }
+
+    public float getRotation(){
+        return getTransform().getRotationRad();
+    }
+
+    public Vector2 getVelocity(){
+        if(body == null) return null;
+        return velocity.set(body.getLinearVelocity());
     }
 
     // Setters
     public Body setBody(Body b){
+        // TODO: TEMP
+        if(b != null){
+            setPosition(b.getPosition().cpy().scl(physScale));
+            setRotation(b.getAngle());
+        }
+
         body = b;
-        updateTransform();
         return b;
     }
 
-    public void setPosition(Vector2 v){ setPosition(v.x, v.y); }
-
-    // Functions
-    public void loadToWorld(PhysWorld world){
+    public void setWorld(PhysWorld world){
         // You can only load an entity to a world if it has a body
         if(body == null) return;
-        if(world == null) return;
+        if(world == null){ this.world = world; return; }
 
         // Save all data and prep to load to the new world
         Array<FixtureDef> fixtures = new Array<>(body.getFixtureList().size);
@@ -144,54 +152,44 @@ public abstract class Entity extends Actor implements IEntity {
             s.dispose();
         }
 
-        currentWorld = world;
+        this.world = world;
         afterWorldChange(world);
     }
 
-    @Override
-    public Vector2 getPosition() { return new Vector2(body.getPosition().x * physScale, body.getPosition().y * physScale); }
-
-    @Override
-    public Vector2 getGlobalPosition() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getGlobalPosition'");
-    }
-
-    // Actor overrides
-    @Override
-    public void setX(float x){
-        if(body != null){
-            body.setTransform(x / physScale, body.getPosition().y, body.getAngle());
-        }
-
-        super.setX(x);
-    }
-
-    @Override
-    public void setY(float y){
-        if(body != null){
-            body.setTransform(body.getPosition().x, y / physScale, body.getAngle());
-        }
-
-        super.setY(y);
-    }
-
-    @Override
-    public void setRotation(float degrees){
-        if(body != null){
-            body.setTransform(body.getPosition(), (float)Math.toRadians(degrees));
-        }
-
-        super.setRotation(degrees);
-    }
-
-    @Override
     public void setPosition(float x, float y){
         if(body != null){
-            body.setTransform(x / physScale, y / physScale, body.getAngle());
+            // TODO: TEMP
+            body.setTransform(x / physScale, y / physScale, getRotation());
+        } else {
+            getPosition();
+            transform.translate(position.x * -1, position.y * -1);
         }
-
-        super.setPosition(x, y);
     }
+
+    public void setPosition(Vector2 p){ setPosition(p.x, p.y); }
+
+    public void setRotation(float rads){
+        if(body != null){
+            body.setTransform(getPosition(), rads);
+        } else {
+            float oldRads = getRotation();
+            transform.rotateRad(oldRads);
+            transform.rotateRad(rads);
+        }
+    }
+
+    public void setVelocity(Vector2 vel){
+        if(body == null) return;
+        body.setLinearVelocity(vel);
+    }
+
+    // Functions
+    public void afterWorldChange(PhysWorld world){}
     
+    // Depreciated functions for backwards compat
+    public float getX(){ return getPosition().x; }
+    public float getY(){ return getPosition().y; }
+    public void setX(float x){ setPosition(x, getPosition().y); }
+    public void setY(float y){ setPosition(getPosition().x, y); }
+
 }

@@ -1,10 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
-import com.alicornlunaa.spacegame.scenes.ship_view_scene.ShipViewScene;
-import com.alicornlunaa.spacegame.scenes.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
@@ -84,8 +81,8 @@ public class SpaceUIPanel extends Stage {
         shipViewButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent e, Actor a){
-                if(!(game.player.getDriving() instanceof Ship)) return;
-                game.setScreen(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, (Ship)game.player.getDriving()), 0.15f));
+                // if(!(game.player.getDriving() instanceof Ship)) return;
+                // game.setScreen(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, (Ship)game.player.getDriving()), 0.15f));
             }
         });
 
@@ -94,11 +91,11 @@ public class SpaceUIPanel extends Stage {
         pilotButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                if(game.player.isDriving()){
-                    game.player.stopDriving();
-                } else {
-                    game.player.drive(game.spaceScene.spacePanel.ship);
-                }
+                // if(game.player.isDriving()){
+                //     game.player.stopDriving();
+                // } else {
+                //     game.player.drive(game.spaceScene.spacePanel.ship);
+                // }
             }
         });
         this.addActor(pilotButton);

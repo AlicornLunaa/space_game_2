@@ -1,15 +1,16 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.Disposable;
 
-public class Star extends Celestial {
+public class Star extends Celestial implements Disposable {
 
     // Variables
     // private final App game;
@@ -39,18 +40,16 @@ public class Star extends Celestial {
 
     // Functions
     @Override
-    public void draw(Batch batch, float parentAlpha){
-        super.draw(batch, parentAlpha);
+    public void render(Batch batch){
         batch.setShader(shader);
         batch.draw(starTexture, radius * -1, radius * -1, radius * 2, radius * 2);
         batch.setShader(null);
     }
 
     @Override
-    public boolean remove(){
+    public void dispose(){
         starTexture.dispose();
         shader.dispose();
-        return super.remove();
     }
     
 }

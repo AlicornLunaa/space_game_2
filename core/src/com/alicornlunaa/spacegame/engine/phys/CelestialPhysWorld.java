@@ -1,7 +1,7 @@
-package com.alicornlunaa.spacegame.phys;
+package com.alicornlunaa.spacegame.engine.phys;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.badlogic.gdx.Gdx;
 
@@ -18,7 +18,7 @@ public class CelestialPhysWorld extends PhysWorld {
 
     // Functions
     @Override
-    public void onEntityUpdate(Entity e) {
+    public void onEntityUpdate(BaseEntity e) {
         // Check keplerian approximation transfer
         if(!(e instanceof Celestial))
             game.universe.checkTransfer(e);

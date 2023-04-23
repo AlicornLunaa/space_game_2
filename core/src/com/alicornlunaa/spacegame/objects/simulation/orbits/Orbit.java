@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.simulation.orbits;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.alicornlunaa.spacegame.objects.Entity;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -20,7 +20,7 @@ public class Orbit {
 
     // Variables
     private final Universe universe;
-    private final Entity entity;
+    private final BaseEntity entity;
 
     private ArrayList<GenericConic> conics = new ArrayList<>();
     private HashMap<Celestial, GenericConic> celestialConics = new HashMap<>();
@@ -196,7 +196,7 @@ public class Orbit {
     }
 
     // Constructors
-    public Orbit(Universe universe, Entity e){
+    public Orbit(Universe universe, BaseEntity e){
         this.universe = universe;
         entity = e;
         recalculate();
@@ -223,7 +223,7 @@ public class Orbit {
         }
     }
 
-    public Entity getEntity(){ return entity; }
+    public BaseEntity getEntity(){ return entity; }
 
     public ArrayList<GenericConic> getConics(){ return conics; }
 

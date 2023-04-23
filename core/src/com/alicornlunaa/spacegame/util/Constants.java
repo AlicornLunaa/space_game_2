@@ -17,6 +17,7 @@ public class Constants {
     public static final float GRAVITY_CONSTANT = 2;//1.0f;
     public static final float DRAG_COEFFICIENT = 0.004f;
     public static final float CONVERSION_FACTOR = (1.f / 3.125f) * 0.2f;
+    public static final float FPI = (float)Math.PI;
     
     // Map constants
     public static final int ORBIT_RESOLUTION = 512;

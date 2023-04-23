@@ -1,9 +1,9 @@
 package com.alicornlunaa.spacegame.scenes.dev;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
-import com.alicornlunaa.spacegame.phys.PhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

@@ -1,10 +1,10 @@
 package com.alicornlunaa.spacegame;
 
+import com.alicornlunaa.spacegame.engine.phys.Simulation;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
-import com.alicornlunaa.spacegame.phys.Simulation;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
@@ -105,12 +105,12 @@ public class App extends Game {
 				spaceScene = new SpaceScene(this);
 				this.setScreen(spaceScene);
 				
-				Planet p = ((Planet)universe.getCelestial(3));
-				p.addEntityWorld(spaceScene.spacePanel.ship);
-				spaceScene.spacePanel.ship.setPosition(500, 2.5f * p.getWorld().getPhysScale());
-				p.addEntityWorld(player);
-				player.setPosition(0, 2.5f * p.getWorld().getPhysScale());
-				this.setScreen(new PlanetScene(this, p));
+				// Planet p = ((Planet)universe.getCelestial(3));
+				// p.addEntityWorld(spaceScene.spacePanel.ship);
+				// spaceScene.spacePanel.ship.setPosition(500, 2.5f * p.getWorld().getPhysScale());
+				// p.addEntityWorld(player);
+				// player.setPosition(0, 2.5f * p.getWorld().getPhysScale());
+				// this.setScreen(new PlanetScene(this, p));
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
