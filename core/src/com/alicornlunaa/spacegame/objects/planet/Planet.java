@@ -222,7 +222,7 @@ public class Planet extends Celestial {
         if(planetEnts.contains(e)) return;
 
         // Formula: x = theta, y = radius
-        Vector2 localPos = e.getPosition();
+        Vector2 localPos = e.getBody().getPosition().cpy();
         float x = (localPos.angleRad() / (float)Math.PI / 2.f * terrestrialWidth);
         float y = localPos.len();
         e.setPosition(x, y);

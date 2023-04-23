@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects;
+package com.alicornlunaa.spacegame.engine.phys;
 
 import org.json.JSONArray;
 

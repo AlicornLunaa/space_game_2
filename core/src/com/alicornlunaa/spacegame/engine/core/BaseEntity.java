@@ -166,11 +166,12 @@ public abstract class BaseEntity implements IEntity {
 
     public void setPosition(float x, float y){
         if(body != null){
-            // TODO: TEMP
+            // TODO: TEMP Problem with bug here
             body.setTransform(x / physScale, y / physScale, getRotation());
         } else {
             getPosition();
             transform.translate(position.x * -1, position.y * -1);
+            transform.translate(x, y);
         }
     }
 
@@ -178,7 +179,7 @@ public abstract class BaseEntity implements IEntity {
 
     public void setRotation(float rads){
         if(body != null){
-            body.setTransform(getPosition(), rads);
+            body.setTransform(getPosition().cpy().scl(1 / physScale), rads);
         } else {
             float oldRads = getRotation();
             transform.rotateRad(oldRads);
