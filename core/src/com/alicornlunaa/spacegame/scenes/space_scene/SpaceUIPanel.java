@@ -162,8 +162,8 @@ public class SpaceUIPanel extends Stage {
         rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
         throttleBar.setValue(spacePanel.ship.state.throttle);
 
-        positionLabel.setText(game.player.getBody().getWorldCenter().toString());
-        velocityLabel.setText(game.player.getBody().getLinearVelocity().toString());
+        positionLabel.setText(game.player.getPosition().toString());
+        velocityLabel.setText(game.player.getVelocity().toString());
         fpsCounter.setText((int)(1 / Gdx.graphics.getDeltaTime()));
     }
 

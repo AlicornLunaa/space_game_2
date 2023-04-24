@@ -69,7 +69,7 @@ public abstract class BaseEntity implements IEntity {
 
     // Setters
     public Body setBody(Body b){
-        // TODO: TEMP
+        // TODO: TEMP physscale
         if(b != null){
             setPosition(b.getPosition().cpy().scl(physScale));
             setRotation(b.getAngle());

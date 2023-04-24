@@ -223,14 +223,14 @@ public class Planet extends Celestial {
 
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getBody().getPosition().cpy();
-        float x = (localPos.angleRad() / (float)Math.PI / 2.f * terrestrialWidth);
-        float y = localPos.len();
+        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Tile.TILE_SIZE));
+        float y = localPos.len() * e.getPhysScale();
         e.setPosition(x, y);
 
         // Load space angle relative to the world
         float theta = localPos.angleDeg();
         float omega = (float)Math.toDegrees(e.getRotation());
-        e.setRotation(omega - theta + 90);
+        e.setRotation((float)Math.toRadians(omega - theta + 90));
 
         // Convert orbital velocity to world
         Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
@@ -250,12 +250,12 @@ public class Planet extends Celestial {
      */
     public void delEntityWorld(BaseEntity e){
         // Formula: BaseEntityheta = x, radius = y
-        double theta = ((e.getX() / terrestrialWidth) * Math.PI * 2);
+        double theta = ((e.getX() / (terrestrialWidth * Tile.TILE_SIZE)) * Math.PI * 2);
         float radius = e.getY();
 
-        // Convert to space angles, spaceAngle = worldAngle + theta - 90
+        // Convert to space angles, spaceAngle = worldAngle + theta
         float worldAngle = (float)Math.toDegrees(e.getRotation());
-        e.setRotation(worldAngle + (float)Math.toDegrees(theta) - 90);
+        e.setRotation((float)Math.toRadians(worldAngle + Math.toDegrees(theta) - 90));
 
         // Convet to space position
         float x = (float)(Math.cos(theta) * radius);

@@ -146,6 +146,7 @@ public class Player extends BaseEntity {
         // Groundchecking
         grounded = false;
         getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (PLAYER_HEIGHT / 2 + 4.5f) / getPhysScale())));
+        grounded = true;
 
         // Movement
         if(vertical != 0 || horizontal != 0){
@@ -212,6 +213,12 @@ public class Player extends BaseEntity {
     public float getRotation(){
         if(isDriving()) return vehicle.getRotation();
         return super.getRotation();
+    }
+
+    @Override
+    public Vector2 getVelocity(){
+        if(isDriving()) return vehicle.getVelocity();
+        return super.getVelocity();
     }
 
 }
