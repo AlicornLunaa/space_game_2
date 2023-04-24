@@ -109,9 +109,9 @@ public class App extends Game {
 				p.addEntityWorld(spaceScene.spacePanel.ship);
 				spaceScene.spacePanel.ship.setPosition(500, 3.9f * p.getWorld().getPhysScale());
 				spaceScene.spacePanel.ship.setRotation(0);
-				p.addEntityWorld(player);
-				player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
-				this.setScreen(new PlanetScene(this, p));
+				// p.addEntityWorld(player);
+				// player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
+				// this.setScreen(new PlanetScene(this, p));
 
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));

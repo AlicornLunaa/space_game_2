@@ -8,7 +8,6 @@ import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -268,7 +267,7 @@ public class Planet extends Celestial {
         Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
-        if(e instanceof Player || e instanceof Ship)
+        if(e instanceof Player)
             game.setScreen(game.spaceScene);
 
         // Remove body
@@ -287,7 +286,7 @@ public class Planet extends Celestial {
             // Move it into this world
             this.addEntityWorld(e);
 
-            if(e instanceof Player || e instanceof Ship)
+            if(e instanceof Player)
                 game.setScreen(new PlanetScene(game, this));
 
             return true;
