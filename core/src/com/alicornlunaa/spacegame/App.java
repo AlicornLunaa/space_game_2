@@ -13,6 +13,7 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -32,6 +33,7 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public SpaceScene spaceScene;
+	public Screen activeSpaceScreen;
 
 	public Simulation simulation;
 	public Universe universe;
@@ -103,6 +105,7 @@ public class App extends Game {
 				universe = new Universe(this);
 				player = new Player(this, universe.getUniversalWorld(), -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
+				activeSpaceScreen = spaceScene;
 				this.setScreen(spaceScene);
 				
 				Planet p = ((Planet)universe.getCelestial(3));

@@ -21,10 +21,10 @@ public class MapScene implements Screen {
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
-    public MapScene(final App game, final Screen previousScreen, final Player player, OrthographicCamera oldCam){
+    public MapScene(final App game, final Player player, OrthographicCamera oldCam){
         this.game = game;
 
-        mapPanel = new MapPanel(game, previousScreen, oldCam);
+        mapPanel = new MapPanel(game, oldCam);
         uiShip = game.spaceScene.uiPanel;
 
         inputs.addProcessor(mapPanel);

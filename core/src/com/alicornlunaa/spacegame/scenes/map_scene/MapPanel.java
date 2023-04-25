@@ -16,7 +16,6 @@ import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -80,7 +79,7 @@ public class MapPanel extends Stage {
     }
 
     // Constructor
-    public MapPanel(final App game, final Screen previousScreen, OrthographicCamera oldCam){
+    public MapPanel(final App game, OrthographicCamera oldCam){
         super(new ScreenViewport());
         this.game = game;
 
@@ -106,7 +105,7 @@ public class MapPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     cam.zoom = oldZoom;
-                    game.setScreen(previousScreen);
+                    game.setScreen(game.activeSpaceScreen);
                     return true;
                 }
 
