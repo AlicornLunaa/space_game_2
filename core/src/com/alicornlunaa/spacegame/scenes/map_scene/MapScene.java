@@ -25,7 +25,7 @@ public class MapScene implements Screen {
         this.game = game;
 
         mapPanel = new MapPanel(game, oldCam);
-        uiShip = game.spaceScene.uiPanel;
+        uiShip = game.spaceScene.getUI();
 
         inputs.addProcessor(mapPanel);
         // inputs.addProcessor(uiPanel);

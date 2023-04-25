@@ -79,8 +79,8 @@ public class PlanetPanel extends Stage {
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
         batch.setTransformMatrix(new Matrix4());
-        game.spaceScene.spacePanel.getStarfield().setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
-        game.spaceScene.spacePanel.getStarfield().draw(batch, -1, -1, 2, 2);
+        game.spaceScene.getContent().getStarfield().setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
+        game.spaceScene.getContent().getStarfield().draw(batch, -1, -1, 2, 2);
 
         cam.zoom = oldZoom;
         cam.update();

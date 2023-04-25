@@ -88,7 +88,7 @@ public class MapPanel extends Stage {
         shipIcon = game.atlas.findRegion("ui/ship_icon");
         apoapsisMarkerTexture = game.atlas.findRegion("ui/apoapsis");
         periapsisMarkerTexture = game.atlas.findRegion("ui/periapsis");
-        backgroundTexture = game.spaceScene.spacePanel.getStarfield();
+        backgroundTexture = game.spaceScene.getContent().getStarfield();
 
         // Initializations
         initiatePaths();

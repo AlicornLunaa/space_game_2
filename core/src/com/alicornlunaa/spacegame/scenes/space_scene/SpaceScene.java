@@ -1,81 +1,17 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.spacegame.App;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.alicornlunaa.spacegame.engine.scenes.GameScene;
 
-public class SpaceScene implements Screen {
-
-    // Variables
-    final App game;
-
-    public SpacePanel spacePanel;
-    public SpaceUIPanel uiPanel;
-
-    private InputMultiplexer inputs = new InputMultiplexer();
+public class SpaceScene extends GameScene<SpacePanel, SpaceUIPanel> {
 
     // Constructor
     public SpaceScene(final App game){
-        this.game = game;
-        
-        spacePanel = new SpacePanel(game);
-        uiPanel = new SpaceUIPanel(game);
-
-        inputs.addProcessor(uiPanel);
-        inputs.addProcessor(spacePanel);
+        super(game, new SpacePanel(game), new SpaceUIPanel(game));
 
         // Initialize UI
-        uiPanel.shipCompass.setTarget(spacePanel.ship);
-        uiPanel.shipCompass.setUniverse(game.universe);
-        
-        // spacePanel.setDebugAll(true);
-        // uiPanel.setDebugAll(true);
+        getUI().shipCompass.setTarget(getContent().ship);
+        getUI().shipCompass.setUniverse(game.universe);
     }
 
-    // Functions
-    @Override
-    public void render(float delta) {
-        // Render the stage
-        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
-
-        // Update vfx manager
-        game.vfxManager.update(delta);
-
-        // Render
-        spacePanel.act(delta);
-        uiPanel.act(delta);
-
-        spacePanel.drawSkybox();
-        spacePanel.draw();
-        uiPanel.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        spacePanel.getViewport().update(width, height, true);
-        uiPanel.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {}
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(inputs);
-    }
-
-    @Override
-    public void hide() {}
-
-    @Override
-    public void dispose() {
-        spacePanel.dispose();
-        uiPanel.dispose();
-    }
-    
 }

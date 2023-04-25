@@ -70,14 +70,14 @@ public class SpaceUIPanel extends Stage {
         sasBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.spaceScene.spacePanel.ship.state.sas = !game.spaceScene.spacePanel.ship.state.sas;
+                game.spaceScene.getContent().ship.state.sas = !game.spaceScene.getContent().ship.state.sas;
             }
         });
 
         rcsBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.spaceScene.spacePanel.ship.state.rcs = !game.spaceScene.spacePanel.ship.state.rcs;
+                game.spaceScene.getContent().ship.state.rcs = !game.spaceScene.getContent().ship.state.rcs;
             }
         });
 
@@ -96,9 +96,9 @@ public class SpaceUIPanel extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y){
                 if(game.player.isDriving()){
-                    game.spaceScene.spacePanel.ship.stopDriving();
+                    game.spaceScene.getContent().ship.stopDriving();
                 } else {
-                    game.spaceScene.spacePanel.ship.drive(game.player);
+                    game.spaceScene.getContent().ship.drive(game.player);
                 }
             }
         });
@@ -132,22 +132,22 @@ public class SpaceUIPanel extends Stage {
                     setKeyboardFocus(console);
                     return true;
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
-                    game.spaceScene.spacePanel.ship.state.debug = !game.spaceScene.spacePanel.ship.state.debug;
+                    game.spaceScene.getContent().ship.state.debug = !game.spaceScene.getContent().ship.state.debug;
                     return true;
                 } else if(keycode == ControlSchema.SHIP_TOGGLE_RCS){
-                    game.spaceScene.spacePanel.ship.state.rcs = !game.spaceScene.spacePanel.ship.state.rcs;
+                    game.spaceScene.getContent().ship.state.rcs = !game.spaceScene.getContent().ship.state.rcs;
                     return true;
                 } else if(keycode == ControlSchema.SHIP_TOGGLE_SAS){
-                    game.spaceScene.spacePanel.ship.state.sas = !game.spaceScene.spacePanel.ship.state.sas;
+                    game.spaceScene.getContent().ship.state.sas = !game.spaceScene.getContent().ship.state.sas;
                     return true;
                 } else if(keycode == ControlSchema.SHIP_FULL_THROTTLE){
-                    game.spaceScene.spacePanel.ship.state.throttle = 1;
+                    game.spaceScene.getContent().ship.state.throttle = 1;
                     return true;
                 } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
-                    game.spaceScene.spacePanel.ship.state.throttle = 0;
+                    game.spaceScene.getContent().ship.state.throttle = 0;
                     return true;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    game.setScreen(new MapScene(game, game.player, (OrthographicCamera)game.spaceScene.spacePanel.getCamera()));
+                    game.setScreen(new MapScene(game, game.player, (OrthographicCamera)game.spaceScene.getContent().getCamera()));
                     return true;
                 }
 
@@ -161,7 +161,7 @@ public class SpaceUIPanel extends Stage {
     public void draw(){
         super.draw();
 
-        SpacePanel spacePanel = ((SpaceScene)game.spaceScene).spacePanel;
+        SpacePanel spacePanel = ((SpaceScene)game.spaceScene).getContent();
         sasBtn.setColor(spacePanel.ship.state.sas ? Color.GREEN : Color.RED);
         rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
         throttleBar.setValue(spacePanel.ship.state.throttle);

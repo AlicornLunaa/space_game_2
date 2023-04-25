@@ -35,14 +35,14 @@ public class ConsoleWidget extends VisWindow {
         String[] args = cmd.split("\\s+");
         
         if(args[0].equals("loadship")){
-            game.spaceScene.spacePanel.ship.load(args[1]);
+            game.spaceScene.getContent().ship.load(args[1]);
         } else if(args[0].equals("setpos")){
-            game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            game.spaceScene.getContent().ship.setPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         } else if(args[0].equals("setrot")){
-            game.spaceScene.spacePanel.ship.setRotation(Integer.parseInt(args[1]));
+            game.spaceScene.getContent().ship.setRotation(Integer.parseInt(args[1]));
         } else if(args[0].equals("orbit")){
-            game.spaceScene.spacePanel.ship.setPosition(Integer.parseInt(args[1]), 0);
-            OrbitUtils.createOrbit(game.universe, game.spaceScene.spacePanel.ship);
+            game.spaceScene.getContent().ship.setPosition(Integer.parseInt(args[1]), 0);
+            OrbitUtils.createOrbit(game.universe, game.spaceScene.getContent().ship);
         } else if(args[0].equals("settimewarp")){
             game.universe.setTimewarp(Float.parseFloat(args[1]));
         } else if(args[0].equals("reloadshaders")){

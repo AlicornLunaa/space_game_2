@@ -108,6 +108,7 @@ public class SpacePanel extends Stage {
 
     @Override
     public void draw(){
+        drawSkybox();
         super.draw();
 
         if(Constants.DEBUG){
