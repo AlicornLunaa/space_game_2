@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.scenes.map_scene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
+import com.alicornlunaa.spacegame.engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
@@ -32,8 +33,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MapPanel extends Stage {
 
+    // Static variables
+    private static float sStartingZoom = 300.f;
+
     // Variables
-    final App game;
+    private final App game;
 
     private final OrthographicCamera cam;
     private Starfield backgroundTexture;
@@ -76,13 +80,15 @@ public class MapPanel extends Stage {
     }
 
     // Constructor
-    public MapPanel(final App game, OrthographicCamera oldCam){
+    public MapPanel(final App game, final Stage oldStage){
         super(new ScreenViewport());
         this.game = game;
 
         cam = (OrthographicCamera)getCamera();
-        cam.zoom = 25.0f;
+        cam.zoom = MapPanel.sStartingZoom;
         cam.update();
+
+        game.vfxManager.add(new CameraZoomTransition(this, (OrthographicCamera)oldStage.getCamera(), cam, 0.4f));
 
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
@@ -99,7 +105,10 @@ public class MapPanel extends Stage {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
+                    MapPanel.sStartingZoom = cam.zoom; // Saves the old zoom
+
                     game.setScreen(game.activeSpaceScreen);
+                    game.vfxManager.add(new CameraZoomTransition(oldStage, cam, (OrthographicCamera)oldStage.getCamera(), 0.4f));
                     return true;
                 }
 
@@ -108,8 +117,8 @@ public class MapPanel extends Stage {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * cam.zoom * amountY;
-                cam.zoom = Math.min(Math.max(cam.zoom + speed, Constants.MAP_VIEW_MIN_ZOOM), Constants.MAP_VIEW_MAX_ZOOM);
+                float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * getCamera().zoom * amountY;
+                getCamera().zoom = Math.min(Math.max(getCamera().zoom + speed, Constants.MAP_VIEW_MIN_ZOOM), Constants.MAP_VIEW_MAX_ZOOM);
                 return true;
             }
         });
@@ -117,12 +126,17 @@ public class MapPanel extends Stage {
 
     // Functions
     @Override
+    public OrthographicCamera getCamera(){
+        return (OrthographicCamera)super.getCamera();
+    }
+
+    @Override
     public void act(float delta){
         Universe u = game.universe;
         game.universe.update(delta);
 
         // Parent camera to the player
-        game.player.updateCamera(cam, false);
+        game.player.updateCamera(getCamera(), false);
 
         // Keep the predicted paths up to date
         orbits.clear();
@@ -150,10 +164,10 @@ public class MapPanel extends Stage {
                     periapsis.set((float)conic.getPeriapsis() * -1, 0);
                 }
 
-                markers.addActor(new Marker(game, parent, periapsis, periapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getPeriapsis()))));
+                markers.addActor(new Marker(game, parent, periapsis, periapsisMarkerTexture, 15.6f * getCamera().zoom, String.valueOf(Math.round(conic.getPeriapsis()))));
 
                 if(!(conic instanceof HyperbolicConic)){
-                    markers.addActor(new Marker(game, parent, apoapsis, apoapsisMarkerTexture, 15.6f * cam.zoom, String.valueOf(Math.round(conic.getApoapsis()))));
+                    markers.addActor(new Marker(game, parent, apoapsis, apoapsisMarkerTexture, 15.6f * getCamera().zoom, String.valueOf(Math.round(conic.getApoapsis()))));
                 }
             }
         }
@@ -165,22 +179,15 @@ public class MapPanel extends Stage {
         Batch batch = getBatch();
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
-        
-        float oldZoom = cam.zoom;
-        cam.zoom = 1;
-        cam.update();
 
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
         batch.setTransformMatrix(new Matrix4());
-        backgroundTexture.setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
+        backgroundTexture.setOffset(getCamera().position.x / 10000000, getCamera().position.y / 10000000);
         backgroundTexture.draw(batch, -1, -1, 2, 2);
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
         batch.end();
-
-        cam.zoom = oldZoom;
-        cam.update();
     }
 
     public void drawUniverse(Batch batch){
@@ -223,14 +230,14 @@ public class MapPanel extends Stage {
         drawSkybox();
 
         // Get value dictating the opacity of simplified icons
-        celestialOpacity = 1 - Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
-        entityOpacity = Math.min(Math.max(cam.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
+        celestialOpacity = 1 - Math.min(Math.max(getCamera().zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
+        entityOpacity = Math.min(Math.max(getCamera().zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
 
         // Begin a shape drawing pass
-        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.setProjectionMatrix(getCamera().combined);
         game.shapeRenderer.begin(ShapeType.Filled);
         for(GenericConic o : orbits){
-            o.draw(game.shapeRenderer, cam.zoom);
+            o.draw(game.shapeRenderer, getCamera().zoom);
 
             // Render a circle to the closest point on the orbit by taking the angle to the mouse
             // TODO: Mouse point on orbit
@@ -248,19 +255,19 @@ public class MapPanel extends Stage {
             // game.shapeRenderer.circle(p.x, p.y, 5000);
         }
         for(Orbit cs : patchedConics){
-            cs.draw(game.shapeRenderer, 1.5f * cam.zoom);
+            cs.draw(game.shapeRenderer, 1.5f * getCamera().zoom);
         }
         game.shapeRenderer.setTransformMatrix(new Matrix4());
         game.shapeRenderer.end();
 
         // Begin a batch renderer pass
         Batch batch = getBatch();
-        batch.setProjectionMatrix(cam.combined);
+        batch.setProjectionMatrix(getCamera().combined);
         batch.setTransformMatrix(new Matrix4());
         batch.begin();
         batch.setColor(1, 1, 1, entityOpacity);
 
-        Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(cam.zoom);
+        Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(getCamera().zoom);
         Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(

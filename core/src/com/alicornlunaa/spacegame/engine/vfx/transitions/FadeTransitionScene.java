@@ -54,9 +54,6 @@ public class FadeTransitionScene implements Screen, IVfx {
         } else if(frameTime < transitionlength * 2){
             toScreen.render(delta);
             a = 1 - (frameTime / transitionlength * 2);
-        } else {
-            game.setScreen(toScreen);
-            this.dispose();
         }
 
         batch.begin();
@@ -85,7 +82,14 @@ public class FadeTransitionScene implements Screen, IVfx {
     @Override
     public boolean update(float delta) {
         frameTime += delta;
-        return frameTime >= transitionlength;
+
+        if(frameTime >= transitionlength * 2){
+            game.setScreen(toScreen);
+            this.dispose();
+            return true;
+        }
+
+        return false;
     }
     
 }

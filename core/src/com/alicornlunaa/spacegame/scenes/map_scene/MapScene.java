@@ -6,7 +6,7 @@ import com.alicornlunaa.spacegame.scenes.space_scene.SpaceUIPanel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MapScene implements Screen {
@@ -21,10 +21,10 @@ public class MapScene implements Screen {
     private InputMultiplexer inputs = new InputMultiplexer();
 
     // Constructor
-    public MapScene(final App game, final Player player, OrthographicCamera oldCam){
+    public MapScene(final App game, final Player player, final Stage oldStage){
         this.game = game;
 
-        mapPanel = new MapPanel(game, oldCam);
+        mapPanel = new MapPanel(game, oldStage);
         uiShip = game.spaceScene.getUI();
 
         inputs.addProcessor(mapPanel);

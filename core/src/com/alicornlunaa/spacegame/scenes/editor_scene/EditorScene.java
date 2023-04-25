@@ -174,7 +174,7 @@ public class EditorScene implements Screen {
         ui.getRoot().findActor("exitbutton").addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                game.setScreen(new FadeTransitionScene(game, game.getScreen(), previouScreen, 0.15f));
+                game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), previouScreen, 0.15f));
             }
         });
 
@@ -404,6 +404,7 @@ public class EditorScene implements Screen {
     public void render(float delta) {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
+        game.vfxManager.update(delta);
         cursor = editor.screenToStageCoordinates(cursor.set(Gdx.input.getX(), Gdx.input.getY()));
         
         editor.act(delta);

@@ -20,7 +20,7 @@ public class GameScene<C extends Stage, U extends Stage> extends BaseScene {
         inputs.addProcessor(ui);
         inputs.addProcessor(content);
 
-        ui.setDebugAll(Constants.DEBUG);
+        // ui.setDebugAll(Constants.DEBUG);
         content.setDebugAll(Constants.DEBUG);
     }
 
