@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.widgets.Compass;
 import com.alicornlunaa.spacegame.widgets.ConsoleWidget;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -91,11 +92,11 @@ public class SpaceUIPanel extends Stage {
         pilotButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                // if(game.player.isDriving()){
-                //     game.player.stopDriving();
-                // } else {
-                //     game.player.drive(game.spaceScene.spacePanel.ship);
-                // }
+                if(game.player.isDriving()){
+                    game.spaceScene.spacePanel.ship.stopDriving();
+                } else {
+                    game.spaceScene.spacePanel.ship.drive(game.player);
+                }
             }
         });
         this.addActor(pilotButton);
@@ -143,7 +144,7 @@ public class SpaceUIPanel extends Stage {
                     game.spaceScene.spacePanel.ship.state.throttle = 0;
                     return true;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    game.setScreen(new MapScene(game, game.getScreen(), game.player));
+                    game.setScreen(new MapScene(game, game.getScreen(), game.player, (OrthographicCamera)game.spaceScene.spacePanel.getCamera()));
                     return true;
                 }
 

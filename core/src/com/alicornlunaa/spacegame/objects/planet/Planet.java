@@ -6,6 +6,7 @@ import java.util.Stack;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
@@ -22,8 +23,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 
-public class Planet extends Celestial {
+public class Planet extends Celestial implements Disposable {
 
     // Variables
     private final App game;
@@ -117,7 +119,7 @@ public class Planet extends Celestial {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.simulation.addWorld(new PhysWorld(Constants.PLANET_PPM){
+        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(Constants.PLANET_PPM){
             @Override
             public void onEntityUpdate(BaseEntity e) {
                 // Constrain entities to the world
@@ -370,11 +372,9 @@ public class Planet extends Celestial {
         batch.setTransformMatrix(trans);
     }
     
-    // TODO: Reimplement
-    // @Override
-    // public boolean remove(){
-    //     texture.dispose();
-    //     return super.remove();
-    // }
+    @Override
+    public void dispose(){
+        texture.dispose();
+    }
 
 }

@@ -23,11 +23,12 @@ public abstract class DriveableEntity extends BaseEntity {
     public void stopDriving(){
         driver.setPosition(getPosition());
         driver.setVehicle(null);
-        driver = null;
 
         if(driver.getBody() != null){
             driver.getBody().setActive(true);
         }
+        
+        driver = null;
     }
     
 }

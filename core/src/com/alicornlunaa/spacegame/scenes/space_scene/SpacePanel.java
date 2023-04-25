@@ -54,7 +54,7 @@ public class SpacePanel extends Stage {
         // OrbitUtils.createOrbit(game.universe, game.player);
         this.addActor(game.universe);
 
-        // ship.drive(game.player);
+        ship.drive(game.player);
 
         // Controls
         this.addListener(new InputListener(){
