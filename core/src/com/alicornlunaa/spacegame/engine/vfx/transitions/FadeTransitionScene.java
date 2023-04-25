@@ -1,6 +1,7 @@
-package com.alicornlunaa.spacegame.scenes.transitions;
+package com.alicornlunaa.spacegame.engine.vfx.transitions;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.vfx.IVfx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -8,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class FadeTransitionScene implements Screen {
+public class FadeTransitionScene implements Screen, IVfx {
 
     // Variables
     private final App game;
@@ -62,8 +63,6 @@ public class FadeTransitionScene implements Screen {
         batch.setColor(1, 1, 1, a);
         batch.draw(texture, 0, 0, 600000, 600000);
         batch.end();
-
-        frameTime += delta;
     }
 
     @Override
@@ -81,6 +80,12 @@ public class FadeTransitionScene implements Screen {
     @Override
     public void dispose() {
         texture.dispose();
+    }
+
+    @Override
+    public boolean update(float delta) {
+        frameTime += delta;
+        return frameTime >= transitionlength;
     }
     
 }

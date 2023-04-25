@@ -1,6 +1,8 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.vfx.transitions.FadeTransitionScene;
+import com.alicornlunaa.spacegame.scenes.editor_scene.EditorScene;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.scenes.transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -84,6 +86,7 @@ public class SpaceUIPanel extends Stage {
             public void changed(ChangeEvent e, Actor a){
                 // if(!(game.player.getDriving() instanceof Ship)) return;
                 // game.setScreen(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, (Ship)game.player.getDriving()), 0.15f));
+                game.vfxManager.add(new FadeTransitionScene(game, game.spaceScene, new EditorScene(game), 2));
             }
         });
 

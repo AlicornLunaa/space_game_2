@@ -40,6 +40,10 @@ public class SpaceScene implements Screen {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
+        // Update vfx manager
+        game.vfxManager.update(delta);
+
+        // Render
         spacePanel.act(delta);
         uiPanel.act(delta);
 

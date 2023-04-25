@@ -41,12 +41,14 @@ public class MapScene implements Screen {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
 
+        // Update vfx manager
+        game.vfxManager.update(delta);
+
+        // Render
         mapPanel.act(delta);
-        // uiPanel.act(delta);
         uiShip.act(delta);
 
         mapPanel.draw();
-        // uiPanel.draw();
         uiShip.draw();
     }
 

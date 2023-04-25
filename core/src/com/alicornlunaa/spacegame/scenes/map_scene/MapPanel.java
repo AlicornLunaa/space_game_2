@@ -23,7 +23,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -38,8 +37,6 @@ public class MapPanel extends Stage {
 
     private final OrthographicCamera cam;
     private Starfield backgroundTexture;
-    private float oldZoom = 0.0f;
-    private Vector3 pos = new Vector3();
 
     private float celestialOpacity = 0.f;
     private float entityOpacity = 0.f;
@@ -83,8 +80,6 @@ public class MapPanel extends Stage {
         super(new ScreenViewport());
         this.game = game;
 
-        oldZoom = oldCam.zoom;
-
         cam = (OrthographicCamera)getCamera();
         cam.zoom = 25.0f;
         cam.update();
@@ -104,7 +99,6 @@ public class MapPanel extends Stage {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    cam.zoom = oldZoom;
                     game.setScreen(game.activeSpaceScreen);
                     return true;
                 }
@@ -217,10 +211,6 @@ public class MapPanel extends Stage {
                     }
                 }
 
-                if(e instanceof Player){
-                    pos = mat.cpy().mul(new Matrix4().set(e.getTransform())).getTranslation(new Vector3());
-                }
-                
                 batch.setTransformMatrix(mat);
                 e.render(batch);
             }
@@ -261,8 +251,6 @@ public class MapPanel extends Stage {
             cs.draw(game.shapeRenderer, 1.5f * cam.zoom);
         }
         game.shapeRenderer.setTransformMatrix(new Matrix4());
-        game.shapeRenderer.setColor(Color.PINK);
-        game.shapeRenderer.circle(pos.x, pos.y, 100);
         game.shapeRenderer.end();
 
         // Begin a batch renderer pass
