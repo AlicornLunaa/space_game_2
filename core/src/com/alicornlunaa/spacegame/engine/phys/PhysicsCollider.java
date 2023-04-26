@@ -43,14 +43,7 @@ public class PhysicsCollider {
     // Functions
     public Body attachCollider(Body b){
         // Remove existing body
-        if(bodyRef != null){
-            for(Fixture f : fixtures){
-                if(f == null) continue;
-                bodyRef.destroyFixture(f);
-            }
-
-            fixtures.clear();
-        }
+        detachCollider();
 
         // Attach to new body
         Matrix3 trans = new Matrix3().translate(position).rotate(rotation).scale(scale);
@@ -73,7 +66,7 @@ public class PhysicsCollider {
             def.restitution = collider.getDensity(i);
             def.density = collider.getDensity(i);
             def.isSensor = collider.getSensor(i);
-            b.createFixture(def);
+            fixtures.add(b.createFixture(def));
 
             physShape.dispose();
         }
@@ -85,7 +78,7 @@ public class PhysicsCollider {
         // Remove existing body
         if(bodyRef != null){
             for(Fixture f : fixtures){
-                if(f == null) continue;
+                if(f == null || bodyRef.getFixtureList().size <= 0) continue;
                 bodyRef.destroyFixture(f);
             }
 

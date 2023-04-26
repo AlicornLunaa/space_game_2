@@ -60,7 +60,7 @@ public class PhysicsEditor implements Screen {
     public Vector2 cursorOnPart = new Vector2();
     public Vector2 cursor = new Vector2();
     public Vector2 center = new Vector2();
-    public float partSize = 256;
+    public float partSize = 32;
     public float snapDistance = 2;
     public Texture reference;
     public Collider collider = new Collider();
@@ -318,7 +318,7 @@ public class PhysicsEditor implements Screen {
         inputs.addProcessor(1, new InputAdapter(){
             @Override
             public boolean scrolled(float amountX, float amountY){
-                partSize = Math.min(Math.max(partSize - amountY * 20, 1), 500);
+                partSize = Math.min(Math.max(partSize - amountY * 0.5f, 1), 500);
                 return true;
             }
         });

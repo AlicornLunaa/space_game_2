@@ -35,7 +35,7 @@ public class InteriorCell {
 
         if(connections == 0){
             texture = new TextureRegion(game.atlas.findRegion("interior/cell"));
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell.json").readString()));
+            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_through.json").readString()));
         } else if(connections == 1){
             collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_one.json").readString()));
 

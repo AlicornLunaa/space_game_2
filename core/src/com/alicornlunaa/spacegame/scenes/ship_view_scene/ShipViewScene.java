@@ -18,6 +18,8 @@ public class ShipViewScene implements Screen {
     private ShipViewUI uiPanel;
     private InputMultiplexer inputs = new InputMultiplexer();
 
+    private Ship vehicle;
+
     // Constructor
     public ShipViewScene(final App game, final Ship ship){
         this.game = game;
@@ -27,7 +29,7 @@ public class ShipViewScene implements Screen {
         inputs.addProcessor(shipPanel);
         inputs.addProcessor(uiPanel);
 
-        game.player.setWorld(ship.getInteriorWorld());
+        vehicle = ship;
     }
 
     // Functions
@@ -35,6 +37,8 @@ public class ShipViewScene implements Screen {
     public void render(float delta) {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
+        game.vfxManager.update(delta);
+
         shipPanel.act(delta);
         uiPanel.act(delta);
         shipPanel.draw();
@@ -55,9 +59,12 @@ public class ShipViewScene implements Screen {
 
     @Override
     public void show() {
-        // oldDrivingEnt = game.player.getDriving();
-        // game.player.stopDriving();
+        vehicle.stopDriving();
+
+        game.simulation.addEntity(vehicle.getInteriorWorld(), game.player);
+
         game.player.setPosition(0, 0);
+        game.player.setRotation(0);
         game.player.getBody().setLinearVelocity(0, 0);
 
         Gdx.input.setInputProcessor(inputs);
@@ -65,8 +72,8 @@ public class ShipViewScene implements Screen {
 
     @Override
     public void hide() {
-        // game.player.drive(oldDrivingEnt);
-        // oldDrivingEnt = null;
+        vehicle.drive(game.player);
+        vehicle = null;
     }
 
     @Override

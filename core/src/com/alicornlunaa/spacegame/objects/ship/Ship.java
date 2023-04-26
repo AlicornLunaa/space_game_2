@@ -64,11 +64,6 @@ public class Ship extends DriveableEntity implements Disposable {
         game.player.render(batch);
     }
 
-    public void updateWorld(float delta){
-        // Step the physics world inside the ship
-        game.player.update();
-    }
-
     public PhysWorld getInteriorWorld(){ return interior.getWorld(); }
 
     // Space functions

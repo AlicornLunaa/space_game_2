@@ -127,6 +127,8 @@ public class Player extends BaseEntity {
     // Functions
     public boolean isDriving(){ return (vehicle != null); }
 
+    public DriveableEntity getVehicle(){ return vehicle; }
+
     public void setVehicle(DriveableEntity de){ vehicle = de; }
 
     public void updateCamera(OrthographicCamera cam, boolean localToPhysWorld){
