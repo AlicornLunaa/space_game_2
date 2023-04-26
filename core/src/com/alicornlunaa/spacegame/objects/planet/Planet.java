@@ -10,7 +10,6 @@ import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
-import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -241,6 +240,10 @@ public class Planet extends Celestial implements Disposable {
         float tangentVel = vel.dot(tangent);
         e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
+        if(e instanceof Player || e == game.player.getVehicle()){
+            game.activeSpaceScreen = new PlanetScene(game, this);
+        }
+
         // Add body
         game.simulation.addEntity(physWorld, e);
         planetEnts.add(e);
@@ -272,10 +275,6 @@ public class Planet extends Celestial implements Disposable {
 
         if(e instanceof Player || e == game.player.getVehicle()){
             game.activeSpaceScreen = game.spaceScene;
-
-            if(!(game.getScreen() instanceof MapScene)){
-                game.setScreen(game.activeSpaceScreen);
-            }
         }
 
         // Remove body
@@ -293,15 +292,6 @@ public class Planet extends Celestial implements Disposable {
         if(dist < radius * 1.2f){
             // Move it into this world
             this.addEntityWorld(e);
-
-            if(e instanceof Player || e == game.player.getVehicle()){
-                game.activeSpaceScreen = new PlanetScene(game, this);
-
-                if(!(game.getScreen() instanceof MapScene)){
-                    game.setScreen(game.activeSpaceScreen);
-                }
-            }
-
             return true;
         }
 

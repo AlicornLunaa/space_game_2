@@ -5,10 +5,12 @@ import java.util.HashMap;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
+import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -217,6 +219,16 @@ public class Player extends BaseEntity {
     }
 
     // Overrides
+    @Override
+    public void afterWorldChange(PhysWorld world){
+        // Change scenes depending on world
+        if(game.getScreen() instanceof MapScene) return;
+
+        if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
+            game.setScreen(game.activeSpaceScreen);
+        }
+    }
+
     @Override
     public Vector2 getPosition(){
         if(isDriving()) return vehicle.getCenter();
