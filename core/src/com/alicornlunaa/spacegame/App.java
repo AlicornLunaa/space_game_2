@@ -117,6 +117,7 @@ public class App extends Game {
 				p.addEntityWorld(player);
 				player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
 				this.setScreen(new PlanetScene(this, p));
+				activeSpaceScreen = this.getScreen();
 
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));

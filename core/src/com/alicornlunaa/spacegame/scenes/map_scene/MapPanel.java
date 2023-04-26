@@ -108,8 +108,6 @@ public class MapPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     MapPanel.sStartingZoom = cam.zoom; // Saves the old zoom
-
-                    ((OrthographicCamera)oldStage.getCamera()).up.set(getCamera().up);
                     game.setScreen(game.activeSpaceScreen);
                     game.vfxManager.add(new CameraZoomTransition(oldStage, cam, (OrthographicCamera)oldStage.getCamera(), 0.4f));
                     return true;
