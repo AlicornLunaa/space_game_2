@@ -34,6 +34,8 @@ public class Simulation {
     public void addEntity(int index, BaseEntity e){ addEntity(physWorlds.get(index), e); }
 
     public void addEntity(PhysWorld world, BaseEntity e){
+        if(e.getWorld() == world) return;
+
         if(!entities.contains(e, true)){
             // Initialize new entity
             entities.add(e);
