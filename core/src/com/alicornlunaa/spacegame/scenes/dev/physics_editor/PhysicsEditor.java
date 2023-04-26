@@ -318,7 +318,7 @@ public class PhysicsEditor implements Screen {
         inputs.addProcessor(1, new InputAdapter(){
             @Override
             public boolean scrolled(float amountX, float amountY){
-                partSize = Math.min(Math.max(partSize - amountY * 0.5f, 1), 500);
+                partSize = Math.min(Math.max(partSize - amountY * 10.5f, 1), 500);
                 return true;
             }
         });

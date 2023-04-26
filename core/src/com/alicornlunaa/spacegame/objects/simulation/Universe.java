@@ -8,13 +8,16 @@ import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
@@ -322,6 +325,11 @@ public class Universe extends Actor {
         for(BaseEntity e : game.simulation.getEntities()){
             if(e instanceof Celestial){
                 batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
+
+                if(e instanceof Planet){
+                    ((Planet)e).setStarDirection(new Vector3(OrbitUtils.directionToNearestStar(this, e), 0));
+                }
+
                 e.render(batch);
             } else {
                 batch.setTransformMatrix(new Matrix4());
