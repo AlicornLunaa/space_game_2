@@ -35,9 +35,9 @@ public class InteriorCell {
 
         if(connections == 0){
             texture = new TextureRegion(game.atlas.findRegion("interior/cell"));
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_through.json").readString()));
+            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
         } else if(connections == 1){
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_one.json").readString()));
+            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_one.json").readString()));
 
             if(left){
                 texture = new TextureRegion(game.atlas.findRegion("interior/cell_one_horizontal"));
@@ -61,7 +61,7 @@ public class InteriorCell {
             if((up || down) && (left || right)){
                 // Corner piece
                 texture = new TextureRegion(game.atlas.findRegion("interior/cell_corner"));
-                collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_corner.json").readString()));
+                collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_corner.json").readString()));
 
                 if(right && down){
                     texture.flip(false, false);
@@ -78,7 +78,7 @@ public class InteriorCell {
                 }
             } else {
                 // Through piece
-                collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_through.json").readString()));
+                collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
 
                 if(left || right){
                     texture = new TextureRegion(game.atlas.findRegion("interior/cell_through_horizontal"));
@@ -90,7 +90,7 @@ public class InteriorCell {
             }
         } else if(connections == 3){
             // Wall piece
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/interior/cell_wall.json").readString()));
+            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_wall.json").readString()));
 
             if(!up){
                 texture = new TextureRegion(game.atlas.findRegion("interior/cell_wall_horizontal"));
