@@ -28,6 +28,7 @@ public class PlanetPanel extends Stage {
         this.game = game;
         this.planet = planet;
         this.cam = (OrthographicCamera)getCamera();
+        cam.zoom = ((OrthographicCamera)game.spaceScene.getContent().getCamera()).zoom;
 
         // Controls
         this.addListener(new InputListener(){

@@ -50,7 +50,7 @@ public class SpacePanel extends Stage {
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(3));
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(4));
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(5));
-        OrbitUtils.createOrbit(game.universe, ship);
+        // OrbitUtils.createOrbit(game.universe, ship);
         // OrbitUtils.createOrbit(game.universe, game.player);
         this.addActor(game.universe);
 

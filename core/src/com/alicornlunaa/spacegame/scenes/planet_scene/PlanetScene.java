@@ -53,6 +53,7 @@ public class PlanetScene implements Screen {
     public void render(float delta) {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
+        game.vfxManager.update(delta);
 
         planetPanel.act(delta);
         uiPanel.act(delta);
