@@ -1,13 +1,19 @@
 package com.alicornlunaa.spacegame;
 
+import com.alicornlunaa.spacegame.engine.phys.Simulation;
+import com.alicornlunaa.spacegame.engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.scenes.SpaceScene.SpaceScene;
-import com.alicornlunaa.spacegame.scenes.Transitions.LoadingScene;
+import com.alicornlunaa.spacegame.objects.planet.Biome;
+import com.alicornlunaa.spacegame.objects.simulation.Universe;
+import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
+import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -22,10 +28,15 @@ public class App extends Game {
 	// Variables
 	public Assets manager;
 	public PartManager partManager = new PartManager();
+	public VfxManager vfxManager = new VfxManager();
 	public Skin skin;
 
 	public LoadingScene loadingScene;
 	public SpaceScene spaceScene;
+	public Screen activeSpaceScreen;
+
+	public Simulation simulation;
+	public Universe universe;
 	public Player player;
 
 	public boolean loaded = false;
@@ -77,19 +88,40 @@ public class App extends Game {
 
 				// Get all the particle effects
 				manager.initEffects(this);
+				Biome.register("Desert", Color.YELLOW, 0.5f, 0.0f, 0.2f, 100, 0.2f);
+				Biome.register("Forest", Color.GREEN, 0.4f, 0.4f, 0.2f, 40, 0.8f);
+				Biome.register("Grassland", Color.LIME, 0.3f, 0.5f, 0.2f, 40, 0.8f);
+				Biome.register("Jungle", Color.OLIVE, 0.62f, 0.5f, 0.3f, 40, 0.8f);
+				Biome.register("Mountains", Color.GRAY, 0.0f, 0.0f, 0.5f, 40, 0.8f);
+				Biome.register("Ocean", Color.BLUE, 0.0f, 0.0f, 0.0f, 1, 0.05f);
+				Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
 
 				// Initialize VisUI for dev screens
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame2");
 
 				// Start new scene
-				player = new Player(this, -50, 0, Constants.PPM);
+				simulation = new Simulation();
+				universe = new Universe(this);
+				player = new Player(this, universe.getUniversalWorld(), -50, 0, Constants.PPM);
 				spaceScene = new SpaceScene(this);
+				activeSpaceScreen = spaceScene;
 				this.setScreen(spaceScene);
+				
+				// Planet p = ((Planet)universe.getCelestial(3));
+				// p.addEntityWorld(spaceScene.spacePanel.ship);
+				// spaceScene.spacePanel.ship.setPosition(500, 3.9f * p.getWorld().getPhysScale());
+				// spaceScene.spacePanel.ship.setRotation(0);
+				// p.addEntityWorld(player);
+				// player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
+				// this.setScreen(new PlanetScene(this, p));
+
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
 				// this.setScreen(new TestScreen(this));
+				// this.setScreen(new OrbitTest(this));
+				// this.setScreen(new PlanetEditor(this));
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());

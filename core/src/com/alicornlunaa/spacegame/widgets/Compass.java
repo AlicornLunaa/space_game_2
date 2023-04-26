@@ -1,8 +1,8 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.Entity;
-import com.alicornlunaa.spacegame.objects.Simulation.Universe;
+import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -17,7 +17,7 @@ public class Compass extends Widget {
     
     // Variables
     private Universe universe;
-    private @Null Entity targetEnt = null;
+    private @Null BaseEntity targetEnt = null;
 
     private TextureRegion ballTexture;
     private TextureRegion arrowTexture;
@@ -42,7 +42,7 @@ public class Compass extends Widget {
         this.universe = universe;
     }
 
-    public void setTarget(Entity e){
+    public void setTarget(BaseEntity e){
         targetEnt = e;
     }
 
@@ -69,7 +69,7 @@ public class Compass extends Widget {
         // Draw the ball with the angle relative to the target and parent
         float theta = 0;
         if(universe != null){
-            Entity gravityParentEnt = universe.getParentCelestial(targetEnt);
+            BaseEntity gravityParentEnt = universe.getParentCelestial(targetEnt);
 
             if(targetEnt != null && gravityParentEnt != null){
                 Vector2 targetToParent = targetEnt.getPosition().sub(gravityParentEnt.getPosition()).nor();
@@ -81,7 +81,7 @@ public class Compass extends Widget {
         // Draw the ball with the angle relative to the target and parent
         theta = 0;
         if(targetEnt != null){
-            theta = targetEnt.getRotation();
+            theta = (float)Math.toDegrees(targetEnt.getRotation());
         }
         batch.draw(
             arrowTexture,
@@ -99,11 +99,11 @@ public class Compass extends Widget {
         // Draw the ball with the angle relative to the target velocity
         theta = 0;
         if(targetEnt != null){
-            if(targetEnt.getDriving() != null){
-                theta = targetEnt.getDriving().getBody().getLinearVelocity().angleDeg() - 90;
-            } else {
+            // if(targetEnt.getDriving() != null){
+            //     theta = targetEnt.getDriving().getBody().getLinearVelocity().angleDeg() - 90;
+            // } else {
                 theta = targetEnt.getBody().getLinearVelocity().angleDeg() - 90;
-            }
+            // }
         }
         batch.draw(
             markerTexture,
