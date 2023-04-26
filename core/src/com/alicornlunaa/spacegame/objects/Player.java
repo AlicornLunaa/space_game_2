@@ -6,6 +6,8 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -16,9 +18,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -44,6 +48,7 @@ public class Player extends BaseEntity {
     private boolean grounded = false;
 
     private @Null DriveableEntity vehicle = null;
+    private Vector3 cameraAngle = new Vector3();
 
     private RayCastCallback jumpCallback;
     private float animationTimer = 0.f;
@@ -133,12 +138,19 @@ public class Player extends BaseEntity {
 
     public void updateCamera(OrthographicCamera cam, boolean localToPhysWorld){
         BaseEntity e = (vehicle == null) ? this : vehicle;
+        Celestial c = game.universe.getParentCelestial(e);
         Vector2 pos = (e.getBody() != null) ? e.getBody().getWorldCenter().cpy().scl(getPhysScale()) : e.getPosition();
+        cameraAngle.set(pos.cpy().nor(), 0);
+
+        if((e.getWorld() instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, e)){
+            cameraAngle.set(0, 1, 0);
+        }
 
         if(!localToPhysWorld){
             pos = OrbitUtils.getUniverseSpacePosition(game.universe, this);
         }
 
+        cam.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
         cam.position.set(pos, 0);
         cam.update();
     }

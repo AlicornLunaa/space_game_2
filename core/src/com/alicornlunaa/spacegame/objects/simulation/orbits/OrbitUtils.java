@@ -117,4 +117,15 @@ public class OrbitUtils {
         e.getBody().setLinearVelocity(tangent.scl(velScl));
     }
 
+    /**
+     * Returns true ro false depending on if the orbit is decaying
+     * @param parent
+     * @param entity
+     * @return True or false
+     */
+    public static boolean isOrbitDecaying(Celestial parent, BaseEntity entity){
+        GenericConic gc = OrbitPropagator.getConic(parent, entity);
+        return (gc.getPeriapsis() <= parent.getRadius() / parent.getPhysScale());
+    }
+
 }
