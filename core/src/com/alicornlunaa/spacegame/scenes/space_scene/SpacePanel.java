@@ -83,10 +83,6 @@ public class SpacePanel extends Stage {
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        
-        float oldZoom = cam.zoom;
-        cam.zoom = 1;
-        cam.update();
 
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
@@ -96,9 +92,6 @@ public class SpacePanel extends Stage {
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
         batch.end();
-
-        cam.zoom = oldZoom;
-        cam.update();
     }
 
     @Override
