@@ -266,7 +266,7 @@ public class MapPanel extends Stage {
         batch.setColor(1, 1, 1, entityOpacity);
 
         Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(mapCamera.zoom);
-        Vector2 plyPos = OrbitUtils.getUniverseSpaceCenter(game.universe, game.player);
+        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(
             shipIcon,
