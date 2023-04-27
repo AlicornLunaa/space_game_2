@@ -240,6 +240,12 @@ public class Player extends BaseEntity {
     }
 
     @Override
+    public Vector2 getCenter(){
+        if(isDriving()) return vehicle.getCenter();
+        return super.getCenter();
+    }
+
+    @Override
     public Vector2 getPosition(){
         if(isDriving()) return vehicle.getCenter();
         return super.getPosition();

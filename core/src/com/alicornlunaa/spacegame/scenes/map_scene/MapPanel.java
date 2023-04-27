@@ -128,7 +128,7 @@ public class MapPanel extends Stage {
         // Update the universe
         game.universe.update(delta);
 
-        mapCamera.position.set(OrbitUtils.getUniverseSpacePosition(game.universe, targetEntity), 0);
+        mapCamera.position.set(OrbitUtils.getUniverseSpaceCenter(game.universe, targetEntity), 0);
         mapCamera.update();
 
         // Keep the predicted paths up to date
@@ -266,7 +266,7 @@ public class MapPanel extends Stage {
         batch.setColor(1, 1, 1, entityOpacity);
 
         Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(mapCamera.zoom);
-        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
+        Vector2 plyPos = OrbitUtils.getUniverseSpaceCenter(game.universe, game.player);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(
             shipIcon,

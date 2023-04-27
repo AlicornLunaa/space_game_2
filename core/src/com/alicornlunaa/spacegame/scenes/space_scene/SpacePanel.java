@@ -104,12 +104,12 @@ public class SpacePanel extends Stage {
     @Override
     public void draw(){
         game.player.updateCamera();
-        
+
         drawSkybox();
         super.draw();
 
         if(Constants.DEBUG){
-            game.debug.render(world.getBox2DWorld(), getCamera().combined.cpy().scl(Constants.PPM));
+            game.debug.render(world.getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PPM));
         }
     }
     

@@ -70,7 +70,7 @@ public class OrbitPropagator {
     public static GenericConic getConic(Celestial parent, BaseEntity child){
         if(parent == null) return null;
 
-        ConicType type = getConicType(parent.getBody().getMass(), child.getBody().getPosition(), child.getBody().getLinearVelocity());
+        ConicType type = getConicType(parent.getBody().getMass(), child.getBody().getWorldCenter(), child.getBody().getLinearVelocity());
 
         if(type == ConicType.HYPERBOLIC){
             return new HyperbolicConic(parent, child);
