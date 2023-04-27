@@ -36,9 +36,7 @@ public class Tile extends Actor {
         this.y = y;
         this.id = id;
         region = getTexture(game.atlas, id);
-
-        setSize(TILE_SIZE, TILE_SIZE);
-        setPosition(x, y);
+        setBounds(x, y, TILE_SIZE, TILE_SIZE);
     }
 
     // Functions
@@ -48,7 +46,7 @@ public class Tile extends Actor {
     public void draw(Batch b, float a){
         b.draw(
             region,
-            x * TILE_SIZE, y * TILE_SIZE,
+            x * TILE_SIZE - TILE_SIZE / 2, y * TILE_SIZE - TILE_SIZE / 2,
             0, 0,
             TILE_SIZE, TILE_SIZE,
             1, 1,

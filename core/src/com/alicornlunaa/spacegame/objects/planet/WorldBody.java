@@ -31,7 +31,7 @@ public class WorldBody extends Group {
 
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                shape.setAsBox(Tile.TILE_SIZE / Constants.PLANET_PPM, Tile.TILE_SIZE / Constants.PLANET_PPM, new Vector2(x, y).scl(Tile.TILE_SIZE / Constants.PLANET_PPM), 0.f);
+                shape.setAsBox(Tile.TILE_SIZE / Constants.PLANET_PPM / 2, Tile.TILE_SIZE / Constants.PLANET_PPM / 2, new Vector2(x, y).scl(Tile.TILE_SIZE / Constants.PLANET_PPM), 0.f);
                 body.createFixture(shape, 0.f);
 
                 tiles[x][y] = new Tile(game, x, y, "stone");

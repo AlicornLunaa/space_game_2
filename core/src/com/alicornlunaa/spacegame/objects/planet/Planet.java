@@ -160,8 +160,8 @@ public class Planet extends Celestial implements Disposable {
 
         setPosition(x, y);
 
-        terrestrialHeight = 35;//(float)Math.floor(radius / 10);
-        terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
+        terrestrialHeight = 2;//35;//(float)Math.floor(radius / 10);
+        terrestrialWidth = 220;//(int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
         generator = new TerrainGenerator((int)terrestrialWidth, (int)terrestrialHeight, terrainSeed);
@@ -185,7 +185,7 @@ public class Planet extends Celestial implements Disposable {
     public Array<Color> getAtmosphereComposition(){ return atmosComposition; }
     public Array<Float> getAtmospherePercentages(){ return atmosPercentages; }
     public long getTerrainSeed(){ return terrainSeed; }
-    public PhysWorld getPhysWorld(){ return physWorld; }
+    public PhysWorld getInternalPhysWorld(){ return physWorld; }
     public WorldBody getWorldBody(){ return worldBlocks; }
     public float getTerrestrialWidth(){ return terrestrialWidth; }
     public float getTerrestrialHeight(){ return terrestrialHeight; }

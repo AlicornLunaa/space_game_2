@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
+import com.alicornlunaa.spacegame.objects.planet.terrain.Chunk;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,6 +30,8 @@ public class PlanetPanel extends Stage {
     private Texture texture;
     private ShaderProgram cartesianAtmosShader;
 
+    private Chunk testChunk;
+
     // Functions
     private void generateTexture(){
         Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
@@ -46,6 +49,9 @@ public class PlanetPanel extends Stage {
 
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
+
+        testChunk = new Chunk(game, planet.getInternalPhysWorld(), 3, 0);
+        this.addActor(testChunk);
 
         getViewport().setCamera(game.activeCamera);
 
@@ -76,8 +82,6 @@ public class PlanetPanel extends Stage {
 
     @Override
     public void draw(){
-        super.draw();
-
         // Draw every map tile
         Batch batch = getBatch();
         batch.setProjectionMatrix(getCamera().combined);
@@ -105,7 +109,7 @@ public class PlanetPanel extends Stage {
         cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Tile.TILE_SIZE);
         cartesianAtmosShader.setUniformf("u_atmosRadius", planet.getAtmosphereRadius());
         cartesianAtmosShader.setUniformf("u_atmosColor", planet.getAtmosphereColor());
-        batch.draw(texture, 0, 0, 1280, 720);
+        //! batch.draw(texture, 0, 0, 1280, 720);
         batch.setShader(null);
 
         // World rendering
@@ -113,17 +117,18 @@ public class PlanetPanel extends Stage {
 
         batch.setProjectionMatrix(proj);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * -1.00f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        //! worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * 1.00f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        //! worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        //! worldBody.draw(batch, batch.getColor().a);
 
         for(BaseEntity e : planet.getPlanetEntities()){
             e.render(batch);
         }
 
         batch.end();
+        super.draw();
 
         // Debug rendering
         if(this.isDebugAll()){
@@ -142,7 +147,7 @@ public class PlanetPanel extends Stage {
             // }
             game.shapeRenderer.end();
 
-            game.debug.render(planet.getPhysWorld().getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
+            game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
         }
     }
 
