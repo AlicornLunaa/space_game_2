@@ -261,6 +261,7 @@ public class Universe extends Actor {
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             timeWarpAccumulator += Math.min(delta, 0.25f);
+            
             while(timeWarpAccumulator >= Constants.TIME_STEP){
                 timeWarpAccumulator -= Constants.TIME_STEP;
 

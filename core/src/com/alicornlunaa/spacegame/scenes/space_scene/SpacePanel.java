@@ -31,6 +31,8 @@ public class SpacePanel extends Stage {
         super(new FillViewport(1280, 720));
         this.game = game;
 
+        getViewport().setCamera(game.activeCamera);
+
         world = game.simulation.addWorld(Constants.PPM);
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
 
@@ -50,8 +52,8 @@ public class SpacePanel extends Stage {
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(3));
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(4));
         OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(5));
-        // OrbitUtils.createOrbit(game.universe, ship);
-        // OrbitUtils.createOrbit(game.universe, game.player);
+        OrbitUtils.createOrbit(game.universe, ship);
+        OrbitUtils.createOrbit(game.universe, game.player);
         this.addActor(game.universe);
 
         ship.drive(game.player);
@@ -60,8 +62,7 @@ public class SpacePanel extends Stage {
         this.addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                OrthographicCamera cam = (OrthographicCamera)getCamera();
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 30), 0.05f), 3.0f);
+                game.activeCamera.zoom = Math.min(Math.max(game.activeCamera.zoom + (amountY / 30), 0.05f), 3.0f);
                 return true;
             }
         });
@@ -74,13 +75,7 @@ public class SpacePanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
-
-        // Physics updates
         game.universe.update(delta);
-
-        // Parent camera to the player
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
-        game.player.updateCamera(cam, false);
     }
 
     public void drawSkybox(){
@@ -108,6 +103,8 @@ public class SpacePanel extends Stage {
 
     @Override
     public void draw(){
+        game.player.updateCamera();
+        
         drawSkybox();
         super.draw();
 

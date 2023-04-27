@@ -33,6 +33,27 @@ public class OrbitUtils {
     }
 
     /**
+     * Returns the center position of the entity local to the center of the universe.
+     * This will be prone to float point precision errors, use with caution.
+     * @param u The universe to search in
+     * @param e The entity to transform into universe-space
+     * @return A 2d vector containing the universe space coordinates
+     */
+    public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
+        Celestial parentOfEntity = u.getParentCelestial(e);
+        Vector2 systemSpacePosition = e.getBody().getWorldCenter().cpy().scl(e.getPhysScale());
+
+        if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
+
+        if(e instanceof Celestial){
+            // Its a celestial body, return its position directly
+            return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
+        }
+
+        return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
+    }
+
+    /**
      * Returns the position of the entity local to the center of the universe.
      * This will be prone to float point precision errors, use with caution.
      * @param u The universe to search in

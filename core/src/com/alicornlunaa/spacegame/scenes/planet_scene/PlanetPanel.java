@@ -20,15 +20,14 @@ public class PlanetPanel extends Stage {
     // Variables
     private final App game;
     private Planet planet;
-    private OrthographicCamera cam;
 
     // Constructor
     public PlanetPanel(final App game, final Planet planet){
         super(new FillViewport(1280, 720));
         this.game = game;
         this.planet = planet;
-        this.cam = (OrthographicCamera)getCamera();
-        cam.zoom = ((OrthographicCamera)game.spaceScene.getContent().getCamera()).zoom;
+
+        getViewport().setCamera(game.activeCamera);
 
         // Controls
         this.addListener(new InputListener(){
@@ -53,11 +52,7 @@ public class PlanetPanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
-
         game.universe.update(delta);
-
-        // Parent camera to player
-        game.player.updateCamera(cam, true);
     }
 
     @Override

@@ -21,7 +21,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -50,7 +49,8 @@ public class Player extends BaseEntity {
     private boolean grounded = false;
 
     private @Null DriveableEntity vehicle = null;
-    private Vector3 cameraAngle = new Vector3();
+    private OrthographicCamera camera;
+    private Vector3 cameraAngle = new Vector3(0, 1, 0);
 
     private RayCastCallback jumpCallback;
     private float animationTimer = 0.f;
@@ -74,31 +74,7 @@ public class Player extends BaseEntity {
         return out;
     }
 
-    private void initializeAnims(){
-        animations.put(State.IDLE, new Animation<>(1 / 12.f, getTextureRegions("player/idle"), PlayMode.LOOP));
-        animations.put(State.MOVE_LEFT, new Animation<>(1 / 12.f, getTextureRegions("player/move_left"), PlayMode.LOOP));
-        animations.put(State.MOVE_RIGHT, new Animation<>(1 / 12.f, getTextureRegions("player/move_right"), PlayMode.LOOP));
-    }
-
-    private void resolveAnimState(){
-        if(horizontal == 0){
-            animationState = State.IDLE;
-        } else if(horizontal == 1){
-            animationState = State.MOVE_RIGHT;
-        } else if(horizontal == -1){
-            animationState = State.MOVE_LEFT;
-        }
-    }
-
-    // Constructor
-    public Player(final App game, PhysWorld world, float x, float y, float physScale){
-        this.game = game;
-
-        // TODO: Reimplement
-        // setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
-        // setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
-        // setPhysScale(physScale);
-
+    private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
@@ -127,7 +103,32 @@ public class Player extends BaseEntity {
                 return fraction;
             }
         };
+    }
 
+    private void initializeAnims(){
+        animations.put(State.IDLE, new Animation<>(1 / 12.f, getTextureRegions("player/idle"), PlayMode.LOOP));
+        animations.put(State.MOVE_LEFT, new Animation<>(1 / 12.f, getTextureRegions("player/move_left"), PlayMode.LOOP));
+        animations.put(State.MOVE_RIGHT, new Animation<>(1 / 12.f, getTextureRegions("player/move_right"), PlayMode.LOOP));
+    }
+
+    private void resolveAnimState(){
+        if(horizontal == 0){
+            animationState = State.IDLE;
+        } else if(horizontal == 1){
+            animationState = State.MOVE_RIGHT;
+        } else if(horizontal == -1){
+            animationState = State.MOVE_LEFT;
+        }
+    }
+
+    // Constructor
+    public Player(final App game, PhysWorld world, float x, float y){
+        this.game = game;
+
+        camera = new OrthographicCamera(1280, 720);
+        game.activeCamera = camera;
+
+        initializePhys(world, x, y);
         initializeAnims();
     }
 
@@ -138,23 +139,29 @@ public class Player extends BaseEntity {
 
     public void setVehicle(DriveableEntity de){ vehicle = de; }
 
-    public void updateCamera(OrthographicCamera cam, boolean localToPhysWorld){
-        BaseEntity e = (vehicle == null) ? this : vehicle;
-        Celestial c = game.universe.getParentCelestial(e);
-        Vector2 pos = (e.getBody() != null) ? e.getBody().getWorldCenter().cpy().scl(getPhysScale()) : e.getPosition();
-        cameraAngle.set(pos.cpy().nor(), 0);
+    public OrthographicCamera getCamera(){ return camera; }
 
-        if((e.getWorld() instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, e)){
+    public void updateCamera(){
+        // Update the camera positioning in order to be relative to the player
+        BaseEntity ent = (vehicle == null) ? this : vehicle;
+        Celestial c = game.universe.getParentCelestial(ent);
+        Vector2 pos = ent.getCenter();
+
+        if((ent.getWorld() instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
+            // Set the desired camera angle to upright if the orbit is not decaying
             cameraAngle.set(0, 1, 0);
+        } else {
+            cameraAngle.set(pos.cpy().nor(), 0);
         }
 
-        if(!localToPhysWorld){
-            pos = OrbitUtils.getUniverseSpacePosition(game.universe, this);
+        if(!(ent.getWorld() instanceof PlanetaryPhysWorld)){
+            // If the player is on a planet, use the universe-based position system
+            pos.set(OrbitUtils.getUniverseSpaceCenter(game.universe, ent));
         }
 
-        cam.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
-        cam.position.set(pos, 0);
-        cam.update();
+        camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
+        camera.position.set(pos, 0);
+        camera.update();
     }
 
     @Override
@@ -190,19 +197,22 @@ public class Player extends BaseEntity {
 
             resolveAnimState();
         } else {
-            vehicle.update();
             setPosition(vehicle.getPosition());
         }
+
+        // Parent camera to the player's position
+        updateCamera();
     }
 
     @Override
     public void render(Batch batch){
+        // Dont render if player is driving something
         if(vehicle != null) return;
 
         animationTimer += Gdx.graphics.getDeltaTime();
 
-        Matrix3 transform = getTransform();
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
+        Matrix4 oldTrans = batch.getTransformMatrix().cpy();
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(getTransform())));
 
         Animation<TextureRegion> curAnimation = animations.get(animationState);
         TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
@@ -215,7 +225,7 @@ public class Player extends BaseEntity {
             0
         );
 
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
+        batch.setTransformMatrix(oldTrans);
     }
 
     // Overrides

@@ -4,18 +4,16 @@ import com.alicornlunaa.spacegame.engine.phys.Simulation;
 import com.alicornlunaa.spacegame.engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
-import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -39,6 +37,7 @@ public class App extends Game {
 
 	public Simulation simulation;
 	public Universe universe;
+	public OrthographicCamera activeCamera;
 	public Player player;
 
 	public boolean loaded = false;
@@ -105,19 +104,19 @@ public class App extends Game {
 				// Start new scene
 				simulation = new Simulation();
 				universe = new Universe(this);
-				player = new Player(this, universe.getUniversalWorld(), -50, 0, Constants.PPM);
+				player = new Player(this, universe.getUniversalWorld(), -50, 0);
 				spaceScene = new SpaceScene(this);
 				activeSpaceScreen = spaceScene;
 				this.setScreen(spaceScene);
 				
-				Planet p = ((Planet)universe.getCelestial(3));
-				p.addEntityWorld(spaceScene.getContent().ship);
-				spaceScene.getContent().ship.setPosition(500, 3.9f * p.getWorld().getPhysScale());
-				spaceScene.getContent().ship.setRotation(0);
-				p.addEntityWorld(player);
-				player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
-				this.setScreen(new PlanetScene(this, p));
-				activeSpaceScreen = this.getScreen();
+				// Planet p = ((Planet)universe.getCelestial(3));
+				// p.addEntityWorld(spaceScene.getContent().ship);
+				// spaceScene.getContent().ship.setPosition(500, 3.9f * p.getWorld().getPhysScale());
+				// spaceScene.getContent().ship.setRotation(0);
+				// p.addEntityWorld(player);
+				// player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
+				// this.setScreen(new PlanetScene(this, p));
+				// activeSpaceScreen = this.getScreen();
 
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
