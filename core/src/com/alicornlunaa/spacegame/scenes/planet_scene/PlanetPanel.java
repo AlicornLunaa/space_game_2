@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -101,7 +100,7 @@ public class PlanetPanel extends Stage {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
         batch.setTransformMatrix(new Matrix4());
         cartesianAtmosShader.setUniformMatrix("u_invCamTrans", invProj);
-        cartesianAtmosShader.setUniformf("u_starDirection", new Vector3(1, 0, 0));
+        cartesianAtmosShader.setUniformf("u_starDirection", planet.getStarDirection());
         cartesianAtmosShader.setUniformf("u_planetRadius", planet.getTerrestrialHeight() * Tile.TILE_SIZE);
         cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Tile.TILE_SIZE);
         cartesianAtmosShader.setUniformf("u_atmosRadius", planet.getAtmosphereRadius());

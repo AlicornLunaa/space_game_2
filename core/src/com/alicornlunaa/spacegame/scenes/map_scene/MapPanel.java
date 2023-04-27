@@ -23,7 +23,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -189,11 +188,6 @@ public class MapPanel extends Stage {
         for(BaseEntity e : game.simulation.getEntities()){
             if(e instanceof Celestial){
                 batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
-
-                if(e instanceof Planet){
-                    ((Planet)e).setStarDirection(new Vector3(OrbitUtils.directionToNearestStar(game.universe, e), 0));
-                }
-                
                 e.render(batch);
             } else {
                 Matrix4 mat = new Matrix4();

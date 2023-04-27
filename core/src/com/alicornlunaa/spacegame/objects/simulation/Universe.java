@@ -17,7 +17,6 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
@@ -270,6 +269,10 @@ public class Universe extends Actor {
                     BaseEntity e = path.getChild();
 
                     if(e instanceof Player && ((Player)e).isDriving()) continue;
+
+                    if(e instanceof Planet){
+                        ((Planet)e).getStarDirection().set(OrbitUtils.directionToNearestStar(this, e), 0);
+                    }
     
                     Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
                     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
@@ -283,6 +286,7 @@ public class Universe extends Actor {
                     BaseEntity e = path.getEntity();
     
                     if(e instanceof Player && ((Player)e).isDriving()) continue;
+                    if(!(e.getWorld() instanceof CelestialPhysWorld)) continue;
     
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);
@@ -326,11 +330,6 @@ public class Universe extends Actor {
         for(BaseEntity e : game.simulation.getEntities()){
             if(e instanceof Celestial){
                 batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
-
-                if(e instanceof Planet){
-                    ((Planet)e).setStarDirection(new Vector3(OrbitUtils.directionToNearestStar(this, e), 0));
-                }
-
                 e.render(batch);
             } else {
                 batch.setTransformMatrix(new Matrix4());

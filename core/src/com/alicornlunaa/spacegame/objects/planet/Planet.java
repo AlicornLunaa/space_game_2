@@ -10,6 +10,7 @@ import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -188,6 +189,7 @@ public class Planet extends Celestial implements Disposable {
     public WorldBody getWorldBody(){ return worldBlocks; }
     public float getTerrestrialWidth(){ return terrestrialWidth; }
     public float getTerrestrialHeight(){ return terrestrialHeight; }
+    public Vector3 getStarDirection(){ return starDirection; }
 
     public Color getAtmosphereColor(){
         float r = 0.f;
@@ -212,8 +214,6 @@ public class Planet extends Celestial implements Disposable {
 
         return new Color(r, g, b, a);
     }
-
-    public void setStarDirection(Vector3 v){ starDirection.set(v); }
 
     /**
      * Converts the entity to 2d planet planar coordinates
@@ -333,6 +333,12 @@ public class Planet extends Celestial implements Disposable {
     public Vector2 applyPhysics(float delta, BaseEntity e){
         checkTransferPlanet(e);
         return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
+    }
+
+    @Override
+    public void update(){
+        super.update();
+        starDirection.set(OrbitUtils.directionToNearestStar(game.universe, this), 0);
     }
 
     @Override
