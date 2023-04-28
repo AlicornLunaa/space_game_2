@@ -73,6 +73,9 @@ public class PlanetPanel extends Stage {
         planet.getWorldBody().act(delta);
         planet.getWorldBody().update();
         game.universe.update(delta);
+
+        if(!game.player.isDriving())
+            game.player.setRotation(0);
     }
 
     @Override

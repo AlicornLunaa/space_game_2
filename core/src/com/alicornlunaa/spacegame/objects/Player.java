@@ -25,7 +25,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -59,7 +61,7 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 0.5f;
+    private static final float MOVEMENT_SPEED = 0.05f;
     private static final float JUMP_FORCE = 1.0f;
 
     // Private functions
@@ -81,20 +83,36 @@ public class Player extends BaseEntity {
         setBody(world.getBox2DWorld().createBody(def));
         setWorld(world);
         setPosition(x, y);
+        getBody().setFixedRotation(true);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.friction = 0.1f;
+        fixtureDef.restitution = 0;
+        fixtureDef.density = 1.4f;
 
         PolygonShape shape = new PolygonShape();
+        float rad = PLAYER_WIDTH / 2.f / getPhysScale();
         shape.setAsBox(
             PLAYER_WIDTH / 2 / getPhysScale(),
-            PLAYER_HEIGHT / 2 / getPhysScale(),
+            PLAYER_HEIGHT / 2 / getPhysScale() - rad,
             new Vector2(
                 0,
                 0
             ),
             0
         );
-        getBody().createFixture(shape, 1.0f);
-        getBody().setFixedRotation(true);
+        fixtureDef.shape = shape;
+        getBody().createFixture(fixtureDef);
         shape.dispose();
+
+        CircleShape cShape = new CircleShape();
+        cShape.setRadius(rad);
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 / getPhysScale() - rad));
+        fixtureDef.shape = cShape;
+        getBody().createFixture(fixtureDef);
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 / getPhysScale() + rad));
+        getBody().createFixture(fixtureDef);
+        cShape.dispose();
 
         jumpCallback = new RayCastCallback(){
             @Override
@@ -164,7 +182,6 @@ public class Player extends BaseEntity {
         } else {
             camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
         }
-
 
         camera.position.set(pos, 0);
         camera.update();
@@ -241,7 +258,6 @@ public class Player extends BaseEntity {
     public void afterWorldChange(PhysWorld world){
         // Change scenes depending on world
         if(game.getScreen() instanceof MapScene) return;
-
         if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
             game.setScreen(game.activeSpaceScreen);
             updateCamera(true);

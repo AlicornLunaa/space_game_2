@@ -35,9 +35,7 @@ public class Chunk extends Group {
                 for(int x = 0; x < CHUNK_SIZE; x++){
                     float halfExtents = Tile.TILE_SIZE / Constants.PLANET_PPM / 2;
                     tempShape.setAsBox(halfExtents, halfExtents, new Vector2(x, y).scl(halfExtents * 2).add(halfExtents, halfExtents), 0.f);
-                    chunkBody.createFixture(tempShape, 0.f);
-
-                    tiles[x][y] = new Tile(game, x, y, "stone");
+                    tiles[x][y] = new Tile(game, x, y, "stone", chunkBody.createFixture(tempShape, 0.f));
                     this.addActor(tiles[x][y]);
                 }
             }
