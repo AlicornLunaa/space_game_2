@@ -141,7 +141,7 @@ public class Player extends BaseEntity {
 
     public OrthographicCamera getCamera(){ return camera; }
 
-    public void updateCamera(){
+    public void updateCamera(boolean instant){
         // Update the camera positioning in order to be relative to the player
         BaseEntity ent = (vehicle == null) ? this : vehicle;
         Celestial c = game.universe.getParentCelestial(ent);
@@ -159,10 +159,18 @@ public class Player extends BaseEntity {
             pos.set(OrbitUtils.getUniverseSpaceCenter(game.universe, ent));
         }
 
-        camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
+        if(instant){
+            camera.up.set(cameraAngle);
+        } else {
+            camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
+        }
+
+
         camera.position.set(pos, 0);
         camera.update();
     }
+
+    public void updateCamera(){ updateCamera(false); }
 
     @Override
     public void update(){
@@ -236,6 +244,7 @@ public class Player extends BaseEntity {
 
         if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
             game.setScreen(game.activeSpaceScreen);
+            updateCamera(true);
         }
     }
 
