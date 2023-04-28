@@ -47,7 +47,6 @@ public class PlanetPanel extends Stage {
 
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
-
         getViewport().setCamera(game.activeCamera);
 
         // Controls
@@ -73,6 +72,7 @@ public class PlanetPanel extends Stage {
     public void act(float delta){
         super.act(delta);
         planet.getWorldBody().act(delta);
+        planet.getWorldBody().update();
         game.universe.update(delta);
     }
 

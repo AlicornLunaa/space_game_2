@@ -30,7 +30,7 @@ public class Chunk extends Group {
     // Private functions
     private void tempTileData(PolygonShape tempShape){
         // TODO: Remove
-        if(chunkY < 1){
+        if(chunkY < 2){
             for(int y = 0; y < CHUNK_SIZE; y++){
                 for(int x = 0; x < CHUNK_SIZE; x++){
                     float halfExtents = Tile.TILE_SIZE / Constants.PLANET_PPM / 2;
@@ -64,9 +64,12 @@ public class Chunk extends Group {
 
         // Cleanup
         shape.dispose();
+        unload();
     }
 
     // Functions
+    public int getChunkX(){ return chunkX; }
+    public int getChunkY(){ return chunkY; }
     public boolean isLoaded(){ return chunkBody.isActive(); }
 
     public void load(){

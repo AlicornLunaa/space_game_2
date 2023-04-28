@@ -7,6 +7,7 @@ public class Constants {
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 2;
     public static final int MAX_PREDICTION_STEPS = 2;
+    public static final int CHUNK_LOAD_DISTANCE = 3;
     
     // Scaling constants
     public static final float PPM = 128.0f;
