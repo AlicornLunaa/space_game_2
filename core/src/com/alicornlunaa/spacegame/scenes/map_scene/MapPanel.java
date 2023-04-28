@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.planet.terrain.Chunk;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.HyperbolicConic;
@@ -200,8 +201,8 @@ public class MapPanel extends Stage {
                         mat.mul(new Matrix4().set(e.getTransform().inv()));
     
                         // Convert the planetary coords to space coords
-                        double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Tile.TILE_SIZE)) * Math.PI * 2);
-                        float radius = ((e.getY() / (((Planet)parent).getTerrestrialHeight() * Tile.TILE_SIZE)) * ((Planet)parent).getRadius());
+                        double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+                        float radius = ((e.getY() / (((Planet)parent).getTerrestrialHeight() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE)) * ((Planet)parent).getRadius());
     
                         // Convet to space position
                         float x = (float)(Math.cos(theta) * radius);

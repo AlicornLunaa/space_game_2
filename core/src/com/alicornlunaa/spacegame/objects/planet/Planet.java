@@ -9,6 +9,7 @@ import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
+import com.alicornlunaa.spacegame.objects.planet.terrain.Chunk;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
@@ -31,8 +32,8 @@ public class Planet extends Celestial implements Disposable {
     // Variables
     private final App game;
 
-    private float terrestrialWidth;
-    private float terrestrialHeight;
+    private int terrestrialWidth; // Chunk-size
+    private int terrestrialHeight; // Chunk-size
     private float atmosphereRadius;
     private float atmosphereDensity = 1.0f;
     private Array<Color> atmosComposition = new Array<>();
@@ -108,7 +109,7 @@ public class Planet extends Celestial implements Disposable {
                 Vector3 coord = sphericalToCartesian(sphereCoord.add(0, 0, 0));
                 coord.add(1, 1, 1);
                 coord.scl(1 / 2.f);
-                coord.scl(terrestrialWidth);
+                coord.scl(terrestrialWidth * Chunk.CHUNK_SIZE);
 
                 p.setColor(new Color(biomeMap.getPixel(biomeMap.getWidth() - (int)coord.x, biomeMap.getHeight() - (int)coord.z)));
                 p.drawPixel((int)x, (int)z);
@@ -124,7 +125,7 @@ public class Planet extends Celestial implements Disposable {
             @Override
             public void onEntityUpdate(BaseEntity e) {
                 // Constrain entities to the world
-                float worldWidthPixels = terrestrialWidth * Tile.TILE_SIZE;
+                float worldWidthPixels = terrestrialWidth * Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
 
                 if(e.getX() > worldWidthPixels){
                     e.setX(e.getX() - worldWidthPixels);
@@ -150,7 +151,8 @@ public class Planet extends Celestial implements Disposable {
             }
         });
 
-        worldBlocks = new WorldBody(game, physWorld, (int)terrestrialWidth, (int)terrestrialHeight);
+        // Create a world-body chunking system to take up the entirety of the planet
+        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Chunk.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Constructor
@@ -160,11 +162,11 @@ public class Planet extends Celestial implements Disposable {
 
         setPosition(x, y);
 
-        terrestrialHeight = 2;//35;//(float)Math.floor(radius / 10);
-        terrestrialWidth = 220;//(int)(2.0 * Math.PI * terrestrialHeight);
+        terrestrialHeight = 1;//35;//(float)Math.floor(radius / 10);
+        terrestrialWidth = 7;//(int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
-        generator = new TerrainGenerator((int)terrestrialWidth, (int)terrestrialHeight, terrainSeed);
+        generator = new TerrainGenerator(terrestrialWidth * Chunk.CHUNK_SIZE, terrestrialHeight * Chunk.CHUNK_SIZE, terrainSeed);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
@@ -187,8 +189,8 @@ public class Planet extends Celestial implements Disposable {
     public long getTerrainSeed(){ return terrainSeed; }
     public PhysWorld getInternalPhysWorld(){ return physWorld; }
     public WorldBody getWorldBody(){ return worldBlocks; }
-    public float getTerrestrialWidth(){ return terrestrialWidth; }
-    public float getTerrestrialHeight(){ return terrestrialHeight; }
+    public int getTerrestrialWidth(){ return terrestrialWidth; }
+    public int getTerrestrialHeight(){ return terrestrialHeight; }
     public Vector3 getStarDirection(){ return starDirection; }
 
     public Color getAtmosphereColor(){
@@ -224,7 +226,7 @@ public class Planet extends Celestial implements Disposable {
 
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getBody().getPosition().cpy();
-        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Tile.TILE_SIZE));
+        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Chunk.CHUNK_SIZE * Tile.TILE_SIZE));
         float y = localPos.len() * e.getPhysScale();
         e.setPosition(x, y);
 
@@ -255,7 +257,7 @@ public class Planet extends Celestial implements Disposable {
      */
     public void delEntityWorld(BaseEntity e){
         // Formula: BaseEntityheta = x, radius = y
-        double theta = ((e.getX() / (terrestrialWidth * Tile.TILE_SIZE)) * Math.PI * 2);
+        double theta = ((e.getX() / (terrestrialWidth * Chunk.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
         float radius = e.getY();
 
         // Convert to space angles, spaceAngle = worldAngle + theta

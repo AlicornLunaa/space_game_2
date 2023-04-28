@@ -30,8 +30,6 @@ public class PlanetPanel extends Stage {
     private Texture texture;
     private ShaderProgram cartesianAtmosShader;
 
-    private Chunk testChunk;
-
     // Functions
     private void generateTexture(){
         Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
@@ -49,9 +47,6 @@ public class PlanetPanel extends Stage {
 
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
-
-        testChunk = new Chunk(game, planet.getInternalPhysWorld(), 3, 0);
-        this.addActor(testChunk);
 
         getViewport().setCamera(game.activeCamera);
 
@@ -77,6 +72,7 @@ public class PlanetPanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
+        planet.getWorldBody().act(delta);
         game.universe.update(delta);
     }
 
@@ -105,23 +101,23 @@ public class PlanetPanel extends Stage {
         batch.setTransformMatrix(new Matrix4());
         cartesianAtmosShader.setUniformMatrix("u_invCamTrans", invProj);
         cartesianAtmosShader.setUniformf("u_starDirection", planet.getStarDirection());
-        cartesianAtmosShader.setUniformf("u_planetRadius", planet.getTerrestrialHeight() * Tile.TILE_SIZE);
-        cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Tile.TILE_SIZE);
+        cartesianAtmosShader.setUniformf("u_planetRadius", planet.getTerrestrialHeight() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
         cartesianAtmosShader.setUniformf("u_atmosRadius", planet.getAtmosphereRadius());
         cartesianAtmosShader.setUniformf("u_atmosColor", planet.getAtmosphereColor());
-        //! batch.draw(texture, 0, 0, 1280, 720);
+        batch.draw(texture, 0, 0, 1280, 720);
         batch.setShader(null);
 
         // World rendering
         WorldBody worldBody = planet.getWorldBody();
 
         batch.setProjectionMatrix(proj);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * -1.00f, 0, 0));
-        //! worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Tile.TILE_SIZE * 1.00f, 0, 0));
-        //! worldBody.draw(batch, batch.getColor().a);
+        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
+        worldBody.draw(batch, batch.getColor().a);
+        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
+        worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
-        //! worldBody.draw(batch, batch.getColor().a);
+        worldBody.draw(batch, batch.getColor().a);
 
         for(BaseEntity e : planet.getPlanetEntities()){
             e.render(batch);

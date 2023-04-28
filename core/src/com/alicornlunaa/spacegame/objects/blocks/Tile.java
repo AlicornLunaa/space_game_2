@@ -46,7 +46,7 @@ public class Tile extends Actor {
     public void draw(Batch b, float a){
         b.draw(
             region,
-            x * TILE_SIZE - TILE_SIZE / 2, y * TILE_SIZE - TILE_SIZE / 2,
+            x * TILE_SIZE, y * TILE_SIZE,
             0, 0,
             TILE_SIZE, TILE_SIZE,
             1, 1,

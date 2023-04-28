@@ -2,44 +2,37 @@ package com.alicornlunaa.spacegame.objects.planet;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
-import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.alicornlunaa.spacegame.objects.planet.terrain.Chunk;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Group;
 
 /**
- * Holds all the tiles
+ * Holds world chunks and manages which is loaded or not
  */
 public class WorldBody extends Group {
 
-    private Tile[][] tiles;
-    private Body body;
+    // Variables
+    private Chunk[][] chunks;
 
+    // Constructor
     public WorldBody(final App game, PhysWorld world, int width, int height){
         this.setTransform(false);
+        chunks = new Chunk[width][height];
 
-        PolygonShape shape = new PolygonShape();
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyType.StaticBody;
-        body = world.getBox2DWorld().createBody(bodyDef);
-
-        tiles = new Tile[width][height];
-
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                shape.setAsBox(Tile.TILE_SIZE / Constants.PLANET_PPM / 2, Tile.TILE_SIZE / Constants.PLANET_PPM / 2, new Vector2(x, y).scl(Tile.TILE_SIZE / Constants.PLANET_PPM), 0.f);
-                body.createFixture(shape, 0.f);
-
-                tiles[x][y] = new Tile(game, x, y, "stone");
-                this.addActor(tiles[x][y]);
-            }
+        // Generate everything as a test
+        for(int y = 0; y < height; y++) for(int x = 0; x < width; x++){
+            chunks[x][y] = new Chunk(game, world, x, y);
+            this.addActor(chunks[x][y]);
         }
+    }
 
-        shape.dispose();
+    // Functions
+    @Override
+    public void draw(Batch batch, float a){
+        Matrix4 trans = batch.getTransformMatrix().cpy();
+        super.draw(batch, a);
+        batch.setTransformMatrix(trans);
     }
     
 }
