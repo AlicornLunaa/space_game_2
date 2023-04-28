@@ -41,6 +41,19 @@ public class Chunk extends Group {
                 }
             }
         }
+
+        if(chunkX == 0 && chunkY == 0){
+            tiles[0][15] = null;
+            tiles[1][15] = null;
+            tiles[0][14] = null;
+            tiles[1][14] = null;
+            tiles[0][13] = null;
+            tiles[1][13] = null;
+            tiles[0][12] = null;
+            tiles[1][12] = null;
+            tiles[0][11] = null;
+            tiles[1][11] = null;
+        }
     }
 
     // Constructor

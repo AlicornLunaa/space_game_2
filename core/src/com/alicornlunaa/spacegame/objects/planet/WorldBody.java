@@ -58,13 +58,15 @@ public class WorldBody extends Group {
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
         int plyChunkX = (int)(plyPos.x / Chunk.CHUNK_SIZE / Tile.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Chunk.CHUNK_SIZE / Tile.TILE_SIZE);
+        int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
+        int containedY = Math.min(Math.max(plyChunkY, 0), chunks[0].length - loadDist);
 
         // Iterate over loaded chunks and unload if they are out of range
         for(int i = 0; i < loadedChunks.size; i++){
             Chunk chunk = loadedChunks.get(i);
             int currentChunkX = chunk.getChunkX();
             int currentChunkY = chunk.getChunkY();
-            int distance = Math.max(Math.abs(plyChunkX - currentChunkX), Math.abs(plyChunkY - currentChunkY));
+            int distance = Math.max(Math.abs(containedX - currentChunkX), Math.abs(containedY - currentChunkY));
             
             // Unload if too far
             if(distance > loadDist * 2){
@@ -76,9 +78,11 @@ public class WorldBody extends Group {
 
         // Iterate over the players surrounding chunks and load them
         for(int y = loadDist * -1; y < loadDist; y++){
+            if(containedY + y > chunks[0].length) continue;
+
             for(int x = loadDist * -1; x < loadDist; x++){
-                int wrappedX = Math.floorMod(plyChunkX + x, chunks.length);
-                int wrappedY = Math.floorMod(plyChunkY + y, chunks[0].length);
+                int wrappedX = Math.floorMod(containedX + x, chunks.length);
+                int wrappedY = Math.floorMod(containedY + y, chunks[0].length);
                 Chunk chunk = chunks[wrappedX][wrappedY];
 
                 if(chunk == null){
@@ -107,7 +111,7 @@ public class WorldBody extends Group {
             // Algorithm: Start top-left and move right. If there's a break in tiles, stop and create a new fixture
             PolygonShape shape = new PolygonShape();
             float offsetX = (plyChunkX - loadDist) * Tile.TILE_SIZE * Chunk.CHUNK_SIZE / Constants.PLANET_PPM;
-            float offsetY = (plyChunkY - loadDist) * Tile.TILE_SIZE * Chunk.CHUNK_SIZE / Constants.PLANET_PPM;
+            float offsetY = (containedY - loadDist) * Tile.TILE_SIZE * Chunk.CHUNK_SIZE / Constants.PLANET_PPM;
             float physTileSize = Tile.TILE_SIZE / Constants.PLANET_PPM;
             int scanX = -1; // ScanX is the last X position to start a new tile bar
             int globalX = 0;
@@ -117,7 +121,7 @@ public class WorldBody extends Group {
                 for(int ty = 0; ty < Chunk.CHUNK_SIZE; ty++){
                     for(int x = loadDist * -1; x < loadDist; x++){
                         int wrappedX = Math.floorMod(plyChunkX + x, chunks.length);
-                        int wrappedY = Math.floorMod(plyChunkY + y, chunks[0].length);
+                        int wrappedY = Math.floorMod(containedY + y, chunks[0].length);
                         Chunk chunk = chunks[wrappedX][wrappedY];
                         
                         for(int tx = 0; tx < Chunk.CHUNK_SIZE; tx++){
