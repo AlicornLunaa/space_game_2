@@ -35,7 +35,8 @@ public class Chunk extends Group {
                 for(int x = 0; x < CHUNK_SIZE; x++){
                     float halfExtents = Tile.TILE_SIZE / Constants.PLANET_PPM / 2;
                     tempShape.setAsBox(halfExtents, halfExtents, new Vector2(x, y).scl(halfExtents * 2).add(halfExtents, halfExtents), 0.f);
-                    tiles[x][y] = new Tile(game, x, y, "stone", chunkBody.createFixture(tempShape, 0.f));
+                    // tiles[x][y] = new Tile(game, x, y, "stone", chunkBody.createFixture(tempShape, 0.f));
+                    tiles[x][y] = new Tile(game, x, y, "stone", null);
                     this.addActor(tiles[x][y]);
                 }
             }
@@ -50,7 +51,7 @@ public class Chunk extends Group {
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
-        // Generate body for the chunk
+        // Create shape data
         PolygonShape shape = new PolygonShape();
         BodyDef chunkBodyDef = new BodyDef();
         chunkBodyDef.type = BodyType.StaticBody;
@@ -68,6 +69,8 @@ public class Chunk extends Group {
     // Functions
     public int getChunkX(){ return chunkX; }
     public int getChunkY(){ return chunkY; }
+    public Body getChunkBody(){ return chunkBody; }
+    public Tile getTile(int x, int y){ return tiles[x][y]; }
     public boolean isLoaded(){ return chunkBody.isActive(); }
 
     public void load(){

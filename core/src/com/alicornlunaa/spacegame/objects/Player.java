@@ -87,7 +87,7 @@ public class Player extends BaseEntity {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0;
+        fixtureDef.restitution = 0.05f;
         fixtureDef.density = 1.4f;
 
         PolygonShape shape = new PolygonShape();
