@@ -18,6 +18,7 @@ public class WorldBody extends Group {
 
     // Variables
     private final App game;
+    private PhysWorld world;
     private Chunk[][] chunks;
     private Array<Chunk> loadedChunks = new Array<>();
 
@@ -25,13 +26,8 @@ public class WorldBody extends Group {
     public WorldBody(final App game, PhysWorld world, int width, int height){
         this.setTransform(false);
         this.game = game;
+        this.world = world;
         chunks = new Chunk[width][height];
-
-        // Generate everything as a test
-        for(int y = 0; y < height; y++) for(int x = 0; x < width; x++){
-            chunks[x][y] = new Chunk(game, world, x, y);
-            this.addActor(chunks[x][y]);
-        }
     }
 
     // Functions
@@ -62,10 +58,16 @@ public class WorldBody extends Group {
         // Iterate over the players surrounding chunks and load them
         for(int y = loadDist * -1; y < loadDist; y++){
             for(int x = loadDist * -1; x < loadDist; x++){
-                Chunk chunk = chunks[Math.floorMod(plyChunkX + x, chunks.length)][Math.floorMod(plyChunkY + y, chunks[0].length)];
+                int wrappedX = Math.floorMod(plyChunkX + x, chunks.length);
+                int wrappedY = Math.floorMod(plyChunkY + y, chunks[0].length);
+                Chunk chunk = chunks[wrappedX][wrappedY];
 
-                // Load if not loaded
-                if(!chunk.isLoaded()){
+                if(chunk == null){
+                    // Generate new chunk
+                    chunks[wrappedX][wrappedY] = new Chunk(game, world, wrappedX, wrappedY);
+                    this.addActor(chunks[wrappedX][wrappedY]);
+                } else if(!chunk.isLoaded()){
+                    // Load if not loaded
                     loadedChunks.add(chunk);
                     chunk.load();
                 }

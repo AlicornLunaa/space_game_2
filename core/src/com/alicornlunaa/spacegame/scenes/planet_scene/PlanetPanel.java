@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -128,21 +127,6 @@ public class PlanetPanel extends Stage {
 
         // Debug rendering
         if(this.isDebugAll()){
-            // Draw chunk borders
-            game.shapeRenderer.begin(ShapeType.Line);
-            game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-            game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-            // for(Chunk chunk : planet.getMap().values()){
-            //     if(!isChunkVisible(chunk)) continue;
-
-            //     Vector2 pos = chunk.getChunkPos();
-            //     float size = Chunk.CHUNK_SIZE * Tile.TILE_SIZE;
-
-            //     game.shapeRenderer.setColor(chunk.isActive() ? Color.GREEN : Color.GRAY);
-            //     game.shapeRenderer.rect(pos.x * size, pos.y * size, size, size);
-            // }
-            game.shapeRenderer.end();
-
             game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
         }
     }
