@@ -26,6 +26,9 @@ import com.badlogic.gdx.utils.Null;
  * when they are in the sphere of influence, and removed when they leave
  */
 public class Celestial extends BaseEntity {
+
+    // Static vars
+    private static int NEXT_CELESTIAL_ID = 0;
     
     // Variables
     protected final App game;
@@ -33,6 +36,7 @@ public class Celestial extends BaseEntity {
     // Planet variables
     protected float radius;
     protected float opacity = 1.f;
+    private int celestialID;
 
     // Physics variables
     protected CelestialPhysWorld influenceWorld;
@@ -46,6 +50,7 @@ public class Celestial extends BaseEntity {
     public Celestial(App game, PhysWorld parentWorld, float radius){
         this.game = game;
         this.radius = radius;
+        this.celestialID = NEXT_CELESTIAL_ID++;
 
         influenceWorld = new CelestialPhysWorld(game, Constants.PPM);
         game.simulation.addWorld(influenceWorld);
@@ -71,6 +76,7 @@ public class Celestial extends BaseEntity {
 
     // Functions
     public float getRadius(){ return radius; }
+    public int getCelestialID(){ return celestialID; }
     public PhysWorld getWorld(){ return influenceWorld; }
     public Array<BaseEntity> getEntities(){ return ents; }
     public Array<Celestial> getChildren(){ return children; }

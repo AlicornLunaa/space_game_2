@@ -245,7 +245,8 @@ public class Planet extends Celestial implements Disposable {
         float tangentVel = vel.dot(tangent);
         e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
-        if(e instanceof Player || e == game.player.getVehicle()){
+        // if(e instanceof Player || e == game.player.getVehicle()){
+        if(e instanceof Player){
             game.activeSpaceScreen = new PlanetScene(game, this);
         }
 

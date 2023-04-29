@@ -9,7 +9,6 @@ import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
@@ -58,8 +57,10 @@ public class App extends Game {
 
 	// Private functions
 	private void initializeUniverse(){
+		simulation = new Simulation();
+		universe = new Universe(this);
+
 		PhysWorld world = universe.getUniversalWorld();
-		
         universe.addCelestial(new Star(this, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
         universe.addCelestial(new Planet(this, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Mercury
         universe.addCelestial(new Planet(this, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1), universe.getCelestial(0)); // Venus
@@ -128,19 +129,14 @@ public class App extends Game {
 				SaveManager.init(this);
 
 				// Start new scene
-				simulation = new Simulation();
-				universe = new Universe(this);
 				initializeUniverse();
-				// player = new Player(this, universe.getUniversalWorld(), -50, 0);
-				SaveManager.load(this, "dev_world");
-				universe.addEntity(player);
+				player = new Player(this, universe.getUniversalWorld(), -50, 0);
+				// SaveManager.load(this, "dev_world");
 				spaceScene = new SpaceScene(this);
 				activeSpaceScreen = spaceScene;
 				this.setScreen(spaceScene);
 
-				// OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
-				OrbitUtils.createOrbit(universe, player);
-				// player.setVelocity(new Vector2(0, 0));
+				OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
 				spaceScene.getContent().ship.setVelocity(new Vector2(0, 0));
 				
 				// Planet p = ((Planet)universe.getCelestial(3));
@@ -149,9 +145,7 @@ public class App extends Game {
 				// spaceScene.getContent().ship.setRotation(0);
 				// p.addEntityWorld(player);
 				// player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
-				// this.setScreen(new PlanetScene(this, p));
-				// activeSpaceScreen = this.getScreen();
-				// SaveManager.save(this, "dev_world");
+				SaveManager.save(this, "dev_world");
 
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
