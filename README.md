@@ -14,3 +14,41 @@ part will have to be told which attachment point is being used as well.
 ### How the simulation works and different terminology
 - The Universe class holds all the solar systems, planets, moons, and entities. It has Box2D world where an entity will be stored when it has no nearby gravitational parent, this is equivalent to deep space. This class handles transfers between the different Box2D worlds.
 - OrbitUtils contains different helper functions such as coordinate conversions to system-space to universe-space. Universe-space should be avoided because it is prone to floating point precision errors with large systems.
+  
+### Save file structure
+- saves/settings
+- saves/universes
+    - saves/universes/(world_name)
+        - saves/universes/(world_name)/planets/(planet_id).dat
+            - chunk_width
+            - chunk_height
+            - atmos_radius
+            - atmos_density
+            - atmos_composition
+            - atmos_percentages
+            - seed
+            - world_body
+                - chunks
+                    - tiles
+                    - loaded_chunks
+                        - x
+                        - y
+        - saves/universes/(world_name)/ships/(ship_name).ship
+        - saves/universes/(world_name)/simulation.dat
+            - entities
+                - transform 
+                - velocity
+                - world_id
+        - saves/universes/(world_name)/player.dat
+            - inherits entities
+
+### Creation procedure:
+1. Create simulation
+2. Create universe
+3. Load planets
+    - Load world, parent, position, and velocity
+4. Load entities
+    - Load position and world from files
+5. Load player
+    - Load position and world from files
+6. Start scene
