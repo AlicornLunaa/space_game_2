@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.planet_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
@@ -69,11 +70,9 @@ public class PlanetPanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
-        planet.getWorldBody().act(delta);
-        planet.getWorldBody().update();
         game.universe.update(delta);
 
-        if(!game.player.isDriving())
+        if(!game.player.isDriving() && game.player.getWorld() instanceof PlanetaryPhysWorld)
             game.player.setRotation(0);
     }
 

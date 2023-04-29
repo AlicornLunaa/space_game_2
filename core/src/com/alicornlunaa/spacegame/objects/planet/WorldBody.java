@@ -202,6 +202,8 @@ public class WorldBody extends Group {
                         int wrappedX = Math.floorMod(plyChunkX + x, chunks.length);
                         int wrappedY = Math.floorMod(containedY + y, chunks[0].length);
                         Chunk chunk = chunks[wrappedX][wrappedY];
+
+                        if(chunk == null) continue;
                         
                         for(int tx = 0; tx < Constants.CHUNK_SIZE; tx++){
                             Tile tile = chunk.getTile(tx, ty);

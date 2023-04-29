@@ -13,6 +13,7 @@ import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -147,6 +148,9 @@ public class Planet extends Celestial implements Disposable {
                 while(leavingEnts.size() > 0){
                     delEntityWorld(leavingEnts.pop());
                 }
+
+                worldBlocks.act(Gdx.graphics.getDeltaTime());
+                worldBlocks.update();
             }
         });
 
