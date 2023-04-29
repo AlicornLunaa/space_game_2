@@ -119,7 +119,7 @@ public class Planet extends Celestial implements Disposable {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(Constants.PLANET_PPM){
+        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM){
             @Override
             public void onEntityUpdate(BaseEntity e) {
                 // Constrain entities to the world

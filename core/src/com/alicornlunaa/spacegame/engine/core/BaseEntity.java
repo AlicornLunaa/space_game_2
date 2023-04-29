@@ -187,10 +187,12 @@ public abstract class BaseEntity implements IEntity {
         }
     }
 
-    public void setVelocity(Vector2 vel){
+    public void setVelocity(float x, float y){
         if(body == null) return;
-        body.setLinearVelocity(vel);
+        body.setLinearVelocity(x, y);
     }
+
+    public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
 
     // Functions
     public void afterWorldChange(PhysWorld world){}

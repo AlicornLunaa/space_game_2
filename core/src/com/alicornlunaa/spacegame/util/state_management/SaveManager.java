@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
@@ -50,31 +51,19 @@ public class SaveManager {
 
             @Override
             public Player unserialize(JSONObject data) {
-                Player p = new Player(
-                    game,
-                    game.universe.getUniversalWorld(),
-                    data.getFloat("x"),
-                    data.getFloat("y")
-                );
+                Player p = new Player(game, 0, 0);
                 game.universe.addEntity(p);
 
-                // game.simulation.addEntity(game.simulation.getWorld(data.getInt("physworld_id")), p);
-                // p.setPosition(data.getFloat("x"), data.getFloat("y"));
-                // p.setPosition(0, 0);
+                p.setPosition(data.getFloat("x"), data.getFloat("y"));
+                p.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
 
-				Planet planet = ((Planet)game.universe.getCelestial(3));
-				planet.addEntityWorld(p);
-				p.setPosition(1, 2.5f * p.getWorld().getPhysScale());
-                p.setVelocity(new Vector2(data.getFloat("vx"), data.getFloat("vy")));
-
-                // Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
-                // if(parent != null && game.simulation.getWorldID(parent.getWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
-                //     Planet planet = (Planet)parent;
-                //     planet.addEntityWorld(p);
-                //     p.setPosition(data.getFloat("x"), data.getFloat("y"));
-                //     p.setVelocity(new Vector2(data.getFloat("vx"), data.getFloat("vy")));
-                //     p.setPosition(1, 2.5f * p.getWorld().getPhysScale());
-                // }
+                Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
+                if(parent != null && game.simulation.getWorldID(parent.getWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
+                    Planet planet = (Planet)parent;
+                    planet.addEntityWorld(p);
+                    p.setPosition(data.getFloat("x"), data.getFloat("y"));
+                    p.setVelocity(new Vector2(data.getFloat("vx"), data.getFloat("vy")));
+                }
                 
                 return p;
             }

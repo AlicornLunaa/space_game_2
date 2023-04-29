@@ -8,7 +8,6 @@ import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
@@ -81,11 +80,9 @@ public class Player extends BaseEntity {
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        def.position.set(0, 0);
         setBody(world.getBox2DWorld().createBody(def));
-        setWorld(world);
-        setPosition(x, y);
         getBody().setFixedRotation(true);
+        setPosition(x, y);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.1f;
@@ -142,13 +139,13 @@ public class Player extends BaseEntity {
     }
 
     // Constructor
-    public Player(final App game, PhysWorld world, float x, float y){
+    public Player(final App game, float x, float y){
         this.game = game;
 
         camera = new OrthographicCamera(1280, 720);
         game.activeCamera = camera;
 
-        initializePhys(world, x, y);
+        initializePhys(game.universe.getUniversalWorld(), x, y);
         initializeAnims();
     }
 
@@ -258,14 +255,14 @@ public class Player extends BaseEntity {
     // Overrides
     @Override
     public void afterWorldChange(PhysWorld world){
-        // Change scenes depending on world
-        if(game.getScreen() instanceof MapScene) return;
-        
+        // Change scenes depending on world        
         if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
-            game.activeSpaceScreen = new PlanetScene(game, (Planet)game.universe.getParentCelestial(game.player));
+            game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
         } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
             game.activeSpaceScreen = game.spaceScene;
         }
+
+        if(game.getScreen() instanceof MapScene) return;
 
         if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
             game.setScreen(game.activeSpaceScreen);

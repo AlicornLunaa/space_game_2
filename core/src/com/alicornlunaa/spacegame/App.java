@@ -127,15 +127,15 @@ public class App extends Game {
 
 				// Start new scene
 				initializeUniverse();
-				player = new Player(this, universe.getUniversalWorld(), -50, 0);
-				universe.addEntity(player);
-				// SaveManager.load(this, "dev_world");
+				// player = new Player(this, -50, 0);
+				// universe.addEntity(player);
+				SaveManager.load(this, "dev_world");
 				spaceScene = new SpaceScene(this);
 				activeSpaceScreen = (activeSpaceScreen == null) ? spaceScene : activeSpaceScreen;
 				this.setScreen(activeSpaceScreen);
 
 				OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
-				OrbitUtils.createOrbit(universe, player);
+				// OrbitUtils.createOrbit(universe, player);
 				
 				// Planet p = ((Planet)universe.getCelestial(3));
 				// p.addEntityWorld(spaceScene.getContent().ship);
