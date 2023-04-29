@@ -21,6 +21,8 @@ public class Simulation {
 
     public PhysWorld getWorld(int index){ return physWorlds.get(index); }
 
+    public int getWorldID(PhysWorld world){ return physWorlds.indexOf(world, true); }
+
     public PhysWorld addWorld(float physScale){
         physWorlds.add(new PhysWorld(physScale));
         return physWorlds.peek();

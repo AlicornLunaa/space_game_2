@@ -29,10 +29,11 @@ part will have to be told which attachment point is being used as well.
             - seed
             - world_body
                 - chunks
-                    - tiles
-                    - loaded_chunks
-                        - x
-                        - y
+                    - chunk-x-y
+                        - tiles
+                        - loaded_chunks
+                            - x
+                            - y
         - saves/universes/(world_name)/ships/(ship_name).ship
         - saves/universes/(world_name)/simulation.dat
             - entities
