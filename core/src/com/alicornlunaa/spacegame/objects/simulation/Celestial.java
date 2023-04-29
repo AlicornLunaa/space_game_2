@@ -47,7 +47,7 @@ public class Celestial extends BaseEntity {
     private Array<BaseEntity> ents = new Array<>();
     
     // Constructor
-    public Celestial(App game, PhysWorld parentWorld, float radius){
+    public Celestial(App game, float radius){
         this.game = game;
         this.radius = radius;
         this.celestialID = NEXT_CELESTIAL_ID++;
@@ -62,7 +62,7 @@ public class Celestial extends BaseEntity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
-        setBody(parentWorld.getBox2DWorld().createBody(def));
+        setBody(game.universe.getUniversalWorld().getBox2DWorld().createBody(def));
         getBody().createFixture(shape, 1.0f);
 
         def = new BodyDef();

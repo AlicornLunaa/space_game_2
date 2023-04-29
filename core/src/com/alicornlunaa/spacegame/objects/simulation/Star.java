@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -30,8 +29,8 @@ public class Star extends Celestial implements Disposable {
     }
 
     // Constructor
-    public Star(App game, PhysWorld world, float x, float y, float radius){
-        super(game, world, radius);
+    public Star(App game, float x, float y, float radius){
+        super(game, radius);
         generateSprite();
         setPosition(x, y);
 

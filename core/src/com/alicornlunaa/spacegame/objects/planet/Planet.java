@@ -7,11 +7,9 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
-import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -159,8 +157,8 @@ public class Planet extends Celestial implements Disposable {
     }
 
     // Constructor
-    public Planet(App game, PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
-        super(game, world, terraRadius);
+    public Planet(App game, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
+        super(game, terraRadius);
         this.game = game;
 
         setPosition(x, y);
@@ -245,11 +243,6 @@ public class Planet extends Celestial implements Disposable {
         float tangentVel = vel.dot(tangent);
         e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
-        // if(e instanceof Player || e == game.player.getVehicle()){
-        if(e instanceof Player){
-            game.activeSpaceScreen = new PlanetScene(game, this);
-        }
-
         // Add body
         game.simulation.addEntity(physWorld, e);
         planetEnts.add(e);
@@ -278,11 +271,6 @@ public class Planet extends Celestial implements Disposable {
         Vector2 planetToEnt = e.getPosition().nor();
         Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
-
-        // Update screens
-        if(e instanceof Player || e == game.player.getVehicle()){
-            game.activeSpaceScreen = game.spaceScene;
-        }
 
         // Remove body
         game.simulation.addEntity(getWorld(), e);

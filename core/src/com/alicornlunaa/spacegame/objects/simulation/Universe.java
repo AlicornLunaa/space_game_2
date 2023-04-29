@@ -61,7 +61,7 @@ public class Universe extends Actor {
 
         // Convert the target celestial's body to the new Box2D world
         target.setPosition(target.getPosition().mul(parent.getUniverseSpaceTransform().inv()));
-        target.setWorld(parent.getWorld());
+        game.simulation.addEntity(parent.getWorld(), target);
     }
 
     // Constructor
@@ -254,6 +254,7 @@ public class Universe extends Actor {
      * @param delta
      */
     public void update(float delta){
+        // Update physics
         if(timewarp == 1){
             // Step the physics on the world
             game.simulation.update();

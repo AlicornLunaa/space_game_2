@@ -8,9 +8,11 @@ import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
+import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
+import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -258,6 +260,13 @@ public class Player extends BaseEntity {
     public void afterWorldChange(PhysWorld world){
         // Change scenes depending on world
         if(game.getScreen() instanceof MapScene) return;
+        
+        if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
+            game.activeSpaceScreen = new PlanetScene(game, (Planet)game.universe.getParentCelestial(game.player));
+        } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
+            game.activeSpaceScreen = game.spaceScene;
+        }
+
         if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
             game.setScreen(game.activeSpaceScreen);
             updateCamera(true);
