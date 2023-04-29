@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
-import com.alicornlunaa.spacegame.objects.planet.terrain.Chunk;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -103,8 +102,8 @@ public class PlanetPanel extends Stage {
         batch.setTransformMatrix(new Matrix4());
         cartesianAtmosShader.setUniformMatrix("u_invCamTrans", invProj);
         cartesianAtmosShader.setUniformf("u_starDirection", planet.getStarDirection());
-        cartesianAtmosShader.setUniformf("u_planetRadius", planet.getTerrestrialHeight() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
-        cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.setUniformf("u_planetRadius", planet.getTerrestrialHeight() * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
         cartesianAtmosShader.setUniformf("u_atmosRadius", planet.getAtmosphereRadius());
         cartesianAtmosShader.setUniformf("u_atmosColor", planet.getAtmosphereColor());
         batch.draw(texture, 0, 0, 1280, 720);
@@ -114,9 +113,9 @@ public class PlanetPanel extends Stage {
         WorldBody worldBody = planet.getWorldBody();
 
         batch.setProjectionMatrix(proj);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
+        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Chunk.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
+        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
         worldBody.draw(batch, batch.getColor().a);

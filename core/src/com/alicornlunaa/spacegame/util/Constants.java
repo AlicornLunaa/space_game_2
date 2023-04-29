@@ -30,6 +30,9 @@ public class Constants {
     public static final float MAP_VIEW_SIMPLE_ICONS_CELESTIAL = 1000;
     public static final float MAP_VIEW_SIMPLE_ICONS_ENTS = 20;
 
+    // Terrain constants
+    public static final int CHUNK_SIZE = 16;
+
     // Debug constants
     public static boolean DEBUG = true;
 
