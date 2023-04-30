@@ -122,6 +122,7 @@ public class App extends Game {
 				Biome.register("Mountains", Color.GRAY, 0.0f, 0.0f, 0.5f, 40, 0.8f);
 				Biome.register("Ocean", Color.BLUE, 0.0f, 0.0f, 0.0f, 1, 0.05f);
 				Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
+				System.out.println("Biomes loaded");
 
 				// Initialize VisUI for dev screens
 				VisUI.load();

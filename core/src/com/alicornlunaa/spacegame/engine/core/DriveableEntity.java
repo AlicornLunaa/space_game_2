@@ -26,6 +26,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
         if(driver.getBody() != null){
             driver.getBody().setActive(false);
+            driver.setVelocity(0, 0);
         }
     }
 
@@ -35,6 +36,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
         if(driver.getBody() != null){
             driver.getBody().setActive(true);
+            driver.setVelocity(getVelocity());
         }
         
         driver = null;
@@ -44,7 +46,7 @@ public abstract class DriveableEntity extends BaseEntity {
     public void afterWorldChange(PhysWorld world){
         // Carry the driver with the vehicle
         if(driver == null) return;
-        driver.afterWorldChange(world);
+        game.simulation.addEntity(world, driver);
         driver.getBody().setActive(false);
     }
     

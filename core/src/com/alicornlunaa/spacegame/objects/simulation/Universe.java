@@ -96,6 +96,9 @@ public class Universe extends Actor {
      * @param e The entity to check
      */
     public boolean checkTransfer(BaseEntity e){
+        // Only transfer active entities
+        if(!e.getBody().isActive()) return false;
+
         // Check whether or not this entity has a celestial parent or not
         Celestial parent = getParentCelestial(e);
         Array<Celestial> celestialsToCheck = (parent == null) ? celestials : parent.getChildren();
