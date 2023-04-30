@@ -192,7 +192,7 @@ public class MapPanel extends Stage {
             } else {
                 Matrix4 mat = new Matrix4();
 
-                Celestial parent = game.universe.getEntityParents().get(e);
+                Celestial parent = game.universe.getParentCelestial(e);
                 if(parent != null){
                     mat.set(parent.getUniverseSpaceTransform());
 

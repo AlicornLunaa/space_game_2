@@ -52,7 +52,7 @@ public class Celestial extends BaseEntity {
         this.radius = radius;
         this.celestialID = NEXT_CELESTIAL_ID++;
 
-        influenceWorld = new CelestialPhysWorld(game, Constants.PPM);
+        influenceWorld = new CelestialPhysWorld(game, this, Constants.PPM);
         game.simulation.addWorld(influenceWorld);
         
         CircleShape shape = new CircleShape();

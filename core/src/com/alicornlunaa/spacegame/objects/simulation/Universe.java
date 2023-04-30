@@ -1,12 +1,11 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
-import java.util.HashMap;
-
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
@@ -30,8 +29,6 @@ public class Universe extends Actor {
     private final App game;
 
     private Array<Celestial> celestials = new Array<>();
-    private HashMap<BaseEntity, Celestial> entityParents = new HashMap<>();
-    
     private Array<GenericConic> celestialPaths = new Array<>();
     private Array<Orbit> entityPaths = new Array<>();
 
@@ -49,7 +46,7 @@ public class Universe extends Actor {
      */
     private void parentCelestial(Celestial target, Celestial parent){
         // Remove target from existing celestial parent
-        Celestial curParent = entityParents.get(target);
+        Celestial curParent = getParentCelestial(target);
         if(curParent != null){
             curParent.getChildren().removeValue(target, true);
         }
@@ -57,7 +54,6 @@ public class Universe extends Actor {
         // Update the target's parent to be the parent celestial
         target.setCelestialParent(parent);
         parent.getChildren().add(target);
-        entityParents.put(target, parent);
 
         // Convert the target celestial's body to the new Box2D world
         target.setPosition(target.getPosition().mul(parent.getUniverseSpaceTransform().inv()));
@@ -67,9 +63,7 @@ public class Universe extends Actor {
     // Constructor
     public Universe(final App game){
         this.game = game;
-        
-        universalWorld = new CelestialPhysWorld(game, Constants.PPM);
-        game.simulation.addWorld(universalWorld);
+        universalWorld = game.simulation.addWorld(new CelestialPhysWorld(game, null, Constants.PPM));
     }
 
     // Functions
@@ -104,7 +98,7 @@ public class Universe extends Actor {
      */
     public boolean checkTransfer(BaseEntity e){
         // Check whether or not this entity has a celestial parent or not
-        Celestial parent = entityParents.get(e);
+        Celestial parent = getParentCelestial(e);
         Array<Celestial> celestialsToCheck = (parent == null) ? celestials : parent.getChildren();
 
         // Find closest celestial with proper SOI parameters
@@ -136,8 +130,6 @@ public class Universe extends Actor {
      */
     public Array<BaseEntity> getEntities(){ return game.simulation.getEntities(); }
 
-    public HashMap<BaseEntity, Celestial> getEntityParents(){ return entityParents; }
-
     /**
      * Gets all the celestials in the simulation.
      * @return Array of Celestial
@@ -156,7 +148,17 @@ public class Universe extends Actor {
      * @param e The entity to check. This supports celestials.
      * @return The celestial parent
      */
-    public Celestial getParentCelestial(BaseEntity e){ return entityParents.get(e); }
+    public Celestial getParentCelestial(BaseEntity e){
+        PhysWorld w = e.getWorld();
+
+        if(w instanceof CelestialPhysWorld){
+            return ((CelestialPhysWorld)w).getParent();
+        } else if(w instanceof PlanetaryPhysWorld){
+            return ((PlanetaryPhysWorld)w).getPlanet();
+        }
+
+        return null;
+    }
     
     /**
      * Sets the timewarp speed. If set to 1, resumes the normal simulation.
@@ -205,7 +207,7 @@ public class Universe extends Actor {
             }
         }
 
-        Celestial parent = entityParents.get(e);
+        Celestial parent = getParentCelestial(e);
         if(parent != null){
             parent.getEntities().removeValue(e, true);
         }
@@ -214,7 +216,6 @@ public class Universe extends Actor {
         e.setPosition(e.getPosition().sub(c.getPosition()));
 
         // Add body
-        entityParents.put(e, c);
         game.simulation.addEntity(c.getInfluenceWorld(), e);
         c.getEntities().add(e);
     }
@@ -233,8 +234,8 @@ public class Universe extends Actor {
         }
 
         // Raise up a level
-        Celestial parent = entityParents.get(e);
-        Celestial celestialParent = entityParents.get(parent);
+        Celestial parent = getParentCelestial(e);
+        Celestial celestialParent = getParentCelestial(parent);
         PhysWorld targetWorld = (celestialParent == null) ? universalWorld : celestialParent.getInfluenceWorld();
 
         if(parent == null) return;
@@ -244,7 +245,6 @@ public class Universe extends Actor {
         e.setPosition(e.getPosition().add(parent.getPosition()));
 
         // Remove body
-        entityParents.put(e, celestialParent);
         game.simulation.addEntity(targetWorld, e);
         parent.getEntities().removeValue(e, true);
     }
@@ -335,7 +335,7 @@ public class Universe extends Actor {
             } else {
                 batch.setTransformMatrix(new Matrix4());
 
-                Celestial parent = entityParents.get(e);
+                Celestial parent = getParentCelestial(e);
                 if(parent != null)
                     batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
 
