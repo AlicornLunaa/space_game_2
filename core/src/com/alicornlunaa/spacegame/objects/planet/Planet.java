@@ -273,7 +273,7 @@ public class Planet extends Celestial implements Disposable {
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
-        game.simulation.addEntity(getWorld(), e);
+        game.simulation.addEntity(getInfluenceWorld(), e);
         planetEnts.remove(e);
     }
 

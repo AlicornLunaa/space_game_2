@@ -61,7 +61,7 @@ public class Universe extends Actor {
 
         // Convert the target celestial's body to the new Box2D world
         target.setPosition(target.getPosition().mul(parent.getUniverseSpaceTransform().inv()));
-        game.simulation.addEntity(parent.getWorld(), target);
+        game.simulation.addEntity(parent.getInfluenceWorld(), target);
     }
 
     // Constructor
@@ -215,7 +215,7 @@ public class Universe extends Actor {
 
         // Add body
         entityParents.put(e, c);
-        game.simulation.addEntity(c.getWorld(), e);
+        game.simulation.addEntity(c.getInfluenceWorld(), e);
         c.getEntities().add(e);
     }
 
@@ -235,7 +235,7 @@ public class Universe extends Actor {
         // Raise up a level
         Celestial parent = entityParents.get(e);
         Celestial celestialParent = entityParents.get(parent);
-        PhysWorld targetWorld = (celestialParent == null) ? universalWorld : celestialParent.getWorld();
+        PhysWorld targetWorld = (celestialParent == null) ? universalWorld : celestialParent.getInfluenceWorld();
 
         if(parent == null) return;
         if(celestialParent != null) celestialParent.getEntities().add(e);

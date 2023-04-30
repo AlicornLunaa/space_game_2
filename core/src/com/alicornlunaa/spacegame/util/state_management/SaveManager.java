@@ -58,11 +58,15 @@ public class SaveManager {
                 p.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
 
                 Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
-                if(parent != null && game.simulation.getWorldID(parent.getWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
-                    Planet planet = (Planet)parent;
-                    planet.addEntityWorld(p);
-                    p.setPosition(data.getFloat("x"), data.getFloat("y"));
-                    p.setVelocity(new Vector2(data.getFloat("vx"), data.getFloat("vy")));
+                if(parent != null){
+                    game.universe.addToCelestial(parent, p);
+
+                    if(game.simulation.getWorldID(parent.getWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
+                        Planet planet = (Planet)parent;
+                        planet.addEntityWorld(p);
+                        p.setPosition(data.getFloat("x"), data.getFloat("y"));
+                        p.setVelocity(new Vector2(data.getFloat("vx"), data.getFloat("vy")));
+                    }
                 }
                 
                 return p;

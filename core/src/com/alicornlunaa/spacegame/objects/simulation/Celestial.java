@@ -77,7 +77,7 @@ public class Celestial extends BaseEntity {
     // Functions
     public float getRadius(){ return radius; }
     public int getCelestialID(){ return celestialID; }
-    public PhysWorld getWorld(){ return influenceWorld; }
+    public PhysWorld getInfluenceWorld(){ return influenceWorld; }
     public Array<BaseEntity> getEntities(){ return ents; }
     public Array<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }

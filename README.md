@@ -37,11 +37,19 @@ part will have to be told which attachment point is being used as well.
         - saves/universes/(world_name)/ships/(ship_name).ship
         - saves/universes/(world_name)/simulation.dat
             - entities
-                - transform 
-                - velocity
-                - world_id
+                - x
+                - y
+                - vx
+                - vy
+                - physworld_id
+                - celestial_id
         - saves/universes/(world_name)/player.dat
-            - inherits entities
+            - x
+            - y
+            - vx
+            - vy
+            - physworld_id
+            - celestial_id
 
 ### Creation procedure:
 1. Create simulation

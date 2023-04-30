@@ -98,10 +98,11 @@ public class SpaceUIPanel extends Stage {
                     DriveableEntity ship = game.spaceScene.getContent().ship;
                     ship.stopDriving();
                     game.simulation.addEntity(ship.getWorld(), game.player);
+                    game.player.setVelocity(ship.getVelocity());
                 } else {
                     DriveableEntity ship = game.spaceScene.getContent().ship;
                     ship.drive(game.player);
-                    game.simulation.addEntity(ship.getWorld(), ship);
+                    game.simulation.addEntity(ship.getWorld(), game.player);
                 }
             }
         });
