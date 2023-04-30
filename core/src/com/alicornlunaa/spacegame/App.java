@@ -70,8 +70,8 @@ public class App extends Game {
         OrbitUtils.createOrbit(universe, universe.getCelestial(4));
         OrbitUtils.createOrbit(universe, universe.getCelestial(5));
 
-		player = new Player(this, -50, 0);
-		universe.addEntity(player);
+		// player = new Player(this, -50, 0);
+		// universe.addEntity(player);
 	}
 	
 	// Functions
@@ -130,7 +130,7 @@ public class App extends Game {
 
 				// Start new scene
 				initializeUniverse();
-				// SaveManager.load(this, "dev_world");
+				SaveManager.load(this, "dev_world");
 				spaceScene = new SpaceScene(this);
 
 				if(activeSpaceScreen == null){
@@ -139,7 +139,7 @@ public class App extends Game {
 				this.setScreen(activeSpaceScreen);
 
 				OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
-				OrbitUtils.createOrbit(universe, player);
+				// OrbitUtils.createOrbit(universe, player);
 				
 				// SaveManager.save(this, "dev_world");
 

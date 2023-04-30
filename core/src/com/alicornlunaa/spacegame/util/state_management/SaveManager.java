@@ -10,7 +10,6 @@ import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
 
 /**
  * Handles creation of a new save, loading of a save, etc
@@ -54,20 +53,17 @@ public class SaveManager {
                 Player p = new Player(game, 0, 0);
                 game.universe.addEntity(p);
 
-                p.setPosition(data.getFloat("x"), data.getFloat("y"));
-                p.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
-
                 Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
                 if(parent != null){
-                    game.universe.addToCelestial(parent, p);
-
                     if(game.simulation.getWorldID(parent.getWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
-                        Planet planet = (Planet)parent;
-                        planet.addEntityWorld(p);
-                        p.setPosition(data.getFloat("x"), data.getFloat("y"));
-                        p.setVelocity(new Vector2(data.getFloat("vx"), data.getFloat("vy")));
+                        game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), p);
+                    } else {
+                        game.simulation.addEntity(parent.getInfluenceWorld(), p);
                     }
                 }
+
+                p.setPosition(data.getFloat("x"), data.getFloat("y"));
+                p.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
                 
                 return p;
             }

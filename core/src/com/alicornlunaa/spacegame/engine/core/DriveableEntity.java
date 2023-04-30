@@ -45,6 +45,7 @@ public abstract class DriveableEntity extends BaseEntity {
         // Carry the driver with the vehicle
         if(driver == null) return;
         driver.afterWorldChange(world);
+        driver.getBody().setActive(false);
     }
     
 }
