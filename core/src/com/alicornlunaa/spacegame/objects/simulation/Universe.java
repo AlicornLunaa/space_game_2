@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
-import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
@@ -124,13 +123,6 @@ public class Universe extends Actor {
     }
 
     /**
-     * Gets all the entities in the simulation. This does not
-     * include celestials.
-     * @return Array of Entity
-     */
-    public Array<BaseEntity> getEntities(){ return game.simulation.getEntities(); }
-
-    /**
      * Gets all the celestials in the simulation.
      * @return Array of Celestial
      */
@@ -199,14 +191,6 @@ public class Universe extends Actor {
      * @param e Entity to be converted
      */
     public void addToCelestial(Celestial c, BaseEntity e){
-        if(e instanceof DriveableEntity){
-            DriveableEntity de = (DriveableEntity)e;
-
-            if(de.getDriver() != null){
-                this.addToCelestial(c, de.getDriver());
-            }
-        }
-
         Celestial parent = getParentCelestial(e);
         if(parent != null){
             parent.getEntities().removeValue(e, true);
@@ -225,15 +209,6 @@ public class Universe extends Actor {
      * @param e Entity to be converted
      */
     public void removeFromCelestial(BaseEntity e){
-        if(e instanceof DriveableEntity){
-            DriveableEntity de = (DriveableEntity)e;
-
-            if(de.getDriver() != null){
-                this.removeFromCelestial(de.getDriver());
-            }
-        }
-
-        // Raise up a level
         Celestial parent = getParentCelestial(e);
         Celestial celestialParent = getParentCelestial(parent);
         PhysWorld targetWorld = (celestialParent == null) ? universalWorld : celestialParent.getInfluenceWorld();
@@ -241,6 +216,7 @@ public class Universe extends Actor {
         if(parent == null) return;
         if(celestialParent != null) celestialParent.getEntities().add(e);
 
+        // TODO: bug here
         e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().add(parent.getBody().getLinearVelocity()));
         e.setPosition(e.getPosition().add(parent.getPosition()));
 
@@ -269,8 +245,6 @@ public class Universe extends Actor {
                     GenericConic path = celestialPaths.get(i);
                     BaseEntity e = path.getChild();
 
-                    if(e instanceof Player && ((Player)e).isDriving()) continue;
-
                     if(e instanceof Planet){
                         ((Planet)e).getStarDirection().set(OrbitUtils.directionToNearestStar(this, e), 0);
                     }
@@ -286,8 +260,8 @@ public class Universe extends Actor {
                     Orbit path = entityPaths.get(i);
                     BaseEntity e = path.getEntity();
     
-                    if(e instanceof Player && ((Player)e).isDriving()) continue;
-                    if(!(e.getWorld() instanceof CelestialPhysWorld)) continue;
+                    if(e instanceof Player && ((Player)e).isDriving()) continue; // Skip player if player is inside a vehicle
+                    if(!(e.getWorld() instanceof CelestialPhysWorld)) continue; // Skip entities on a planet surface
     
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);

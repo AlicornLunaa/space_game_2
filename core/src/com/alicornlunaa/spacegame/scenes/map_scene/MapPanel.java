@@ -53,7 +53,7 @@ public class MapPanel extends Stage {
 
     // Private functions
     private void initiatePaths(){
-        for(BaseEntity e : game.universe.getEntities()){
+        for(BaseEntity e : game.simulation.getEntities()){
             Celestial parent = game.universe.getParentCelestial(e);
 
             if(e instanceof Player && ((Player)e).isDriving()) continue;
