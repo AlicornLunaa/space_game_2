@@ -1,6 +1,5 @@
 package com.alicornlunaa.spacegame.objects.planet;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
@@ -49,7 +48,6 @@ public class Planet extends Celestial implements Disposable {
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
 
     private PhysWorld physWorld;
-    private ArrayList<BaseEntity> planetEnts = new ArrayList<>();
     private Stack<BaseEntity> leavingEnts = new Stack<>();
     private WorldBody worldBlocks;
 
@@ -223,8 +221,6 @@ public class Planet extends Celestial implements Disposable {
      * @param e Entity to be converted
      */
     public void addEntityWorld(BaseEntity e){
-        if(planetEnts.contains(e)) return;
-
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getBody().getPosition().cpy();
         float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
@@ -245,7 +241,6 @@ public class Planet extends Celestial implements Disposable {
 
         // Add body
         game.simulation.addEntity(physWorld, e);
-        planetEnts.add(e);
     }
 
     /**
@@ -274,10 +269,7 @@ public class Planet extends Celestial implements Disposable {
 
         // Remove body
         game.simulation.addEntity(getInfluenceWorld(), e);
-        planetEnts.remove(e);
     }
-
-    public ArrayList<BaseEntity> getPlanetEntities(){ return planetEnts; }
 
     public boolean checkTransferPlanet(BaseEntity e){
         // This function checks if the entity supplied
@@ -286,7 +278,7 @@ public class Planet extends Celestial implements Disposable {
 
         if(dist < radius * 1.2f){
             // Move it into this world
-            this.addEntityWorld(e);
+            addEntityWorld(e);
             return true;
         }
 

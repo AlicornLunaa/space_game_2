@@ -6,8 +6,6 @@ import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class Tile extends Actor {
@@ -29,26 +27,20 @@ public class Tile extends Actor {
     private int x;
     private int y;
     private String id;
-    private Fixture fixture;
     private TextureRegion region;
 
     // Constructor
-    public Tile(final App game, int x, int y, String id, Fixture fixture){
+    public Tile(final App game, int x, int y, String id){
         super();
         this.x = x;
         this.y = y;
         this.id = id;
-        this.fixture = fixture;
         region = getTexture(game.atlas, id);
         setBounds(x, y, TILE_SIZE, TILE_SIZE);
     }
 
     // Functions
     public String getID(){ return id; }
-
-    public void delete(Body body){
-        body.destroyFixture(fixture);
-    }
 
     @Override
     public void draw(Batch b, float a){

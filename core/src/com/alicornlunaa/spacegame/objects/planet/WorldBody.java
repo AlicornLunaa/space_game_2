@@ -36,7 +36,7 @@ public class WorldBody extends Group {
             if(chunkY < 2){
                 for(int y = 0; y < Constants.CHUNK_SIZE; y++){
                     for(int x = 0; x < Constants.CHUNK_SIZE; x++){
-                        tiles[x][y] = new Tile(game, x, y, "stone", null);
+                        tiles[x][y] = new Tile(game, x, y, "stone");
                         this.addActor(tiles[x][y]);
                     }
                 }

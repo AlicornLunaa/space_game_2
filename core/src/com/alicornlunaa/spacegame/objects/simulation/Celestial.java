@@ -44,7 +44,6 @@ public class Celestial extends BaseEntity {
 
     private @Null Celestial parent = null;
     private Array<Celestial> children = new Array<>();
-    private Array<BaseEntity> ents = new Array<>();
     
     // Constructor
     public Celestial(App game, float radius){
@@ -78,7 +77,6 @@ public class Celestial extends BaseEntity {
     public float getRadius(){ return radius; }
     public int getCelestialID(){ return celestialID; }
     public PhysWorld getInfluenceWorld(){ return influenceWorld; }
-    public Array<BaseEntity> getEntities(){ return ents; }
     public Array<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }
     public void setCelestialParent(Celestial c){ parent = c; }

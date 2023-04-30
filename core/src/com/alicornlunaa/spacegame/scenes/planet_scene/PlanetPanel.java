@@ -119,7 +119,7 @@ public class PlanetPanel extends Stage {
         batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
 
-        for(BaseEntity e : planet.getPlanetEntities()){
+        for(BaseEntity e : planet.getInternalPhysWorld().getEntities()){
             e.render(batch);
         }
 

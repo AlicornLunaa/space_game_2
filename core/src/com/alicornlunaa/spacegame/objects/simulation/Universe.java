@@ -191,17 +191,11 @@ public class Universe extends Actor {
      * @param e Entity to be converted
      */
     public void addToCelestial(Celestial c, BaseEntity e){
-        Celestial parent = getParentCelestial(e);
-        if(parent != null){
-            parent.getEntities().removeValue(e, true);
-        }
-
         e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().sub(c.getBody().getLinearVelocity()));
         e.setPosition(e.getPosition().sub(c.getPosition()));
 
         // Add body
         game.simulation.addEntity(c.getInfluenceWorld(), e);
-        c.getEntities().add(e);
     }
 
     /**
@@ -214,7 +208,6 @@ public class Universe extends Actor {
         PhysWorld targetWorld = (celestialParent == null) ? universalWorld : celestialParent.getInfluenceWorld();
 
         if(parent == null) return;
-        if(celestialParent != null) celestialParent.getEntities().add(e);
 
         // TODO: bug here
         e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().add(parent.getBody().getLinearVelocity()));
@@ -222,7 +215,6 @@ public class Universe extends Actor {
 
         // Remove body
         game.simulation.addEntity(targetWorld, e);
-        parent.getEntities().removeValue(e, true);
     }
 
     /**
