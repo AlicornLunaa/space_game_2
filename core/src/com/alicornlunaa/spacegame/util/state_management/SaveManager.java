@@ -55,7 +55,7 @@ public class SaveManager {
 
                 Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
                 if(parent != null){
-                    if(game.simulation.getWorldID(parent.getWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
+                    if(game.simulation.getWorldID(parent.getInfluenceWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
                         game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), p);
                     } else {
                         game.simulation.addEntity(parent.getInfluenceWorld(), p);
@@ -68,6 +68,8 @@ public class SaveManager {
                 return p;
             }
         });
+    
+        
     }
 
     public static <T> void register(Class<T> c, SaveSerializer<T> serializer){
