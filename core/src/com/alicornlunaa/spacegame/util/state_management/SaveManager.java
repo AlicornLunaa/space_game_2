@@ -37,6 +37,39 @@ public class SaveManager {
     // Functions
     public static void init(final App game){
         // Create registers
+        /* register(BaseEntity.class, new SaveSerializer<BaseEntity>() {
+            @Override
+            public void serialize(JSONObject data, BaseEntity object) {
+                data.put("entity_type", object.getClass().getName());
+                data.put("x", object.getX());
+                data.put("y", object.getY());
+                data.put("vx", object.getVelocity().x);
+                data.put("vy", object.getVelocity().y);
+                data.put("physworld_id", game.simulation.getWorldID(object.getWorld()));
+                data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+            }
+
+            @Override
+            public BaseEntity unserialize(JSONObject data) {
+                BaseEntity e = new BaseEntity();
+                game.universe.addEntity(e);
+
+                Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
+                if(parent != null){
+                    if(game.simulation.getWorldID(parent.getInfluenceWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
+                        game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), e);
+                    } else {
+                        game.simulation.addEntity(parent.getInfluenceWorld(), e);
+                    }
+                }
+
+                e.setPosition(data.getFloat("x"), data.getFloat("y"));
+                e.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
+                
+                return p;
+            }
+        }); */
+
         register(Player.class, new SaveSerializer<Player>() {
             @Override
             public void serialize(JSONObject data, Player object) {
@@ -68,8 +101,29 @@ public class SaveManager {
                 return p;
             }
         });
-    
         
+        register(Celestial.class, new SaveSerializer<Celestial>() {
+            @Override
+            public void serialize(JSONObject data, Celestial object) {
+                data.put("x", object.getX());
+                data.put("y", object.getY());
+                data.put("vx", object.getVelocity().x);
+                data.put("vy", object.getVelocity().y);
+                data.put("physworld_id", game.simulation.getWorldID(object.getWorld()));
+                data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+                data.put("parent_celestial_id", (object.getCelestialParent() == null) ? -1 : object.getCelestialParent().getCelestialID());
+                data.put("celestial_radius", object.getRadius());
+            }
+
+            @Override
+            public Celestial unserialize(JSONObject data) {
+                Celestial c = new Celestial(game, data.getFloat("celestial_radius"));
+                c.setPosition(data.getFloat("x"), data.getFloat("y"));
+                c.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
+                game.universe.addCelestial(c);
+                return c;
+            }
+        });
     }
 
     public static <T> void register(Class<T> c, SaveSerializer<T> serializer){
@@ -96,11 +150,23 @@ public class SaveManager {
         // Save entity data
 
         // Save celestial data
+        for(Celestial c : game.universe.getCelestials()){
+            f = Gdx.files.local("./saves/universes/" + saveName + "/planets/celestial_" + c.getCelestialID() + "/level.dat");
+            f.writeString(write(Celestial.class, c), false);
+        }
     }
 
     public static void load(final App game, String saveName){
+        // Save celestial data
+        FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/planets/");
+        FileHandle planetData[] = f.list();
+        for(FileHandle d : planetData){
+            FileHandle h = Gdx.files.local("./saves/universes/" + saveName + "/planets/" + d.name() + "/level.dat");
+            read(Celestial.class, h.readString());
+        }
+
         // Load player data
-        FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/player.dat");
+        f = Gdx.files.local("./saves/universes/" + saveName + "/player.dat");
         game.player = read(Player.class, f.readString());
     }
 

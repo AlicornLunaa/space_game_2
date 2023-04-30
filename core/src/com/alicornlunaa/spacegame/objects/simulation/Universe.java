@@ -38,25 +38,41 @@ public class Universe extends Actor {
     private float timewarp = 1.0f;
 
     // Private functions
-    /**
-     * Transfers the parent of one celestial to another celestial
-     * @param target The celestial to reparent
-     * @param parent The new parent of the celestial
-     */
-    private void parentCelestial(Celestial target, Celestial parent){
-        // Remove target from existing celestial parent
-        Celestial curParent = getParentCelestial(target);
+    private boolean checkCelestialTransfer(Celestial celestial){
+        // Check whether or not this entity has a celestial parent or not
+        Celestial curParent = getParentCelestial(celestial);
+        Array<Celestial> celestialsToCheck = (curParent == null) ? celestials : curParent.getChildren();
+
+        // Find closest celestial with proper SOI parameters
+        Celestial parent = null;
+        float minDist = Float.MAX_VALUE;
+
+        for(Celestial c : celestialsToCheck){
+            // Only transfer to next-level celestials.
+            if(curParent == null && c.getCelestialParent() != null) continue;
+
+            float curDist = c.getPosition().dst2(celestial.getPosition());
+            if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2) && c != celestial){
+                parent = c;
+                minDist = curDist;
+            }
+        }
+
+        if(parent == null) return false;
+
         if(curParent != null){
-            curParent.getChildren().removeValue(target, true);
+            curParent.getChildren().removeValue(celestial, true);
         }
 
         // Update the target's parent to be the parent celestial
-        target.setCelestialParent(parent);
-        parent.getChildren().add(target);
+        celestial.setCelestialParent(parent);
+        parent.getChildren().add(celestial);
 
         // Convert the target celestial's body to the new Box2D world
-        target.setPosition(target.getPosition().mul(parent.getUniverseSpaceTransform().inv()));
-        game.simulation.addEntity(parent.getInfluenceWorld(), target);
+        celestial.setPosition(celestial.getPosition().mul(parent.getTransform().inv()));
+        game.simulation.addEntity(parent.getInfluenceWorld(), celestial);
+
+        return true;
     }
 
     // Constructor
@@ -82,11 +98,12 @@ public class Universe extends Actor {
      * @param c The celestial to add
      * @param parent The celestial to parent it to
      */
-    public void addCelestial(Celestial c, Celestial parent){
+    public void addCelestial(Celestial c){
         game.simulation.addEntity(universalWorld, c);
         celestials.add(c);
 
-        if(parent != null) parentCelestial(c, parent);
+        boolean res = false;
+        do { res = checkCelestialTransfer(c); } while(res == true);
     }
 
     /**
@@ -136,7 +153,10 @@ public class Universe extends Actor {
      * @param i Celestial index
      * @return Celestial or null
      */
-    public Celestial getCelestial(int i){ return celestials.get(i); }
+    public Celestial getCelestial(int i){
+        if(i >= celestials.size) return null;
+        return celestials.get(i);
+    }
 
     /**
      * Gets the celestial that is the parent of this entity or celestial

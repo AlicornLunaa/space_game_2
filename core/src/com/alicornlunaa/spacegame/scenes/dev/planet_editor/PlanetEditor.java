@@ -71,8 +71,8 @@ public class PlanetEditor implements Screen {
 
         universe = new Universe(game);
         planet = new Planet(game, 0, 0, 300, 350, 1.f);
-        universe.addCelestial(planet, null);
-        universe.addCelestial(new Star(game, 10000, 0, 100), null);
+        universe.addCelestial(planet);
+        universe.addCelestial(new Star(game, 10000, 0, 100));
         stage.addActor(universe);
 
         // Controls

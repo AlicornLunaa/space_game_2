@@ -19,24 +19,25 @@ part will have to be told which attachment point is being used as well.
 - saves/settings
 - saves/universes
     - saves/universes/(world_name)
-        - saves/universes/(world_name)/planets/(planet_id).dat
-            - chunk_width
-            - chunk_height
-            - atmos_radius
-            - atmos_density
-            - atmos_composition
-            - atmos_percentages
-            - seed
-            - world_body
-                - chunks
-                    - chunk-x-y
+        - saves/universes/(world_name)/planets/(planet_id)/
+            - saves/universes/(world_name)/planets/(planet_id)/level.dat
+                - chunk_width
+                - chunk_height
+                - atmos_radius
+                - atmos_density
+                - atmos_composition
+                - atmos_percentages
+                - seed
+                - loaded_chunks
+                    - x
+                    - y
+                - /data/
+                    - chunk-x-y.dat
                         - tiles
-                        - loaded_chunks
-                            - x
-                            - y
         - saves/universes/(world_name)/ships/(ship_name).ship
         - saves/universes/(world_name)/simulation.dat
             - entities
+                - classname
                 - x
                 - y
                 - vx
