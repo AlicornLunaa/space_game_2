@@ -47,6 +47,7 @@ public class PlanetPanel extends Stage {
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
         getViewport().setCamera(game.activeCamera);
+        addActor(planet.getWorldBody());
 
         // Controls
         this.addListener(new InputListener(){
@@ -110,14 +111,12 @@ public class PlanetPanel extends Stage {
 
         // World rendering
         WorldBody worldBody = planet.getWorldBody();
-
         batch.setProjectionMatrix(proj);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(0, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        batch.setTransformMatrix(new Matrix4());
 
         for(BaseEntity e : planet.getInternalPhysWorld().getEntities()){
             e.render(batch);

@@ -158,15 +158,15 @@ public class SaveManager {
 
     public static void load(final App game, String saveName){
         // Save celestial data
-        FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/planets/");
-        FileHandle planetData[] = f.list();
-        for(FileHandle d : planetData){
-            FileHandle h = Gdx.files.local("./saves/universes/" + saveName + "/planets/" + d.name() + "/level.dat");
-            read(Celestial.class, h.readString());
-        }
+        // FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/planets/");
+        // FileHandle planetData[] = f.list();
+        // for(FileHandle d : planetData){
+        //     FileHandle h = Gdx.files.local("./saves/universes/" + saveName + "/planets/" + d.name() + "/level.dat");
+        //     read(Celestial.class, h.readString());
+        // }
 
         // Load player data
-        f = Gdx.files.local("./saves/universes/" + saveName + "/player.dat");
+        FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/player.dat");
         game.player = read(Player.class, f.readString());
     }
 

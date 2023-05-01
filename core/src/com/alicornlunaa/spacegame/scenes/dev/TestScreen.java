@@ -1,55 +1,51 @@
 package com.alicornlunaa.spacegame.scenes.dev;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+@SuppressWarnings("unused")
 public class TestScreen implements Screen {
 
-    // private final App game;
+    private static class TestActor extends Actor {
+        public TestActor(){
+            setSize(100, 100);
+
+            addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y){
+                    System.out.println("Clicked!");
+                }
+            });
+        }
+    }
+
     private final App game;
     private OrthographicCamera cam;
     private Stage stage;
 
-    private PhysWorld world;
-    private Ship ship;
-    private Interior interior;
-
     public TestScreen(final App game){
         this.game = game;
         stage = new Stage(new ScreenViewport());
+        stage.setDebugAll(true);
+
         cam = (OrthographicCamera)stage.getCamera();
-        // cam.zoom = 0.05f;
+        cam.zoom = 0.5f;
         cam.position.set(0, 0, 0);
         cam.update();
 
-        world = game.simulation.addWorld(Constants.PPM);
-        ship = new Ship(game, world, 0, 0, 0);
-        interior = new Interior(game, ship);
-
-        System.out.println("");
-        // Orbit o = new Orbit(
-        //     new Vector3(-5060f, 549f, -4419f),
-        //     new Vector3(-3.53f, -5.97f, 3.3f),
-        //     (float)(5.97219e24)
-        // );
-        // Orbit o = new Orbit(
-        //     new Vector3(154.252550f, 105.699660f, 0.f),
-        //     new Vector3(-4.779790f, 9.428806f, 0),
-        //     (float)(27611.654000f)
-        // );
-        // System.out.println(o);
-
-        Gdx.app.exit();
+        TestActor test = new TestActor();
+        test.setPosition(50, 50);
+        stage.addActor(test);
     }
 
     @Override
@@ -57,18 +53,19 @@ public class TestScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1);
 
         Batch batch = stage.getBatch();
-        batch.begin();
         batch.setProjectionMatrix(stage.getCamera().combined);
-
-        interior.draw(batch);
-
+        batch.setTransformMatrix(new Matrix4());
+        batch.begin();
         batch.end();
-        
-        game.debug.render(interior.getWorld().getBox2DWorld(), batch.getProjectionMatrix().cpy().scl(Constants.SHIP_PPM));
+
+        stage.act(delta);
+        stage.draw();
     }
 
     @Override
-    public void show() {}
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+    }
 
     @Override
     public void resize(int width, int height) {}

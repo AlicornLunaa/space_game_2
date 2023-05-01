@@ -161,8 +161,8 @@ public class Planet extends Celestial implements Disposable {
 
         setPosition(x, y);
 
-        terrestrialHeight = 3;//35;//(float)Math.floor(radius / 10);
-        terrestrialWidth = 20;//(int)(2.0 * Math.PI * terrestrialHeight);
+        terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2);
+        terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
         generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE, terrestrialHeight * Constants.CHUNK_SIZE, terrainSeed);

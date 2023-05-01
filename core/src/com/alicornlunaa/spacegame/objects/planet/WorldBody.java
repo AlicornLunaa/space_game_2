@@ -4,16 +4,21 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 
 /**
  * Holds world chunks and manages which is loaded or not
@@ -29,15 +34,35 @@ public class WorldBody extends Group {
         private boolean active = false;
         private int chunkX;
         private int chunkY;
+
+        public boolean chunkUpdate = false;
     
         // Private functions
         private void tempTileData(){
             // TODO: Remove
-            if(chunkY < 2){
+            if(chunkY < 14){
                 for(int y = 0; y < Constants.CHUNK_SIZE; y++){
                     for(int x = 0; x < Constants.CHUNK_SIZE; x++){
-                        tiles[x][y] = new Tile(game, x, y, "stone");
-                        this.addActor(tiles[x][y]);
+                        final Tile tile = new Tile(game, x, y, "stone");
+                        tiles[x][y] = tile;
+
+                        tile.setBounds(
+                            x * Tile.TILE_SIZE + chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE,
+                            y * Tile.TILE_SIZE + chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE,
+                            Tile.TILE_SIZE,
+                            Tile.TILE_SIZE
+                        );
+                        this.addActor(tile);
+
+                        tile.addListener(new ClickListener(){
+                            @Override
+                            public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
+                                if(!Gdx.input.isTouched(0)) return;
+                                removeActor(tile);
+                                tiles[tile.getTileX()][tile.getTileY()] = null;
+                                chunkUpdate = true;
+                            }
+                        });
                     }
                 }
             }
@@ -75,8 +100,10 @@ public class WorldBody extends Group {
     private PhysWorld world;
     private Chunk[][] chunks;
     private Array<Chunk> loadedChunks = new Array<>();
+    // private Array<Chunk> visibleChunks = new Array<>();
     private Array<Fixture> activeFixtures = new Array<>();
     private Body worldBody;
+    private boolean tileUpdate = false;
     private int lastPlayerX = -1;
     private int lastPlayerY = -1;
 
@@ -146,6 +173,7 @@ public class WorldBody extends Group {
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
+        // int viewDist = loadDist + 1;//(int)(game.activeCamera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2);
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
@@ -163,7 +191,25 @@ public class WorldBody extends Group {
                 unloadChunk(currentChunkX, currentChunkY);
                 i--;
             }
+
+            if(chunk.chunkUpdate){
+                tileUpdate = true;
+            }
         }
+
+        // for(int i = 0; i < visibleChunks.size; i++){
+        //     Chunk chunk = visibleChunks.get(i);
+        //     int currentChunkX = chunk.getChunkX();
+        //     int currentChunkY = chunk.getChunkY();
+        //     int distance = Math.max(Math.abs(containedX - currentChunkX), Math.abs(containedY - currentChunkY));
+            
+        //     // Unload if too far
+        //     if(distance > viewDist * 2){
+        //         chunk.setVisible(false);
+        //         visibleChunks.removeValue(chunk, true);
+        //         i--;
+        //     }
+        // }
 
         // Iterate over the players surrounding chunks and load them
         for(int y = loadDist * -1; y < loadDist; y++){
@@ -175,12 +221,31 @@ public class WorldBody extends Group {
                 loadChunk(wrappedX, wrappedY);
             }
         }
+
+        // for(int y = viewDist * -1; y < viewDist; y++){
+        //     if(containedY + y > chunks[0].length) continue;
+
+        //     for(int x = viewDist * -1; x < viewDist + 1; x++){
+        //         int wrappedX = Math.floorMod(containedX + x, chunks.length);
+        //         int wrappedY = Math.floorMod(containedY + y, chunks[0].length);
+
+        //         if(chunks[wrappedX][wrappedY] == null){
+        //             // Generate new chunk because it didnt exist before
+        //             // chunks[wrappedX][wrappedY] = new Chunk(game, world, wrappedX, wrappedY);
+        //             // this.addActor(chunks[wrappedX][wrappedY]);
+        //         } else {
+        //             chunks[wrappedX][wrappedY].setVisible(true);
+        //             visibleChunks.add(chunks[wrappedX][wrappedY]);
+        //         }
+        //     }
+        // }
     
         // Now that everything's loaded or unloaded, run an algorithm to build the worldbody around the player
         // but only if theyve specifically moved locations to another chunk
-        if(plyChunkX != lastPlayerX || plyChunkY != lastPlayerY){
+        if(plyChunkX != lastPlayerX || plyChunkY != lastPlayerY || tileUpdate){
             lastPlayerX = plyChunkX;
             lastPlayerY = plyChunkY;
+            tileUpdate = false;
 
             // Destroy all current fixtures
             while(activeFixtures.size > 0){
