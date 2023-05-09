@@ -135,7 +135,7 @@ public class Planet extends Celestial implements Disposable {
                 Vector2 dragForce = applyDrag(e.getBody());
                 float height = Math.max(e.getBody().getPosition().y, getRadius() / getPhysScale());
                 float force = Constants.GRAVITY_CONSTANT * ((getBody().getMass() * e.getBody().getMass()) / (height * height));
-                e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
+                // e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
             }
 
             @Override
@@ -151,7 +151,8 @@ public class Planet extends Celestial implements Disposable {
         });
 
         // Create a world-body chunking system to take up the entirety of the planet
-        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
+        // worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
+        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, terrestrialHeight);
     }
 
     // Constructor
@@ -161,8 +162,8 @@ public class Planet extends Celestial implements Disposable {
 
         setPosition(x, y);
 
-        terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2);
-        terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
+        terrestrialHeight = 1;//(int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2);
+        terrestrialWidth = 15;//(int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
         generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE, terrestrialHeight * Constants.CHUNK_SIZE, terrainSeed);

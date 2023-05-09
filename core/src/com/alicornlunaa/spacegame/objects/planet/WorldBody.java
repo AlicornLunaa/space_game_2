@@ -10,9 +10,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -84,7 +84,11 @@ public class WorldBody extends Group {
         public boolean isLoaded(){ return active; }
         public int getChunkX(){ return chunkX; }
         public int getChunkY(){ return chunkY; }
-        public Tile getTile(int x, int y){ return tiles[x][y]; }
+        public Tile getTile(int x, int y){
+            if(x < 0 || x >= tiles.length) return null;
+            if(y < 0 || y >= tiles[x].length) return null;
+            return tiles[x][y];
+        }
         
         @Override
         public void draw(Batch batch, float a){
@@ -93,6 +97,107 @@ public class WorldBody extends Group {
             batch.setTransformMatrix(batch.getTransformMatrix().cpy().translate(-chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE, -chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE, 0));
         }
     
+    }
+
+    // Private functions
+    private Tile getTileFromGlobal(int x, int y){
+        if(chunks.length <= 0) return null;
+        if(y < 0) return null;
+        if(y >= chunks[0].length * Constants.CHUNK_SIZE) return null;
+
+        int chunkX = Math.floorMod(Math.floorDiv(x, Constants.CHUNK_SIZE), chunks.length);
+        int chunkY = Math.floorMod((int)(y / Constants.CHUNK_SIZE), chunks[0].length);
+        int tileX = Math.floorMod(x, Constants.CHUNK_SIZE);
+        int tileY = Math.floorMod(y, Constants.CHUNK_SIZE);
+        Chunk chunk = chunks[chunkX][chunkY];
+
+        if(chunk == null) return null;
+        return chunk.getTile(tileX, tileY);
+    }
+
+    private void generateChunkHull(){
+        // Update based on the player's positioning and time active
+        Vector2 plyPos = game.player.getCenter();
+        
+        // Get chunk coordinates for the player
+        int loadDist = Constants.CHUNK_LOAD_DISTANCE;
+        int plyTileX = (int)(plyPos.x / Tile.TILE_SIZE);
+        int plyTileY = (int)(plyPos.y / Tile.TILE_SIZE);
+        
+        // Destroy all current fixtures
+        while(activeFixtures.size > 0){
+            worldBody.destroyFixture(activeFixtures.pop());
+        }
+
+        // Algorithm: Go from start to end of the entire load distance,
+        // Keep track of the start of an edge and create the edge when it ends.
+        // Repeat until finished. Run again but for Y.
+        EdgeShape hullShape = new EdgeShape();
+        float physTileSize = Tile.TILE_SIZE / Constants.PLANET_PPM;
+        int startTop = -1;
+        int startBottom = -1;
+
+        for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
+            for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
+                // Get the chunk coordinates and tile coordinates from the global x and y
+                Tile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
+                Tile tileAbove = getTileFromGlobal(x + plyTileX, y + plyTileY + 1);
+                Tile tileBelow = getTileFromGlobal(x + plyTileX, y + plyTileY - 1);
+
+                if(tile != null && tileAbove == null && startTop == -1){
+                    // Create a new shape on the edge of this tile on the top
+                    startTop = x + plyTileX;
+                } else if((tile == null || tileAbove != null) && startTop != -1){
+                    hullShape.set(
+                        startTop * physTileSize,
+                        (y + plyTileY) * physTileSize + physTileSize,
+                        (x - 1 + plyTileX) * physTileSize + physTileSize,
+                        (y + plyTileY) * physTileSize + physTileSize
+                    );
+                    activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+                    startTop = -1;
+                }
+
+                if(tile != null && tileBelow == null && startBottom == -1){
+                    // Create a new shape on the edge of this tile on the top
+                    startBottom = x + plyTileX;
+                } else if((tile == null || tileBelow != null) && startBottom != -1){
+                    hullShape.set(
+                        startBottom * physTileSize,
+                        (y + plyTileY) * physTileSize,
+                        (x - 1 + plyTileX) * physTileSize + physTileSize,
+                        (y + plyTileY) * physTileSize
+                    );
+                    activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+                    startBottom = -1;
+                }
+            }
+
+            if(startTop != -1){
+                hullShape.set(
+                    startTop * physTileSize,
+                    (y + plyTileY) * physTileSize + physTileSize,
+                    (loadDist * Constants.CHUNK_SIZE - 1 + plyTileX) * physTileSize + physTileSize,
+                    (y + plyTileY) * physTileSize + physTileSize
+                );
+                activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+            }
+
+            if(startBottom != -1){
+                hullShape.set(
+                    startBottom * physTileSize,
+                    (y + plyTileY) * physTileSize,
+                    (loadDist * Constants.CHUNK_SIZE - 1 + plyTileX) * physTileSize + physTileSize,
+                    (y + plyTileY) * physTileSize
+                );
+                activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+            }
+
+            startTop = -1;
+            startBottom = -1;
+        }
+
+        hullShape.dispose();
     }
 
     // Variables
@@ -247,61 +352,7 @@ public class WorldBody extends Group {
             lastPlayerY = plyChunkY;
             tileUpdate = false;
 
-            // Destroy all current fixtures
-            while(activeFixtures.size > 0){
-                worldBody.destroyFixture(activeFixtures.pop());
-            }
-
-            // Algorithm: Start top-left and move right. If there's a break in tiles, stop and create a new fixture
-            PolygonShape shape = new PolygonShape();
-            float offsetX = (plyChunkX - loadDist) * Tile.TILE_SIZE * Constants.CHUNK_SIZE / Constants.PLANET_PPM;
-            float offsetY = (containedY - loadDist) * Tile.TILE_SIZE * Constants.CHUNK_SIZE / Constants.PLANET_PPM;
-            float physTileSize = Tile.TILE_SIZE / Constants.PLANET_PPM;
-            int scanX = -1; // ScanX is the last X position to start a new tile bar
-            int globalX = 0;
-            int globalY = 0;
-
-            for(int y = loadDist * -1; y < loadDist; y++){
-                for(int ty = 0; ty < Constants.CHUNK_SIZE; ty++){
-                    for(int x = loadDist * -1; x < loadDist + 1; x++){
-                        int wrappedX = Math.floorMod(plyChunkX + x, chunks.length);
-                        int wrappedY = Math.floorMod(containedY + y, chunks[0].length);
-                        Chunk chunk = chunks[wrappedX][wrappedY];
-
-                        if(chunk == null) continue;
-                        
-                        for(int tx = 0; tx < Constants.CHUNK_SIZE; tx++){
-                            Tile tile = chunk.getTile(tx, ty);
-
-                            if(tile != null && scanX == -1){
-                                // No tile in progress, create a new one
-                                scanX = globalX;
-                            } else if(tile == null && scanX != -1) {
-                                // A new tile was in creation, it ends here.
-                                float width = (globalX - scanX) * physTileSize / 2;
-                                shape.setAsBox(width, physTileSize / 2, new Vector2(width + (scanX * Tile.TILE_SIZE / Constants.PLANET_PPM) + offsetX, physTileSize / 2 + (globalY * Tile.TILE_SIZE / Constants.PLANET_PPM) + offsetY), 0.f);
-                                activeFixtures.add(worldBody.createFixture(shape, 0.0f));
-                                scanX = -1;
-                            }
-
-                            globalX++;
-                        }
-                    }
-
-                    if(scanX != -1){
-                        // Entire bar is one solid piece
-                        float width = (globalX - scanX) * physTileSize / 2;
-                        shape.setAsBox(width, physTileSize / 2, new Vector2(width + (scanX * Tile.TILE_SIZE / Constants.PLANET_PPM) + offsetX, physTileSize / 2 + (globalY * Tile.TILE_SIZE / Constants.PLANET_PPM) + offsetY), 0.f);
-                        activeFixtures.add(worldBody.createFixture(shape, 0.0f));
-                    }
-                    
-                    scanX = -1;
-                    globalX = 0;
-                    globalY++;
-                }
-            }
-
-            shape.dispose();
+            generateChunkHull();
         }
     }
 

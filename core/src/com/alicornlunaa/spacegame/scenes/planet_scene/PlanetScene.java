@@ -34,13 +34,13 @@ public class PlanetScene implements Screen {
         uiShip = new SpaceUIPanel(game);
 
         inputs.addProcessor(planetPanel);
-        // inputs.addProcessor(uiPanel);
-        // inputs.addProcessor(uiShip);
+        inputs.addProcessor(uiPanel);
+        inputs.addProcessor(uiShip);
 
         // Initialize UI
         uiShip.shipCompass.setTarget(game.player);
 
-        planetPanel.setDebugAll(true);
+        planetPanel.setDebugAll(false);
         uiPanel.setDebugAll(true);
     }
 

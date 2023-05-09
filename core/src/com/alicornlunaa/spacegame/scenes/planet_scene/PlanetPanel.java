@@ -112,10 +112,10 @@ public class PlanetPanel extends Stage {
         // World rendering
         WorldBody worldBody = planet.getWorldBody();
         batch.setProjectionMatrix(proj);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        // batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
+        // worldBody.draw(batch, batch.getColor().a);
+        // batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
+        // worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4());
 
         for(BaseEntity e : planet.getInternalPhysWorld().getEntities()){
@@ -126,7 +126,7 @@ public class PlanetPanel extends Stage {
         super.draw();
 
         // Debug rendering
-        if(this.isDebugAll()){
+        if(Constants.DEBUG){
             game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
         }
     }
