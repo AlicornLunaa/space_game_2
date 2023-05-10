@@ -63,7 +63,7 @@ public class Player extends BaseEntity {
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
     private static final float MOVEMENT_SPEED = 0.05f;
-    private static final float JUMP_FORCE = 0.05f;
+    private static final float JUMP_FORCE = 1.25f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
@@ -192,8 +192,7 @@ public class Player extends BaseEntity {
     public void update(){
         // Groundchecking
         grounded = false;
-        getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (PLAYER_HEIGHT / 2 + 4.5f) / getPhysScale())));
-        grounded = true;
+        getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / getPhysScale())).cpy(), getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / getPhysScale())));
 
         // Movement
         if(vertical != 0 || horizontal != 0){
