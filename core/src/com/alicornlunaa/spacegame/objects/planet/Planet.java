@@ -135,7 +135,7 @@ public class Planet extends Celestial implements Disposable {
                 Vector2 dragForce = applyDrag(e.getBody());
                 float height = Math.max(e.getBody().getPosition().y, getRadius() / getPhysScale());
                 float force = Constants.GRAVITY_CONSTANT * ((getBody().getMass() * e.getBody().getMass()) / (height * height));
-                // e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
+                e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
             }
 
             @Override

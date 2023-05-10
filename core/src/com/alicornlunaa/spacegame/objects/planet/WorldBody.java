@@ -136,6 +136,8 @@ public class WorldBody extends Group {
         float physTileSize = Tile.TILE_SIZE / Constants.PLANET_PPM;
         int startTop = -1;
         int startBottom = -1;
+        int startLeft = -1;
+        int startRight = -1;
 
         for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
             for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
@@ -195,6 +197,66 @@ public class WorldBody extends Group {
 
             startTop = -1;
             startBottom = -1;
+        }
+
+        for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
+            for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
+                // Get the chunk coordinates and tile coordinates from the global x and y
+                Tile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
+                Tile tileLeft = getTileFromGlobal(x - 1 + plyTileX, y + plyTileY);
+                Tile tileRight = getTileFromGlobal(x + 1 + plyTileX, y + plyTileY);
+
+                if(tile != null && tileLeft == null && startLeft == -1){
+                    // Create a new shape on the edge of this tile on the top
+                    startLeft = y + plyTileY;
+                } else if((tile == null || tileLeft != null) && startLeft != -1){
+                    hullShape.set(
+                        (x + plyTileX) * physTileSize,
+                        startLeft * physTileSize + 0.001f,
+                        (x + plyTileX) * physTileSize,
+                        (y - 1 + plyTileY) * physTileSize + physTileSize - 0.001f
+                    );
+                    activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+                    startLeft = -1;
+                }
+
+                if(tile != null && tileRight == null && startRight == -1){
+                    // Create a new shape on the edge of this tile on the top
+                    startRight = y + plyTileY;
+                } else if((tile == null || tileRight != null) && startRight != -1){
+                    hullShape.set(
+                        (x + plyTileX) * physTileSize + physTileSize,
+                        startRight * physTileSize + 0.001f,
+                        (x + plyTileX) * physTileSize + physTileSize,
+                        (y - 1 + plyTileY) * physTileSize + physTileSize - 0.001f
+                    );
+                    activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+                    startRight = -1;
+                }
+            }
+
+            if(startLeft != -1){
+                hullShape.set(
+                    (x * plyTileX) * physTileSize,
+                    startLeft * physTileSize + physTileSize,
+                    (x * plyTileX) * physTileSize,
+                    (loadDist * Constants.CHUNK_SIZE - 1 + plyTileY) * physTileSize + physTileSize
+                );
+                activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+            }
+
+            if(startRight != -1){
+                hullShape.set(
+                    (x + plyTileX) * physTileSize,
+                    startRight * physTileSize,
+                    (x + plyTileX) * physTileSize,
+                     (loadDist * Constants.CHUNK_SIZE - 1 + plyTileY) * physTileSize
+                );
+                activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
+            }
+
+            startLeft = -1;
+            startRight = -1;
         }
 
         hullShape.dispose();
