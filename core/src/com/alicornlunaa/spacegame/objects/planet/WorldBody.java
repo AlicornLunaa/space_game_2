@@ -237,9 +237,9 @@ public class WorldBody extends Group {
 
             if(startLeft != -1){
                 hullShape.set(
-                    (x * plyTileX) * physTileSize,
-                    startLeft * physTileSize + physTileSize,
-                    (x * plyTileX) * physTileSize,
+                    (x + plyTileX) * physTileSize,
+                    startLeft * physTileSize,
+                    (x + plyTileX) * physTileSize,
                     (loadDist * Constants.CHUNK_SIZE - 1 + plyTileY) * physTileSize + physTileSize
                 );
                 activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
@@ -247,10 +247,10 @@ public class WorldBody extends Group {
 
             if(startRight != -1){
                 hullShape.set(
-                    (x + plyTileX) * physTileSize,
+                    (x + plyTileX) * physTileSize + physTileSize,
                     startRight * physTileSize,
-                    (x + plyTileX) * physTileSize,
-                     (loadDist * Constants.CHUNK_SIZE - 1 + plyTileY) * physTileSize
+                    (x + plyTileX) * physTileSize + physTileSize,
+                    (loadDist * Constants.CHUNK_SIZE - 1 + plyTileY) * physTileSize
                 );
                 activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
             }
