@@ -33,9 +33,9 @@ public class PlanetScene implements Screen {
         uiPanel = new PlanetUIPanel(game);
         uiShip = new SpaceUIPanel(game);
 
-        inputs.addProcessor(planetPanel);
         inputs.addProcessor(uiPanel);
         inputs.addProcessor(uiShip);
+        inputs.addProcessor(planetPanel);
 
         // Initialize UI
         uiShip.shipCompass.setTarget(game.player);

@@ -212,9 +212,9 @@ public class WorldBody extends Group {
                 } else if((tile == null || tileLeft != null) && startLeft != -1){
                     hullShape.set(
                         (x + plyTileX) * physTileSize,
-                        startLeft * physTileSize + 0.001f,
+                        startLeft * physTileSize,
                         (x + plyTileX) * physTileSize,
-                        (y - 1 + plyTileY) * physTileSize + physTileSize - 0.001f
+                        (y - 1 + plyTileY) * physTileSize + physTileSize
                     );
                     activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
                     startLeft = -1;
@@ -226,9 +226,9 @@ public class WorldBody extends Group {
                 } else if((tile == null || tileRight != null) && startRight != -1){
                     hullShape.set(
                         (x + plyTileX) * physTileSize + physTileSize,
-                        startRight * physTileSize + 0.001f,
+                        startRight * physTileSize,
                         (x + plyTileX) * physTileSize + physTileSize,
-                        (y - 1 + plyTileY) * physTileSize + physTileSize - 0.001f
+                        (y - 1 + plyTileY) * physTileSize + physTileSize
                     );
                     activeFixtures.add(worldBody.createFixture(hullShape, 0.f));
                     startRight = -1;
