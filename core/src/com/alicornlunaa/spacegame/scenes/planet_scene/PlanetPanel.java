@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -89,12 +91,12 @@ public class PlanetPanel extends Stage {
         Matrix4 invProj = proj.cpy().inv();
 
         // Skybox rendering
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
+        Vector2 globalPos = OrbitUtils.getUniverseSpaceCenter(game.universe, game.player);
         
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
         batch.setTransformMatrix(new Matrix4());
-        game.spaceScene.getContent().getStarfield().setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
+        game.spaceScene.getContent().getStarfield().setOffset(globalPos.x / 10000000, globalPos.y / 10000000);
         game.spaceScene.getContent().getStarfield().draw(batch, -1, -1, 2, 2);
 
         batch.setShader(cartesianAtmosShader);

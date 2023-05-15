@@ -126,7 +126,6 @@ public class MapPanel extends Stage {
     public void act(float delta){
         // Update the universe
         game.universe.update(delta);
-        mapCamera.position.set(game.player.getCamera().position);
 
         // Keep the predicted paths up to date
         orbits.clear();
@@ -216,6 +215,9 @@ public class MapPanel extends Stage {
 
     @Override
     public void draw(){
+        // Update camera
+        mapCamera.position.set(OrbitUtils.getUniverseSpaceCenter(game.universe, (game.player.isDriving()) ? game.player.getVehicle() : game.player), 0.0f);
+        
         // Draw stars in the map view
         drawSkybox();
 

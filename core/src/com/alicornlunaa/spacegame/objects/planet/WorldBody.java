@@ -99,6 +99,19 @@ public class WorldBody extends Group {
     
     }
 
+    
+    // Variables
+    private final App game;
+    private PhysWorld world;
+    private Chunk[][] chunks;
+    private Array<Chunk> loadedChunks = new Array<>();
+    private Array<Chunk> visibleChunks = new Array<>();
+    private Array<Fixture> activeFixtures = new Array<>();
+    private Body worldBody;
+    private boolean tileUpdate = false;
+    private int lastPlayerX = -1;
+    private int lastPlayerY = -1;
+
     // Private functions
     private Tile getTileFromGlobal(int x, int y){
         if(chunks.length <= 0) return null;
@@ -262,18 +275,6 @@ public class WorldBody extends Group {
         hullShape.dispose();
     }
 
-    // Variables
-    private final App game;
-    private PhysWorld world;
-    private Chunk[][] chunks;
-    private Array<Chunk> loadedChunks = new Array<>();
-    // private Array<Chunk> visibleChunks = new Array<>();
-    private Array<Fixture> activeFixtures = new Array<>();
-    private Body worldBody;
-    private boolean tileUpdate = false;
-    private int lastPlayerX = -1;
-    private int lastPlayerY = -1;
-
     // Constructor
     public WorldBody(final App game, PhysWorld world, int width, int height){
         this.setTransform(false);
@@ -292,7 +293,6 @@ public class WorldBody extends Group {
         if(chunks[x][y] == null){
             // Generate new chunk because it didnt exist before
             chunks[x][y] = new Chunk(game, world, x, y);
-            this.addActor(chunks[x][y]);
         }
 
         if(!chunks[x][y].active){
@@ -340,7 +340,7 @@ public class WorldBody extends Group {
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        // int viewDist = loadDist + 1;//(int)(game.activeCamera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2);
+        int viewDist = (int)(game.activeCamera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
@@ -354,7 +354,7 @@ public class WorldBody extends Group {
             int distance = Math.max(Math.abs(containedX - currentChunkX), Math.abs(containedY - currentChunkY));
             
             // Unload if too far
-            if(distance > loadDist * 2){
+            if(distance > loadDist){
                 unloadChunk(currentChunkX, currentChunkY);
                 i--;
             }
@@ -364,19 +364,20 @@ public class WorldBody extends Group {
             }
         }
 
-        // for(int i = 0; i < visibleChunks.size; i++){
-        //     Chunk chunk = visibleChunks.get(i);
-        //     int currentChunkX = chunk.getChunkX();
-        //     int currentChunkY = chunk.getChunkY();
-        //     int distance = Math.max(Math.abs(containedX - currentChunkX), Math.abs(containedY - currentChunkY));
+        for(int i = 0; i < visibleChunks.size; i++){
+            Chunk chunk = visibleChunks.get(i);
+            int currentChunkX = chunk.getChunkX();
+            int currentChunkY = chunk.getChunkY();
+            int distance = Math.max(Math.abs(containedX - currentChunkX), Math.abs(containedY - currentChunkY));
             
-        //     // Unload if too far
-        //     if(distance > viewDist * 2){
-        //         chunk.setVisible(false);
-        //         visibleChunks.removeValue(chunk, true);
-        //         i--;
-        //     }
-        // }
+            // Unload if too far
+            if(distance > viewDist){
+                chunk.setVisible(false);
+                visibleChunks.removeIndex(i);
+                removeActor(chunk);
+                i--;
+            }
+        }
 
         // Iterate over the players surrounding chunks and load them
         for(int y = loadDist * -1; y < loadDist; y++){
@@ -389,23 +390,23 @@ public class WorldBody extends Group {
             }
         }
 
-        // for(int y = viewDist * -1; y < viewDist; y++){
-        //     if(containedY + y > chunks[0].length) continue;
+        for(int y = viewDist * -1; y < viewDist; y++){
+            if(plyChunkY + y > chunks[0].length) continue;
 
-        //     for(int x = viewDist * -1; x < viewDist + 1; x++){
-        //         int wrappedX = Math.floorMod(containedX + x, chunks.length);
-        //         int wrappedY = Math.floorMod(containedY + y, chunks[0].length);
+            for(int x = viewDist * -1; x < viewDist + 1; x++){
+                int wrappedX = Math.floorMod(plyChunkX + x, chunks.length);
+                int wrappedY = Math.floorMod(plyChunkY + y, chunks[0].length);
 
-        //         if(chunks[wrappedX][wrappedY] == null){
-        //             // Generate new chunk because it didnt exist before
-        //             // chunks[wrappedX][wrappedY] = new Chunk(game, world, wrappedX, wrappedY);
-        //             // this.addActor(chunks[wrappedX][wrappedY]);
-        //         } else {
-        //             chunks[wrappedX][wrappedY].setVisible(true);
-        //             visibleChunks.add(chunks[wrappedX][wrappedY]);
-        //         }
-        //     }
-        // }
+                if(chunks[wrappedX][wrappedY] == null){
+                    // Generate new chunk because it didnt exist before
+                    chunks[wrappedX][wrappedY] = new Chunk(game, world, wrappedX, wrappedY);
+                }
+
+                chunks[wrappedX][wrappedY].setVisible(true);
+                visibleChunks.add(chunks[wrappedX][wrappedY]);
+                this.addActor(chunks[wrappedX][wrappedY]);
+            }
+        }
     
         // Now that everything's loaded or unloaded, run an algorithm to build the worldbody around the player
         // but only if theyve specifically moved locations to another chunk
