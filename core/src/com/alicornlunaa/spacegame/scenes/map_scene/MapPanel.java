@@ -126,9 +126,7 @@ public class MapPanel extends Stage {
     public void act(float delta){
         // Update the universe
         game.universe.update(delta);
-
-        mapCamera.position.set(OrbitUtils.getUniverseSpaceCenter(game.universe, targetEntity), 0);
-        mapCamera.update();
+        mapCamera.position.set(game.player.getCamera().position);
 
         // Keep the predicted paths up to date
         orbits.clear();
@@ -201,7 +199,7 @@ public class MapPanel extends Stage {
     
                         // Convert the planetary coords to space coords
                         double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-                        float radius = ((e.getY() / (((Planet)parent).getTerrestrialHeight() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * ((Planet)parent).getRadius());
+                        float radius = e.getY();
     
                         // Convet to space position
                         float x = (float)(Math.cos(theta) * radius);

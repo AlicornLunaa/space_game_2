@@ -171,7 +171,7 @@ public class Player extends BaseEntity {
             cameraAngle.set(pos.cpy().nor(), 0);
         }
 
-        if(!(ent.getWorld() instanceof PlanetaryPhysWorld)){
+        if(!(ent.getWorld() instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
             // If the player is on a planet, use the universe-based position system
             pos.set(OrbitUtils.getUniverseSpaceCenter(game.universe, ent));
         }
@@ -193,6 +193,7 @@ public class Player extends BaseEntity {
         // Groundchecking
         grounded = false;
         getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / getPhysScale())).cpy(), getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / getPhysScale())));
+        grounded = true;
 
         // Movement
         if(vertical != 0 || horizontal != 0){

@@ -1,6 +1,8 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
+import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -29,6 +31,12 @@ public class OrbitUtils {
             return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
         }
 
+        if(e.getWorld() instanceof PlanetaryPhysWorld){
+            // Its on a rectangular phys world, return the position converted
+            Planet planet = (Planet)parentOfEntity;
+            systemSpacePosition.set(planet.getSpacePosition(e));
+        }
+
         return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
     }
 
@@ -50,6 +58,12 @@ public class OrbitUtils {
             return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
         }
 
+        if(e.getWorld() instanceof PlanetaryPhysWorld){
+            // Its on a rectangular phys world, return the position converted
+            Planet planet = (Planet)parentOfEntity;
+            systemSpacePosition.set(planet.getSpacePosition(e));
+        }
+
         return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
     }
 
@@ -69,6 +83,12 @@ public class OrbitUtils {
         if(e instanceof Celestial){
             // Its a celestial body, return its position directly
             return localPos.mul(((Celestial)e).getUniverseSpaceTransform());
+        }
+
+        if(e.getWorld() instanceof PlanetaryPhysWorld){
+            // Its on a rectangular phys world, return the position converted
+            Planet planet = (Planet)parentOfEntity;
+            localPos.set(planet.getSpacePosition(e));
         }
 
         return localPos.mul(parentOfEntity.getUniverseSpaceTransform());

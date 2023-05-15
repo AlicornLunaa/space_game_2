@@ -11,7 +11,7 @@ precision mediump float;
 #define MAX_IN_SCATTER_POINTS 20
 #define MAX_OPTICAL_DEPTH_POINTS 20
 #define INTENSITY 0.988
-#define EPSILON 1e-4
+#define EPSILON 1e-2
 #define C_PI 3.1415926535897932384626433832795
 
 struct Celestial {
@@ -47,19 +47,18 @@ vec2 sphereRaycast(vec3 center, float radius, vec3 rayOrigin, vec3 rayDir){
         }
     }
 
-    return vec2(0.0);
+    return vec2(1.0 / 0.0, 0.0);
 }
 
-vec2 cartesianRaycast(float radius, vec3 rayOrigin, vec3 rayDir){
-    // Convert the coordinates of the ray to be spherical for it to work with sphere raycast
+vec3 cartesianOriginToPolar(vec3 rayOrigin){
     float theta = (rayOrigin.x / u_planetCircumference) * 2.0 * C_PI;
     float polarX = cos(theta) * rayOrigin.y;
     float polarY = sin(theta) * rayOrigin.y;
-    return sphereRaycast(vec3(0, 0, 0), radius, vec3(polarX, polarY, rayOrigin.z), rayDir);
+    return vec3(polarX, polarY, rayOrigin.z);
 }
 
 float densityAtPoint(vec3 sample){
-    float heightAboveSurface = sample.y - u_planetRadius;
+    float heightAboveSurface = length(sample) - u_planetRadius;
     float height01 = heightAboveSurface / (u_atmosRadius - u_planetRadius);
     float density = exp(-height01 * DENSITY_FALLOFF) * (1.0 - height01);
     return density;
@@ -86,7 +85,7 @@ vec3 light(vec3 rayOrigin, vec3 rayDir, float rayLength){
     float stepSize = rayLength / float(MAX_IN_SCATTER_POINTS - 1);
 
     for(int i = 0; i < MAX_IN_SCATTER_POINTS; i++){
-        float sunRayLength = cartesianRaycast(u_atmosRadius, inScatterPoint, u_starDirection).y;
+        float sunRayLength = sphereRaycast(vec3(0.0), u_atmosRadius, inScatterPoint, u_starDirection).y;
         float sunRayOpticalDepth = opticalDepth(inScatterPoint, u_starDirection, sunRayLength);
         float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * float(i));
         float localDensity = densityAtPoint(inScatterPoint);
@@ -104,16 +103,16 @@ void main() {
     // vec4 color = texture2D(u_texture, v_texcoord);
     vec4 color = vec4(0.0);
 
-    vec3 rayOrigin = vec3(v_worldcoord, u_atmosRadius * -2.0);
+    vec3 rayOrigin = cartesianOriginToPolar(vec3(v_worldcoord, u_atmosRadius * -2.0));
     vec3 rayDir = vec3(0, 0, 1);
 
-    vec2 surfaceRay = cartesianRaycast(u_planetRadius, rayOrigin, rayDir);
-    vec2 atmosRay = cartesianRaycast(u_atmosRadius, rayOrigin, rayDir);
+    vec2 surfaceRay = sphereRaycast(vec3(0.0), u_planetRadius, rayOrigin, rayDir);
+    vec2 atmosRay = sphereRaycast(vec3(0.0), u_atmosRadius, rayOrigin, rayDir);
 
     float distToAtmos = atmosRay.x;
-    float distThruAtmos = min(atmosRay.y, abs(surfaceRay.x - atmosRay.x));
+    float distThruAtmos = min(atmosRay.y, surfaceRay.x - atmosRay.x);
 
-    if(distThruAtmos > 0.0) {
+    if(distThruAtmos > 0.0){
         vec3 pointInAtmosphere = rayOrigin + rayDir * (distToAtmos + EPSILON);
         vec3 light = light(pointInAtmosphere, rayDir, distThruAtmos - EPSILON * 2.0);
         color = vec4((color.rgb * u_atmosColor.rgb) * (1.0 * light) + light, 1.0);

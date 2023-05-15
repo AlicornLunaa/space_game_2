@@ -151,8 +151,7 @@ public class Planet extends Celestial implements Disposable {
         });
 
         // Create a world-body chunking system to take up the entirety of the planet
-        // worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
-        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, terrestrialHeight);
+        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Constructor
@@ -162,11 +161,11 @@ public class Planet extends Celestial implements Disposable {
 
         setPosition(x, y);
 
-        terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2);
+        terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
-        generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE, terrestrialHeight * Constants.CHUNK_SIZE, terrainSeed);
+        generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE / 2, terrestrialHeight * Constants.CHUNK_SIZE / 2, terrainSeed);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
@@ -192,6 +191,40 @@ public class Planet extends Celestial implements Disposable {
     public int getTerrestrialWidth(){ return terrestrialWidth; }
     public int getTerrestrialHeight(){ return terrestrialHeight; }
     public Vector3 getStarDirection(){ return starDirection; }
+
+    /**
+     * Returns the position of the entity on the planet in terms of space coordinates
+     * @param e
+     * @return
+     */
+    public Vector2 getSpacePosition(BaseEntity e){
+        // Convert the planetary coords to space coords
+        double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+        float radius = e.getY();
+
+        // Convet to space position
+        float x = (float)(Math.cos(theta) * radius);
+        float y = (float)(Math.sin(theta) * radius);
+
+        return new Vector2(x, y);
+    }
+
+    /**
+     * Returns the velocity of the entity on the planet in terms of space coordinates
+     * @param e
+     * @return
+     */
+    public Vector2 getSpaceVelocity(BaseEntity e){
+        // Convert the planetary coords to space coords
+        double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+
+        // Convet to space velocity
+        Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
+        Vector2 planetToEnt = e.getPosition().nor();
+        Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
+
+        return tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y));
+    }
 
     public Color getAtmosphereColor(){
         float r = 0.f;
@@ -235,7 +268,7 @@ public class Planet extends Celestial implements Disposable {
 
         // Convert orbital velocity to world
         Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
-        Vector2 tangent = localPos.cpy().nor().rotateDeg(-90);
+        Vector2 tangent = localPos.cpy().nor().rotateDeg(90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
         e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
@@ -263,7 +296,7 @@ public class Planet extends Celestial implements Disposable {
         e.setPosition(x, y);
 
         // Convert to space velocity, tangent = x, planetToEntity = y
-        Vector2 tangent = new Vector2(0, -1).rotateRad((float)theta);
+        Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
         Vector2 planetToEnt = e.getPosition().nor();
         Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
