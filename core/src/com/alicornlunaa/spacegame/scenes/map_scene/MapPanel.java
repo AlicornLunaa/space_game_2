@@ -194,7 +194,7 @@ public class MapPanel extends Stage {
                     mat.set(parent.getUniverseSpaceTransform());
 
                     if(e.getWorld() instanceof PlanetaryPhysWorld){
-                        mat.mul(new Matrix4().set(e.getTransform().inv()));
+                        // mat.mul(new Matrix4().set(e.getTransform().inv()));
     
                         // Convert the planetary coords to space coords
                         double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
@@ -216,7 +216,8 @@ public class MapPanel extends Stage {
     @Override
     public void draw(){
         // Update camera
-        mapCamera.position.set(OrbitUtils.getUniverseSpaceCenter(game.universe, (game.player.isDriving()) ? game.player.getVehicle() : game.player), 0.0f);
+        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
+        mapCamera.position.set(plyPos, 0.0f);
         
         // Draw stars in the map view
         drawSkybox();
@@ -260,7 +261,6 @@ public class MapPanel extends Stage {
         batch.setColor(1, 1, 1, entityOpacity);
 
         Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(mapCamera.zoom);
-        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(
             shipIcon,
