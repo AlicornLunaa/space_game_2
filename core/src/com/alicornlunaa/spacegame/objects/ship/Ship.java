@@ -50,6 +50,7 @@ public class Ship extends DriveableEntity implements Disposable {
 
     // Constructor
     public Ship(final App game, PhysWorld world, float x, float y, float rotation){
+        super(game);
         this.game = game;
         generateExterior(world);
         interior = new Interior(game, this);
@@ -208,6 +209,8 @@ public class Ship extends DriveableEntity implements Disposable {
 
     @Override
     public void afterWorldChange(PhysWorld world){
+        super.afterWorldChange(world);
+        
         for(Part p : parts){
             p.setParent(getBody(), getPhysScale());
         }

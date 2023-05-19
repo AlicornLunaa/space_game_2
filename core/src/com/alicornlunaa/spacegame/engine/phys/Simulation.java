@@ -21,6 +21,8 @@ public class Simulation {
 
     public PhysWorld getWorld(int index){ return physWorlds.get(index); }
 
+    public int getWorldID(PhysWorld world){ return physWorlds.indexOf(world, true); }
+
     public PhysWorld addWorld(float physScale){
         physWorlds.add(new PhysWorld(physScale));
         return physWorlds.peek();
@@ -34,6 +36,8 @@ public class Simulation {
     public void addEntity(int index, BaseEntity e){ addEntity(physWorlds.get(index), e); }
 
     public void addEntity(PhysWorld world, BaseEntity e){
+        if(e.getWorld() == world) return;
+
         if(!entities.contains(e, true)){
             // Initialize new entity
             entities.add(e);

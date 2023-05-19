@@ -1,18 +1,16 @@
 package com.alicornlunaa.spacegame.objects.planet;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
-import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
-import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
-import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -31,8 +29,8 @@ public class Planet extends Celestial implements Disposable {
     // Variables
     private final App game;
 
-    private float terrestrialWidth;
-    private float terrestrialHeight;
+    private int terrestrialWidth; // Chunk-size
+    private int terrestrialHeight; // Chunk-size
     private float atmosphereRadius;
     private float atmosphereDensity = 1.0f;
     private Array<Color> atmosComposition = new Array<>();
@@ -50,7 +48,6 @@ public class Planet extends Celestial implements Disposable {
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
 
     private PhysWorld physWorld;
-    private ArrayList<BaseEntity> planetEnts = new ArrayList<>();
     private Stack<BaseEntity> leavingEnts = new Stack<>();
     private WorldBody worldBlocks;
 
@@ -108,7 +105,7 @@ public class Planet extends Celestial implements Disposable {
                 Vector3 coord = sphericalToCartesian(sphereCoord.add(0, 0, 0));
                 coord.add(1, 1, 1);
                 coord.scl(1 / 2.f);
-                coord.scl(terrestrialWidth);
+                coord.scl(terrestrialWidth * Constants.CHUNK_SIZE);
 
                 p.setColor(new Color(biomeMap.getPixel(biomeMap.getWidth() - (int)coord.x, biomeMap.getHeight() - (int)coord.z)));
                 p.drawPixel((int)x, (int)z);
@@ -120,11 +117,11 @@ public class Planet extends Celestial implements Disposable {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(Constants.PLANET_PPM){
+        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM){
             @Override
             public void onEntityUpdate(BaseEntity e) {
                 // Constrain entities to the world
-                float worldWidthPixels = terrestrialWidth * Tile.TILE_SIZE;
+                float worldWidthPixels = terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
                 if(e.getX() > worldWidthPixels){
                     e.setX(e.getX() - worldWidthPixels);
@@ -147,24 +144,28 @@ public class Planet extends Celestial implements Disposable {
                 while(leavingEnts.size() > 0){
                     delEntityWorld(leavingEnts.pop());
                 }
+
+                worldBlocks.act(Gdx.graphics.getDeltaTime());
+                worldBlocks.update();
             }
         });
 
-        worldBlocks = new WorldBody(game, physWorld, (int)terrestrialWidth, (int)terrestrialHeight);
+        // Create a world-body chunking system to take up the entirety of the planet
+        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Constructor
-    public Planet(App game, PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
-        super(game, world, terraRadius);
+    public Planet(App game, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
+        super(game, terraRadius);
         this.game = game;
 
         setPosition(x, y);
 
-        terrestrialHeight = 35;//(float)Math.floor(radius / 10);
+        terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
-        generator = new TerrainGenerator((int)terrestrialWidth, (int)terrestrialHeight, terrainSeed);
+        generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE / 2, terrestrialHeight * Constants.CHUNK_SIZE / 2, terrainSeed);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
@@ -185,10 +186,45 @@ public class Planet extends Celestial implements Disposable {
     public Array<Color> getAtmosphereComposition(){ return atmosComposition; }
     public Array<Float> getAtmospherePercentages(){ return atmosPercentages; }
     public long getTerrainSeed(){ return terrainSeed; }
-    public PhysWorld getPhysWorld(){ return physWorld; }
+    public PhysWorld getInternalPhysWorld(){ return physWorld; }
     public WorldBody getWorldBody(){ return worldBlocks; }
-    public float getTerrestrialWidth(){ return terrestrialWidth; }
-    public float getTerrestrialHeight(){ return terrestrialHeight; }
+    public int getTerrestrialWidth(){ return terrestrialWidth; }
+    public int getTerrestrialHeight(){ return terrestrialHeight; }
+    public Vector3 getStarDirection(){ return starDirection; }
+
+    /**
+     * Returns the position of the entity on the planet in terms of space coordinates
+     * @param e
+     * @return
+     */
+    public Vector2 getSpacePosition(BaseEntity e){
+        // Convert the planetary coords to space coords
+        double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+        float radius = e.getY();
+
+        // Convet to space position
+        float x = (float)(Math.cos(theta) * radius);
+        float y = (float)(Math.sin(theta) * radius);
+
+        return new Vector2(x, y);
+    }
+
+    /**
+     * Returns the velocity of the entity on the planet in terms of space coordinates
+     * @param e
+     * @return
+     */
+    public Vector2 getSpaceVelocity(BaseEntity e){
+        // Convert the planetary coords to space coords
+        double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+
+        // Convet to space velocity
+        Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
+        Vector2 planetToEnt = e.getPosition().nor();
+        Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
+
+        return tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y));
+    }
 
     public Color getAtmosphereColor(){
         float r = 0.f;
@@ -214,18 +250,14 @@ public class Planet extends Celestial implements Disposable {
         return new Color(r, g, b, a);
     }
 
-    public void setStarDirection(Vector3 v){ starDirection.set(v); }
-
     /**
      * Converts the entity to 2d planet planar coordinates
      * @param e Entity to be converted
      */
     public void addEntityWorld(BaseEntity e){
-        if(planetEnts.contains(e)) return;
-
         // Formula: x = theta, y = radius
         Vector2 localPos = e.getBody().getPosition().cpy();
-        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Tile.TILE_SIZE));
+        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
         float y = localPos.len() * e.getPhysScale();
         e.setPosition(x, y);
 
@@ -236,14 +268,13 @@ public class Planet extends Celestial implements Disposable {
 
         // Convert orbital velocity to world
         Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
-        Vector2 tangent = localPos.cpy().nor().rotateDeg(-90);
+        Vector2 tangent = localPos.cpy().nor().rotateDeg(90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
         e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
         // Add body
         game.simulation.addEntity(physWorld, e);
-        planetEnts.add(e);
     }
 
     /**
@@ -252,7 +283,7 @@ public class Planet extends Celestial implements Disposable {
      */
     public void delEntityWorld(BaseEntity e){
         // Formula: BaseEntityheta = x, radius = y
-        double theta = ((e.getX() / (terrestrialWidth * Tile.TILE_SIZE)) * Math.PI * 2);
+        double theta = ((e.getX() / (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
         float radius = e.getY();
 
         // Convert to space angles, spaceAngle = worldAngle + theta
@@ -265,25 +296,14 @@ public class Planet extends Celestial implements Disposable {
         e.setPosition(x, y);
 
         // Convert to space velocity, tangent = x, planetToEntity = y
-        Vector2 tangent = new Vector2(0, -1).rotateRad((float)theta);
+        Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
         Vector2 planetToEnt = e.getPosition().nor();
         Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
         e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
-        if(e instanceof Player){
-            game.activeSpaceScreen = game.spaceScene;
-
-            if(!(game.getScreen() instanceof MapScene)){
-                game.setScreen(game.activeSpaceScreen);
-            }
-        }
-
         // Remove body
-        game.simulation.addEntity(getWorld(), e);
-        planetEnts.remove(e);
+        game.simulation.addEntity(getInfluenceWorld(), e);
     }
-
-    public ArrayList<BaseEntity> getPlanetEntities(){ return planetEnts; }
 
     public boolean checkTransferPlanet(BaseEntity e){
         // This function checks if the entity supplied
@@ -292,16 +312,7 @@ public class Planet extends Celestial implements Disposable {
 
         if(dist < radius * 1.2f){
             // Move it into this world
-            this.addEntityWorld(e);
-
-            if(e instanceof Player){
-                game.activeSpaceScreen = new PlanetScene(game, this);
-
-                if(!(game.getScreen() instanceof MapScene)){
-                    game.setScreen(game.activeSpaceScreen);
-                }
-            }
-
+            addEntityWorld(e);
             return true;
         }
 
@@ -343,6 +354,12 @@ public class Planet extends Celestial implements Disposable {
     public Vector2 applyPhysics(float delta, BaseEntity e){
         checkTransferPlanet(e);
         return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
+    }
+
+    @Override
+    public void update(){
+        super.update();
+        starDirection.set(OrbitUtils.directionToNearestStar(game.universe, this), 0);
     }
 
     @Override

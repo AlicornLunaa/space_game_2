@@ -76,7 +76,7 @@ public class Part implements Comparable<Part> {
         texture = game.atlas.findRegion("parts/" + id.toLowerCase());
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
-        collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("assets/colliders/parts/" + id.toLowerCase() + ".json").readString()));
+        collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
         
         for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
             JSONObject vec = obj.getJSONArray("attachmentPoints").getJSONObject(i);

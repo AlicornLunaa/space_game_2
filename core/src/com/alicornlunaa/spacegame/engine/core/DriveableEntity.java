@@ -1,12 +1,21 @@
 package com.alicornlunaa.spacegame.engine.core;
 
+import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.badlogic.gdx.utils.Null;
 
 public abstract class DriveableEntity extends BaseEntity {
 
     // Variables
+    @SuppressWarnings("unused")
+    private final App game;
     private @Null Player driver;
+
+    // Constructor
+    public DriveableEntity(final App game){
+        this.game = game;
+    }
     
     // Functions
     public Player getDriver(){ return driver; }
@@ -17,6 +26,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
         if(driver.getBody() != null){
             driver.getBody().setActive(false);
+            driver.setVelocity(0, 0);
         }
     }
 
@@ -26,9 +36,18 @@ public abstract class DriveableEntity extends BaseEntity {
 
         if(driver.getBody() != null){
             driver.getBody().setActive(true);
+            driver.setVelocity(getVelocity());
         }
         
         driver = null;
+    }
+
+    @Override
+    public void afterWorldChange(PhysWorld world){
+        // Carry the driver with the vehicle
+        if(driver == null) return;
+        game.simulation.addEntity(world, driver);
+        driver.getBody().setActive(false);
     }
     
 }

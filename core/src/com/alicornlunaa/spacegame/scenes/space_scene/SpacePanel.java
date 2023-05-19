@@ -1,12 +1,8 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.objects.simulation.Star;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,9 +15,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 public class SpacePanel extends Stage {
 
     // Variables
-    final App game;
-
-    private PhysWorld world;
+    private final App game;
     private Starfield backgroundTexture;
 
     public Ship ship;
@@ -31,56 +25,33 @@ public class SpacePanel extends Stage {
         super(new FillViewport(1280, 720));
         this.game = game;
 
-        world = game.simulation.addWorld(Constants.PPM);
+        getViewport().setCamera(game.activeCamera);
+        addActor(game.universe);
+
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
 
-        ship = new Ship(game, world, -49, 0, 0);
+        ship = new Ship(game, game.universe.getUniversalWorld(), -49, 0, 0);
         ship.load("./saves/ships/null.ship");
-
-        game.universe.addCelestial(new Star(game, world, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR), null);
-        game.universe.addCelestial(new Planet(game, world, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Mercury
-        game.universe.addCelestial(new Planet(game, world, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Venus
-        game.universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Earth
-        game.universe.addCelestial(new Planet(game, world, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1), game.universe.getCelestial(0)); // Mars
-        game.universe.addCelestial(new Planet(game, world, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0), game.universe.getCelestial(3)); // Moon
+        // ship.drive(game.player);
         game.universe.addEntity(ship);
-        game.universe.addEntity(game.player);
-        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(1));
-        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(2));
-        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(3));
-        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(4));
-        OrbitUtils.createOrbit(game.universe, game.universe.getCelestial(5));
-        // OrbitUtils.createOrbit(game.universe, ship);
-        // OrbitUtils.createOrbit(game.universe, game.player);
-        this.addActor(game.universe);
-
-        ship.drive(game.player);
 
         // Controls
         this.addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                OrthographicCamera cam = (OrthographicCamera)getCamera();
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 30), 0.05f), 3.0f);
+                game.activeCamera.zoom = Math.min(Math.max(game.activeCamera.zoom + (amountY / 30), 0.05f), 3.0f);
                 return true;
             }
         });
     }
 
     // Functions
-    public PhysWorld getWorld(){ return world; }
     public Starfield getStarfield(){ return backgroundTexture; }
 
     @Override
     public void act(float delta){
         super.act(delta);
-
-        // Physics updates
         game.universe.update(delta);
-
-        // Parent camera to the player
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
-        game.player.updateCamera(cam, false);
     }
 
     public void drawSkybox(){
@@ -88,10 +59,6 @@ public class SpacePanel extends Stage {
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        
-        float oldZoom = cam.zoom;
-        cam.zoom = 1;
-        cam.update();
 
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
@@ -101,18 +68,17 @@ public class SpacePanel extends Stage {
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);
         batch.end();
-
-        cam.zoom = oldZoom;
-        cam.update();
     }
 
     @Override
     public void draw(){
+        game.player.updateCamera();
+
         drawSkybox();
         super.draw();
 
         if(Constants.DEBUG){
-            game.debug.render(world.getBox2DWorld(), getCamera().combined.cpy().scl(Constants.PPM));
+            game.debug.render(game.universe.getUniversalWorld().getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PPM));
         }
     }
     

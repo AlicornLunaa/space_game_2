@@ -5,8 +5,13 @@ import java.util.HashMap;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
+import com.alicornlunaa.spacegame.engine.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
+import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -16,11 +21,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
-import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -44,6 +52,8 @@ public class Player extends BaseEntity {
     private boolean grounded = false;
 
     private @Null DriveableEntity vehicle = null;
+    private OrthographicCamera camera;
+    private Vector3 cameraAngle = new Vector3(0, 1, 0);
 
     private RayCastCallback jumpCallback;
     private float animationTimer = 0.f;
@@ -52,8 +62,8 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 0.5f;
-    private static final float JUMP_FORCE = 1.0f;
+    private static final float MOVEMENT_SPEED = 0.05f;
+    private static final float JUMP_FORCE = 1.25f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
@@ -65,6 +75,51 @@ public class Player extends BaseEntity {
         }
 
         return out;
+    }
+
+    private void initializePhys(PhysWorld world, float x, float y){
+        BodyDef def = new BodyDef();
+        def.type = BodyType.DynamicBody;
+        setBody(world.getBox2DWorld().createBody(def));
+        getBody().setFixedRotation(true);
+        setPosition(x, y);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.friction = 0.1f;
+        fixtureDef.restitution = 0.05f;
+        fixtureDef.density = 1.4f;
+
+        PolygonShape shape = new PolygonShape();
+        float rad = PLAYER_WIDTH / 2.f / getPhysScale();
+        shape.setAsBox(
+            PLAYER_WIDTH / 2 / getPhysScale(),
+            PLAYER_HEIGHT / 2 / getPhysScale() - rad,
+            new Vector2(
+                0,
+                0
+            ),
+            0
+        );
+        fixtureDef.shape = shape;
+        getBody().createFixture(fixtureDef);
+        shape.dispose();
+
+        CircleShape cShape = new CircleShape();
+        cShape.setRadius(rad);
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 / getPhysScale() - rad));
+        fixtureDef.shape = cShape;
+        getBody().createFixture(fixtureDef);
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 / getPhysScale() + rad));
+        getBody().createFixture(fixtureDef);
+        cShape.dispose();
+
+        jumpCallback = new RayCastCallback(){
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction){
+                grounded = true;
+                return fraction;
+            }
+        };
     }
 
     private void initializeAnims(){
@@ -84,43 +139,13 @@ public class Player extends BaseEntity {
     }
 
     // Constructor
-    public Player(final App game, PhysWorld world, float x, float y, float physScale){
+    public Player(final App game, float x, float y){
         this.game = game;
 
-        // TODO: Reimplement
-        // setBounds(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT);
-        // setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
-        // setPhysScale(physScale);
+        camera = new OrthographicCamera(1280, 720);
+        game.activeCamera = camera;
 
-        BodyDef def = new BodyDef();
-        def.type = BodyType.DynamicBody;
-        def.position.set(0, 0);
-        setBody(world.getBox2DWorld().createBody(def));
-        setWorld(world);
-        setPosition(x, y);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(
-            PLAYER_WIDTH / 2 / getPhysScale(),
-            PLAYER_HEIGHT / 2 / getPhysScale(),
-            new Vector2(
-                0,
-                0
-            ),
-            0
-        );
-        getBody().createFixture(shape, 1.0f);
-        getBody().setFixedRotation(true);
-        shape.dispose();
-
-        jumpCallback = new RayCastCallback(){
-            @Override
-            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction){
-                grounded = true;
-                return fraction;
-            }
-        };
-
+        initializePhys(game.universe.getUniversalWorld(), x, y);
         initializeAnims();
     }
 
@@ -131,23 +156,43 @@ public class Player extends BaseEntity {
 
     public void setVehicle(DriveableEntity de){ vehicle = de; }
 
-    public void updateCamera(OrthographicCamera cam, boolean localToPhysWorld){
-        BaseEntity e = (vehicle == null) ? this : vehicle;
-        Vector2 pos = (e.getBody() != null) ? e.getBody().getWorldCenter().cpy().scl(getPhysScale()) : e.getPosition();
+    public OrthographicCamera getCamera(){ return camera; }
 
-        if(!localToPhysWorld){
-            pos = OrbitUtils.getUniverseSpacePosition(game.universe, this);
+    public void updateCamera(boolean instant){
+        // Update the camera positioning in order to be relative to the player
+        BaseEntity ent = (vehicle == null) ? this : vehicle;
+        Celestial c = game.universe.getParentCelestial(ent);
+        Vector2 pos = ent.getCenter();
+
+        if((ent.getWorld() instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
+            // Set the desired camera angle to upright if the orbit is not decaying
+            cameraAngle.set(0, 1, 0);
+        } else {
+            cameraAngle.set(pos.cpy().nor(), 0);
         }
 
-        cam.position.set(pos, 0);
-        cam.update();
+        if(!(ent.getWorld() instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
+            // If the player is on a planet, use the universe-based position system
+            pos.set(OrbitUtils.getUniverseSpaceCenter(game.universe, ent));
+        }
+
+        if(instant){
+            camera.up.set(cameraAngle);
+        } else {
+            camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
+        }
+
+        camera.position.set(pos, 0);
+        camera.update();
     }
+
+    public void updateCamera(){ updateCamera(false); }
 
     @Override
     public void update(){
         // Groundchecking
         grounded = false;
-        getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldCenter(), getBody().getWorldPoint(new Vector2(0, -1 * (PLAYER_HEIGHT / 2 + 4.5f) / getPhysScale())));
+        getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / getPhysScale())).cpy(), getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / getPhysScale())));
         grounded = true;
 
         // Movement
@@ -176,19 +221,22 @@ public class Player extends BaseEntity {
 
             resolveAnimState();
         } else {
-            vehicle.update();
             setPosition(vehicle.getPosition());
         }
+
+        // Parent camera to the player's position
+        updateCamera();
     }
 
     @Override
     public void render(Batch batch){
+        // Dont render if player is driving something
         if(vehicle != null) return;
 
         animationTimer += Gdx.graphics.getDeltaTime();
 
-        Matrix3 transform = getTransform();
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
+        Matrix4 oldTrans = batch.getTransformMatrix().cpy();
+        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(getTransform())));
 
         Animation<TextureRegion> curAnimation = animations.get(animationState);
         TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
@@ -201,10 +249,33 @@ public class Player extends BaseEntity {
             0
         );
 
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
+        batch.setTransformMatrix(oldTrans);
     }
 
     // Overrides
+    @Override
+    public void afterWorldChange(PhysWorld world){
+        // Change scenes depending on world        
+        if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
+            game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
+        } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
+            game.activeSpaceScreen = game.spaceScene;
+        }
+
+        if(game.getScreen() instanceof MapScene) return;
+
+        if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
+            game.setScreen(game.activeSpaceScreen);
+            updateCamera(true);
+        }
+    }
+
+    @Override
+    public Vector2 getCenter(){
+        if(isDriving()) return vehicle.getCenter();
+        return super.getCenter();
+    }
+
     @Override
     public Vector2 getPosition(){
         if(isDriving()) return vehicle.getCenter();

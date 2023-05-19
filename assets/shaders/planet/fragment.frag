@@ -56,7 +56,7 @@ void main() {
     vec2 lightingRay = sphereRaycast(vec3(u_planetWorldPos, 0.0), u_planetRadius, rayOrigin, rayDir);
 
     if(lightingRay.y > 0.0){
-        color *= 1.0 - (lightingRay.y / (u_planetRadius * 2.0));
+        color *= vec4(vec3(1.0 - (lightingRay.y / (u_planetRadius * 2.0))), 1.0);
     }
 
     gl_FragColor = color;

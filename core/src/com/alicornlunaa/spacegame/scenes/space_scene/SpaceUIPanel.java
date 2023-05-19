@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.scenes.ship_view_scene.ShipViewScene;
@@ -94,9 +95,14 @@ public class SpaceUIPanel extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y){
                 if(game.player.isDriving()){
-                    game.spaceScene.getContent().ship.stopDriving();
+                    DriveableEntity ship = game.spaceScene.getContent().ship;
+                    ship.stopDriving();
+                    game.simulation.addEntity(ship.getWorld(), game.player);
+                    game.player.setVelocity(ship.getVelocity());
                 } else {
-                    game.spaceScene.getContent().ship.drive(game.player);
+                    DriveableEntity ship = game.spaceScene.getContent().ship;
+                    ship.drive(game.player);
+                    game.simulation.addEntity(ship.getWorld(), game.player);
                 }
             }
         });

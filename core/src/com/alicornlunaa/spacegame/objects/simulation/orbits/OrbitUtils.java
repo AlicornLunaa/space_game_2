@@ -1,6 +1,8 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
+import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -29,6 +31,39 @@ public class OrbitUtils {
             return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
         }
 
+        if(e.getWorld() instanceof PlanetaryPhysWorld){
+            // Its on a rectangular phys world, return the position converted
+            Planet planet = (Planet)parentOfEntity;
+            systemSpacePosition.set(planet.getSpacePosition(e));
+        }
+
+        return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
+    }
+
+    /**
+     * Returns the center position of the entity local to the center of the universe.
+     * This will be prone to float point precision errors, use with caution.
+     * @param u The universe to search in
+     * @param e The entity to transform into universe-space
+     * @return A 2d vector containing the universe space coordinates
+     */
+    public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
+        Celestial parentOfEntity = u.getParentCelestial(e);
+        Vector2 systemSpacePosition = e.getBody().getWorldCenter().cpy().scl(e.getPhysScale());
+
+        if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
+
+        if(e instanceof Celestial){
+            // Its a celestial body, return its position directly
+            return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
+        }
+
+        if(e.getWorld() instanceof PlanetaryPhysWorld){
+            // Its on a rectangular phys world, return the position converted
+            Planet planet = (Planet)parentOfEntity;
+            systemSpacePosition.set(planet.getSpacePosition(e));
+        }
+
         return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
     }
 
@@ -48,6 +83,12 @@ public class OrbitUtils {
         if(e instanceof Celestial){
             // Its a celestial body, return its position directly
             return localPos.mul(((Celestial)e).getUniverseSpaceTransform());
+        }
+
+        if(e.getWorld() instanceof PlanetaryPhysWorld){
+            // Its on a rectangular phys world, return the position converted
+            Planet planet = (Planet)parentOfEntity;
+            localPos.set(planet.getSpacePosition(e));
         }
 
         return localPos.mul(parentOfEntity.getUniverseSpaceTransform());
@@ -115,6 +156,17 @@ public class OrbitUtils {
         float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getBody().getMass()) / radius);
 
         e.getBody().setLinearVelocity(tangent.scl(velScl));
+    }
+
+    /**
+     * Returns true ro false depending on if the orbit is decaying
+     * @param parent
+     * @param entity
+     * @return True or false
+     */
+    public static boolean isOrbitDecaying(Celestial parent, BaseEntity entity){
+        GenericConic gc = OrbitPropagator.getConic(parent, entity);
+        return (gc.getPeriapsis() <= (parent.getRadius() * 1.2f) / parent.getPhysScale()) && !(gc instanceof HyperbolicConic);
     }
 
 }

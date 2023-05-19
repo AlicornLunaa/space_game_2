@@ -9,14 +9,18 @@ public class CelestialPhysWorld extends PhysWorld {
 
     // Variables
     private final App game;
+    private final Celestial parent;
 
     // Constructor
-    public CelestialPhysWorld(final App game, float physScale) {
+    public CelestialPhysWorld(final App game, final Celestial parent, float physScale) {
         super(physScale);
         this.game = game;
+        this.parent = parent;
     }
 
     // Functions
+    public Celestial getParent(){ return parent; }
+
     @Override
     public void onEntityUpdate(BaseEntity e) {
         // Check keplerian approximation transfer

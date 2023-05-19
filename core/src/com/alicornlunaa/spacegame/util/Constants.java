@@ -7,6 +7,7 @@ public class Constants {
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 2;
     public static final int MAX_PREDICTION_STEPS = 2;
+    public static final int CHUNK_LOAD_DISTANCE = 3;
     
     // Scaling constants
     public static final float PPM = 128.0f;
@@ -28,6 +29,9 @@ public class Constants {
     public static final float MAP_VIEW_MAX_ZOOM = 3000;
     public static final float MAP_VIEW_SIMPLE_ICONS_CELESTIAL = 1000;
     public static final float MAP_VIEW_SIMPLE_ICONS_ENTS = 20;
+
+    // Terrain constants
+    public static final int CHUNK_SIZE = 16;
 
     // Debug constants
     public static boolean DEBUG = true;

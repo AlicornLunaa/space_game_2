@@ -33,18 +33,14 @@ public class PlanetScene implements Screen {
         uiPanel = new PlanetUIPanel(game);
         uiShip = new SpaceUIPanel(game);
 
-        inputs.addProcessor(planetPanel);
         inputs.addProcessor(uiPanel);
         inputs.addProcessor(uiShip);
-
-        // if(!game.player.isDriving()){
-        game.player.setRotation(0);
-        // }
+        inputs.addProcessor(planetPanel);
 
         // Initialize UI
         uiShip.shipCompass.setTarget(game.player);
 
-        planetPanel.setDebugAll(true);
+        planetPanel.setDebugAll(false);
         uiPanel.setDebugAll(true);
     }
 
@@ -53,6 +49,7 @@ public class PlanetScene implements Screen {
     public void render(float delta) {
         // Render the stage
         ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
+        game.vfxManager.update(delta);
 
         planetPanel.act(delta);
         uiPanel.act(delta);

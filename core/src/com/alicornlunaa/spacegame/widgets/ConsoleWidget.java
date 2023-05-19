@@ -5,6 +5,7 @@ import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.dev.part_editor.PartEditor;
 import com.alicornlunaa.spacegame.scenes.dev.physics_editor.PhysicsEditor;
 import com.alicornlunaa.spacegame.scenes.editor_scene.EditorScene;
+import com.alicornlunaa.spacegame.util.state_management.SaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
@@ -52,6 +53,8 @@ public class ConsoleWidget extends VisWindow {
             game.setScreen(new PhysicsEditor(game));
         } else if(args[0].equals("shipeditor")){
             game.setScreen(new EditorScene(game));
+        } else if(args[0].equals("save")){
+            SaveManager.save(game, "dev_world");
         }
 
         commandBar.setText("");

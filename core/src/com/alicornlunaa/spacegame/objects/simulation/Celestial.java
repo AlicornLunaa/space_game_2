@@ -26,6 +26,9 @@ import com.badlogic.gdx.utils.Null;
  * when they are in the sphere of influence, and removed when they leave
  */
 public class Celestial extends BaseEntity {
+
+    // Static vars
+    private static int NEXT_CELESTIAL_ID = 0;
     
     // Variables
     protected final App game;
@@ -33,6 +36,7 @@ public class Celestial extends BaseEntity {
     // Planet variables
     protected float radius;
     protected float opacity = 1.f;
+    private int celestialID;
 
     // Physics variables
     protected CelestialPhysWorld influenceWorld;
@@ -40,14 +44,14 @@ public class Celestial extends BaseEntity {
 
     private @Null Celestial parent = null;
     private Array<Celestial> children = new Array<>();
-    private Array<BaseEntity> ents = new Array<>();
     
     // Constructor
-    public Celestial(App game, PhysWorld parentWorld, float radius){
+    public Celestial(App game, float radius){
         this.game = game;
         this.radius = radius;
+        this.celestialID = NEXT_CELESTIAL_ID++;
 
-        influenceWorld = new CelestialPhysWorld(game, Constants.PPM);
+        influenceWorld = new CelestialPhysWorld(game, this, Constants.PPM);
         game.simulation.addWorld(influenceWorld);
         
         CircleShape shape = new CircleShape();
@@ -57,7 +61,7 @@ public class Celestial extends BaseEntity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
-        setBody(parentWorld.getBox2DWorld().createBody(def));
+        setBody(game.universe.getUniversalWorld().getBox2DWorld().createBody(def));
         getBody().createFixture(shape, 1.0f);
 
         def = new BodyDef();
@@ -71,8 +75,8 @@ public class Celestial extends BaseEntity {
 
     // Functions
     public float getRadius(){ return radius; }
-    public PhysWorld getWorld(){ return influenceWorld; }
-    public Array<BaseEntity> getEntities(){ return ents; }
+    public int getCelestialID(){ return celestialID; }
+    public PhysWorld getInfluenceWorld(){ return influenceWorld; }
     public Array<Celestial> getChildren(){ return children; }
     public Celestial getCelestialParent(){ return parent; }
     public void setCelestialParent(Celestial c){ parent = c; }

@@ -84,7 +84,7 @@ public abstract class GenericConic {
     }
 
     public GenericConic(Celestial parent, BaseEntity child) {
-        this(parent.getBody().getMass(), child.getBody().getPosition(), child.getBody().getLinearVelocity());
+        this(parent.getBody().getMass(), child.getBody().getWorldCenter(), child.getBody().getLinearVelocity());
         this.parent = parent;
         this.child = child;
     }

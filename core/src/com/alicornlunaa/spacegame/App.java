@@ -4,16 +4,21 @@ import com.alicornlunaa.spacegame.engine.phys.Simulation;
 import com.alicornlunaa.spacegame.engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
+import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
+import com.alicornlunaa.spacegame.util.state_management.SaveManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -37,6 +42,7 @@ public class App extends Game {
 
 	public Simulation simulation;
 	public Universe universe;
+	public OrthographicCamera activeCamera;
 	public Player player;
 
 	public boolean loaded = false;
@@ -46,6 +52,28 @@ public class App extends Game {
 	public SpriteBatch spriteBatch;
 	public ShapeRenderer shapeRenderer;
 	public Box2DDebugRenderer debug;
+
+	// Private functions
+	private void initializeUniverse(){
+		simulation = new Simulation();
+		universe = new Universe(this);
+
+        universe.addCelestial(new Star(this, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
+        universe.addCelestial(new Planet(this, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1)); // Mercury
+        universe.addCelestial(new Planet(this, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1)); // Venus
+        universe.addCelestial(new Planet(this, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1)); // Earth
+        universe.addCelestial(new Planet(this, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1)); // Mars
+        universe.addCelestial(new Planet(this, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0)); // Moon
+        OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(2));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(3));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(4));
+        OrbitUtils.createOrbit(universe, universe.getCelestial(5));
+
+		// player = new Player(this, -50, 0);
+		// universe.addEntity(player);
+		// OrbitUtils.createOrbit(universe, player);
+	}
 	
 	// Functions
 	@Override
@@ -95,26 +123,25 @@ public class App extends Game {
 				Biome.register("Mountains", Color.GRAY, 0.0f, 0.0f, 0.5f, 40, 0.8f);
 				Biome.register("Ocean", Color.BLUE, 0.0f, 0.0f, 0.0f, 1, 0.05f);
 				Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
+				System.out.println("Biomes loaded");
 
 				// Initialize VisUI for dev screens
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame2");
+				SaveManager.init(this);
 
 				// Start new scene
-				simulation = new Simulation();
-				universe = new Universe(this);
-				player = new Player(this, universe.getUniversalWorld(), -50, 0, Constants.PPM);
+				initializeUniverse();
+				SaveManager.load(this, "dev_world");
 				spaceScene = new SpaceScene(this);
-				activeSpaceScreen = spaceScene;
-				this.setScreen(spaceScene);
-				
-				// Planet p = ((Planet)universe.getCelestial(3));
-				// p.addEntityWorld(spaceScene.spacePanel.ship);
-				// spaceScene.spacePanel.ship.setPosition(500, 3.9f * p.getWorld().getPhysScale());
-				// spaceScene.spacePanel.ship.setRotation(0);
-				// p.addEntityWorld(player);
-				// player.setPosition(1, 2.5f * p.getWorld().getPhysScale());
-				// this.setScreen(new PlanetScene(this, p));
+				OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
+
+				if(activeSpaceScreen == null){
+					activeSpaceScreen = spaceScene;
+				}
+				this.setScreen(activeSpaceScreen);
+
+				// SaveManager.save(this, "dev_world");
 
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
