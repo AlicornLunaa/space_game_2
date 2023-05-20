@@ -1,12 +1,12 @@
 package com.alicornlunaa.spacegame.scenes.planet_scene;
 
+import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.core.BaseEntity;
-import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;

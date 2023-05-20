@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
-import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;

@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
+import com.alicornlunaa.selene_engine.scenes.GameScene;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.scenes.GameScene;
 
 public class SpaceScene extends GameScene<SpacePanel, SpaceUIPanel> {
 

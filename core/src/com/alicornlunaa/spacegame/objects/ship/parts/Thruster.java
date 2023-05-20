@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter.ScaledNumericValue;
@@ -39,7 +40,7 @@ public class Thruster extends Part {
 
         currentAngle = 0.f;
 
-        effect = game.manager.getEffect(metadata.getString("effect"));
+        effect = game.manager.get(metadata.getString("effect"), ParticleEffectPool.class).obtain();
         effect.setPosition(0, 0);
         effect.scaleEffect(initial_scale);
         effect.start();

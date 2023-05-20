@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.simulation.orbits;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.alicornlunaa.spacegame.engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;

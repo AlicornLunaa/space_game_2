@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.ship_view_scene;
 
+import com.alicornlunaa.selene_engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.vfx.transitions.FadeTransitionScene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;

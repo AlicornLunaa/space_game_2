@@ -80,8 +80,7 @@ public class PlanetEditor implements Screen {
             @Override
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == Keys.F5){
-                    game.manager.reloadShaders("shaders/atmosphere");
-                    game.manager.reloadShaders("shaders/planet");
+                    game.manager.reload();
                     return true;
                 } else if(keycode == Keys.A){
                     cam.position.x += 10.f;

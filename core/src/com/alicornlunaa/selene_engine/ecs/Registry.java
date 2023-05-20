@@ -1,0 +1,86 @@
+package com.alicornlunaa.selene_engine.ecs;
+
+
+import com.alicornlunaa.selene_engine.core.IEntity;
+import com.alicornlunaa.selene_engine.util.Assets;
+import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
+
+public class Registry implements Disposable, Reloadable {
+    
+    // Variables
+    private Array<IEntity> entities = new Array<>();
+    private Array<ISystem> systems = new Array<>();
+
+    // Functions
+    public int addEntity(IEntity entity){
+        entities.add(entity);
+        return (entities.size - 1);
+    }
+
+    public IEntity getEntity(int entity){
+        return entities.get(entity);
+    }
+
+    public IEntity removeEntity(int entity){
+        return entities.removeIndex(entity);
+    }
+
+    public void registerSystem(ISystem system){
+        systems.add(system);
+    }
+
+    public void update(){
+        for(ISystem system : systems){
+            system.beforeUpdate();
+
+            for(IEntity entity : entities){
+                if(!system.shouldRunOnEntity(entity)) continue;
+                system.update(entity);
+            }
+
+            system.afterUpdate();
+        }
+    }
+
+    public void render(){
+        for(ISystem system : systems){
+            system.beforeRender();
+
+            for(IEntity entity : entities){
+                if(!system.shouldRunOnEntity(entity)) continue;
+                system.render(entity);
+            }
+
+            system.afterRender();
+        }
+    }
+
+    @Override
+    public void dispose(){
+        for(IEntity entity : entities){
+            if(!(entity instanceof Disposable)) continue;
+            ((Disposable)entity).dispose();
+        }
+
+        for(ISystem system : systems){
+            if(!(system instanceof Disposable)) continue;
+            ((Disposable)system).dispose();
+        }
+    }
+
+    @Override
+    public void reload(Assets assets) {
+        for(IEntity entity : entities){
+            if(!(entity instanceof Reloadable)) continue;
+            ((Reloadable)entity).reload(assets);
+        }
+
+        for(ISystem system : systems){
+            if(!(system instanceof Reloadable)) continue;
+            ((Reloadable)system).reload(assets);
+        }
+    }
+
+}

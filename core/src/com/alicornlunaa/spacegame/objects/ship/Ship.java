@@ -4,9 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alicornlunaa.selene_engine.core.DriveableEntity;
+import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
-import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
 import com.alicornlunaa.spacegame.states.ShipState;
@@ -21,14 +21,13 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
  * The ship class will hold the physical ship in space as well as
  * a tilemap and physics world for the player inside the ship
  */
-public class Ship extends DriveableEntity implements Disposable {
+public class Ship extends DriveableEntity {
     
     // Variables
     private final App game;

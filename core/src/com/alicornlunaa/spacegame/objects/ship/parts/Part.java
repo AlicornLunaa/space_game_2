@@ -3,8 +3,8 @@ package com.alicornlunaa.spacegame.objects.ship.parts;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.badlogic.gdx.Gdx;

@@ -2,8 +2,8 @@ package com.alicornlunaa.spacegame.objects.ship.interior;
 
 import org.json.JSONArray;
 
+import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;

@@ -1,9 +1,8 @@
 package com.alicornlunaa.spacegame.scenes.map_scene;
 
+import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.core.BaseEntity;
-import com.alicornlunaa.spacegame.engine.phys.PlanetaryPhysWorld;
-import com.alicornlunaa.spacegame.engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
@@ -14,6 +13,7 @@ import com.alicornlunaa.spacegame.objects.simulation.orbits.HyperbolicConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.Color;

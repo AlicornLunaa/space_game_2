@@ -1,7 +1,9 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.spacegame.engine.phys.Simulation;
-import com.alicornlunaa.spacegame.engine.vfx.VfxManager;
+import com.alicornlunaa.selene_engine.phys.Simulation;
+import com.alicornlunaa.selene_engine.util.Assets;
+import com.alicornlunaa.selene_engine.util.Assets.ILoader;
+import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
@@ -10,15 +12,16 @@ import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
-import com.alicornlunaa.spacegame.util.Assets;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.alicornlunaa.spacegame.util.state_management.SaveManager;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -81,7 +84,22 @@ public class App extends Game {
 		// Load files and settings
 		ControlSchema.fromFile("./saves/settings/controls.json");
 
-		manager = new Assets();
+		manager = new Assets(new ILoader() {
+			@Override
+			public void loadAssets(Assets manager) {
+				manager.load("shaders/star", ShaderProgram.class);
+				manager.load("shaders/planet", ShaderProgram.class);
+				manager.load("shaders/starfield", ShaderProgram.class);
+				manager.load("shaders/atmosphere", ShaderProgram.class);
+				manager.load("shaders/cartesian_atmosphere", ShaderProgram.class);
+				manager.load("shaders/shadow_map", ShaderProgram.class);
+				manager.load("shaders/light", ShaderProgram.class);
+				manager.load("textures_packed/textures.atlas", TextureAtlas.class);
+				manager.load("particles_packed/particles.atlas", TextureAtlas.class);
+				manager.load("effects/rcs", ParticleEffectPool.class);
+				manager.load("effects/rocket", ParticleEffectPool.class);
+			}
+		});
 		skin = manager.get("skins/spacecadet/spacecadet.json");
 
 		partManager.load("parts/aero.json");
@@ -112,10 +130,9 @@ public class App extends Game {
 				atlas = manager.get("textures_packed/textures.atlas", TextureAtlas.class);
 				particleAtlas = manager.get("particles_packed/particles.atlas", TextureAtlas.class);
 				loaded = true;
-				System.out.println("Assets loaded");
+				Gdx.app.log("Asset Manager", "Loaded");
 
 				// Get all the particle effects
-				manager.initEffects(this);
 				Biome.register("Desert", Color.YELLOW, 0.5f, 0.0f, 0.2f, 100, 0.2f);
 				Biome.register("Forest", Color.GREEN, 0.4f, 0.4f, 0.2f, 40, 0.8f);
 				Biome.register("Grassland", Color.LIME, 0.3f, 0.5f, 0.2f, 40, 0.8f);
@@ -123,7 +140,7 @@ public class App extends Game {
 				Biome.register("Mountains", Color.GRAY, 0.0f, 0.0f, 0.5f, 40, 0.8f);
 				Biome.register("Ocean", Color.BLUE, 0.0f, 0.0f, 0.0f, 1, 0.05f);
 				Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
-				System.out.println("Biomes loaded");
+				Gdx.app.log("Biome Manager", "Loaded");
 
 				// Initialize VisUI for dev screens
 				VisUI.load();

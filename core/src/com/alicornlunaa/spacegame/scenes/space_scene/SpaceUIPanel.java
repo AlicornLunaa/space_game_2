@@ -1,8 +1,8 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
+import com.alicornlunaa.selene_engine.core.DriveableEntity;
+import com.alicornlunaa.selene_engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.core.DriveableEntity;
-import com.alicornlunaa.spacegame.engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.scenes.ship_view_scene.ShipViewScene;
 import com.alicornlunaa.spacegame.scenes.transitions.PauseScene;

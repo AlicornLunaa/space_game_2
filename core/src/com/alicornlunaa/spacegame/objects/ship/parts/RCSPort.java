@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter.ScaledNumericValue;
@@ -35,7 +36,7 @@ public class RCSPort extends Part {
         power = metadata.getFloat("power");
         fuelUsage = metadata.getFloat("fuelUsage");
         
-        effect = game.manager.getEffect("effects/rcs");
+        effect = game.manager.get("effects/rcs", ParticleEffectPool.class).obtain();
         effect.setPosition(0, getHeight() / 2);
         effect.scaleEffect(initial_scale);
         effect.start();

@@ -130,7 +130,7 @@ public class ShaderScene implements Screen {
         }
 
         if(Gdx.input.isKeyJustPressed(Keys.F5)){
-            game.manager.reloadShaders("shaders/atmosphere");
+            game.manager.reload();
         }else if(Gdx.input.isKeyJustPressed(Keys.A)){
             cam.position.add(10, 0, 0);
             cam.update();

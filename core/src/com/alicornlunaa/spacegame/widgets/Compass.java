@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.widgets;
 
+import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;

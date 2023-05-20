@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.objects.ship.interior;
 
+import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
 import com.alicornlunaa.spacegame.util.Constants;
