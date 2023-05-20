@@ -122,7 +122,6 @@ public class TestScreen implements Screen {
             @Override
             public boolean keyDown(InputEvent event, int keycode){
                 if(keycode == Keys.F5){
-                    game.manager.reload();
                     registry.reload(game.manager);
                     return true;
                 }

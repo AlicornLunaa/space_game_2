@@ -29,8 +29,9 @@ public class Registry implements Disposable, Reloadable {
         return entities.removeIndex(entity);
     }
 
-    public void registerSystem(ISystem system){
+    public ISystem registerSystem(ISystem system){
         systems.add(system);
+        return system;
     }
 
     public void update(float delta){
@@ -80,6 +81,8 @@ public class Registry implements Disposable, Reloadable {
 
     @Override
     public void reload(Assets assets) {
+        assets.reload();
+
         for(IEntity entity : entities){
             if(!(entity instanceof Reloadable)) continue;
             ((Reloadable)entity).reload(assets);
