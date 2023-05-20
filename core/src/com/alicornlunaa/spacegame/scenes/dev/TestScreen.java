@@ -153,7 +153,7 @@ public class TestScreen implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
 
-        registry.update();
+        registry.update(delta);
         stage.act(delta);
 
         registry.render();

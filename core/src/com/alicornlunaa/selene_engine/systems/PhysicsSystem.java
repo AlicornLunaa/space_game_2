@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 public class PhysicsSystem implements ISystem {
@@ -25,7 +26,7 @@ public class PhysicsSystem implements ISystem {
 	// Functions
     @Override
     public void beforeUpdate() {
-        world.update();
+        world.getBox2DWorld().step(Constants.TIME_STEP, Constants.VELOCITY_ITERATIONS, Constants.POSITION_ITERATIONS);
     }
 
     @Override
