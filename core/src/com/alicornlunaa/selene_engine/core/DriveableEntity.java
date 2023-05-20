@@ -42,8 +42,7 @@ public abstract class DriveableEntity extends BaseEntity {
         
         driver = null;
     }
-
-    @Override
+    
     public void afterWorldChange(PhysWorld world){
         // Carry the driver with the vehicle
         if(driver == null) return;

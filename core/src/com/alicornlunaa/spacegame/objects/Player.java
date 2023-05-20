@@ -81,7 +81,24 @@ public class Player extends BaseEntity {
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def));
+        bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def){
+            @Override
+            public void afterWorldChange(PhysWorld world){
+                // Change scenes depending on world        
+                if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
+                    game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
+                } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
+                    game.activeSpaceScreen = game.spaceScene;
+                }
+
+                if(game.getScreen() instanceof MapScene) return;
+
+                if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
+                    game.setScreen(game.activeSpaceScreen);
+                    updateCamera(true);
+                }
+            }
+        });
         getBody().setFixedRotation(true);
         setPosition(x, y);
 
@@ -255,23 +272,6 @@ public class Player extends BaseEntity {
     }
 
     // Overrides
-    @Override
-    public void afterWorldChange(PhysWorld world){
-        // Change scenes depending on world        
-        if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
-            game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
-        } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
-            game.activeSpaceScreen = game.spaceScene;
-        }
-
-        if(game.getScreen() instanceof MapScene) return;
-
-        if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
-            game.setScreen(game.activeSpaceScreen);
-            updateCamera(true);
-        }
-    }
-
     @Override
     public Vector2 getCenter(){
         if(isDriving()) return vehicle.getCenter();

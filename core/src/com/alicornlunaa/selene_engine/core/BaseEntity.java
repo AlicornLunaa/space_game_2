@@ -10,12 +10,6 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Null;
@@ -94,100 +88,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     // Setters
-    public Body setBody(Body b){
-        // TODO: TEMP physscale
-        if(b != null){
-            setPosition(b.getPosition().cpy().scl(getPhysScale()));
-            setRotation(b.getAngle());
-        }
-
-        bodyComponent.body = b;
-        return b;
-    }
-
-    public void setWorld(PhysWorld world){
-        // You can only load an entity to a world if it has a body
-        if(bodyComponent == null) return;
-        if(world == null){ bodyComponent.world = world; return; }
-
-        // Save all data and prep to load to the new world
-        Array<FixtureDef> fixtures = new Array<>(bodyComponent.body.getFixtureList().size);
-        Array<Shape> shapes = new Array<>(bodyComponent.body.getFixtureList().size);
-        float newPhysScale = world.getPhysScale();
-
-        for(Fixture f : bodyComponent.body.getFixtureList()){
-            FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.density = f.getDensity();
-            fixtureDef.filter.set(f.getFilterData());
-            fixtureDef.friction = f.getFriction();
-            fixtureDef.isSensor = f.isSensor();
-            fixtureDef.restitution = f.getRestitution();
-
-            // Recreate the shape
-            if(f.getShape().getType() == Shape.Type.Polygon){
-                PolygonShape shape = (PolygonShape)f.getShape();
-                PolygonShape copy = new PolygonShape();
-                Vector2[] vertices = new Vector2[shape.getVertexCount()];
-
-                for(int i = 0; i < shape.getVertexCount(); i++){
-                    vertices[i] = new Vector2();
-                    shape.getVertex(i, vertices[i]);
-
-                    vertices[i].scl(getPhysScale());
-                    vertices[i].scl(1 / newPhysScale);
-                }
-                
-                copy.set(vertices);
-                shapes.add(copy);
-                fixtureDef.shape = copy;
-            } else if(f.getShape().getType() == Shape.Type.Circle) {
-                CircleShape shape = (CircleShape)f.getShape();
-                CircleShape copy = new CircleShape();
-
-                copy.setPosition(shape.getPosition().scl(getPhysScale()).scl(1 / newPhysScale));
-                copy.setRadius(shape.getRadius() * getPhysScale() / newPhysScale);
-                
-                shapes.add(copy);
-                fixtureDef.shape = copy;
-            }
-
-            fixtures.add(fixtureDef);
-        }
-
-        // Save body data
-        BodyDef def = new BodyDef();
-        def.active = bodyComponent.body.isActive();
-        def.allowSleep = bodyComponent.body.isSleepingAllowed();
-        def.angle = bodyComponent.body.getAngle();
-        def.angularDamping = bodyComponent.body.getAngularDamping();
-        def.angularVelocity = bodyComponent.body.getAngularVelocity();
-        def.awake = bodyComponent.body.isAwake();
-        def.bullet = bodyComponent.body.isBullet();
-        def.fixedRotation = bodyComponent.body.isFixedRotation();
-        def.gravityScale = bodyComponent.body.getGravityScale();
-        def.linearDamping = bodyComponent.body.getLinearDamping();
-        def.linearVelocity.set(bodyComponent.body.getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / newPhysScale));
-        def.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()).scl(1 / newPhysScale));
-        def.type = bodyComponent.body.getType();
-
-        // Delete body from world and recreate it in the new one
-        bodyComponent.body.getWorld().destroyBody(bodyComponent.body);
-        setBody(world.getBox2DWorld().createBody(def));
-
-        // Recreate the fixtures
-        for(FixtureDef fixtureDef : fixtures){
-            bodyComponent.body.createFixture(fixtureDef);
-        }
-
-        // Remove shapes
-        for(Shape s : shapes){
-            s.dispose();
-        }
-
-        bodyComponent.world = world;
-        afterWorldChange(world);
-    }
-
     public void setPosition(float x, float y){
         if(bodyComponent != null){
             // TODO: TEMP Problem with bug here
@@ -213,7 +113,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
-
 
     // Component system
     @Override
@@ -292,9 +191,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         }
     }
 
-    // Functions
-    public void afterWorldChange(PhysWorld world){}
-    
     // Depreciated functions for backwards compat
     public float getX(){ return getPosition().x; }
     public float getY(){ return getPosition().y; }

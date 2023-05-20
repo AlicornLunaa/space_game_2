@@ -2,6 +2,7 @@ package com.alicornlunaa.selene_engine.phys;
 
 import java.util.HashMap;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.badlogic.gdx.utils.Array;
 
@@ -43,14 +44,19 @@ public class Simulation {
             entities.add(e);
             containers.put(e, world);
             world.getEntities().add(e);
-            e.setWorld(world);
+
+            if(e.hasComponent(BodyComponent.class))
+                e.getComponent(BodyComponent.class).setWorld(world);
+
             return;
         }
 
         containers.get(e).getEntities().removeValue(e, true);
         containers.put(e, world);
         world.getEntities().add(e);
-        e.setWorld(world);
+
+        if(e.hasComponent(BodyComponent.class))
+            e.getComponent(BodyComponent.class).setWorld(world);
     }
 
     public void update(){

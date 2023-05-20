@@ -44,8 +44,17 @@ public class Ship extends DriveableEntity {
         // Create exterior body for the real-world scenes
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(world, def));
-        setWorld(world);
+        bodyComponent = addComponent(new BodyComponent(world, def){
+            @Override
+            public void afterWorldChange(PhysWorld world){
+                Ship.super.afterWorldChange(world);
+
+                for(Part p : parts){
+                    p.setParent(getBody(), getPhysScale());
+                }
+            }
+        });
+        bodyComponent.setWorld(world);
     }
 
     // Constructor
@@ -205,15 +214,6 @@ public class Ship extends DriveableEntity {
             p.draw(batch, Gdx.graphics.getDeltaTime());
         }
         batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
-    }
-
-    @Override
-    public void afterWorldChange(PhysWorld world){
-        super.afterWorldChange(world);
-        
-        for(Part p : parts){
-            p.setParent(getBody(), getPhysScale());
-        }
     }
 
     @Override
