@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.phys;
 
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
@@ -23,8 +24,10 @@ public class CelestialPhysWorld extends PhysWorld {
     public Celestial getParent(){ return parent; }
 
     @Override
-    public void onEntityUpdate(BaseEntity e) {
+    public void onEntityUpdate(IEntity eRaw) {
         // Check keplerian approximation transfer
+        BaseEntity e = (BaseEntity)eRaw;
+
         if(!(e instanceof Celestial))
             game.universe.checkTransfer(e);
         

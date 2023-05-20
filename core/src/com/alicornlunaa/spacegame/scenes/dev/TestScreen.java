@@ -112,6 +112,7 @@ public class TestScreen implements Screen {
     private PhysWorld world;
     private OrthographicCamera cam;
     private Registry registry;
+    private PhysicsSystem simulation;
 
     public TestScreen(final App game){
         this.game = game;
@@ -136,14 +137,16 @@ public class TestScreen implements Screen {
         cam.update();
         game.activeCamera = cam;
 
-        world = new PhysWorld(128.0f);
-        world.getBox2DWorld().setGravity(new Vector2(0, -0.5f));
-
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));
-        registry.registerSystem(new PhysicsSystem(game, world));
+        simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(game));
         registry.registerSystem(new ScriptSystem());
+
+        world = new PhysWorld(128.0f);
+        world.getBox2DWorld().setGravity(new Vector2(0, -0.5f));
+        simulation.addWorld(world);
+
         registry.addEntity(new TestEntity(game, world));
         registry.addEntity(new WorldEntity(game, world));
     }

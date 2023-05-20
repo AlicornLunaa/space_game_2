@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.planet;
 import java.util.Stack;
 
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
@@ -118,8 +119,9 @@ public class Planet extends Celestial {
     private void generatePhysWorld(){
         physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM){
             @Override
-            public void onEntityUpdate(BaseEntity e) {
+            public void onEntityUpdate(IEntity eRaw) {
                 // Constrain entities to the world
+                BaseEntity e = (BaseEntity)eRaw;
                 float worldWidthPixels = terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
                 if(e.getX() > worldWidthPixels){

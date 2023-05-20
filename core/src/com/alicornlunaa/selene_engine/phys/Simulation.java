@@ -7,6 +7,7 @@ import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.badlogic.gdx.utils.Array;
 
 /** Holds every PhysWorld and coordinates them */
+@Deprecated
 public class Simulation {
     
     // Variables

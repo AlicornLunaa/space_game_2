@@ -29,7 +29,9 @@ public class Registry implements Disposable, Reloadable {
         return entities.removeIndex(entity);
     }
 
-    public ISystem registerSystem(ISystem system){
+    public Array<IEntity> getEntities(){ return entities; }
+
+    public <T extends ISystem> T registerSystem(T system){
         systems.add(system);
         return system;
     }
