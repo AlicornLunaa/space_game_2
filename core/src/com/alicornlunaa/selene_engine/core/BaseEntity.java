@@ -1,5 +1,6 @@
 package com.alicornlunaa.selene_engine.core;
 
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.util.Assets;
@@ -23,9 +24,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     // Variables
     private Array<IComponent> components = new Array<>();
 
-    private Matrix3 transform = new Matrix3();
-    private Vector2 position = new Vector2();
-    private Vector2 velocity = new Vector2();
+    private TransformComponent transform = new TransformComponent();
 
     private @Null PhysWorld world = null;
     private @Null Body body = null;
@@ -43,17 +42,25 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
 
     public Matrix3 getTransform(){
         if(body != null){
-            transform.idt();
-            // TODO: TEMP
-            transform.translate(body.getPosition().cpy().scl(physScale));
-            transform.rotateRad(body.getAngle());
+            transform.position.set(body.getPosition().cpy().scl(physScale));
+            transform.rotation = body.getAngle();
         }
 
-        return transform;
+        Matrix3 matrix = new Matrix3();
+        matrix.idt();
+        matrix.translate(transform.position);
+        matrix.rotateRad(transform.rotation);
+
+        return matrix;
     }
 
     public Vector2 getPosition(){
-        return getTransform().getTranslation(position);
+        if(body != null){
+            transform.position.set(body.getPosition().cpy().scl(physScale));
+            transform.rotation = body.getAngle();
+        }
+
+        return transform.position;
     }
 
     public Vector2 getCenter(){
@@ -65,12 +72,17 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     public float getRotation(){
-        return getTransform().getRotationRad();
+        if(body != null){
+            transform.position.set(body.getPosition().cpy().scl(physScale));
+            transform.rotation = body.getAngle();
+        }
+
+        return transform.rotation;
     }
 
     public Vector2 getVelocity(){
         if(body == null) return null;
-        return velocity.set(body.getLinearVelocity());
+        return transform.velocity.set(body.getLinearVelocity());
     }
 
     // Setters
@@ -175,9 +187,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
             // TODO: TEMP Problem with bug here
             body.setTransform(x / physScale, y / physScale, getRotation());
         } else {
-            getPosition();
-            transform.translate(position.x * -1, position.y * -1);
-            transform.translate(x, y);
+            transform.position.set(x, y);
         }
     }
 
@@ -187,9 +197,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         if(body != null){
             body.setTransform(getPosition().cpy().scl(1 / physScale), rads);
         } else {
-            float oldRads = getRotation();
-            transform.rotateRad(oldRads);
-            transform.rotateRad(rads);
+            transform.rotation = rads;
         }
     }
 
@@ -278,10 +286,8 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         }
     }
 
-
     // Functions
     public void afterWorldChange(PhysWorld world){}
-   
     
     // Depreciated functions for backwards compat
     public float getX(){ return getPosition().x; }
