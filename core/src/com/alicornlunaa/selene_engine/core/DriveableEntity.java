@@ -14,6 +14,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
     // Constructor
     public DriveableEntity(final App game){
+        super();
         this.game = game;
     }
     

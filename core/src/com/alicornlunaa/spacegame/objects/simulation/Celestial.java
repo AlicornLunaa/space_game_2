@@ -48,6 +48,7 @@ public class Celestial extends BaseEntity {
     
     // Constructor
     public Celestial(App game, float radius){
+        super();
         this.game = game;
         this.radius = radius;
         this.celestialID = NEXT_CELESTIAL_ID++;

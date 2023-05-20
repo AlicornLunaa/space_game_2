@@ -141,6 +141,7 @@ public class Player extends BaseEntity {
 
     // Constructor
     public Player(final App game, float x, float y){
+        super();
         this.game = game;
 
         camera = new OrthographicCamera(1280, 720);

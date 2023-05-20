@@ -7,7 +7,7 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
 import com.alicornlunaa.spacegame.util.Constants;
-/*  */import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -24,9 +24,13 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
 
     // Variables
     private Array<IComponent> components = new Array<>();
-
-    private TransformComponent transform = new TransformComponent();
+    private TransformComponent transform;
     protected @Null BodyComponent bodyComponent;
+
+    // Constructors
+    public BaseEntity(){
+        transform = addComponent(new TransformComponent());
+    }
 
     // Getters
     public Body getBody(){
