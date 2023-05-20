@@ -185,8 +185,8 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public void reload(Assets assets){
         for(IComponent component : components){
             if(component instanceof Reloadable){
-                Reloadable disposableComponent = (Reloadable)component;
-                disposableComponent.reload(assets);
+                Reloadable reloadableComponent = (Reloadable)component;
+                reloadableComponent.reload(assets);
             }
         }
     }

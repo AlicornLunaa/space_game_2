@@ -10,6 +10,7 @@ import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.scenes.dev.TestScreen;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -98,6 +100,7 @@ public class App extends Game {
 				manager.load("particles_packed/particles.atlas", TextureAtlas.class);
 				manager.load("effects/rcs", ParticleEffectPool.class);
 				manager.load("effects/rocket", ParticleEffectPool.class);
+				manager.load("textures/test_image.png", Texture.class);
 			}
 		});
 		skin = manager.get("skins/spacecadet/spacecadet.json");
@@ -163,7 +166,7 @@ public class App extends Game {
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
-				// this.setScreen(new TestScreen(this));
+				this.setScreen(new TestScreen(this));
 				// this.setScreen(new OrbitTest(this));
 				// this.setScreen(new PlanetEditor(this));
 			} else {

@@ -1,13 +1,34 @@
 package com.alicornlunaa.spacegame.scenes.dev;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.BoxColliderComponent;
+import com.alicornlunaa.selene_engine.components.CameraComponent;
+import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.SpriteComponent;
+import com.alicornlunaa.selene_engine.components.TextureComponent;
+import com.alicornlunaa.selene_engine.components.SpriteComponent.AnchorPoint;
+import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.ecs.Registry;
+import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.selene_engine.phys.Simulation;
+import com.alicornlunaa.selene_engine.systems.CameraSystem;
+import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
+import com.alicornlunaa.selene_engine.systems.RenderSystem;
+import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -16,49 +37,126 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 @SuppressWarnings("unused")
 public class TestScreen implements Screen {
 
-    private static class TestActor extends Actor {
-        public TestActor(){
-            setSize(100, 100);
+    public static class WorldEntity extends BaseEntity {
 
-            addListener(new ClickListener(){
+        public WorldEntity(App game, PhysWorld world){
+            addComponent(new TextureComponent(game.manager, "textures/test_image.png"));
+            addComponent(new SpriteComponent(512, 16, AnchorPoint.CENTER));
+            addComponent(new BodyComponent(world, new BodyDef()));
+            addComponent(new BoxColliderComponent(getComponent(BodyComponent.class), 2.0f, 0.0625f, 1.f));
+            
+            getComponent(BodyComponent.class).body.setTransform(0, -1, 0);
+        }
+
+        @Override
+        public void update() {}
+
+        @Override
+        public void render(Batch batch) {}
+
+    }
+
+    public static class TestEntity extends BaseEntity {
+
+        public TestEntity(App game, PhysWorld world){
+            BodyDef def = new BodyDef();
+            def.type = BodyType.DynamicBody;
+
+            addComponent(new TextureComponent(game.manager, "textures/test_image.png"));
+            addComponent(new SpriteComponent(128, 128, AnchorPoint.CENTER));
+            addComponent(new BodyComponent(world, def));
+            addComponent(new BoxColliderComponent(getComponent(BodyComponent.class), 0.5f, 0.5f, 1.f));
+            addComponent(new CameraComponent(1280, 720));
+
+            addComponent(new IScriptComponent() {
+                BodyComponent rb = getComponent(BodyComponent.class);
+
                 @Override
-                public void clicked(InputEvent event, float x, float y){
-                    System.out.println("Clicked!");
+                public void update(){
+                    if(Gdx.input.isKeyPressed(Keys.W)){
+                        rb.body.applyForceToCenter(0, 1.5f, true);
+                    }
+    
+                    if(Gdx.input.isKeyPressed(Keys.S)){
+                        rb.body.applyForceToCenter(0, -1.5f, true);
+                    }
+    
+                    if(Gdx.input.isKeyPressed(Keys.A)){
+                        rb.body.applyForceToCenter(-1.5f, 0, true);
+                    }
+    
+                    if(Gdx.input.isKeyPressed(Keys.D)){
+                        rb.body.applyForceToCenter(1.5f, 0, true);
+                    }
+
+                    if(Gdx.input.isKeyPressed(Keys.SPACE)){
+                        rb.body.applyForceToCenter(0, 15.f, true);
+                    }
                 }
+    
+                @Override
+                public void render(){}
             });
         }
+
+        @Override
+        public void update() {}
+
+        @Override
+        public void render(Batch batch) {}
+
     }
 
     private final App game;
-    private OrthographicCamera cam;
     private Stage stage;
+    private PhysWorld world;
+    private OrthographicCamera cam;
+    private Registry registry;
 
     public TestScreen(final App game){
         this.game = game;
+
         stage = new Stage(new ScreenViewport());
         stage.setDebugAll(true);
+        stage.addListener(new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, int keycode){
+                if(keycode == Keys.F5){
+                    game.manager.reload();
+                    registry.reload(game.manager);
+                    return true;
+                }
+
+                return false;
+            }
+        });
 
         cam = (OrthographicCamera)stage.getCamera();
         cam.zoom = 0.5f;
         cam.position.set(0, 0, 0);
         cam.update();
+        game.activeCamera = cam;
 
-        TestActor test = new TestActor();
-        test.setPosition(50, 50);
-        stage.addActor(test);
+        world = new PhysWorld(128.0f);
+        world.getBox2DWorld().setGravity(new Vector2(0, -0.5f));
+
+        registry = new Registry();
+        registry.registerSystem(new CameraSystem(game));
+        registry.registerSystem(new PhysicsSystem(game, world));
+        registry.registerSystem(new RenderSystem(game));
+        registry.registerSystem(new ScriptSystem());
+        registry.addEntity(new TestEntity(game, world));
+        registry.addEntity(new WorldEntity(game, world));
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
 
-        Batch batch = stage.getBatch();
-        batch.setProjectionMatrix(stage.getCamera().combined);
-        batch.setTransformMatrix(new Matrix4());
-        batch.begin();
-        batch.end();
-
+        registry.update();
         stage.act(delta);
+
+        registry.render();
         stage.draw();
     }
 

@@ -4,19 +4,19 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
+import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 
 public class PhysicsSystem implements ISystem {
 
     // Variables
     private final App game;
-    private World world;
+    private PhysWorld world;
     private Box2DDebugRenderer debugRenderer;
 
 	// Constructor
-	public PhysicsSystem(App game, World world) {
+	public PhysicsSystem(App game, PhysWorld world) {
         this.game = game;
         this.world = world;
         debugRenderer = new Box2DDebugRenderer();
@@ -25,7 +25,7 @@ public class PhysicsSystem implements ISystem {
 	// Functions
     @Override
     public void beforeUpdate() {
-        world.step(1.0f / 60.0f, 6, 2);
+        world.update();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PhysicsSystem implements ISystem {
 		TransformComponent transform = entity.getComponent(TransformComponent.class);
 		BodyComponent rb = entity.getComponent(BodyComponent.class);
 
-        transform.position.set(rb.body.getWorldCenter());
+        transform.position.set(rb.body.getWorldCenter().cpy().scl(world.getPhysScale()));
         transform.velocity.set(rb.body.getLinearVelocity());
         transform.rotation = rb.body.getAngle();
     }
@@ -46,7 +46,7 @@ public class PhysicsSystem implements ISystem {
 
     @Override
     public void afterRender() {
-        debugRenderer.render(world, game.activeCamera.combined.cpy().scl(256));
+        debugRenderer.render(world.getBox2DWorld(), game.activeCamera.combined.cpy().scl(world.getPhysScale()));
     }
 
     @Override

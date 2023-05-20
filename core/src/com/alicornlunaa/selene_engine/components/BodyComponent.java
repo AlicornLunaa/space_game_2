@@ -20,8 +20,8 @@ public class BodyComponent implements IComponent {
 
     // Constructor
     public BodyComponent(PhysWorld world, BodyDef def){
-        body = world.getBox2DWorld().createBody(def);
         this.world = world;
+        body = world.getBox2DWorld().createBody(def);
     }
 
     // Functions

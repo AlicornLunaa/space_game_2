@@ -36,7 +36,8 @@ public class CameraSystem implements ISystem {
     public void render(IEntity entity) {
         TransformComponent transform = entity.getComponent(TransformComponent.class);
         CameraComponent cameraComponent = entity.getComponent(CameraComponent.class);
-        cameraComponent.camera.position.set(transform.position.cpy().scl(256), 0.0f);
+        
+        cameraComponent.camera.position.set(transform.position, 0.0f);
         cameraComponent.camera.update();
         
         if(cameraComponent.active && game.activeCamera != cameraComponent.camera){
