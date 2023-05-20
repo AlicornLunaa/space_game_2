@@ -33,8 +33,8 @@ public class PhysicsSystem implements ISystem {
 
     @Override
     public void update(IEntity entity) {
-		TransformComponent transform = ((TransformComponent) entity.getComponent(TransformComponent.class));
-		BodyComponent rb = ((BodyComponent) entity.getComponent(BodyComponent.class));
+		TransformComponent transform = entity.getComponent(TransformComponent.class);
+		BodyComponent rb = entity.getComponent(BodyComponent.class);
 
         transform.position.set(rb.body.getWorldCenter());
         transform.velocity.set(rb.body.getLinearVelocity());
@@ -54,7 +54,7 @@ public class PhysicsSystem implements ISystem {
 
     @Override
     public boolean shouldRunOnEntity(IEntity entity) {
-        return (entity.hasComponent(TransformComponent.class) && entity.hasComponent(BodyComponent.class));
+        return (entity.hasComponents(TransformComponent.class, BodyComponent.class));
     }
     
 }

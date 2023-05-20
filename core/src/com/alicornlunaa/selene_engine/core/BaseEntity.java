@@ -1,12 +1,13 @@
 package com.alicornlunaa.selene_engine.core;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.math.Matrix3;
+/*  */import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -25,25 +26,28 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     private Array<IComponent> components = new Array<>();
 
     private TransformComponent transform = new TransformComponent();
-
-    private @Null PhysWorld world = null;
-    private @Null Body body = null;
-    private float physScale = Constants.PPM;
-    
-    // Constructor
-    public BaseEntity(){}
+    protected @Null BodyComponent bodyComponent;
 
     // Getters
-    public Body getBody(){ return body; }
+    public Body getBody(){
+        if(bodyComponent == null) return null;
+        return bodyComponent.body;
+    }
 
-    public PhysWorld getWorld(){ return world; }
+    public PhysWorld getWorld(){
+        if(bodyComponent == null) return null;
+        return bodyComponent.world;
+    }
     
-    public float getPhysScale(){ return physScale; }
+    public float getPhysScale(){
+        if(bodyComponent == null) return Constants.PPM;
+        return bodyComponent.world.getPhysScale();
+    }
 
     public Matrix3 getTransform(){
-        if(body != null){
-            transform.position.set(body.getPosition().cpy().scl(physScale));
-            transform.rotation = body.getAngle();
+        if(bodyComponent != null){
+            transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
+            transform.rotation = bodyComponent.body.getAngle();
         }
 
         Matrix3 matrix = new Matrix3();
@@ -55,59 +59,59 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     public Vector2 getPosition(){
-        if(body != null){
-            transform.position.set(body.getPosition().cpy().scl(physScale));
-            transform.rotation = body.getAngle();
+        if(bodyComponent != null){
+            transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
+            transform.rotation = bodyComponent.body.getAngle();
         }
 
         return transform.position;
     }
 
     public Vector2 getCenter(){
-        if(body != null){
-            return body.getWorldCenter().cpy().scl(physScale);
+        if(bodyComponent != null){
+            return bodyComponent.body.getWorldCenter().cpy().scl(getPhysScale());
         }
 
         return getPosition();
     }
 
     public float getRotation(){
-        if(body != null){
-            transform.position.set(body.getPosition().cpy().scl(physScale));
-            transform.rotation = body.getAngle();
+        if(bodyComponent != null){
+            transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
+            transform.rotation = bodyComponent.body.getAngle();
         }
 
         return transform.rotation;
     }
 
     public Vector2 getVelocity(){
-        if(body == null) return null;
-        return transform.velocity.set(body.getLinearVelocity());
+        if(bodyComponent == null) return null;
+        return transform.velocity.set(bodyComponent.body.getLinearVelocity());
     }
 
     // Setters
     public Body setBody(Body b){
         // TODO: TEMP physscale
         if(b != null){
-            setPosition(b.getPosition().cpy().scl(physScale));
+            setPosition(b.getPosition().cpy().scl(getPhysScale()));
             setRotation(b.getAngle());
         }
 
-        body = b;
+        bodyComponent.body = b;
         return b;
     }
 
     public void setWorld(PhysWorld world){
         // You can only load an entity to a world if it has a body
-        if(body == null) return;
-        if(world == null){ this.world = world; return; }
+        if(bodyComponent == null) return;
+        if(world == null){ bodyComponent.world = world; return; }
 
         // Save all data and prep to load to the new world
-        Array<FixtureDef> fixtures = new Array<>(body.getFixtureList().size);
-        Array<Shape> shapes = new Array<>(body.getFixtureList().size);
+        Array<FixtureDef> fixtures = new Array<>(bodyComponent.body.getFixtureList().size);
+        Array<Shape> shapes = new Array<>(bodyComponent.body.getFixtureList().size);
         float newPhysScale = world.getPhysScale();
 
-        for(Fixture f : body.getFixtureList()){
+        for(Fixture f : bodyComponent.body.getFixtureList()){
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.density = f.getDensity();
             fixtureDef.filter.set(f.getFilterData());
@@ -125,7 +129,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
                     vertices[i] = new Vector2();
                     shape.getVertex(i, vertices[i]);
 
-                    vertices[i].scl(physScale);
+                    vertices[i].scl(getPhysScale());
                     vertices[i].scl(1 / newPhysScale);
                 }
                 
@@ -136,8 +140,8 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
                 CircleShape shape = (CircleShape)f.getShape();
                 CircleShape copy = new CircleShape();
 
-                copy.setPosition(shape.getPosition().scl(physScale).scl(1 / newPhysScale));
-                copy.setRadius(shape.getRadius() * physScale / newPhysScale);
+                copy.setPosition(shape.getPosition().scl(getPhysScale()).scl(1 / newPhysScale));
+                copy.setRadius(shape.getRadius() * getPhysScale() / newPhysScale);
                 
                 shapes.add(copy);
                 fixtureDef.shape = copy;
@@ -148,29 +152,27 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
 
         // Save body data
         BodyDef def = new BodyDef();
-        def.active = body.isActive();
-        def.allowSleep = body.isSleepingAllowed();
-        def.angle = body.getAngle();
-        def.angularDamping = body.getAngularDamping();
-        def.angularVelocity = body.getAngularVelocity();
-        def.awake = body.isAwake();
-        def.bullet = body.isBullet();
-        def.fixedRotation = body.isFixedRotation();
-        def.gravityScale = body.getGravityScale();
-        def.linearDamping = body.getLinearDamping();
-        def.linearVelocity.set(body.getLinearVelocity().cpy().scl(physScale).scl(1 / newPhysScale));
-        def.position.set(body.getPosition().cpy().scl(physScale).scl(1 / newPhysScale));
-        def.type = body.getType();
-
-        physScale = newPhysScale;
+        def.active = bodyComponent.body.isActive();
+        def.allowSleep = bodyComponent.body.isSleepingAllowed();
+        def.angle = bodyComponent.body.getAngle();
+        def.angularDamping = bodyComponent.body.getAngularDamping();
+        def.angularVelocity = bodyComponent.body.getAngularVelocity();
+        def.awake = bodyComponent.body.isAwake();
+        def.bullet = bodyComponent.body.isBullet();
+        def.fixedRotation = bodyComponent.body.isFixedRotation();
+        def.gravityScale = bodyComponent.body.getGravityScale();
+        def.linearDamping = bodyComponent.body.getLinearDamping();
+        def.linearVelocity.set(bodyComponent.body.getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / newPhysScale));
+        def.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()).scl(1 / newPhysScale));
+        def.type = bodyComponent.body.getType();
 
         // Delete body from world and recreate it in the new one
-        body.getWorld().destroyBody(body);
+        bodyComponent.body.getWorld().destroyBody(bodyComponent.body);
         setBody(world.getBox2DWorld().createBody(def));
 
         // Recreate the fixtures
         for(FixtureDef fixtureDef : fixtures){
-            body.createFixture(fixtureDef);
+            bodyComponent.body.createFixture(fixtureDef);
         }
 
         // Remove shapes
@@ -178,14 +180,14 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
             s.dispose();
         }
 
-        this.world = world;
+        bodyComponent.world = world;
         afterWorldChange(world);
     }
 
     public void setPosition(float x, float y){
-        if(body != null){
+        if(bodyComponent != null){
             // TODO: TEMP Problem with bug here
-            body.setTransform(x / physScale, y / physScale, getRotation());
+            bodyComponent.body.setTransform(x / getPhysScale(), y / getPhysScale(), getRotation());
         } else {
             transform.position.set(x, y);
         }
@@ -194,16 +196,16 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public void setPosition(Vector2 p){ setPosition(p.x, p.y); }
 
     public void setRotation(float rads){
-        if(body != null){
-            body.setTransform(getPosition().cpy().scl(1 / physScale), rads);
+        if(bodyComponent != null){
+            bodyComponent.body.setTransform(getPosition().cpy().scl(1 / getPhysScale()), rads);
         } else {
             transform.rotation = rads;
         }
     }
 
     public void setVelocity(float x, float y){
-        if(body == null) return;
-        body.setLinearVelocity(x, y);
+        if(bodyComponent == null) return;
+        bodyComponent.body.setLinearVelocity(x, y);
     }
 
     public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
@@ -211,7 +213,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
 
     // Component system
     @Override
-    public IComponent addComponent(IComponent component){
+    public <T extends IComponent> T addComponent(T component){
         components.add(component);
         return component;
     }
@@ -243,10 +245,10 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     @Override
-    public IComponent getComponent(Class<? extends IComponent> componentType) {
+    public <T extends IComponent> T getComponent(Class<T> componentType){
         for(IComponent component : components){
             if(componentType.isAssignableFrom(component.getClass())){
-                return component;
+                return componentType.cast(component);
             }
         }
 
@@ -254,12 +256,12 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     @Override
-    public IComponent[] getComponents(Class<? extends IComponent> componentType) {
-        Array<IComponent> out = new Array<>(IComponent.class);
+    public <T extends IComponent> T[] getComponents(Class<T> componentType) {
+        Array<T> out = new Array<>(componentType);
 
         for(IComponent component : components){
             if(componentType.isAssignableFrom(component.getClass())){
-                out.add(component);
+                out.add(componentType.cast(component));
             }
         }
 

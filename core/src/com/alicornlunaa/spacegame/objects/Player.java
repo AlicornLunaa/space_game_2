@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.objects;
 
 import java.util.HashMap;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
@@ -80,7 +81,7 @@ public class Player extends BaseEntity {
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        setBody(world.getBox2DWorld().createBody(def));
+        bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def));
         getBody().setFixedRotation(true);
         setPosition(x, y);
 

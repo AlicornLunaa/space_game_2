@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -61,7 +62,7 @@ public class Celestial extends BaseEntity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
-        setBody(game.universe.getUniversalWorld().getBox2DWorld().createBody(def));
+        bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def));
         getBody().createFixture(shape, 1.0f);
 
         def = new BodyDef();

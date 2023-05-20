@@ -20,7 +20,7 @@ public interface IEntity {
      * @param component
      * @return component
      */
-    IComponent addComponent(IComponent component);
+    <T extends IComponent> T addComponent(T component);
 
     /**
      * Returns true or false depending on if the class has the type of component
@@ -41,12 +41,12 @@ public interface IEntity {
      * @param componentType
      * @return component
      */
-    IComponent getComponent(Class<? extends IComponent> componentType);
+    <T extends IComponent> T getComponent(Class<T> componentType);
 
     /**
      * Returns all the components that match the type provided
      * @param componentType
      * @return component
      */
-    IComponent[] getComponents(Class<? extends IComponent> componentType);
+    <T extends IComponent> T[] getComponents(Class<T> componentType);
 }

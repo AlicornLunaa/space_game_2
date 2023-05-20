@@ -53,13 +53,13 @@ public class RenderSystem implements ISystem, Disposable {
 
 	@Override
 	public void render(IEntity entity) {
-		Texture img = ((TextureComponent)entity.getComponent(TextureComponent.class)).texture;
+		Texture img = entity.getComponent(TextureComponent.class).texture;
 
 		if(entity.hasComponent(BodyComponent.class)){
-			BodyComponent bodyComponent = ((BodyComponent)entity.getComponent(BodyComponent.class));
+			BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
 			batch.draw(img, bodyComponent.body.getPosition().x * PPM, bodyComponent.body.getPosition().y * PPM);
 		} else if(entity.hasComponent(TransformComponent.class)){
-			TransformComponent transform = ((TransformComponent)entity.getComponent(TransformComponent.class));
+			TransformComponent transform = entity.getComponent(TransformComponent.class);
 			batch.draw(img, transform.position.x * PPM, transform.position.y * PPM);
 		}
 	}

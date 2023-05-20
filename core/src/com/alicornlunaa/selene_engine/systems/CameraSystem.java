@@ -34,8 +34,8 @@ public class CameraSystem implements ISystem {
 
     @Override
     public void render(IEntity entity) {
-        TransformComponent transform = ((TransformComponent)entity.getComponent(TransformComponent.class));
-        CameraComponent cameraComponent = ((CameraComponent)entity.getComponent(CameraComponent.class));
+        TransformComponent transform = entity.getComponent(TransformComponent.class);
+        CameraComponent cameraComponent = entity.getComponent(CameraComponent.class);
         cameraComponent.camera.position.set(transform.position.cpy().scl(256), 0.0f);
         cameraComponent.camera.update();
         
@@ -46,7 +46,7 @@ public class CameraSystem implements ISystem {
 
     @Override
     public boolean shouldRunOnEntity(IEntity entity) {
-        return (entity.hasComponent(CameraComponent.class) && entity.hasComponent(TransformComponent.class));
+        return (entity.hasComponents(CameraComponent.class, TransformComponent.class));
     }
     
 }

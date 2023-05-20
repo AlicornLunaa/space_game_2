@@ -14,8 +14,10 @@ public class ScriptSystem implements ISystem {
 
     @Override
     public void update(IEntity entity) {
-        IScriptComponent script = ((IScriptComponent)entity.getComponent(IScriptComponent.class));
-        script.update();
+        IScriptComponent[] scripts = entity.getComponents(IScriptComponent.class);
+
+        for(IScriptComponent script : scripts)
+            script.update();
     }
 
     @Override
@@ -26,8 +28,10 @@ public class ScriptSystem implements ISystem {
 
     @Override
     public void render(IEntity entity) {
-        IScriptComponent script = ((IScriptComponent)entity.getComponent(IScriptComponent.class));
-        script.render();
+        IScriptComponent[] scripts = entity.getComponents(IScriptComponent.class);
+
+        for(IScriptComponent script : scripts)
+            script.render();
     }
 
     @Override

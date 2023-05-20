@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -43,7 +44,7 @@ public class Ship extends DriveableEntity {
         // Create exterior body for the real-world scenes
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        setBody(world.getBox2DWorld().createBody(def));
+        bodyComponent = addComponent(new BodyComponent(world, def));
         setWorld(world);
     }
 
