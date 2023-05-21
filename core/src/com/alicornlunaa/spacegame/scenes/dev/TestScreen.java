@@ -10,7 +10,6 @@ import com.alicornlunaa.selene_engine.components.SpriteComponent.AnchorPoint;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.selene_engine.phys.Simulation;
 import com.alicornlunaa.selene_engine.systems.CameraSystem;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.RenderSystem;
@@ -47,9 +46,6 @@ public class TestScreen implements Screen {
             
             getComponent(BodyComponent.class).body.setTransform(0, -1, 0);
         }
-
-        @Override
-        public void update() {}
 
         @Override
         public void render(Batch batch) {}
@@ -98,9 +94,6 @@ public class TestScreen implements Screen {
                 public void render(){}
             });
         }
-
-        @Override
-        public void update() {}
 
         @Override
         public void render(Batch batch) {}

@@ -1,7 +1,5 @@
 package com.alicornlunaa.selene_engine.systems;
 
-import java.util.HashMap;
-
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -13,7 +11,6 @@ public class PhysicsSystem implements ISystem {
 
     // Variables
     private Array<PhysWorld> physWorlds = new Array<>();
-    private HashMap<IEntity, PhysWorld> containers = new HashMap<>();
 
 	// Constructor
 	public PhysicsSystem() {}
@@ -32,19 +29,10 @@ public class PhysicsSystem implements ISystem {
         return physWorlds.peek();
     }
 
-    public void addEntityToWorld(int index, IEntity e){ addEntityToWorld(physWorlds.get(index), e); }
-
-    public void addEntityToWorld(PhysWorld world, IEntity e){
-        if(!e.hasComponent(BodyComponent.class)) return;
-        if(e.getComponent(BodyComponent.class).world == world) return;
-
-        if(containers.containsKey(e)){
-            containers.get(e).getEntities().removeValue(e, true);
-        }
-
-        containers.put(e, world);
-        world.getEntities().add(e);
-        e.getComponent(BodyComponent.class).setWorld(world);
+    @Deprecated
+    public void addEntity(PhysWorld world, IEntity entity){
+        if(!entity.hasComponent(BodyComponent.class)) return;
+        entity.getComponent(BodyComponent.class).setWorld(world);
     }
 
 	// Functions

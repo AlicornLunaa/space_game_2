@@ -5,11 +5,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
+import com.alicornlunaa.spacegame.scripts.GravityScript;
+import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -64,6 +67,47 @@ public class Ship extends DriveableEntity {
         generateExterior(world);
         interior = new Interior(game, this);
 
+        addComponent(new GravityScript(game, this));
+        addComponent(new PlanetPhysScript(this));
+        addComponent(new IScriptComponent() {
+            @Override
+            public void update(){
+                // Ship controls
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
+                    state.throttle = Math.min(state.throttle + 0.01f, 1);
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
+                    state.throttle = Math.max(state.throttle - 0.01f, 0);
+                }
+                
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_LEFT)){
+                    state.roll = -1;
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_RIGHT)){
+                    state.roll = 1;
+                } else {
+                    state.roll = 0;
+                }
+                
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)){
+                    state.vertical = 1;
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)){
+                    state.vertical = -1;
+                } else {
+                    state.vertical = 0;
+                }
+                
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)){
+                    state.horizontal = -1;
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)){
+                    state.horizontal = 1;
+                } else {
+                    state.horizontal = 0;
+                }
+            }
+
+            @Override
+            public void render(){}
+        });
+        
         setPosition(x, y);
         setRotation(rotation);
     }
@@ -164,45 +208,12 @@ public class Ship extends DriveableEntity {
     }
 
     @Override
-    public void update(){
-        // Ship controls
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
-            state.throttle = Math.min(state.throttle + 0.01f, 1);
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
-            state.throttle = Math.max(state.throttle - 0.01f, 0);
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_LEFT)){
-            state.roll = -1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_RIGHT)){
-            state.roll = 1;
-        } else {
-            state.roll = 0;
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)){
-            state.vertical = 1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)){
-            state.vertical = -1;
-        } else {
-            state.vertical = 0;
-        }
-        
-        if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)){
-            state.horizontal = -1;
-        } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)){
-            state.horizontal = 1;
-        } else {
-            state.horizontal = 0;
-        }
-    }
-
-    @Override
     public void render(Batch batch){
         // Update SAS
         if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
 
         // Update parts
+        // TODO: Parts shouldnt be here
         for(Part p : parts){
             p.update(Gdx.graphics.getDeltaTime());
         }

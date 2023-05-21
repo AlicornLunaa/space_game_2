@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects;
 import java.util.HashMap;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
@@ -13,6 +14,8 @@ import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
+import com.alicornlunaa.spacegame.scripts.GravityScript;
+import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -99,6 +102,8 @@ public class Player extends BaseEntity {
                 }
             }
         });
+        addComponent(new GravityScript(game, this));
+        addComponent(new PlanetPhysScript(this));
         getBody().setFixedRotation(true);
         setPosition(x, y);
 
@@ -166,6 +171,51 @@ public class Player extends BaseEntity {
 
         initializePhys(game.universe.getUniversalWorld(), x, y);
         initializeAnims();
+
+        addComponent(new IScriptComponent() {
+            @Override
+            public void update() {
+                // Groundchecking
+                grounded = false;
+                getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / getPhysScale())).cpy(), getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / getPhysScale())));
+                grounded = true;
+
+                // Movement
+                if(vertical != 0 || horizontal != 0){
+                    getBody().applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / getPhysScale() * 1.f), getBody().getWorldCenter(), true);
+                }
+
+                // Controls
+                if(vehicle == null){
+                    // Controls for player
+                    if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
+                        vertical = 1;
+                    } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
+                        vertical = -1;
+                    } else {
+                        vertical = 0;
+                    }
+                    
+                    if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
+                        horizontal = 1;
+                    } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
+                        horizontal = -1;
+                    } else {
+                        horizontal = 0;
+                    }
+
+                    resolveAnimState();
+                } else {
+                    setPosition(vehicle.getPosition());
+                }
+
+                // Parent camera to the player's position
+                updateCamera();
+            }
+
+            @Override
+            public void render() {}
+        });
     }
 
     // Functions
@@ -206,46 +256,6 @@ public class Player extends BaseEntity {
     }
 
     public void updateCamera(){ updateCamera(false); }
-
-    @Override
-    public void update(){
-        // Groundchecking
-        grounded = false;
-        getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / getPhysScale())).cpy(), getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / getPhysScale())));
-        grounded = true;
-
-        // Movement
-        if(vertical != 0 || horizontal != 0){
-            getBody().applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / this.getPhysScale() * 1.f), getBody().getWorldCenter(), true);
-        }
-
-        // Controls
-        if(vehicle == null){
-            // Controls for player
-            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
-                vertical = 1;
-            } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
-                vertical = -1;
-            } else {
-                vertical = 0;
-            }
-            
-            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
-                horizontal = 1;
-            } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
-                horizontal = -1;
-            } else {
-                horizontal = 0;
-            }
-
-            resolveAnimState();
-        } else {
-            setPosition(vehicle.getPosition());
-        }
-
-        // Parent camera to the player's position
-        updateCamera();
-    }
 
     @Override
     public void render(Batch batch){

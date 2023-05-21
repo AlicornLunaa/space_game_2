@@ -7,6 +7,8 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
+import com.alicornlunaa.spacegame.scripts.GravityScript;
+import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -53,7 +55,7 @@ public class Celestial extends BaseEntity {
         this.radius = radius;
         this.celestialID = NEXT_CELESTIAL_ID++;
 
-        influenceWorld = new CelestialPhysWorld(game, this, Constants.PPM);
+        influenceWorld = new CelestialPhysWorld(this, Constants.PPM);
         game.simulation.addWorld(influenceWorld);
         
         CircleShape shape = new CircleShape();
@@ -73,6 +75,9 @@ public class Celestial extends BaseEntity {
         localBody.createFixture(shape, 1.0f);
 
         shape.dispose();
+
+        addComponent(new GravityScript(game, this));
+        addComponent(new PlanetPhysScript(this));
     }
 
     // Functions
@@ -99,9 +104,6 @@ public class Celestial extends BaseEntity {
     public Matrix3 getSystemSpaceTransform(){
         return getUniverseSpaceTransform().inv();
     }
-
-    @Override
-    public void update(){}
 
     @Override
     public void render(Batch batch){

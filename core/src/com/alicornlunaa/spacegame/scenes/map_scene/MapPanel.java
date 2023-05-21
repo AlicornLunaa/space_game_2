@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.map_scene;
 
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
@@ -53,7 +54,8 @@ public class MapPanel extends Stage {
 
     // Private functions
     private void initiatePaths(){
-        for(BaseEntity e : game.simulation.getEntities()){
+        for(IEntity eRaw : game.registry.getEntities()){
+            BaseEntity e = (BaseEntity)eRaw;
             Celestial parent = game.universe.getParentCelestial(e);
 
             if(e instanceof Player && ((Player)e).isDriving()) continue;
@@ -182,7 +184,9 @@ public class MapPanel extends Stage {
     public void drawUniverse(Batch batch){
         batch.setTransformMatrix(new Matrix4());
 
-        for(BaseEntity e : game.simulation.getEntities()){
+        for(IEntity eRaw : game.registry.getEntities()){
+            BaseEntity e = (BaseEntity)eRaw;
+            
             if(e instanceof Celestial){
                 batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
                 e.render(batch);

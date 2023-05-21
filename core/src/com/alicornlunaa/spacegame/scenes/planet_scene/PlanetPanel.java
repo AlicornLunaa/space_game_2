@@ -1,6 +1,5 @@
 package com.alicornlunaa.spacegame.scenes.planet_scene;
 
-import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
@@ -120,9 +119,10 @@ public class PlanetPanel extends Stage {
         worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4());
 
-        for(IEntity e : planet.getInternalPhysWorld().getEntities()){
-            e.render(batch);
-        }
+        // TODO: Replace
+        // for(IEntity e : planet.getInternalPhysWorld().getEntities()){
+        //     e.render(batch);
+        // }
 
         batch.end();
         super.draw();

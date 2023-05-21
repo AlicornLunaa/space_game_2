@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
@@ -78,7 +79,7 @@ public class Universe extends Actor {
     // Constructor
     public Universe(final App game){
         this.game = game;
-        universalWorld = game.simulation.addWorld(new CelestialPhysWorld(game, null, Constants.PPM));
+        universalWorld = game.simulation.addWorld(new CelestialPhysWorld(null, Constants.PPM));
     }
 
     // Functions
@@ -87,6 +88,7 @@ public class Universe extends Actor {
      * @param e The entity to add
      */
     public void addEntity(BaseEntity e){
+        game.registry.addEntity(e);
         game.simulation.addEntity(universalWorld, e);
 
         boolean res = false;
@@ -99,6 +101,7 @@ public class Universe extends Actor {
      * @param parent The celestial to parent it to
      */
     public void addCelestial(Celestial c){
+        game.registry.addEntity(c);
         game.simulation.addEntity(universalWorld, c);
         celestials.add(c);
 
@@ -190,7 +193,9 @@ public class Universe extends Actor {
         // Starting the timewarp for first time
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
-            for(BaseEntity e : game.simulation.getEntities()){
+            for(IEntity eRaw : game.registry.getEntities()){
+                BaseEntity e = (BaseEntity)eRaw;
+
                 if(e instanceof Celestial){
                     Celestial parent = getParentCelestial(e);
                     if(parent == null) continue;
@@ -248,7 +253,7 @@ public class Universe extends Actor {
         // Update physics
         if(timewarp == 1){
             // Step the physics on the world
-            game.simulation.update();
+            game.registry.update(delta);
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             timeWarpAccumulator += Math.min(delta, 0.25f);
@@ -317,7 +322,9 @@ public class Universe extends Actor {
     public void draw(Batch batch, float a){
         Matrix4 oldMat = batch.getTransformMatrix().cpy();
 
-        for(BaseEntity e : game.simulation.getEntities()){
+        for(IEntity eRaw : game.registry.getEntities()){
+            BaseEntity e = (BaseEntity)eRaw;
+
             if(e instanceof Celestial){
                 batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
                 e.render(batch);
@@ -333,6 +340,8 @@ public class Universe extends Actor {
         }
 
         batch.setTransformMatrix(oldMat);
+
+        game.registry.render();
     }
     
 }

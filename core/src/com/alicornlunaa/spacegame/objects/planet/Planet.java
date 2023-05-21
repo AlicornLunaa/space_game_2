@@ -2,8 +2,8 @@ package com.alicornlunaa.spacegame.objects.planet;
 
 import java.util.Stack;
 
+import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
-import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
@@ -117,46 +117,14 @@ public class Planet extends Celestial {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM){
-            @Override
-            public void onEntityUpdate(IEntity eRaw) {
-                // Constrain entities to the world
-                BaseEntity e = (BaseEntity)eRaw;
-                float worldWidthPixels = terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
-
-                if(e.getX() > worldWidthPixels){
-                    e.setX(e.getX() - worldWidthPixels);
-                } else if(e.getX() < 0){
-                    e.setX(e.getX() + worldWidthPixels);
-                }
-    
-                checkLeavePlanet(e);
-                
-                // Taken from Celestial.java to correctly apply the right force
-                Vector2 dragForce = applyDrag(e.getBody());
-                float height = Math.max(e.getBody().getPosition().y, getRadius() / getPhysScale());
-                float force = Constants.GRAVITY_CONSTANT * ((getBody().getMass() * e.getBody().getMass()) / (height * height));
-                e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
-            }
-
-            @Override
-            public void onAfterUpdate() {
-                // Remove entities in the world still
-                while(leavingEnts.size() > 0){
-                    delEntityWorld(leavingEnts.pop());
-                }
-
-                worldBlocks.act(Gdx.graphics.getDeltaTime());
-                worldBlocks.update();
-            }
-        });
+        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
 
         // Create a world-body chunking system to take up the entirety of the planet
         worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Constructor
-    public Planet(App game, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
+    public Planet(final App game, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
         super(game, terraRadius);
         this.game = game;
 
@@ -174,6 +142,23 @@ public class Planet extends Celestial {
         generateTexture();
         generateSurface();
         generatePhysWorld();
+        addComponent(new IScriptComponent() {
+            @Override
+            public void update() {
+                starDirection.set(OrbitUtils.directionToNearestStar(game.universe, Planet.this), 0);
+
+                // Remove entities in the world still
+                while(leavingEnts.size() > 0){
+                    delEntityWorld(leavingEnts.pop());
+                }
+
+                worldBlocks.act(Gdx.graphics.getDeltaTime());
+                worldBlocks.update();
+            }
+
+            @Override
+            public void render() {} 
+        });
 
         debugTexture = new Texture(generator.getBiomeMap());
 
@@ -355,12 +340,6 @@ public class Planet extends Celestial {
     public Vector2 applyPhysics(float delta, BaseEntity e){
         checkTransferPlanet(e);
         return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
-    }
-
-    @Override
-    public void update(){
-        super.update();
-        starDirection.set(OrbitUtils.directionToNearestStar(game.universe, this), 0);
     }
 
     @Override

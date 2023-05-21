@@ -1,6 +1,9 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.selene_engine.phys.Simulation;
+import com.alicornlunaa.selene_engine.ecs.Registry;
+import com.alicornlunaa.selene_engine.systems.CameraSystem;
+import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
+import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
@@ -10,7 +13,6 @@ import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.scenes.dev.TestScreen;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -45,7 +47,8 @@ public class App extends Game {
 	public SpaceScene spaceScene;
 	public Screen activeSpaceScreen;
 
-	public Simulation simulation;
+	public Registry registry;
+	public PhysicsSystem simulation;
 	public Universe universe;
 	public OrthographicCamera activeCamera;
 	public Player player;
@@ -60,7 +63,6 @@ public class App extends Game {
 
 	// Private functions
 	private void initializeUniverse(){
-		simulation = new Simulation();
 		universe = new Universe(this);
 
         universe.addCelestial(new Star(this, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
@@ -75,9 +77,9 @@ public class App extends Game {
         OrbitUtils.createOrbit(universe, universe.getCelestial(4));
         OrbitUtils.createOrbit(universe, universe.getCelestial(5));
 
-		// player = new Player(this, -50, 0);
-		// universe.addEntity(player);
-		// OrbitUtils.createOrbit(universe, player);
+		player = new Player(this, -50, 0);
+		universe.addEntity(player);
+		OrbitUtils.createOrbit(universe, player);
 	}
 	
 	// Functions
@@ -151,8 +153,13 @@ public class App extends Game {
 				SaveManager.init(this);
 
 				// Start new scene
+				registry = new Registry();
+				registry.registerSystem(new CameraSystem(this));
+				simulation = registry.registerSystem(new PhysicsSystem());
+				registry.registerSystem(new ScriptSystem());
+				
 				initializeUniverse();
-				SaveManager.load(this, "dev_world");
+				// SaveManager.load(this, "dev_world");
 				spaceScene = new SpaceScene(this);
 				OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
 
@@ -166,7 +173,7 @@ public class App extends Game {
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
-				this.setScreen(new TestScreen(this));
+				// this.setScreen(new TestScreen(this));
 				// this.setScreen(new OrbitTest(this));
 				// this.setScreen(new PlanetEditor(this));
 			} else {
