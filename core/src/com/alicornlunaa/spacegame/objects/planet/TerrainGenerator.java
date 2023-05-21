@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 /**
  * Generates the terrain on a planet
  */
+@SuppressWarnings("unused")
 public class TerrainGenerator {
 
     // Variables

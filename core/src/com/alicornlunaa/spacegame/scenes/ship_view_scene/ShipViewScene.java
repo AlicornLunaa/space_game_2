@@ -62,8 +62,7 @@ public class ShipViewScene implements Screen {
     public void show() {
         vehicle.stopDriving();
 
-        game.simulation.addEntity(vehicle.getInteriorWorld(), game.player);
-
+        game.player.bodyComponent.setWorld(vehicle.getInteriorWorld());
         game.player.setPosition(0, 0);
         game.player.setRotation(0);
         game.player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);

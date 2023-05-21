@@ -21,14 +21,12 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public BaseEntity(){}
 
     // Getters
-    @Deprecated
     public float getPhysScale(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return Constants.PPM;
         return bodyComponent.world.getPhysScale();
     }
 
-    @Deprecated
     public Matrix3 getTransform(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
@@ -44,7 +42,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return matrix;
     }
 
-    @Deprecated
     public Vector2 getPosition(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
@@ -55,7 +52,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return transform.position;
     }
 
-    @Deprecated
     public Vector2 getCenter(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
@@ -65,7 +61,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return getPosition();
     }
 
-    @Deprecated
     public float getRotation(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
@@ -76,7 +71,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return transform.rotation;
     }
 
-    @Deprecated
     public Vector2 getVelocity(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return null;
@@ -84,7 +78,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     // Setters
-    @Deprecated
     public void setPosition(float x, float y){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
@@ -95,10 +88,8 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         }
     }
 
-    @Deprecated
     public void setPosition(Vector2 p){ setPosition(p.x, p.y); }
 
-    @Deprecated
     public void setRotation(float rads){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
@@ -108,14 +99,12 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         }
     }
 
-    @Deprecated
     public void setVelocity(float x, float y){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return;
         bodyComponent.body.setLinearVelocity(x, y);
     }
 
-    @Deprecated
     public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
 
     // Component system
@@ -196,12 +185,8 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     // Depreciated functions for backwards compat
-    @Deprecated
     public float getX(){ return getPosition().x; }
-    @Deprecated
     public float getY(){ return getPosition().y; }
-    @Deprecated
     public void setX(float x){ setPosition(x, getPosition().y); }
-    @Deprecated
     public void setY(float y){ setPosition(getPosition().x, y); }
 }

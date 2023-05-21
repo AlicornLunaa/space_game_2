@@ -6,10 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class EntityActorWrapper extends Actor {
 
-    private BaseEntity ent;
+    // private BaseEntity ent;
 
     public EntityActorWrapper(BaseEntity ent){
-        this.ent = ent;
+        // this.ent = ent;
     }
 
     @Override

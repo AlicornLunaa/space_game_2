@@ -62,3 +62,9 @@ part will have to be told which attachment point is being used as well.
 5. Load player
     - Load position and world from files
 6. Start scene
+
+### Refactor
+1. Fix depreciation
+2. Add new render system for when on a planet
+3. Rework camera system
+4. Fix scaling

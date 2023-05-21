@@ -4,10 +4,8 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
-import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -71,60 +69,60 @@ public class SaveManager {
             }
         }); */
 
-        register(Player.class, new SaveSerializer<Player>() {
-            @Override
-            public void serialize(JSONObject data, Player object) {
-                data.put("x", object.getX());
-                data.put("y", object.getY());
-                data.put("vx", object.getVelocity().x);
-                data.put("vy", object.getVelocity().y);
-                data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
-                data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
-            }
+        // register(Player.class, new SaveSerializer<Player>() {
+        //     @Override
+        //     public void serialize(JSONObject data, Player object) {
+        //         data.put("x", object.getX());
+        //         data.put("y", object.getY());
+        //         data.put("vx", object.getVelocity().x);
+        //         data.put("vy", object.getVelocity().y);
+        //         data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
+        //         data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+        //     }
 
-            @Override
-            public Player unserialize(JSONObject data) {
-                Player p = new Player(game, 0, 0);
-                game.universe.addEntity(p);
+        //     @Override
+        //     public Player unserialize(JSONObject data) {
+        //         Player p = new Player(game, 0, 0);
+        //         game.universe.addEntity(p);
 
-                Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
-                if(parent != null){
-                    if(game.simulation.getWorldID(parent.getInfluenceWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
-                        game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), p);
-                    } else {
-                        game.simulation.addEntity(parent.getInfluenceWorld(), p);
-                    }
-                }
+        //         Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
+        //         if(parent != null){
+        //             if(game.simulation.getWorldID(parent.getInfluenceWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
+        //                 game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), p);
+        //             } else {
+        //                 game.simulation.addEntity(parent.getInfluenceWorld(), p);
+        //             }
+        //         }
 
-                p.setPosition(data.getFloat("x"), data.getFloat("y"));
-                p.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
+        //         p.setPosition(data.getFloat("x"), data.getFloat("y"));
+        //         p.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
                 
-                return p;
-            }
-        });
+        //         return p;
+        //     }
+        // });
         
-        register(Celestial.class, new SaveSerializer<Celestial>() {
-            @Override
-            public void serialize(JSONObject data, Celestial object) {
-                data.put("x", object.getX());
-                data.put("y", object.getY());
-                data.put("vx", object.getVelocity().x);
-                data.put("vy", object.getVelocity().y);
-                data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
-                data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
-                data.put("parent_celestial_id", (object.getCelestialParent() == null) ? -1 : object.getCelestialParent().getCelestialID());
-                data.put("celestial_radius", object.getRadius());
-            }
+        // register(Celestial.class, new SaveSerializer<Celestial>() {
+        //     @Override
+        //     public void serialize(JSONObject data, Celestial object) {
+        //         data.put("x", object.getX());
+        //         data.put("y", object.getY());
+        //         data.put("vx", object.getVelocity().x);
+        //         data.put("vy", object.getVelocity().y);
+        //         data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
+        //         data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+        //         data.put("parent_celestial_id", (object.getCelestialParent() == null) ? -1 : object.getCelestialParent().getCelestialID());
+        //         data.put("celestial_radius", object.getRadius());
+        //     }
 
-            @Override
-            public Celestial unserialize(JSONObject data) {
-                Celestial c = new Celestial(game, data.getFloat("celestial_radius"));
-                c.setPosition(data.getFloat("x"), data.getFloat("y"));
-                c.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
-                game.universe.addCelestial(c);
-                return c;
-            }
-        });
+        //     @Override
+        //     public Celestial unserialize(JSONObject data) {
+        //         Celestial c = new Celestial(game, data.getFloat("celestial_radius"));
+        //         c.setPosition(data.getFloat("x"), data.getFloat("y"));
+        //         c.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
+        //         game.universe.addCelestial(c);
+        //         return c;
+        //     }
+        // });
     }
 
     public static <T> void register(Class<T> c, SaveSerializer<T> serializer){

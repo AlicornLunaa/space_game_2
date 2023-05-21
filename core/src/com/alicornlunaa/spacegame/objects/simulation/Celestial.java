@@ -37,7 +37,7 @@ public class Celestial extends BaseEntity {
     
     // Variables
     protected final App game;
-    private BodyComponent bodyComponent;
+    public BodyComponent bodyComponent;
 
     // Planet variables
     protected float radius;

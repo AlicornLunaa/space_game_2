@@ -71,8 +71,7 @@ public class Universe extends Actor {
 
         // Convert the target celestial's body to the new Box2D world
         celestial.setPosition(celestial.getPosition().mul(parent.getTransform().inv()));
-        // celestial.setWorld(parent.getInfluenceWorld());
-        game.simulation.addEntity(parent.getInfluenceWorld(), celestial);
+        celestial.bodyComponent.setWorld(parent.getInfluenceWorld());
 
         return true;
     }
@@ -88,12 +87,14 @@ public class Universe extends Actor {
      * Adds a new entity to this universe
      * @param e The entity to add
      */
-    public void addEntity(BaseEntity e){
+    public void addEntity(IEntity e){
         game.registry.addEntity(e);
-        game.simulation.addEntity(universalWorld, e);
+
+        if(!e.hasComponent(BodyComponent.class)) return;
+        e.getComponent(BodyComponent.class).setWorld(universalWorld);
 
         boolean res = false;
-        do { res = checkTransfer(e); } while(res == true);
+        do { res = checkTransfer((BaseEntity)e); } while(res == true);
     }
 
     /**
@@ -103,7 +104,7 @@ public class Universe extends Actor {
      */
     public void addCelestial(Celestial c){
         game.registry.addEntity(c);
-        game.simulation.addEntity(universalWorld, c);
+        c.bodyComponent.setWorld(universalWorld);
         celestials.add(c);
 
         boolean res = false;
