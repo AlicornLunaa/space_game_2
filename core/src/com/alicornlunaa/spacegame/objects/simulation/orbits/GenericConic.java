@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -84,13 +85,13 @@ public abstract class GenericConic {
     }
 
     public GenericConic(Celestial parent, BaseEntity child) {
-        this(parent.getBody().getMass(), child.getBody().getWorldCenter(), child.getBody().getLinearVelocity());
+        this(parent.getComponent(BodyComponent.class).body.getMass(), child.getComponent(BodyComponent.class).body.getWorldCenter(), child.getComponent(BodyComponent.class).body.getLinearVelocity());
         this.parent = parent;
         this.child = child;
     }
 
     public GenericConic(Celestial parent, BaseEntity child, Vector2 position, Vector2 velocity) {
-        this(parent.getBody().getMass(), position, velocity);
+        this(parent.getComponent(BodyComponent.class).body.getMass(), position, velocity);
         this.parent = parent;
         this.child = child;
     }

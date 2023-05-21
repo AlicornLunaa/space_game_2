@@ -2,8 +2,11 @@ package com.alicornlunaa.spacegame.objects.planet;
 
 import java.util.Stack;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
@@ -29,6 +32,7 @@ public class Planet extends Celestial {
 
     // Variables
     private final App game;
+    private BodyComponent bodyComponent;
 
     private int terrestrialWidth; // Chunk-size
     private int terrestrialHeight; // Chunk-size
@@ -241,9 +245,13 @@ public class Planet extends Celestial {
         double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
 
         // Convet to space velocity
+        BodyComponent bc = e.getComponent(BodyComponent.class);
+
+        if(bc == null) return new Vector2();
+
         Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
         Vector2 planetToEnt = e.getPosition().nor();
-        Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
+        Vector2 curVelocity = bc.body.getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
 
         return tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y));
     }
@@ -276,27 +284,28 @@ public class Planet extends Celestial {
      * Converts the entity to 2d planet planar coordinates
      * @param e Entity to be converted
      */
-    public void addEntityWorld(BaseEntity e){
+    public void addEntityWorld(IEntity e){
         // Formula: x = theta, y = radius
-        Vector2 localPos = e.getBody().getPosition().cpy();
-        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
-        float y = localPos.len() * e.getPhysScale();
-        e.setPosition(x, y);
+        TransformComponent transform = e.getComponent(TransformComponent.class);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+        if(bodyComponent == null || transform == null) return;
 
-        // Load space angle relative to the world
-        float theta = localPos.angleDeg();
-        float omega = (float)Math.toDegrees(e.getRotation());
-        e.setRotation((float)Math.toRadians(omega - theta + 90));
+        // Convert orbital position to world
+        Vector2 localPos = transform.position.cpy();
+        float ppm = bodyComponent.world.getPhysScale();
+        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
+        float y = localPos.len();
+        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle() - localPos.angleRad() + (float)Math.PI / 2);
 
         // Convert orbital velocity to world
-        Vector2 vel = e.getBody().getLinearVelocity().cpy().scl(getPhysScale()).scl(1 / Constants.PLANET_PPM);
+        Vector2 vel = bodyComponent.body.getLinearVelocity().cpy().scl(ppm).scl(1 / Constants.PLANET_PPM);
         Vector2 tangent = localPos.cpy().nor().rotateDeg(90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
-        e.getBody().setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
+        bodyComponent.body.setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
         // Add body
-        game.simulation.addEntity(physWorld, e);
+        bodyComponent.setWorld(physWorld);
     }
 
     /**
@@ -304,33 +313,34 @@ public class Planet extends Celestial {
      * @param e Entity to be converted
      */
     public void delEntityWorld(BaseEntity e){
-        // Formula: BaseEntityheta = x, radius = y
-        double theta = ((e.getX() / (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-        float radius = e.getY();
+        // Formula: theta = x, radius = y
+        TransformComponent transform = e.getComponent(TransformComponent.class);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+        if(bodyComponent == null || transform == null) return;
 
         // Convert to space angles, spaceAngle = worldAngle + theta
-        float worldAngle = (float)Math.toDegrees(e.getRotation());
-        e.setRotation((float)Math.toRadians(worldAngle + Math.toDegrees(theta) - 90));
-
-        // Convet to space position
+        float ppm = bodyComponent.world.getPhysScale();
+        float theta = ((transform.position.x / (terrestrialWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * (float)Math.PI * 2);
+        float radius = transform.position.y;
         float x = (float)(Math.cos(theta) * radius);
         float y = (float)(Math.sin(theta) * radius);
-        e.setPosition(x, y);
+        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle() + theta - (float)Math.PI / 2);
 
         // Convert to space velocity, tangent = x, planetToEntity = y
         Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
-        Vector2 planetToEnt = e.getPosition().nor();
-        Vector2 curVelocity = e.getBody().getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
-        e.getBody().setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
+        Vector2 planetToEnt = transform.position.cpy().nor();
+        Vector2 curVelocity = bodyComponent.body.getLinearVelocity().cpy().scl(ppm).scl(1 / Constants.PPM);
+        bodyComponent.body.setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
-        game.simulation.addEntity(getInfluenceWorld(), e);
+        bodyComponent.setWorld(getInfluenceWorld());
     }
 
-    public boolean checkTransferPlanet(BaseEntity e){
+    public boolean checkTransferPlanet(IEntity e){
         // This function checks if the entity supplied
         // is within range to change its physics system to the planet's
-        float dist = e.getPosition().len();
+        TransformComponent transform = e.getComponent(TransformComponent.class);
+        float dist = transform.position.len();
 
         if(dist < radius * 1.2f){
             // Move it into this world
@@ -353,19 +363,23 @@ public class Planet extends Celestial {
         return false;
     }
 
-    public Vector2 applyDrag(Body b){
+    public Vector2 applyDrag(BodyComponent bc){
         // Newtons gravitational law: F = 1/2(density * velocity^2 * dragCoefficient * Area)
-        float planetRadPhys = radius / getPhysScale(); // Planet radius in physics scale
-        float atmosRadPhys = atmosphereRadius / getPhysScale(); // Atmosphere radius in physics scale
-        float entRadPhys = b.getPosition().len(); // Entity radius in physics scale
+        BodyComponent bodyComponent = this.getComponent(BodyComponent.class);
+        if(bodyComponent == null || bc == null) return new Vector2();
+
+        float ppm = bodyComponent.world.getPhysScale();
+        float planetRadPhys = getRadius() / ppm; // Planet radius in physics scale
+        float atmosRadPhys = getAtmosphereRadius() / ppm; // Atmosphere radius in physics scale
+        float entRadPhys = bc.body.getPosition().len(); // Entity radius in physics scale
 
         float atmosSurface = atmosRadPhys - planetRadPhys; // Atmosphere radius above surface
         float entSurface = entRadPhys - planetRadPhys; // Entity radius above surface
         float atmosDepth = Math.max(atmosSurface - entSurface, 0) / atmosSurface; // How far the entity is in the atmosphere, where zero is outside and 1 is submerged
         float density = atmosphereDensity * atmosDepth * 0.001f;
 
-        Vector2 relVel = getBody().getLinearVelocity().cpy().sub(b.getLinearVelocity());
-        Vector2 velDir = b.getLinearVelocity().cpy().nor();
+        Vector2 relVel = bodyComponent.body.getLinearVelocity().cpy().sub(bc.body.getLinearVelocity());
+        Vector2 velDir = bc.body.getLinearVelocity().cpy().nor();
         float velSqr = relVel.len2();
         float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
 
@@ -373,9 +387,9 @@ public class Planet extends Celestial {
     }
 
     @Override
-    public Vector2 applyPhysics(float delta, BaseEntity e){
+    public Vector2 applyPhysics(float delta, IEntity e){
         checkTransferPlanet(e);
-        return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
+        return super.applyPhysics(delta, e).add(applyDrag(e.getComponent(BodyComponent.class)));
     }
 
     @Override

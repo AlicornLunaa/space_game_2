@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -56,7 +57,7 @@ public class OrbitPropagator {
     public static GenericConic getConic(Celestial parent, BaseEntity child, Vector2 position, Vector2 velocity){
         if(parent == null) return null;
 
-        ConicType type = getConicType(parent.getBody().getMass(), position, velocity);
+        ConicType type = getConicType(parent.getComponent(BodyComponent.class).body.getMass(), position, velocity);
         
         if(type == ConicType.HYPERBOLIC){
             return new HyperbolicConic(parent, child, position, velocity);
@@ -70,7 +71,7 @@ public class OrbitPropagator {
     public static GenericConic getConic(Celestial parent, BaseEntity child){
         if(parent == null) return null;
 
-        ConicType type = getConicType(parent.getBody().getMass(), child.getBody().getWorldCenter(), child.getBody().getLinearVelocity());
+        ConicType type = getConicType(parent.getComponent(BodyComponent.class).body.getMass(), child.getComponent(BodyComponent.class).body.getWorldCenter(), child.getComponent(BodyComponent.class).body.getLinearVelocity());
 
         if(type == ConicType.HYPERBOLIC){
             return new HyperbolicConic(parent, child);

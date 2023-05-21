@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.scenes.ship_view_scene;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.badlogic.gdx.Gdx;
@@ -65,7 +66,7 @@ public class ShipViewScene implements Screen {
 
         game.player.setPosition(0, 0);
         game.player.setRotation(0);
-        game.player.getBody().setLinearVelocity(0, 0);
+        game.player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);
 
         Gdx.input.setInputProcessor(inputs);
     }

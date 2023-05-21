@@ -1,5 +1,6 @@
 package com.alicornlunaa.selene_engine.core;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
@@ -25,8 +26,9 @@ public abstract class DriveableEntity extends BaseEntity {
         this.driver = driver;
         driver.setVehicle(this);
 
-        if(driver.getBody() != null){
-            driver.getBody().setActive(false);
+        BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
+        if(bodyComponent != null){
+            bodyComponent.body.setActive(false);
             driver.setVelocity(0, 0);
         }
     }
@@ -35,8 +37,9 @@ public abstract class DriveableEntity extends BaseEntity {
         driver.setPosition(getPosition());
         driver.setVehicle(null);
 
-        if(driver.getBody() != null){
-            driver.getBody().setActive(true);
+        BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
+        if(bodyComponent != null){
+            bodyComponent.body.setActive(true);
             driver.setVelocity(getVelocity());
         }
         
@@ -46,7 +49,11 @@ public abstract class DriveableEntity extends BaseEntity {
     public void afterWorldChange(PhysWorld world){
         // Carry the driver with the vehicle
         if(driver == null) return;
-        driver.getBody().setActive(false);
+
+        BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
+        if(bodyComponent != null){
+            bodyComponent.body.setActive(false);
+        }
     }
     
 }

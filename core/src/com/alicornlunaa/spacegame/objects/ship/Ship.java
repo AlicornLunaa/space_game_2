@@ -36,6 +36,7 @@ public class Ship extends DriveableEntity {
     
     // Variables
     private final App game;
+    private BodyComponent bodyComponent;
 
     private Array<Part> parts = new Array<>();
     private AttachmentList attachments = new AttachmentList();
@@ -54,7 +55,7 @@ public class Ship extends DriveableEntity {
                 Ship.super.afterWorldChange(world);
 
                 for(Part p : parts){
-                    p.setParent(getBody(), getPhysScale());
+                    p.setParent(bodyComponent.body, getPhysScale());
                 }
             }
         });
@@ -149,7 +150,7 @@ public class Ship extends DriveableEntity {
     public void assemble(){
         // Puts all the parts together with their respective physics bodies
         for(Part p : parts){
-            p.setParent(getBody(), Constants.PPM);
+            p.setParent(bodyComponent.body, Constants.PPM);
         }
 
         interior.assemble();
@@ -197,12 +198,12 @@ public class Ship extends DriveableEntity {
             JSONObject data = new JSONObject(file.readString());
 
             // Reset body
-            for(Fixture f : getBody().getFixtureList()){
-                getBody().destroyFixture(f);
+            for(Fixture f : bodyComponent.body.getFixtureList()){
+                bodyComponent.body.destroyFixture(f);
             }
 
-            getBody().setLinearVelocity(0, 0);
-            getBody().setAngularVelocity(0);
+            bodyComponent.body.setLinearVelocity(0, 0);
+            bodyComponent.body.setAngularVelocity(0);
 
             // Load body data
             JSONArray partArray = data.getJSONArray("assembly");
@@ -224,7 +225,7 @@ public class Ship extends DriveableEntity {
 
     private void computeSAS(){
         // Reduce angular velocity with controls
-        float angVel = getBody().getAngularVelocity();
+        float angVel = bodyComponent.body.getAngularVelocity();
         angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
 
         if(Math.abs(angVel) <= 0.005f) angVel = 0;

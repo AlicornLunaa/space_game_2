@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
@@ -49,7 +50,7 @@ public class OrbitUtils {
      */
     public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
-        Vector2 systemSpacePosition = e.getBody().getWorldCenter().cpy().scl(e.getPhysScale());
+        Vector2 systemSpacePosition = e.getComponent(BodyComponent.class).body.getWorldCenter().cpy().scl(e.getPhysScale());
 
         if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
 
@@ -151,11 +152,11 @@ public class OrbitUtils {
         Celestial parent = u.getParentCelestial(e);
         if(parent == null) return; // Cant create an orbit for no parent
 
-        Vector2 tangent = e.getBody().getPosition().cpy().nor().rotateDeg(90);
-        float radius = e.getBody().getPosition().len();
-        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getBody().getMass()) / radius);
+        Vector2 tangent = e.getComponent(BodyComponent.class).body.getPosition().cpy().nor().rotateDeg(90);
+        float radius = e.getComponent(BodyComponent.class).body.getPosition().len();
+        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getComponent(BodyComponent.class).body.getMass()) / radius);
 
-        e.getBody().setLinearVelocity(tangent.scl(velScl));
+        e.getComponent(BodyComponent.class).body.setLinearVelocity(tangent.scl(velScl));
     }
 
     /**

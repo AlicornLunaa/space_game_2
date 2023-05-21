@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
@@ -70,6 +71,7 @@ public class Universe extends Actor {
 
         // Convert the target celestial's body to the new Box2D world
         celestial.setPosition(celestial.getPosition().mul(parent.getTransform().inv()));
+        // celestial.setWorld(parent.getInfluenceWorld());
         game.simulation.addEntity(parent.getInfluenceWorld(), celestial);
 
         return true;
@@ -116,7 +118,7 @@ public class Universe extends Actor {
      */
     public boolean checkTransfer(BaseEntity e){
         // Only transfer active entities
-        if(!e.getBody().isActive()) return false;
+        if(e.hasComponent(BodyComponent.class) && !e.getComponent(BodyComponent.class).body.isActive()) return false;
 
         // Check whether or not this entity has a celestial parent or not
         Celestial parent = getParentCelestial(e);
@@ -218,11 +220,16 @@ public class Universe extends Actor {
      * @param e Entity to be converted
      */
     public void addToCelestial(Celestial c, BaseEntity e){
-        e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().sub(c.getBody().getLinearVelocity()));
-        e.setPosition(e.getPosition().sub(c.getPosition()));
+        BodyComponent bodyComponent1 = c.getComponent(BodyComponent.class);
+        BodyComponent bodyComponent2 = e.getComponent(BodyComponent.class);
+
+        if(bodyComponent1 != null && bodyComponent2 != null){
+            bodyComponent2.body.setLinearVelocity(bodyComponent2.body.getLinearVelocity().cpy().sub(bodyComponent1.body.getLinearVelocity()));
+            bodyComponent2.body.setTransform(bodyComponent2.body.getPosition().cpy().sub(bodyComponent1.body.getPosition()), bodyComponent2.body.getAngle());
+        }
 
         // Add body
-        game.simulation.addEntity(c.getInfluenceWorld(), e);
+        bodyComponent2.setWorld(c.getInfluenceWorld());
     }
 
     /**
@@ -236,12 +243,17 @@ public class Universe extends Actor {
 
         if(parent == null) return;
 
-        // TODO: bug here
-        e.getBody().setLinearVelocity(e.getBody().getLinearVelocity().cpy().add(parent.getBody().getLinearVelocity()));
-        e.setPosition(e.getPosition().add(parent.getPosition()));
+        BodyComponent bodyComponent1 = parent.getComponent(BodyComponent.class);
+        BodyComponent bodyComponent2 = e.getComponent(BodyComponent.class);
+
+        if(bodyComponent1 != null && bodyComponent2 != null){
+            // TODO: bug here
+            bodyComponent2.body.setLinearVelocity(bodyComponent2.body.getLinearVelocity().cpy().add(bodyComponent1.body.getLinearVelocity()));
+            bodyComponent2.body.setTransform(bodyComponent2.body.getPosition().cpy().add(bodyComponent1.body.getPosition()), bodyComponent2.body.getAngle());
+        }
 
         // Remove body
-        game.simulation.addEntity(targetWorld, e);
+        bodyComponent2.setWorld(targetWorld);
     }
 
     /**
@@ -268,11 +280,14 @@ public class Universe extends Actor {
                         ((Planet)e).getStarDirection().set(OrbitUtils.directionToNearestStar(this, e), 0);
                     }
     
+                    BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
                     Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
                     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
     
-                    e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
-                    e.getBody().setLinearVelocity(curVel.cpy());
+                    if(bodyComponent == null) return;
+                    
+                    bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
+                    bodyComponent.body.setLinearVelocity(curVel.cpy());
                 }
 
                 for(int i = 0; i < entityPaths.size; i++){
@@ -282,6 +297,7 @@ public class Universe extends Actor {
                     if(e instanceof Player && ((Player)e).isDriving()) continue; // Skip player if player is inside a vehicle
                     if(!(e.getWorld() instanceof CelestialPhysWorld)) continue; // Skip entities on a planet surface
     
+                    BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);
                     Vector2 curVel = path.getVelocity(currentFuture);
@@ -297,8 +313,10 @@ public class Universe extends Actor {
                         }
                     }
     
-                    e.getBody().setTransform(curPos.cpy(), e.getBody().getAngle());
-                    e.getBody().setLinearVelocity(curVel.cpy());
+                    if(bodyComponent == null) return;
+                    
+                    bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
+                    bodyComponent.body.setLinearVelocity(curVel.cpy());
                 }
             }
 

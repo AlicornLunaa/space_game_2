@@ -9,40 +9,36 @@ import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Null;
 
 public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
 
     // Variables
     private Array<IComponent> components = new Array<>();
-    private TransformComponent transform;
-    protected @Null BodyComponent bodyComponent;
+    private TransformComponent transform = addComponent(new TransformComponent());
 
     // Constructors
-    public BaseEntity(){
-        transform = addComponent(new TransformComponent());
-    }
+    public BaseEntity(){}
 
     // Getters
-    public Body getBody(){
-        if(bodyComponent == null) return null;
-        return bodyComponent.body;
-    }
-
+    @Deprecated
     public PhysWorld getWorld(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return null;
         return bodyComponent.world;
     }
     
+    @Deprecated
     public float getPhysScale(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return Constants.PPM;
         return bodyComponent.world.getPhysScale();
     }
 
+    @Deprecated
     public Matrix3 getTransform(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
             transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
             transform.rotation = bodyComponent.body.getAngle();
@@ -56,7 +52,9 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return matrix;
     }
 
+    @Deprecated
     public Vector2 getPosition(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
             transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
             transform.rotation = bodyComponent.body.getAngle();
@@ -65,7 +63,9 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return transform.position;
     }
 
+    @Deprecated
     public Vector2 getCenter(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
             return bodyComponent.body.getWorldCenter().cpy().scl(getPhysScale());
         }
@@ -73,7 +73,9 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return getPosition();
     }
 
+    @Deprecated
     public float getRotation(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
             transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
             transform.rotation = bodyComponent.body.getAngle();
@@ -82,13 +84,17 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         return transform.rotation;
     }
 
+    @Deprecated
     public Vector2 getVelocity(){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return null;
         return transform.velocity.set(bodyComponent.body.getLinearVelocity());
     }
 
     // Setters
+    @Deprecated
     public void setPosition(float x, float y){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
             // TODO: TEMP Problem with bug here
             bodyComponent.body.setTransform(x / getPhysScale(), y / getPhysScale(), getRotation());
@@ -97,9 +103,12 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         }
     }
 
+    @Deprecated
     public void setPosition(Vector2 p){ setPosition(p.x, p.y); }
 
+    @Deprecated
     public void setRotation(float rads){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
             bodyComponent.body.setTransform(getPosition().cpy().scl(1 / getPhysScale()), rads);
         } else {
@@ -107,11 +116,14 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
         }
     }
 
+    @Deprecated
     public void setVelocity(float x, float y){
+        BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent == null) return;
         bodyComponent.body.setLinearVelocity(x, y);
     }
 
+    @Deprecated
     public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
 
     // Component system
@@ -192,9 +204,12 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     // Depreciated functions for backwards compat
+    @Deprecated
     public float getX(){ return getPosition().x; }
+    @Deprecated
     public float getY(){ return getPosition().y; }
+    @Deprecated
     public void setX(float x){ setPosition(x, getPosition().y); }
+    @Deprecated
     public void setY(float y){ setPosition(getPosition().x, y); }
-
 }

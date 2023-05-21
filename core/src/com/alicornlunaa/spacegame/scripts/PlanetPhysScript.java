@@ -13,9 +13,11 @@ import com.badlogic.gdx.math.Vector2;
 public class PlanetPhysScript implements IScriptComponent {
 
     private IEntity entity;
+    private BodyComponent playerBody;
 
     public PlanetPhysScript(IEntity entity){
         this.entity = entity;
+        playerBody = entity.getComponent(BodyComponent.class);
     }
 
     @Override
@@ -23,7 +25,7 @@ public class PlanetPhysScript implements IScriptComponent {
         if(!entity.hasComponent(BodyComponent.class)) return;
         if(!(entity.getComponent(BodyComponent.class).world instanceof PlanetaryPhysWorld)) return;
 
-        Planet planet = ((PlanetaryPhysWorld)entity.getComponent(BodyComponent.class).world).getPlanet();
+        Planet planet = ((PlanetaryPhysWorld)playerBody.world).getPlanet();
         float worldWidthPixels = planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
         BaseEntity e = (BaseEntity)entity;
@@ -36,10 +38,10 @@ public class PlanetPhysScript implements IScriptComponent {
         planet.checkLeavePlanet(e);
         
         // Taken from Celestial.java to correctly apply the right force
-        Vector2 dragForce = planet.applyDrag(e.getBody());
-        float height = Math.max(e.getBody().getPosition().y, planet.getRadius() / planet.getPhysScale());
-        float force = Constants.GRAVITY_CONSTANT * ((planet.getBody().getMass() * e.getBody().getMass()) / (height * height));
-        e.getBody().applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
+        Vector2 dragForce = planet.applyDrag(playerBody);
+        float height = Math.max(playerBody.body.getPosition().y, planet.getRadius() / planet.getPhysScale());
+        float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * playerBody.body.getMass()) / (height * height));
+        playerBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
     }
 
     @Override

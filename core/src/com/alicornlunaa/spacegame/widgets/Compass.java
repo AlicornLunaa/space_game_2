@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.widgets;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -102,7 +103,7 @@ public class Compass extends Widget {
             // if(targetEnt.getDriving() != null){
             //     theta = targetEnt.getDriving().getBody().getLinearVelocity().angleDeg() - 90;
             // } else {
-                theta = targetEnt.getBody().getLinearVelocity().angleDeg() - 90;
+                theta = targetEnt.getComponent(BodyComponent.class).body.getLinearVelocity().angleDeg() - 90;
             // }
         }
         batch.draw(

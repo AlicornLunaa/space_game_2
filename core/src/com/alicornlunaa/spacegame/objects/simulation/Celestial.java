@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
@@ -36,6 +37,7 @@ public class Celestial extends BaseEntity {
     
     // Variables
     protected final App game;
+    private BodyComponent bodyComponent;
 
     // Planet variables
     protected float radius;
@@ -60,14 +62,14 @@ public class Celestial extends BaseEntity {
         game.simulation.addWorld(influenceWorld);
         
         CircleShape shape = new CircleShape();
-        shape.setRadius(radius / getPhysScale());
+        shape.setRadius(radius / game.universe.getUniversalWorld().getPhysScale());
         shape.setPosition(Vector2.Zero.cpy());
 
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         def.position.set(0, 0);
         bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def));
-        getBody().createFixture(shape, 1.0f);
+        bodyComponent.body.createFixture(shape, 1.0f);
 
         def = new BodyDef();
         def.type = BodyType.StaticBody;
@@ -115,7 +117,7 @@ public class Celestial extends BaseEntity {
         if(getCelestialParent() == null) return radius * 200; // Star radius
 
         GenericConic c = OrbitPropagator.getConic(getCelestialParent(), this);
-        return (float)(c.getSemiMajorAxis() * Math.pow(getBody().getMass() / getCelestialParent().getBody().getMass(), 2.0 / 5.0)) * Constants.PPM;
+        return (float)(c.getSemiMajorAxis() * Math.pow(bodyComponent.body.getMass() / getCelestialParent().bodyComponent.body.getMass(), 2.0 / 5.0)) * Constants.PPM;
     }
 
     public Matrix3 getUniverseSpaceTransform(){
@@ -128,16 +130,18 @@ public class Celestial extends BaseEntity {
     }
 
     // Physics functions
-    public Vector2 applyGravity(float delta, Body b){
+    public Vector2 applyGravity(float delta, BodyComponent bc){
         // Newtons gravitational law: F = (G(m1 * m2)) / r^2
-        float orbitRadius = b.getPosition().len(); // Entity radius in physics scale
-        Vector2 direction = b.getPosition().cpy().nor().scl(-1);
-        float force = Constants.GRAVITY_CONSTANT * ((b.getMass() * getBody().getMass()) / (orbitRadius * orbitRadius));
+        if(bc == null) return new Vector2();
+        
+        float orbitRadius = bc.body.getPosition().len(); // Entity radius in physics scale
+        Vector2 direction = bc.body.getPosition().cpy().nor().scl(-1);
+        float force = Constants.GRAVITY_CONSTANT * ((bc.body.getMass() * bodyComponent.body.getMass()) / (orbitRadius * orbitRadius));
         return direction.scl(force);
     }
 
-    public Vector2 applyPhysics(float delta, BaseEntity e){
-        return applyGravity(delta, e.getBody());
+    public Vector2 applyPhysics(float delta, IEntity e){
+        return applyGravity(delta, e.getComponent(BodyComponent.class));
     }
 
 }

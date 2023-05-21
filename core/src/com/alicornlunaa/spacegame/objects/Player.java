@@ -51,6 +51,7 @@ public class Player extends BaseEntity {
 
     // Variables
     private final App game;
+    private BodyComponent bodyComponent;
 
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
@@ -105,8 +106,10 @@ public class Player extends BaseEntity {
         });
         addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
-        getBody().setFixedRotation(true);
-        setPosition(x, y);
+
+        float ppm = bodyComponent.world.getPhysScale();
+        bodyComponent.body.setFixedRotation(true);
+        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.1f;
@@ -114,10 +117,10 @@ public class Player extends BaseEntity {
         fixtureDef.density = 1.4f;
 
         PolygonShape shape = new PolygonShape();
-        float rad = PLAYER_WIDTH / 2.f / getPhysScale();
+        float rad = PLAYER_WIDTH / 2.f / ppm;
         shape.setAsBox(
-            PLAYER_WIDTH / 2 / getPhysScale(),
-            PLAYER_HEIGHT / 2 / getPhysScale() - rad,
+            PLAYER_WIDTH / 2 / ppm,
+            PLAYER_HEIGHT / 2 / ppm - rad,
             new Vector2(
                 0,
                 0
@@ -125,16 +128,16 @@ public class Player extends BaseEntity {
             0
         );
         fixtureDef.shape = shape;
-        getBody().createFixture(fixtureDef);
+        bodyComponent.body.createFixture(fixtureDef);
         shape.dispose();
 
         CircleShape cShape = new CircleShape();
         cShape.setRadius(rad);
-        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 / getPhysScale() - rad));
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 / ppm - rad));
         fixtureDef.shape = cShape;
-        getBody().createFixture(fixtureDef);
-        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 / getPhysScale() + rad));
-        getBody().createFixture(fixtureDef);
+        bodyComponent.body.createFixture(fixtureDef);
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 / ppm + rad));
+        bodyComponent.body.createFixture(fixtureDef);
         cShape.dispose();
 
         jumpCallback = new RayCastCallback(){
@@ -178,12 +181,11 @@ public class Player extends BaseEntity {
             public void update() {
                 // Groundchecking
                 grounded = false;
-                getWorld().getBox2DWorld().rayCast(jumpCallback, getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / getPhysScale())).cpy(), getBody().getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / getPhysScale())));
-                grounded = true;
+                bodyComponent.world.getBox2DWorld().rayCast(jumpCallback, bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / bodyComponent.world.getPhysScale())).cpy(), bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / bodyComponent.world.getPhysScale())));
 
                 // Movement
                 if(vertical != 0 || horizontal != 0){
-                    getBody().applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / getPhysScale() * 1.f), getBody().getWorldCenter(), true);
+                    bodyComponent.body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / getPhysScale() * 1.f), bodyComponent.body.getWorldCenter(), true);
                 }
 
                 // Controls

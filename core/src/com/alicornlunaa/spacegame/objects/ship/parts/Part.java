@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.ship.parts;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -48,7 +49,7 @@ public class Part implements Comparable<Part> {
 
     // Constructors
     public Part(final Ship ship, final TextureRegion texture, String type, String id, String name, String desc){
-        parent = ship.getBody();
+        parent = ship.getComponent(BodyComponent.class).body;
         stateRef = ship.state;
 
         this.type = type;
@@ -63,7 +64,7 @@ public class Part implements Comparable<Part> {
     }
     
     public Part(final App game, final Ship ship, JSONObject obj){
-        parent = ship.getBody();
+        parent = ship.getComponent(BodyComponent.class).body;
         stateRef = ship.state;
 
         type = obj.getString("type");
