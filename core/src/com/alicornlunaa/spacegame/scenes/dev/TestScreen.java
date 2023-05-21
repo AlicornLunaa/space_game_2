@@ -47,9 +47,6 @@ public class TestScreen implements Screen {
             getComponent(BodyComponent.class).body.setTransform(0, -1, 0);
         }
 
-        @Override
-        public void render(Batch batch) {}
-
     }
 
     public static class TestEntity extends BaseEntity {
@@ -94,9 +91,6 @@ public class TestScreen implements Screen {
                 public void render(){}
             });
         }
-
-        @Override
-        public void render(Batch batch) {}
 
     }
 

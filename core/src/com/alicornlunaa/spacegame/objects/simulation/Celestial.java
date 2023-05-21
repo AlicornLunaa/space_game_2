@@ -4,6 +4,7 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
@@ -49,7 +50,7 @@ public class Celestial extends BaseEntity {
     private Array<Celestial> children = new Array<>();
     
     // Constructor
-    public Celestial(App game, float radius){
+    public Celestial(final App game, float radius){
         super();
         this.game = game;
         this.radius = radius;
@@ -78,6 +79,27 @@ public class Celestial extends BaseEntity {
 
         addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
+        addComponent(new CustomSpriteComponent() {
+            @Override
+            public void render(Batch batch) {
+                if(!Constants.DEBUG) return;
+                batch.end();
+        
+                ShapeRenderer s = game.shapeRenderer;
+                s.begin(ShapeRenderer.ShapeType.Line);
+                s.setProjectionMatrix(batch.getProjectionMatrix());
+                s.setTransformMatrix(new Matrix4().set(getUniverseSpaceTransform()));
+                s.setColor(Color.RED);
+                s.circle(0, 0, getSphereOfInfluence(), 500);
+                s.setColor(Color.YELLOW);
+                s.circle(0, 0, getRadius(), 500);
+                s.end();
+                
+                game.debug.render(influenceWorld.getBox2DWorld(), batch.getProjectionMatrix().cpy().mul(new Matrix4().set(Celestial.this.getUniverseSpaceTransform())).scl(Constants.PPM));
+        
+                batch.begin();
+            }
+        });
     }
 
     // Functions
@@ -103,26 +125,6 @@ public class Celestial extends BaseEntity {
 
     public Matrix3 getSystemSpaceTransform(){
         return getUniverseSpaceTransform().inv();
-    }
-
-    @Override
-    public void render(Batch batch){
-        if(!Constants.DEBUG) return;
-        batch.end();
-
-        ShapeRenderer s = game.shapeRenderer;
-        s.begin(ShapeRenderer.ShapeType.Line);
-        s.setProjectionMatrix(batch.getProjectionMatrix());
-        s.setTransformMatrix(batch.getTransformMatrix());
-        s.setColor(Color.RED);
-        s.circle(0, 0, getSphereOfInfluence(), 500);
-        s.setColor(Color.YELLOW);
-        s.circle(0, 0, getRadius(), 500);
-        s.end();
-        
-        game.debug.render(influenceWorld.getBox2DWorld(), batch.getProjectionMatrix().cpy().mul(new Matrix4().set(this.getUniverseSpaceTransform())).scl(Constants.PPM));
-
-        batch.begin();
     }
 
     // Physics functions

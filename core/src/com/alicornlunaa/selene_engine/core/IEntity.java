@@ -1,15 +1,8 @@
 package com.alicornlunaa.selene_engine.core;
 
 import com.alicornlunaa.selene_engine.ecs.IComponent;
-import com.badlogic.gdx.graphics.g2d.Batch;
 
 public interface IEntity {
-    /**
-     * Called every rendering tick
-     * @param batch The batch to render to
-     */
-    void render(Batch batch);
-
     /**
      * Adds a component to the entity
      * @param component

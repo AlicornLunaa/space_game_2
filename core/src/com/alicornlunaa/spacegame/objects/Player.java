@@ -8,6 +8,7 @@ import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
@@ -216,6 +217,36 @@ public class Player extends BaseEntity {
             @Override
             public void render() {}
         });
+    
+        addComponent(new CustomSpriteComponent() {
+            @Override
+            public void render(Batch batch) {
+                // Dont render if player is driving something
+                if(vehicle != null) return;
+
+                // Advance animation
+                animationTimer += Gdx.graphics.getDeltaTime();
+
+                // Render everything relative to the parent space
+                Matrix4 trans = new Matrix4();
+                Celestial parent = game.universe.getParentCelestial(Player.this);
+                if(parent != null) trans.set(parent.getUniverseSpaceTransform());
+                trans.mul(new Matrix4().set(getTransform()));
+
+                // Render to screen
+                Animation<TextureRegion> curAnimation = animations.get(animationState);
+                TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
+                batch.setTransformMatrix(trans);
+                batch.draw(
+                    animFrame,
+                    -PLAYER_WIDTH / 2, -PLAYER_HEIGHT / 2,
+                    0, 0,
+                    PLAYER_WIDTH, PLAYER_HEIGHT,
+                    1, 1,
+                    0
+                );
+            }
+        });
     }
 
     // Functions
@@ -256,30 +287,6 @@ public class Player extends BaseEntity {
     }
 
     public void updateCamera(){ updateCamera(false); }
-
-    @Override
-    public void render(Batch batch){
-        // Dont render if player is driving something
-        if(vehicle != null) return;
-
-        animationTimer += Gdx.graphics.getDeltaTime();
-
-        Matrix4 oldTrans = batch.getTransformMatrix().cpy();
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(getTransform())));
-
-        Animation<TextureRegion> curAnimation = animations.get(animationState);
-        TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
-        batch.draw(
-            animFrame,
-            -PLAYER_WIDTH / 2, -PLAYER_HEIGHT / 2,
-            0, 0,
-            PLAYER_WIDTH, PLAYER_HEIGHT,
-            1, 1,
-            0
-        );
-
-        batch.setTransformMatrix(oldTrans);
-    }
 
     // Overrides
     @Override

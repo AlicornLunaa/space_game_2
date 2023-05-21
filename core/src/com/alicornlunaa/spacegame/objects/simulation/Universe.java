@@ -14,7 +14,6 @@ import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
@@ -320,27 +319,6 @@ public class Universe extends Actor {
      */
     @Override
     public void draw(Batch batch, float a){
-        Matrix4 oldMat = batch.getTransformMatrix().cpy();
-
-        for(IEntity eRaw : game.registry.getEntities()){
-            BaseEntity e = (BaseEntity)eRaw;
-
-            if(e instanceof Celestial){
-                batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
-                e.render(batch);
-            } else {
-                batch.setTransformMatrix(new Matrix4());
-
-                Celestial parent = getParentCelestial(e);
-                if(parent != null)
-                    batch.setTransformMatrix(new Matrix4().set(parent.getUniverseSpaceTransform()));
-
-                e.render(batch);
-            }
-        }
-
-        batch.setTransformMatrix(oldMat);
-
         game.registry.render();
     }
     

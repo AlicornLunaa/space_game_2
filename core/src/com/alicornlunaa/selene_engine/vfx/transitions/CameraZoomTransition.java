@@ -26,6 +26,8 @@ public class CameraZoomTransition implements IVfx {
     }
 
     // Functions
+    public void finished(){}
+
     @Override
     public boolean update(float delta){
         // Advance the transition
@@ -36,6 +38,9 @@ public class CameraZoomTransition implements IVfx {
         float i = interp.apply(scalar);
         targetCam.zoom = ((1 - i) * startingZoom) + (i * endingZoom);
         targetCam.update();
+
+        if(scalar >= 1)
+            finished();
 
         return (scalar >= 1);
     }

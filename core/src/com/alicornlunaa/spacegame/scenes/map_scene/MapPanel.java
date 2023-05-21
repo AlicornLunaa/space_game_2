@@ -38,6 +38,7 @@ public class MapPanel extends Stage {
     private final App game;
 
     private OrthographicCamera mapCamera;
+    private OrthographicCamera oldCamera;
     private @Null BaseEntity targetEntity = null;
     
     private float celestialOpacity = 0.f;
@@ -84,6 +85,9 @@ public class MapPanel extends Stage {
         mapCamera.zoom = 300.f;
         mapCamera.update();
 
+        oldCamera = game.activeCamera;
+        game.activeCamera = mapCamera;
+
         game.vfxManager.add(new CameraZoomTransition(mapCamera, game.activeCamera.zoom, mapCamera.zoom, 0.4f));
 
         // Load textures
@@ -103,6 +107,7 @@ public class MapPanel extends Stage {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.setScreen(game.activeSpaceScreen);
                     game.vfxManager.add(new CameraZoomTransition(game.activeCamera, mapCamera.zoom, game.activeCamera.zoom, 0.3f));
+                    game.activeCamera = oldCamera;
                     return true;
                 }
 
@@ -182,15 +187,13 @@ public class MapPanel extends Stage {
     }
 
     public void drawUniverse(Batch batch){
+        game.registry.render();
+
         batch.setTransformMatrix(new Matrix4());
 
         for(IEntity eRaw : game.registry.getEntities()){
             BaseEntity e = (BaseEntity)eRaw;
-            
-            if(e instanceof Celestial){
-                batch.setTransformMatrix(new Matrix4().set(((Celestial)e).getUniverseSpaceTransform()));
-                e.render(batch);
-            } else {
+            {
                 Matrix4 mat = new Matrix4();
 
                 Celestial parent = game.universe.getParentCelestial(e);
@@ -212,7 +215,7 @@ public class MapPanel extends Stage {
                 }
 
                 batch.setTransformMatrix(mat);
-                e.render(batch);
+                // e.render(batch);
             }
         }
     }
@@ -280,9 +283,9 @@ public class MapPanel extends Stage {
         );
 
         batch.setColor(1, 1, 1, 1);
-        drawUniverse(batch);
-
         batch.end();
+        
+        drawUniverse(batch);
         super.draw();
 
         if(celestialOpacity < 0.5){

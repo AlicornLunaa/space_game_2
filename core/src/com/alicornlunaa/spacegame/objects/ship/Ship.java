@@ -9,8 +9,10 @@ import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.states.ShipState;
@@ -19,7 +21,6 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -107,7 +108,31 @@ public class Ship extends DriveableEntity {
             @Override
             public void render(){}
         });
-        
+        addComponent(new CustomSpriteComponent() {
+            @Override
+            public void render(Batch batch) {
+                // Update SAS
+                if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
+
+                // Update parts
+                // TODO: Parts shouldnt be here
+                for(Part p : parts){
+                    p.update(Gdx.graphics.getDeltaTime());
+                }
+
+                // Finish rendering
+                Matrix4 trans = new Matrix4();
+                Celestial parent = game.universe.getParentCelestial(Ship.this);
+                if(parent != null) trans.set(parent.getUniverseSpaceTransform());
+                trans.mul(new Matrix4().set(getTransform()));
+                batch.setTransformMatrix(trans);
+
+                for(Part p : parts){
+                    p.draw(batch, Gdx.graphics.getDeltaTime());
+                }
+            }
+        });
+
         setPosition(x, y);
         setRotation(rotation);
     }
@@ -115,7 +140,7 @@ public class Ship extends DriveableEntity {
     // Interior functions
     public void drawWorld(Batch batch, float parentAlpha){
         interior.draw(batch);
-        game.player.render(batch);
+        // game.player.render(batch); TODO: REPLACE WITH RENDER SYSTEM
     }
 
     public PhysWorld getInteriorWorld(){ return interior.getWorld(); }
@@ -205,26 +230,6 @@ public class Ship extends DriveableEntity {
         if(Math.abs(angVel) <= 0.005f) angVel = 0;
 
         state.artifRoll = angVel;
-    }
-
-    @Override
-    public void render(Batch batch){
-        // Update SAS
-        if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
-
-        // Update parts
-        // TODO: Parts shouldnt be here
-        for(Part p : parts){
-            p.update(Gdx.graphics.getDeltaTime());
-        }
-
-        // Finish rendering
-        Matrix3 transform = getTransform();
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform)));
-        for(Part p : parts){
-            p.draw(batch, Gdx.graphics.getDeltaTime());
-        }
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(new Matrix4().set(transform.inv())));
     }
 
     @Override

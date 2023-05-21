@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
@@ -158,6 +159,41 @@ public class Planet extends Celestial {
 
             @Override
             public void render() {} 
+        });
+        addComponent(new CustomSpriteComponent() {
+            @Override
+            public void render(Batch batch) {
+                // Save rendering state
+                Matrix4 proj = batch.getProjectionMatrix().cpy();
+                Matrix4 trans = new Matrix4().set(getUniverseSpaceTransform());
+                Matrix4 invProj = proj.cpy().inv();
+                Vector2 worldPos = getUniverseSpaceTransform().getTranslation(new Vector2());
+                
+                // Shade the planet in
+                batch.setTransformMatrix(trans);
+                batch.setShader(terraShader);
+                terraShader.setUniformMatrix("u_invCamTrans", invProj);
+                terraShader.setUniformf("u_starDirection", starDirection);
+                terraShader.setUniformf("u_planetWorldPos", worldPos);
+                terraShader.setUniformf("u_planetRadius", getRadius());
+                batch.draw(surfaceRender, radius * -1, radius * -1, radius * 2, radius * 2);
+
+                batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
+                batch.setTransformMatrix(new Matrix4());
+
+                batch.setShader(atmosShader);
+                atmosShader.setUniformMatrix("u_invCamTrans", invProj);
+                atmosShader.setUniformf("u_starDirection", starDirection);
+                atmosShader.setUniformf("u_planetWorldPos", worldPos);
+                atmosShader.setUniformf("u_planetRadius", getRadius());
+                atmosShader.setUniformf("u_atmosRadius", getAtmosphereRadius());
+                atmosShader.setUniformf("u_atmosColor", getAtmosphereColor());
+                batch.draw(texture, 0, 0, 1280, 720);
+
+                batch.setShader(null);
+                batch.draw(debugTexture, 10, 10, 256, 256);
+                batch.setProjectionMatrix(proj);
+            }
         });
 
         debugTexture = new Texture(generator.getBiomeMap());
@@ -342,44 +378,6 @@ public class Planet extends Celestial {
         return super.applyPhysics(delta, e).add(applyDrag(e.getBody()));
     }
 
-    @Override
-    public void render(Batch batch){
-        // Save rendering state
-        Matrix4 proj = batch.getProjectionMatrix().cpy();
-        Matrix4 trans = batch.getTransformMatrix().cpy();
-        Matrix4 invProj = proj.cpy().inv();
-        Vector2 worldPos = getUniverseSpaceTransform().getTranslation(new Vector2());
-
-        super.render(batch);
-        
-        // Shade the planet in
-        batch.setShader(terraShader);
-        terraShader.setUniformMatrix("u_invCamTrans", invProj);
-        terraShader.setUniformf("u_starDirection", starDirection);
-        terraShader.setUniformf("u_planetWorldPos", worldPos);
-        terraShader.setUniformf("u_planetRadius", getRadius());
-        batch.draw(surfaceRender, radius * -1, radius * -1, radius * 2, radius * 2);
-
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
-        batch.setTransformMatrix(new Matrix4());
-
-        batch.setShader(null);
-        batch.draw(debugTexture, 10, 10, 256, 256);
-
-        batch.setShader(atmosShader);
-        atmosShader.setUniformMatrix("u_invCamTrans", invProj);
-        atmosShader.setUniformf("u_starDirection", starDirection);
-        atmosShader.setUniformf("u_planetWorldPos", worldPos);
-        atmosShader.setUniformf("u_planetRadius", getRadius());
-        atmosShader.setUniformf("u_atmosRadius", getAtmosphereRadius());
-        atmosShader.setUniformf("u_atmosColor", getAtmosphereColor());
-        batch.draw(texture, 0, 0, 1280, 720);
-
-        batch.setShader(null);
-        batch.setProjectionMatrix(proj);
-        batch.setTransformMatrix(trans);
-    }
-    
     @Override
     public void dispose(){
         texture.dispose();

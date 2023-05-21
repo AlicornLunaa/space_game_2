@@ -370,7 +370,7 @@ public class EditorScene implements Screen {
             batch.setColor(1, 1, 1, 1);
         }
         
-        editorShip.render(batch);
+        // editorShip.render(batch); TODO: FIX
         batch.end();
         
         game.shapeRenderer.begin(ShapeType.Filled);

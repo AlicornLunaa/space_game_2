@@ -14,7 +14,7 @@ public class EntityActorWrapper extends Actor {
 
     @Override
     public void draw(Batch batch, float a){
-        ent.render(batch);
+        // ent.render(batch); TODO: FIX
     }
     
 }

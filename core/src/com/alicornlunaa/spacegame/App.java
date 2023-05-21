@@ -15,6 +15,7 @@ import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
+import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
@@ -156,6 +157,7 @@ public class App extends Game {
 				registry = new Registry();
 				registry.registerSystem(new CameraSystem(this));
 				simulation = registry.registerSystem(new PhysicsSystem());
+				registry.registerSystem(new CustomRenderSystem(this));
 				registry.registerSystem(new ScriptSystem());
 				
 				initializeUniverse();
