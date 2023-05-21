@@ -51,9 +51,20 @@ public class PhysicsSystem implements ISystem {
 		TransformComponent transform = entity.getComponent(TransformComponent.class);
 		BodyComponent rb = entity.getComponent(BodyComponent.class);
 
+        transform.dp.set(transform.position.cpy().sub(transform.dp));
+        transform.dv.set(transform.velocity.cpy().sub(transform.dv));
+        transform.dr = transform.rotation - transform.dr;
+
+        rb.body.setTransform(rb.body.getPosition().cpy().add(transform.dp.scl(1.0f / rb.world.getPhysScale())), rb.body.getAngle() + transform.dr);
+        rb.body.setLinearVelocity(rb.body.getLinearVelocity().cpy().add(transform.dv));
+
         transform.position.set(rb.body.getWorldCenter().cpy().scl(rb.world.getPhysScale()));
         transform.velocity.set(rb.body.getLinearVelocity());
         transform.rotation = rb.body.getAngle();
+
+        transform.dp.set(transform.position);
+        transform.dv.set(transform.velocity);
+        transform.dr = transform.rotation;
     }
 
     @Override

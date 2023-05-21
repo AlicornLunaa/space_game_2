@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
@@ -37,6 +38,7 @@ public class Celestial extends BaseEntity {
     
     // Variables
     protected final App game;
+    public TransformComponent transform;
     public BodyComponent bodyComponent;
 
     // Planet variables
@@ -53,10 +55,10 @@ public class Celestial extends BaseEntity {
     
     // Constructor
     public Celestial(final App game, float radius){
-        super();
         this.game = game;
         this.radius = radius;
         this.celestialID = NEXT_CELESTIAL_ID++;
+        transform = getComponent(TransformComponent.class);
 
         influenceWorld = new CelestialPhysWorld(this, Constants.PPM);
         game.simulation.addWorld(influenceWorld);

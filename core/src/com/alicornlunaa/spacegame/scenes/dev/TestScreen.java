@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
 import com.alicornlunaa.selene_engine.components.TextureComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent.AnchorPoint;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
@@ -62,6 +63,7 @@ public class TestScreen implements Screen {
             addComponent(new CameraComponent(1280, 720));
 
             addComponent(new IScriptComponent() {
+                TransformComponent tr = getComponent(TransformComponent.class);
                 BodyComponent rb = getComponent(BodyComponent.class);
 
                 @Override
@@ -84,6 +86,10 @@ public class TestScreen implements Screen {
 
                     if(Gdx.input.isKeyPressed(Keys.SPACE)){
                         rb.body.applyForceToCenter(0, 15.f, true);
+                    }
+
+                    if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)){
+                        tr.position.y += 0.4f;
                     }
                 }
     

@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scripts;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
@@ -13,35 +14,40 @@ import com.badlogic.gdx.math.Vector2;
 public class PlanetPhysScript implements IScriptComponent {
 
     private IEntity entity;
-    private BodyComponent playerBody;
+    private TransformComponent transform;
+    private BodyComponent entityBody;
 
     public PlanetPhysScript(IEntity entity){
         this.entity = entity;
-        playerBody = entity.getComponent(BodyComponent.class);
+
+        transform = entity.getComponent(TransformComponent.class);
+        entityBody = entity.getComponent(BodyComponent.class);
     }
 
     @Override
     public void update() {
-        if(!entity.hasComponent(BodyComponent.class)) return;
-        if(!(entity.getComponent(BodyComponent.class).world instanceof PlanetaryPhysWorld)) return;
+        if(entityBody == null || transform == null) return;
+        if(!(entityBody.world instanceof PlanetaryPhysWorld)) return;
 
-        Planet planet = ((PlanetaryPhysWorld)playerBody.world).getPlanet();
+        Planet planet = ((PlanetaryPhysWorld)entityBody.world).getPlanet();
         float worldWidthPixels = planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
         BaseEntity e = (BaseEntity)entity;
-        if(e.getX() > worldWidthPixels){
-            e.setX(e.getX() - worldWidthPixels);
-        } else if(e.getX() < 0){
-            e.setX(e.getX() + worldWidthPixels);
+        if(transform.position.x > worldWidthPixels){
+            // transform.position.x -= worldWidthPixels;
+            e.setX(transform.position.x - worldWidthPixels);
+        } else if(transform.position.x < 0){
+            // transform.position.x += worldWidthPixels;
+            e.setX(transform.position.x + worldWidthPixels);
         }
 
         planet.checkLeavePlanet(e);
         
         // Taken from Celestial.java to correctly apply the right force
-        Vector2 dragForce = planet.applyDrag(playerBody);
-        float height = Math.max(playerBody.body.getPosition().y, planet.getRadius() / planet.getPhysScale());
-        float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * playerBody.body.getMass()) / (height * height));
-        playerBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
+        Vector2 dragForce = planet.applyDrag(entityBody);
+        float height = Math.max(entityBody.body.getPosition().y, planet.getRadius() / planet.getPhysScale());
+        float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / (height * height));
+        entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
     }
 
     @Override

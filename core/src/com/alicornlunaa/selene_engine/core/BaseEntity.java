@@ -185,7 +185,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     // Depreciated functions for backwards compat
-    public float getX(){ return getPosition().x; }
     public float getY(){ return getPosition().y; }
     public void setX(float x){ setPosition(x, getPosition().y); }
     public void setY(float y){ setPosition(getPosition().x, y); }

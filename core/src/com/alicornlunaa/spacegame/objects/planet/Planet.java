@@ -221,14 +221,19 @@ public class Planet extends Celestial {
      * @param e
      * @return
      */
-    public Vector2 getSpacePosition(BaseEntity e){
+    public Vector2 getSpacePosition(IEntity e){
         // Convert the planetary coords to space coords
-        double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-        float radius = e.getY();
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
+        float x = 0;
+        float y = 0;
 
-        // Convet to space position
-        float x = (float)(Math.cos(theta) * radius);
-        float y = (float)(Math.sin(theta) * radius);
+        if(entityTransform != null){
+            // Convet to space position
+            double theta = ((entityTransform.position.x / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+            float radius = entityTransform.position.y;
+            x = (float)(Math.cos(theta) * radius);
+            y = (float)(Math.sin(theta) * radius);
+        }
 
         return new Vector2(x, y);
     }
@@ -238,20 +243,24 @@ public class Planet extends Celestial {
      * @param e
      * @return
      */
-    public Vector2 getSpaceVelocity(BaseEntity e){
+    public Vector2 getSpaceVelocity(IEntity e){
         // Convert the planetary coords to space coords
-        double theta = ((e.getX() / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
+        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
+        Vector2 velocity = new Vector2();
 
         // Convet to space velocity
-        BodyComponent bc = e.getComponent(BodyComponent.class);
+        if(entityTransform != null && entityBodyComponent != null){
+            double theta = ((transform.position.x / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
 
-        if(bc == null) return new Vector2();
+            Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
+            Vector2 planetToEnt = entityTransform.position.cpy().nor();
+            Vector2 curVelocity = entityBodyComponent.body.getLinearVelocity().cpy().scl(bodyComponent.world.getPhysScale() / Constants.PPM);
 
-        Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
-        Vector2 planetToEnt = e.getPosition().nor();
-        Vector2 curVelocity = bc.body.getLinearVelocity().scl(e.getPhysScale()).scl(1 / Constants.PPM);
+            velocity.set(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
+        }
 
-        return tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y));
+        return velocity;
     }
 
     public Color getAtmosphereColor(){
