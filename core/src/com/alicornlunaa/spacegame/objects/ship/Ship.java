@@ -22,6 +22,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -122,10 +123,12 @@ public class Ship extends DriveableEntity {
                 }
 
                 // Finish rendering
+                Vector2 pos = bodyComponent.body.getPosition().cpy().scl(bodyComponent.world.getPhysScale());
                 Matrix4 trans = new Matrix4();
                 Celestial parent = game.universe.getParentCelestial(Ship.this);
                 if(parent != null) trans.set(parent.getUniverseSpaceTransform());
-                trans.mul(new Matrix4().set(getTransform()));
+                trans.translate(pos.x, pos.y, 0.0f);
+                trans.rotateRad(0, 0, 1, bodyComponent.body.getAngle());
                 batch.setTransformMatrix(trans);
 
                 for(Part p : parts){

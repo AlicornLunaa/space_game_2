@@ -292,6 +292,7 @@ public class Planet extends Celestial {
      * @param e Entity to be converted
      */
     public void addEntityWorld(IEntity e){
+        // TODO: CHECK FOR ERRORS
         // Formula: x = theta, y = radius
         TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
@@ -321,6 +322,7 @@ public class Planet extends Celestial {
      */
     public void delEntityWorld(BaseEntity e){
         // Formula: theta = x, radius = y
+        // TODO: CHECK FOR ERRORS
         TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         if(bodyComponent == null || transform == null) return;
@@ -360,8 +362,10 @@ public class Planet extends Celestial {
 
     public boolean checkLeavePlanet(BaseEntity e){
         // This function checks if the entity supplied
+        TransformComponent transform = e.getComponent(TransformComponent.class);
+
         // is far enough to leave the planet's physics world
-        if(e.getY() > radius * 1.3f){
+        if(transform != null && transform.position.y > radius * 1.3f){
             // Move it into this world
             leavingEnts.push(e);
             return true;

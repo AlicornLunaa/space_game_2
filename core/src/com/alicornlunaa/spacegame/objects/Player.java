@@ -107,9 +107,8 @@ public class Player extends BaseEntity {
         addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
 
-        float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setFixedRotation(true);
-        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
+        setPosition(x, y);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.1f;
@@ -117,6 +116,7 @@ public class Player extends BaseEntity {
         fixtureDef.density = 1.4f;
 
         PolygonShape shape = new PolygonShape();
+        float ppm = bodyComponent.world.getPhysScale();
         float rad = PLAYER_WIDTH / 2.f / ppm;
         shape.setAsBox(
             PLAYER_WIDTH / 2 / ppm,

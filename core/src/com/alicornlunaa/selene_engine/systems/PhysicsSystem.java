@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.badlogic.gdx.utils.Array;
 
 public class PhysicsSystem implements ISystem {
@@ -55,10 +56,16 @@ public class PhysicsSystem implements ISystem {
         transform.dv.set(transform.velocity.cpy().sub(transform.dv));
         transform.dr = transform.rotation - transform.dr;
 
-        rb.body.setTransform(rb.body.getPosition().cpy().add(transform.dp.scl(1.0f / rb.world.getPhysScale())), rb.body.getAngle() + transform.dr);
-        rb.body.setLinearVelocity(rb.body.getLinearVelocity().cpy().add(transform.dv));
+        if(entity instanceof Ship){
+            System.out.println(transform.dp);
+        }
 
-        transform.position.set(rb.body.getWorldCenter().cpy().scl(rb.world.getPhysScale()));
+        if(transform.dp.len() > 0.0f || transform.dv.len() > 0.0f || transform.dr != 0.0f){
+            rb.body.setTransform(rb.body.getPosition().cpy().add(transform.dp.scl(1.0f / rb.world.getPhysScale())), rb.body.getAngle() + transform.dr);
+            rb.body.setLinearVelocity(rb.body.getLinearVelocity().cpy().add(transform.dv));
+        }
+
+        transform.position.set(rb.body.getPosition().cpy().scl(rb.world.getPhysScale()));
         transform.velocity.set(rb.body.getLinearVelocity());
         transform.rotation = rb.body.getAngle();
 

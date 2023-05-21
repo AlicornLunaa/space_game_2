@@ -69,13 +69,11 @@ public class Celestial extends BaseEntity {
 
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        def.position.set(0, 0);
         bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def));
         bodyComponent.body.createFixture(shape, 1.0f);
 
         def = new BodyDef();
         def.type = BodyType.StaticBody;
-        def.position.set(0, 0);
         localBody = influenceWorld.getBox2DWorld().createBody(def);
         localBody.createFixture(shape, 1.0f);
 

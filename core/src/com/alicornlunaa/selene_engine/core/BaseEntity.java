@@ -28,12 +28,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     public Matrix3 getTransform(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent != null){
-            transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
-            transform.rotation = bodyComponent.body.getAngle();
-        }
-
         Matrix3 matrix = new Matrix3();
         matrix.idt();
         matrix.translate(transform.position);
@@ -43,13 +37,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     public Vector2 getPosition(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent != null){
-            transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
-            transform.rotation = bodyComponent.body.getAngle();
-        }
-
-        return transform.position;
+        return transform.position.cpy();
     }
 
     public Vector2 getCenter(){
@@ -62,47 +50,26 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     public float getRotation(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent != null){
-            transform.position.set(bodyComponent.body.getPosition().cpy().scl(getPhysScale()));
-            transform.rotation = bodyComponent.body.getAngle();
-        }
-
         return transform.rotation;
     }
 
     public Vector2 getVelocity(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent == null) return null;
-        return transform.velocity.set(bodyComponent.body.getLinearVelocity());
+        return transform.velocity.cpy();
     }
 
     // Setters
     public void setPosition(float x, float y){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent != null){
-            // TODO: TEMP Problem with bug here
-            bodyComponent.body.setTransform(x / getPhysScale(), y / getPhysScale(), getRotation());
-        } else {
-            transform.position.set(x, y);
-        }
+        transform.position.set(x, y);
     }
 
     public void setPosition(Vector2 p){ setPosition(p.x, p.y); }
 
     public void setRotation(float rads){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent != null){
-            bodyComponent.body.setTransform(getPosition().cpy().scl(1 / getPhysScale()), rads);
-        } else {
-            transform.rotation = rads;
-        }
+        transform.rotation = rads;
     }
 
     public void setVelocity(float x, float y){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent == null) return;
-        bodyComponent.body.setLinearVelocity(x, y);
+        transform.velocity.set(x, y);
     }
 
     public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
@@ -185,7 +152,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     }
 
     // Depreciated functions for backwards compat
-    public float getY(){ return getPosition().y; }
     public void setX(float x){ setPosition(x, getPosition().y); }
     public void setY(float y){ setPosition(getPosition().x, y); }
 }
