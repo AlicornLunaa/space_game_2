@@ -3,7 +3,6 @@ package com.alicornlunaa.selene_engine.core;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
-import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -22,13 +21,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public BaseEntity(){}
 
     // Getters
-    @Deprecated
-    public PhysWorld getWorld(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent == null) return null;
-        return bodyComponent.world;
-    }
-    
     @Deprecated
     public float getPhysScale(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);

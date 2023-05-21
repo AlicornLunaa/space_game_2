@@ -189,35 +189,35 @@ public class MapPanel extends Stage {
     public void drawUniverse(Batch batch){
         game.registry.render();
 
-        batch.setTransformMatrix(new Matrix4());
+        // batch.setTransformMatrix(new Matrix4());
 
-        for(IEntity eRaw : game.registry.getEntities()){
-            BaseEntity e = (BaseEntity)eRaw;
-            {
-                Matrix4 mat = new Matrix4();
+        // for(IEntity eRaw : game.registry.getEntities()){
+        //     BaseEntity e = (BaseEntity)eRaw;
+        //     {
+        //         Matrix4 mat = new Matrix4();
 
-                Celestial parent = game.universe.getParentCelestial(e);
-                if(parent != null){
-                    mat.set(parent.getUniverseSpaceTransform());
+        //         Celestial parent = game.universe.getParentCelestial(e);
+        //         if(parent != null){
+        //             mat.set(parent.getUniverseSpaceTransform());
 
-                    if(e.getWorld() instanceof PlanetaryPhysWorld){
-                        // mat.mul(new Matrix4().set(e.getTransform().inv()));
+        //             if(e.getWorld() instanceof PlanetaryPhysWorld){
+        //                 // mat.mul(new Matrix4().set(e.getTransform().inv()));
     
-                        // Convert the planetary coords to space coords
-                        double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-                        float radius = e.getY();
+        //                 // Convert the planetary coords to space coords
+        //                 double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
+        //                 float radius = e.getY();
     
-                        // Convet to space position
-                        float x = (float)(Math.cos(theta) * radius);
-                        float y = (float)(Math.sin(theta) * radius);
-                        mat.translate(x, y, 0);
-                    }
-                }
+        //                 // Convet to space position
+        //                 float x = (float)(Math.cos(theta) * radius);
+        //                 float y = (float)(Math.sin(theta) * radius);
+        //                 mat.translate(x, y, 0);
+        //             }
+        //         }
 
-                batch.setTransformMatrix(mat);
-                // e.render(batch);
-            }
-        }
+        //         batch.setTransformMatrix(mat);
+        //         // e.render(batch);
+        //     }
+        // }
     }
 
     @Override

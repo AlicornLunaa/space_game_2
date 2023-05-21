@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
@@ -77,7 +78,7 @@ public class SaveManager {
                 data.put("y", object.getY());
                 data.put("vx", object.getVelocity().x);
                 data.put("vy", object.getVelocity().y);
-                data.put("physworld_id", game.simulation.getWorldID(object.getWorld()));
+                data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
                 data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
             }
 
@@ -109,7 +110,7 @@ public class SaveManager {
                 data.put("y", object.getY());
                 data.put("vx", object.getVelocity().x);
                 data.put("vy", object.getVelocity().y);
-                data.put("physworld_id", game.simulation.getWorldID(object.getWorld()));
+                data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
                 data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
                 data.put("parent_celestial_id", (object.getCelestialParent() == null) ? -1 : object.getCelestialParent().getCelestialID());
                 data.put("celestial_radius", object.getRadius());

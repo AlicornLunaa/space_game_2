@@ -168,12 +168,14 @@ public class Universe extends Actor {
      * @return The celestial parent
      */
     public Celestial getParentCelestial(BaseEntity e){
-        PhysWorld w = e.getWorld();
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+        
+        if(bodyComponent == null) return null;
 
-        if(w instanceof CelestialPhysWorld){
-            return ((CelestialPhysWorld)w).getParent();
-        } else if(w instanceof PlanetaryPhysWorld){
-            return ((PlanetaryPhysWorld)w).getPlanet();
+        if(bodyComponent.world instanceof CelestialPhysWorld){
+            return ((CelestialPhysWorld)bodyComponent.world).getParent();
+        } else if(bodyComponent.world instanceof PlanetaryPhysWorld){
+            return ((PlanetaryPhysWorld)bodyComponent.world).getPlanet();
         }
 
         return null;
@@ -293,11 +295,12 @@ public class Universe extends Actor {
                 for(int i = 0; i < entityPaths.size; i++){
                     Orbit path = entityPaths.get(i);
                     BaseEntity e = path.getEntity();
-    
-                    if(e instanceof Player && ((Player)e).isDriving()) continue; // Skip player if player is inside a vehicle
-                    if(!(e.getWorld() instanceof CelestialPhysWorld)) continue; // Skip entities on a planet surface
-    
                     BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+    
+                    if(bodyComponent == null) continue;
+                    if(e instanceof Player && ((Player)e).isDriving()) continue; // Skip player if player is inside a vehicle
+                    if(!(bodyComponent.world instanceof CelestialPhysWorld)) continue; // Skip entities on a planet surface
+    
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);
                     Vector2 curVel = path.getVelocity(currentFuture);
@@ -312,8 +315,6 @@ public class Universe extends Actor {
                             addToCelestial(parent, e);
                         }
                     }
-    
-                    if(bodyComponent == null) return;
                     
                     bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
                     bodyComponent.body.setLinearVelocity(curVel.cpy());

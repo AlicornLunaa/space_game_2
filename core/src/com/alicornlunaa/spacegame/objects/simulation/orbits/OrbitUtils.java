@@ -23,6 +23,7 @@ public class OrbitUtils {
      */
     public static Vector2 getUniverseSpacePosition(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         Vector2 systemSpacePosition = e/*.getBody()*/.getPosition().cpy(); // TODO: Refactor everything ot use the correct coordinate space
 
         if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
@@ -32,7 +33,7 @@ public class OrbitUtils {
             return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
         }
 
-        if(e.getWorld() instanceof PlanetaryPhysWorld){
+        if(bodyComponent != null && bodyComponent.world instanceof PlanetaryPhysWorld){
             // Its on a rectangular phys world, return the position converted
             Planet planet = (Planet)parentOfEntity;
             systemSpacePosition.set(planet.getSpacePosition(e));
@@ -50,6 +51,7 @@ public class OrbitUtils {
      */
     public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         Vector2 systemSpacePosition = e.getComponent(BodyComponent.class).body.getWorldCenter().cpy().scl(e.getPhysScale());
 
         if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
@@ -59,7 +61,7 @@ public class OrbitUtils {
             return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
         }
 
-        if(e.getWorld() instanceof PlanetaryPhysWorld){
+        if(bodyComponent != null && bodyComponent.world instanceof PlanetaryPhysWorld){
             // Its on a rectangular phys world, return the position converted
             Planet planet = (Planet)parentOfEntity;
             systemSpacePosition.set(planet.getSpacePosition(e));
@@ -78,6 +80,7 @@ public class OrbitUtils {
      */
     public static Vector2 getUniverseSpacePosition(Universe u, BaseEntity e, Vector2 localPos){
         Celestial parentOfEntity = u.getParentCelestial(e);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
 
         if(parentOfEntity == null) return localPos; // No parent, its in the universe world.
 
@@ -86,7 +89,7 @@ public class OrbitUtils {
             return localPos.mul(((Celestial)e).getUniverseSpaceTransform());
         }
 
-        if(e.getWorld() instanceof PlanetaryPhysWorld){
+        if(bodyComponent != null && bodyComponent.world instanceof PlanetaryPhysWorld){
             // Its on a rectangular phys world, return the position converted
             Planet planet = (Planet)parentOfEntity;
             localPos.set(planet.getSpacePosition(e));

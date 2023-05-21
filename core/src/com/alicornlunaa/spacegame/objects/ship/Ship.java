@@ -36,7 +36,7 @@ public class Ship extends DriveableEntity {
     
     // Variables
     private final App game;
-    private BodyComponent bodyComponent;
+    public BodyComponent bodyComponent;
 
     private Array<Part> parts = new Array<>();
     private AttachmentList attachments = new AttachmentList();

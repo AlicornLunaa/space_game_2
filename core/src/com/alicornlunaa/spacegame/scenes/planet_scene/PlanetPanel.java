@@ -74,7 +74,7 @@ public class PlanetPanel extends Stage {
         super.act(delta);
         game.universe.update(delta);
 
-        if(!game.player.isDriving() && game.player.getWorld() instanceof PlanetaryPhysWorld)
+        if(!game.player.isDriving() && game.player.bodyComponent.world instanceof PlanetaryPhysWorld)
             game.player.setRotation(0);
     }
 

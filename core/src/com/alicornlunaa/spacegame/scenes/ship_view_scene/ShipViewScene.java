@@ -73,7 +73,7 @@ public class ShipViewScene implements Screen {
 
     @Override
     public void hide() {
-        game.simulation.addEntity(vehicle.getWorld(), game.player);
+        game.player.bodyComponent.setWorld(vehicle.bodyComponent.world);
         vehicle.drive(game.player);
     }
 

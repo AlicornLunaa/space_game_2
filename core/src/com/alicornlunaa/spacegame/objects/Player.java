@@ -51,7 +51,7 @@ public class Player extends BaseEntity {
 
     // Variables
     private final App game;
-    private BodyComponent bodyComponent;
+    public BodyComponent bodyComponent;
 
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
@@ -266,14 +266,14 @@ public class Player extends BaseEntity {
         Celestial c = game.universe.getParentCelestial(ent);
         Vector2 pos = ent.getCenter();
 
-        if((ent.getWorld() instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
+        if((bodyComponent.world instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
             // Set the desired camera angle to upright if the orbit is not decaying
             cameraAngle.set(0, 1, 0);
         } else {
             cameraAngle.set(pos.cpy().nor(), 0);
         }
 
-        if(!(ent.getWorld() instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
+        if(!(bodyComponent.world instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
             // If the player is on a planet, use the universe-based position system
             pos.set(OrbitUtils.getUniverseSpaceCenter(game.universe, ent));
         }
