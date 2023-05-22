@@ -5,7 +5,6 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.badlogic.gdx.utils.Array;
 
 public class PhysicsSystem implements ISystem {
@@ -55,10 +54,6 @@ public class PhysicsSystem implements ISystem {
         transform.dp.set(transform.position.cpy().sub(transform.dp));
         transform.dv.set(transform.velocity.cpy().sub(transform.dv));
         transform.dr = transform.rotation - transform.dr;
-
-        if(entity instanceof Ship){
-            System.out.println(transform.dp);
-        }
 
         if(transform.dp.len() > 0.0f || transform.dv.len() > 0.0f || transform.dr != 0.0f){
             rb.body.setTransform(rb.body.getPosition().cpy().add(transform.dp.scl(1.0f / rb.world.getPhysScale())), rb.body.getAngle() + transform.dr);

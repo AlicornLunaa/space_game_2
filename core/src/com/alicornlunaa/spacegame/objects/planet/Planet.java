@@ -131,7 +131,8 @@ public class Planet extends Celestial {
         super(game, terraRadius);
         this.game = game;
 
-        setPosition(x, y);
+        float ppm = bodyComponent.world.getPhysScale();
+        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
 
         terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);

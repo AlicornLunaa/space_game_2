@@ -221,7 +221,7 @@ public class MapPanel extends Stage {
     @Override
     public void draw(){
         // Update camera
-        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
+        Vector2 plyPos = OrbitUtils.getUniverseSpaceCenter(game.universe, game.player);
         mapCamera.position.set(plyPos, 0.0f);
         
         // Draw stars in the map view

@@ -52,7 +52,7 @@ public class OrbitUtils {
     public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-        Vector2 systemSpacePosition = e.getComponent(BodyComponent.class).body.getWorldCenter().cpy().scl(e.getPhysScale());
+        Vector2 systemSpacePosition = bodyComponent.body.getWorldCenter().cpy().scl(e.getPhysScale());
 
         if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
 

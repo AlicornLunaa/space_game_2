@@ -52,6 +52,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
         if(bodyComponent != null){
+            driver.bodyComponent.setWorld(world);
             bodyComponent.body.setActive(false);
         }
     }

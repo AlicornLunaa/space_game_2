@@ -33,7 +33,9 @@ public class Star extends Celestial {
     public Star(App game, float x, float y, float radius){
         super(game, radius);
         generateSprite();
-        setPosition(x, y);
+
+        float ppm = bodyComponent.world.getPhysScale();
+        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
 
         addComponent(new CustomSpriteComponent() {
             @Override
