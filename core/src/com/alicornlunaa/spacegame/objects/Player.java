@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
@@ -51,6 +52,7 @@ public class Player extends BaseEntity {
 
     // Variables
     private final App game;
+    public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
 
     private float vertical = 0.0f;
@@ -110,6 +112,8 @@ public class Player extends BaseEntity {
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setFixedRotation(true);
         bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
+        transform.position.set(x, y);
+        transform.dp.set(x, y);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.1f;

@@ -1,7 +1,9 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -283,24 +285,42 @@ public class Universe extends Actor {
                         ((Planet)e).getStarDirection().set(OrbitUtils.directionToNearestStar(this, e), 0);
                     }
     
+                    TransformComponent transform = e.getComponent(TransformComponent.class);
                     BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
                     Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
                     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
     
-                    if(bodyComponent == null) return;
+                    if(transform == null) continue;
+                    if(bodyComponent == null) continue;
                     
                     bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
                     bodyComponent.body.setLinearVelocity(curVel.cpy());
+
+                    curPos.scl(128);
+                    transform.position.set(curPos);
+                    transform.dp.set(curPos);
+                    transform.velocity.set(curVel);
+                    transform.dv.set(curVel);
                 }
 
                 for(int i = 0; i < entityPaths.size; i++){
                     Orbit path = entityPaths.get(i);
                     BaseEntity e = path.getEntity();
+                    TransformComponent transform = e.getComponent(TransformComponent.class);
                     BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
     
+                    if(transform == null) continue;
                     if(bodyComponent == null) continue;
-                    if(e instanceof Player && ((Player)e).isDriving()) continue; // Skip player if player is inside a vehicle
                     if(!(bodyComponent.world instanceof CelestialPhysWorld)) continue; // Skip entities on a planet surface
+
+                    if(e instanceof Player && ((Player)e).isDriving()){
+                        // Skip player if player is inside a vehicle after parenting to vehicle
+                        DriveableEntity vehicle = ((Player)e).getVehicle();
+                        TransformComponent vehicleTrans = vehicle.getComponent(TransformComponent.class);
+                        transform.position.set(vehicleTrans.position);
+                        transform.velocity.set(vehicleTrans.velocity);
+                        continue;
+                    }
     
                     Celestial parent = path.getParent(currentFuture);
                     Vector2 curPos = path.getPosition(currentFuture);
@@ -319,6 +339,12 @@ public class Universe extends Actor {
                     
                     bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
                     bodyComponent.body.setLinearVelocity(curVel.cpy());
+
+                    curPos.scl(128);
+                    transform.position.set(curPos);
+                    transform.dp.set(curPos);
+                    transform.velocity.set(curVel);
+                    transform.dv.set(curVel);
                 }
             }
 

@@ -36,6 +36,8 @@ public class Star extends Celestial {
 
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
+        transform.position.set(x, y);
+        transform.dp.set(x, y);
 
         addComponent(new CustomSpriteComponent() {
             @Override

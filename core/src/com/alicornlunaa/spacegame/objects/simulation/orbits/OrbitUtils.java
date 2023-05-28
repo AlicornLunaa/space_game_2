@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
@@ -51,8 +52,9 @@ public class OrbitUtils {
      */
     public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
+        TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-        Vector2 systemSpacePosition = bodyComponent.body.getWorldCenter().cpy().scl(e.getPhysScale());
+        Vector2 systemSpacePosition = transform.position.cpy();//bodyComponent.body.getWorldCenter().cpy().scl(e.getPhysScale());
 
         if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
 

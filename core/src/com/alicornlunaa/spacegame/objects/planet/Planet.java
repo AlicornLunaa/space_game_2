@@ -132,7 +132,7 @@ public class Planet extends Celestial {
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
         transform.position.set(x, y);
-        transform.rotation = bodyComponent.body.getAngle();
+        transform.dp.set(x, y);
 
         terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);

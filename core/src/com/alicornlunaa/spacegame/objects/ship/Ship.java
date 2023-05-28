@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -37,6 +38,7 @@ public class Ship extends DriveableEntity {
     
     // Variables
     private final App game;
+    public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
 
     private Array<Part> parts = new Array<>();
@@ -137,8 +139,13 @@ public class Ship extends DriveableEntity {
             }
         });
 
-        setPosition(x, y);
-        setRotation(rotation);
+
+        float ppm = bodyComponent.world.getPhysScale();
+        bodyComponent.body.setTransform(x / ppm, y / ppm, rotation);
+        transform.position.set(x, y);
+        transform.dp.set(x, y);
+        transform.rotation = rotation;
+        transform.dr = rotation;
     }
 
     // Interior functions
