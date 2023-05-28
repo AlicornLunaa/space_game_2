@@ -78,6 +78,10 @@ public class App extends Game {
         // OrbitUtils.createOrbit(universe, universe.getCelestial(4));
         // OrbitUtils.createOrbit(universe, universe.getCelestial(5));
 
+        // universe.addCelestial(new Star(this, 1400, 0, 500));
+        // universe.addCelestial(new Planet(this, 6400, 0, 500, 800, 1.0f));
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+
 		player = new Player(this, -50, 0);
 		universe.addEntity(player);
 		// OrbitUtils.createOrbit(universe, player);
