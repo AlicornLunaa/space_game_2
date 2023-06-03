@@ -58,7 +58,7 @@ public class Ship extends DriveableEntity {
                 Ship.super.afterWorldChange(world);
 
                 for(Part p : parts){
-                    p.setParent(bodyComponent.body, getPhysScale());
+                    p.setParent(bodyComponent.body, bodyComponent.world.getPhysScale());
                 }
             }
         });

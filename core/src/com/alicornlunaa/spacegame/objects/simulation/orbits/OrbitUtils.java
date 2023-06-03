@@ -172,7 +172,7 @@ public class OrbitUtils {
      */
     public static boolean isOrbitDecaying(Celestial parent, BaseEntity entity){
         GenericConic gc = OrbitPropagator.getConic(parent, entity);
-        return (gc.getPeriapsis() <= (parent.getRadius() * 1.2f) / parent.getPhysScale()) && !(gc instanceof HyperbolicConic);
+        return (gc.getPeriapsis() <= (parent.getRadius() * 1.2f) / parent.bodyComponent.world.getPhysScale()) && !(gc instanceof HyperbolicConic);
     }
 
 }

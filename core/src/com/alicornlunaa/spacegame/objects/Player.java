@@ -189,7 +189,7 @@ public class Player extends BaseEntity {
 
                 // Movement
                 if(vertical != 0 || horizontal != 0){
-                    bodyComponent.body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / getPhysScale() * 1.f), bodyComponent.body.getWorldCenter(), true);
+                    bodyComponent.body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / bodyComponent.world.getPhysScale() * 1.f), bodyComponent.body.getWorldCenter(), true);
                 }
 
                 // Controls

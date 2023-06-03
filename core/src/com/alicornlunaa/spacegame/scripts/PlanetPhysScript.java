@@ -34,20 +34,18 @@ public class PlanetPhysScript implements IScriptComponent {
 
         BaseEntity e = (BaseEntity)entity;
         if(transform.position.x > worldWidthPixels){
-            // transform.position.x -= worldWidthPixels;
-            e.setX(transform.position.x - worldWidthPixels);
+            transform.position.x -= worldWidthPixels;
         } else if(transform.position.x < 0){
-            // transform.position.x += worldWidthPixels;
-            e.setX(transform.position.x + worldWidthPixels);
+            transform.position.x += worldWidthPixels;
         }
 
         planet.checkLeavePlanet(e);
         
         // Taken from Celestial.java to correctly apply the right force
         Vector2 dragForce = planet.applyDrag(entityBody);
-        float height = Math.max(entityBody.body.getPosition().y, planet.getRadius() / planet.getPhysScale());
+        float height = Math.max(entityBody.body.getPosition().y, planet.getRadius() / planet.bodyComponent.world.getPhysScale());
         float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / (height * height));
-        entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / e.getPhysScale() * 1.f)) + dragForce.y, true);
+        entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / entityBody.world.getPhysScale() * 1.f)) + dragForce.y, true);
     }
 
     @Override

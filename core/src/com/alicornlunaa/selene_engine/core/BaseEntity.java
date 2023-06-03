@@ -5,7 +5,6 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -21,12 +20,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public BaseEntity(){}
 
     // Getters
-    public float getPhysScale(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent == null) return Constants.PPM;
-        return bodyComponent.world.getPhysScale();
-    }
-
     public Matrix3 getTransform(){
         Matrix3 matrix = new Matrix3();
         matrix.idt();
@@ -43,7 +36,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public Vector2 getCenter(){
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         if(bodyComponent != null){
-            return bodyComponent.body.getWorldCenter().cpy().scl(getPhysScale());
+            return bodyComponent.body.getWorldCenter().cpy().scl(bodyComponent.world.getPhysScale());
         }
 
         return getPosition();
@@ -150,8 +143,4 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
             }
         }
     }
-
-    // Depreciated functions for backwards compat
-    public void setX(float x){ setPosition(x, getPosition().y); }
-    public void setY(float y){ setPosition(getPosition().x, y); }
 }
