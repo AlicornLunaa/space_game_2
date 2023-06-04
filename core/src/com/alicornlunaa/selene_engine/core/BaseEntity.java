@@ -1,11 +1,9 @@
 package com.alicornlunaa.selene_engine.core;
 
-import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -20,28 +18,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     public BaseEntity(){}
 
     // Getters
-    public Matrix3 getTransform(){
-        Matrix3 matrix = new Matrix3();
-        matrix.idt();
-        matrix.translate(transform.position);
-        matrix.rotateRad(transform.rotation);
-
-        return matrix;
-    }
-
-    public Vector2 getPosition(){
-        return transform.position.cpy();
-    }
-
-    public Vector2 getCenter(){
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        if(bodyComponent != null){
-            return bodyComponent.body.getWorldCenter().cpy().scl(bodyComponent.world.getPhysScale());
-        }
-
-        return getPosition();
-    }
-
     public float getRotation(){
         return transform.rotation;
     }

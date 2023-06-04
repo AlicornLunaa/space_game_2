@@ -24,8 +24,9 @@ public class OrbitUtils {
      */
     public static Vector2 getUniverseSpacePosition(Universe u, BaseEntity e){
         Celestial parentOfEntity = u.getParentCelestial(e);
+        TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-        Vector2 systemSpacePosition = e/*.getBody()*/.getPosition().cpy(); // TODO: Refactor everything ot use the correct coordinate space
+        Vector2 systemSpacePosition = transform.position.cpy(); // TODO: Refactor everything ot use the correct coordinate space
 
         if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
 
@@ -137,7 +138,7 @@ public class OrbitUtils {
         float minDist = Float.MAX_VALUE;
 
         for(Celestial c : u.getCelestials()){
-            float curDist = c.getPosition().dst2(universeSpacePosition);
+            float curDist = c.transform.position.dst2(universeSpacePosition);
 
             if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
                 closest = c;

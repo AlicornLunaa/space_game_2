@@ -60,7 +60,7 @@ public class PhysicsSystem implements ISystem {
             rb.body.setLinearVelocity(rb.body.getLinearVelocity().cpy().add(transform.dv));
         }
 
-        transform.position.set(rb.body.getPosition().cpy().scl(rb.world.getPhysScale()));
+        transform.position.set(rb.body.getWorldCenter().cpy().scl(rb.world.getPhysScale()));
         transform.velocity.set(rb.body.getLinearVelocity());
         transform.rotation = rb.body.getAngle();
 

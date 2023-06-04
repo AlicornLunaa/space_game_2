@@ -54,7 +54,7 @@ public class Universe extends Actor {
             // Only transfer to next-level celestials.
             if(curParent == null && c.getCelestialParent() != null) continue;
 
-            float curDist = c.getPosition().dst2(celestial.getPosition());
+            float curDist = c.transform.position.dst2(celestial.transform.position);
             if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2) && c != celestial){
                 parent = c;
                 minDist = curDist;
@@ -72,7 +72,7 @@ public class Universe extends Actor {
         parent.getChildren().add(celestial);
 
         // Convert the target celestial's body to the new Box2D world
-        celestial.setPosition(celestial.getPosition().mul(parent.getTransform().inv()));
+        celestial.setPosition(celestial.transform.position.mul(parent.transform.getMatrix().inv()));
         celestial.bodyComponent.setWorld(parent.getInfluenceWorld());
 
         return true;
@@ -122,6 +122,7 @@ public class Universe extends Actor {
     public boolean checkTransfer(BaseEntity e){
         // Only transfer active entities
         if(e.hasComponent(BodyComponent.class) && !e.getComponent(BodyComponent.class).body.isActive()) return false;
+        TransformComponent transform = e.getComponent(TransformComponent.class);
 
         // Check whether or not this entity has a celestial parent or not
         Celestial parent = getParentCelestial(e);
@@ -135,7 +136,7 @@ public class Universe extends Actor {
             // Only transfer to next-level celestials.
             if(parent == null && c.getCelestialParent() != null) continue;
 
-            float curDist = c.getPosition().dst2(e.getPosition());
+            float curDist = c.transform.position.dst2(transform.position);
             if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2)){
                 closest = c;
                 minDist = curDist;
@@ -144,7 +145,7 @@ public class Universe extends Actor {
 
         // Add to celestial if a suitable target was found.
         if(closest != null){ addToCelestial(closest, e); return true; }
-        if(parent != null && e.getPosition().len2() > Math.pow(parent.getSphereOfInfluence(), 2)){ removeFromCelestial(e); return true; }
+        if(parent != null && transform.position.len2() > Math.pow(parent.getSphereOfInfluence(), 2)){ removeFromCelestial(e); return true; }
 
         return false;
     }

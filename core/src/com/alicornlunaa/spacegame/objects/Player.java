@@ -213,7 +213,7 @@ public class Player extends BaseEntity {
 
                     resolveAnimState();
                 } else {
-                    setPosition(vehicle.getPosition());
+                    setPosition(vehicle.getComponent(TransformComponent.class).position);
                 }
 
                 // Parent camera to the player's position
@@ -237,7 +237,7 @@ public class Player extends BaseEntity {
                 Matrix4 trans = new Matrix4();
                 Celestial parent = game.universe.getParentCelestial(Player.this);
                 if(parent != null) trans.set(parent.getUniverseSpaceTransform());
-                trans.mul(new Matrix4().set(getTransform()));
+                trans.mul(new Matrix4().set(transform.getMatrix()));
 
                 // Render to screen
                 Animation<TextureRegion> curAnimation = animations.get(animationState);
@@ -267,8 +267,9 @@ public class Player extends BaseEntity {
     public void updateCamera(boolean instant){
         // Update the camera positioning in order to be relative to the player
         BaseEntity ent = (vehicle == null) ? this : vehicle;
+        TransformComponent transform = ent.getComponent(TransformComponent.class);
         Celestial c = game.universe.getParentCelestial(ent);
-        Vector2 pos = ent.getCenter();
+        Vector2 pos = transform.position.cpy();
 
         if((bodyComponent.world instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
             // Set the desired camera angle to upright if the orbit is not decaying
@@ -295,16 +296,14 @@ public class Player extends BaseEntity {
     public void updateCamera(){ updateCamera(false); }
 
     // Overrides
-    @Override
     public Vector2 getCenter(){
-        if(isDriving()) return vehicle.getCenter();
-        return super.getCenter();
+        if(isDriving()) return vehicle.getComponent(TransformComponent.class).position.cpy();
+        return transform.position.cpy();
     }
 
-    @Override
     public Vector2 getPosition(){
-        if(isDriving()) return vehicle.getCenter();
-        return super.getPosition();
+        if(isDriving()) return vehicle.getComponent(TransformComponent.class).position.cpy();
+        return transform.position.cpy();
     }
 
     @Override

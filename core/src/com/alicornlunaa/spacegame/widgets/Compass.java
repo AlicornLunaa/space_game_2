@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -73,7 +74,7 @@ public class Compass extends Widget {
             BaseEntity gravityParentEnt = universe.getParentCelestial(targetEnt);
 
             if(targetEnt != null && gravityParentEnt != null){
-                Vector2 targetToParent = targetEnt.getPosition().sub(gravityParentEnt.getPosition()).nor();
+                Vector2 targetToParent = targetEnt.getComponent(TransformComponent.class).position.cpy().sub(gravityParentEnt.getComponent(TransformComponent.class).position).nor();
                 theta = targetToParent.angleDeg() - 90;
             }
         }

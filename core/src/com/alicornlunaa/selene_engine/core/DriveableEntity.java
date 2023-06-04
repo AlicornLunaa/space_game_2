@@ -34,7 +34,7 @@ public abstract class DriveableEntity extends BaseEntity {
     }
 
     public void stopDriving(){
-        driver.setPosition(getPosition());
+        driver.setPosition(driver.transform.position);
         driver.setVehicle(null);
 
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
