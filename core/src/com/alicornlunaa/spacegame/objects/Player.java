@@ -10,6 +10,7 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
@@ -253,6 +254,8 @@ public class Player extends BaseEntity {
                 );
             }
         });
+    
+        addComponent(new OrbitComponent(game.universe, this));
     }
 
     // Functions
