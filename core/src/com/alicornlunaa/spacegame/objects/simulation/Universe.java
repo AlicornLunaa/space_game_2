@@ -171,7 +171,7 @@ public class Universe extends Actor {
      * @param e The entity to check. This supports celestials.
      * @return The celestial parent
      */
-    public Celestial getParentCelestial(BaseEntity e){
+    public Celestial getParentCelestial(IEntity e){
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         
         if(bodyComponent == null) return null;

@@ -67,9 +67,9 @@ public class App extends Game {
 		universe = new Universe(this);
 
         universe.addCelestial(new Star(this, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
-        universe.addCelestial(new Planet(this, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1)); // Mercury
+        // universe.addCelestial(new Planet(this, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1)); // Mercury
         // universe.addCelestial(new Planet(this, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1)); // Venus
-        // universe.addCelestial(new Planet(this, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1)); // Earth
+        universe.addCelestial(new Planet(this, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1)); // Earth
         // universe.addCelestial(new Planet(this, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1)); // Mars
         // universe.addCelestial(new Planet(this, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0)); // Moon
         OrbitUtils.createOrbit(universe, universe.getCelestial(1));

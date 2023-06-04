@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.simulation.orbits;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
@@ -154,15 +155,20 @@ public class OrbitUtils {
      * @param u Universe to affect
      * @param e The entity to stablize into a near-circular orbit
      */
-    public static void createOrbit(Universe u, BaseEntity e){
+    public static void createOrbit(Universe u, IEntity e){
+        TransformComponent transform = e.getComponent(TransformComponent.class);
         Celestial parent = u.getParentCelestial(e);
         if(parent == null) return; // Cant create an orbit for no parent
+        if(transform == null) return; // Cant create an orbit for something that doesnt have a position
+        if(!parent.hasComponent(BodyComponent.class)) return; // Cant create an orbit without physics
 
-        Vector2 tangent = e.getComponent(BodyComponent.class).body.getPosition().cpy().nor().rotateDeg(90);
-        float radius = e.getComponent(BodyComponent.class).body.getPosition().len();
-        float velScl = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parent.getComponent(BodyComponent.class).body.getMass()) / radius);
+        BodyComponent parentBodyComponent = parent.getComponent(BodyComponent.class);
 
-        e.getComponent(BodyComponent.class).body.setLinearVelocity(tangent.scl(velScl));
+        Vector2 tangentDirection = transform.position.cpy().nor().rotateDeg(90);
+        float orbitalRadius = transform.position.len() / parentBodyComponent.world.getPhysScale();
+        float speed = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * parentBodyComponent.body.getMass()) / orbitalRadius);
+
+        transform.velocity.set(tangentDirection.scl(speed));
     }
 
     /**
