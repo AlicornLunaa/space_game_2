@@ -64,7 +64,6 @@ part will have to be told which attachment point is being used as well.
 6. Start scene
 
 ### Refactor
-1. Error in universe calculations caused by sphere of influence not being correct on initialization
-2. Add new render system for when on a planet
-3. Rework camera system
-4. Fix scaling
+1. Add new render system for when on a planet
+2. Rework camera system
+3. Fix scaling
