@@ -164,7 +164,7 @@ public class App extends Game {
 				simulation = registry.registerSystem(new PhysicsSystem());
 				registry.registerSystem(new CustomRenderSystem(this));
 				registry.registerSystem(new ScriptSystem());
-				registry.registerSystem(new OrbitSystem());
+				registry.registerSystem(new OrbitSystem(this));
 				
 				initializeUniverse();
 				// SaveManager.load(this, "dev_world");

@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -20,7 +20,7 @@ public abstract class GenericConic {
 
     // Variables
     protected @Null Celestial parent = null;
-    protected @Null BaseEntity child = null;
+    protected @Null IEntity child = null;
 
     protected double mu; // Gravitational constant
     protected double a; // Semi major axis
@@ -84,13 +84,13 @@ public abstract class GenericConic {
         endTime = meanAnomalyToTime(endMeanAnomaly);
     }
 
-    public GenericConic(Celestial parent, BaseEntity child) {
+    public GenericConic(Celestial parent, IEntity child) {
         this(parent.getComponent(BodyComponent.class).body.getMass(), child.getComponent(BodyComponent.class).body.getWorldCenter(), child.getComponent(BodyComponent.class).body.getLinearVelocity());
         this.parent = parent;
         this.child = child;
     }
 
-    public GenericConic(Celestial parent, BaseEntity child, Vector2 position, Vector2 velocity) {
+    public GenericConic(Celestial parent, IEntity child, Vector2 position, Vector2 velocity) {
         this(parent.getComponent(BodyComponent.class).body.getMass(), position, velocity);
         this.parent = parent;
         this.child = child;
@@ -275,7 +275,7 @@ public abstract class GenericConic {
 
     // Getters
     public Celestial getParent(){ return parent; }
-    public BaseEntity getChild(){ return child; }
+    public IEntity getChild(){ return child; }
     public double getSemiMajorAxis() { return a; }
     public double getEccentricity() { return e; }
     public double getArgumentofPeriapsis() { return w; }

@@ -110,7 +110,7 @@ public class OrbitUtils {
      * @param e The entity being focused on
      * @return A direction to the nearest star
      */
-    public static Vector2 directionToNearestStar(Universe u, BaseEntity e){
+    public static Vector2 directionToNearestStar(Universe u, IEntity e){
         float minDist = Float.MAX_VALUE;
         Vector2 dir = new Vector2();
         Vector2 absPos = getUniverseSpacePosition(u, e);

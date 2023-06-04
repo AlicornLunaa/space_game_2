@@ -279,7 +279,7 @@ public class Universe extends Actor {
 
                 for(int i = 0; i < celestialPaths.size; i++){
                     GenericConic path = celestialPaths.get(i);
-                    BaseEntity e = path.getChild();
+                    IEntity e = path.getChild();
 
                     if(e instanceof Planet){
                         ((Planet)e).getStarDirection().set(OrbitUtils.directionToNearestStar(this, e), 0);

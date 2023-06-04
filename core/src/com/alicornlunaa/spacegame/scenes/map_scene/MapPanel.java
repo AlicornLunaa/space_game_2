@@ -253,7 +253,7 @@ public class MapPanel extends Stage {
             // game.shapeRenderer.circle(p.x, p.y, 5000);
         }
         for(Orbit cs : patchedConics){
-            cs.draw(game.shapeRenderer, 1.5f * mapCamera.zoom);
+            // cs.draw(game.shapeRenderer, 1.5f * mapCamera.zoom);
         }
         game.shapeRenderer.setTransformMatrix(new Matrix4());
         game.shapeRenderer.end();
