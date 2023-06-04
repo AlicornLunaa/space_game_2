@@ -116,6 +116,9 @@ public class Celestial extends BaseEntity {
     public float getSphereOfInfluence(){
         if(getCelestialParent() == null) return radius * 200; // Star radius
 
+        // TODO: TEMP
+        bodyComponent.sync(transform);
+
         GenericConic c = OrbitPropagator.getConic(getCelestialParent(), this);
         return (float)(c.getSemiMajorAxis() * Math.pow(bodyComponent.body.getMass() / getCelestialParent().bodyComponent.body.getMass(), 2.0 / 5.0)) * Constants.PPM;
     }

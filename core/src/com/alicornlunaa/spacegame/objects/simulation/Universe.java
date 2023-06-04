@@ -95,7 +95,7 @@ public class Universe extends Actor {
         e.getComponent(BodyComponent.class).setWorld(universalWorld);
 
         boolean res = false;
-        do { res = checkTransfer((BaseEntity)e); } while(res == true);
+        do { res = checkTransfer(e); } while(res == true);
     }
 
     /**
@@ -125,7 +125,7 @@ public class Universe extends Actor {
 
         if(transform == null) return false;
         if(bodyComponent == null) return false;
-        if(bodyComponent.body.isActive()) return false;
+        if(!bodyComponent.body.isActive()) return false;
 
         // Check whether or not this entity has a celestial parent or not
         Celestial parent = getParentCelestial(e);
@@ -255,8 +255,8 @@ public class Universe extends Actor {
         BodyComponent targetBodyComponent = e.getComponent(BodyComponent.class);
 
         if(targetTransform != null && parentTransform != null && targetBodyComponent != null){
-            targetTransform.velocity.set(targetTransform.velocity.cpy().add(parentTransform.velocity));
-            targetTransform.position.set(targetTransform.position.cpy().add(parentTransform.position));
+            targetTransform.velocity.add(parentTransform.velocity);
+            targetTransform.position.add(parentTransform.position);
             targetBodyComponent.setWorld(targetWorld);
         }
     }

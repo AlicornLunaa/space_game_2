@@ -109,4 +109,13 @@ public class BodyComponent implements IComponent {
     
     public void afterWorldChange(PhysWorld world){}
 
+    public void sync(TransformComponent transform){
+        body.setTransform(transform.position.cpy().scl(1.0f / world.getPhysScale()), transform.rotation);
+        body.setLinearVelocity(transform.velocity.cpy());
+
+        transform.dp.set(transform.position);
+        transform.dv.set(transform.velocity);
+        transform.dr = transform.rotation;
+    }
+
 }

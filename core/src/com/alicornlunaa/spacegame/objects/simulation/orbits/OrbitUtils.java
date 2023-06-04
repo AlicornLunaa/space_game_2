@@ -23,23 +23,24 @@ public class OrbitUtils {
      * @param e The entity to transform into universe-space
      * @return A 2d vector containing the universe space coordinates
      */
-    public static Vector2 getUniverseSpacePosition(Universe u, BaseEntity e){
-        Celestial parentOfEntity = u.getParentCelestial(e);
-        TransformComponent transform = e.getComponent(TransformComponent.class);
-        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-        Vector2 systemSpacePosition = transform.position.cpy(); // TODO: Refactor everything ot use the correct coordinate space
+    public static Vector2 getUniverseSpacePosition(Universe universe, IEntity entity){
+        TransformComponent transform = entity.getComponent(TransformComponent.class);
+        BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
 
-        if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
+        Celestial parentOfEntity = universe.getParentCelestial(entity);
+        Vector2 systemSpacePosition = transform.position.cpy();
 
-        if(e instanceof Celestial){
+        if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world, therefore coordinates already global
+
+        if(entity instanceof Celestial){
             // Its a celestial body, return its position directly
-            return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
+            return new Vector2().mul(((Celestial)entity).getUniverseSpaceTransform());
         }
 
         if(bodyComponent != null && bodyComponent.world instanceof PlanetaryPhysWorld){
             // Its on a rectangular phys world, return the position converted
             Planet planet = (Planet)parentOfEntity;
-            systemSpacePosition.set(planet.getSpacePosition(e));
+            systemSpacePosition.set(planet.getSpacePosition(entity));
         }
 
         return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
