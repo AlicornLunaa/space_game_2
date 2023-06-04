@@ -21,5 +21,15 @@ public class TransformComponent implements IComponent{
         matrix.rotateRad(rotation);
         return matrix;
     }
+
+    public void sync(BodyComponent bodyComponent){
+        position.set(bodyComponent.body.getWorldCenter().cpy().scl(bodyComponent.world.getPhysScale()));
+        velocity.set(bodyComponent.body.getLinearVelocity());
+        rotation = bodyComponent.body.getAngle();
+
+        dp.set(position);
+        dv.set(velocity);
+        dr = rotation;
+    }
     
 }

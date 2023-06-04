@@ -29,12 +29,6 @@ public class PhysicsSystem implements ISystem {
         return physWorlds.peek();
     }
 
-    @Deprecated
-    public void addEntity(PhysWorld world, IEntity entity){
-        if(!entity.hasComponent(BodyComponent.class)) return;
-        entity.getComponent(BodyComponent.class).setWorld(world);
-    }
-
 	// Functions
     @Override
     public void beforeUpdate() {

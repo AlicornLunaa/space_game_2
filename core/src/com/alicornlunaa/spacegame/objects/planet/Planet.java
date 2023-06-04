@@ -247,18 +247,17 @@ public class Planet extends Celestial {
     public Vector2 getSpaceVelocity(IEntity e){
         // Convert the planetary coords to space coords
         TransformComponent entityTransform = e.getComponent(TransformComponent.class);
-        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
         Vector2 velocity = new Vector2();
 
         // Convet to space velocity
-        if(entityTransform != null && entityBodyComponent != null){
+        if(entityTransform != null){
             double theta = ((transform.position.x / (getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
 
-            Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
-            Vector2 planetToEnt = entityTransform.position.cpy().nor();
-            Vector2 curVelocity = entityBodyComponent.body.getLinearVelocity().cpy().scl(bodyComponent.world.getPhysScale() / Constants.PPM);
+            Vector2 tangentDirection = new Vector2(0, 1).rotateRad((float)theta);
+            Vector2 radialDirection = entityTransform.position.cpy().nor();
+            Vector2 currentVelocity = entityTransform.velocity.cpy();
 
-            velocity.set(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
+            velocity.set(tangentDirection.scl(currentVelocity.x).add(radialDirection.scl(currentVelocity.y)));
         }
 
         return velocity;
@@ -293,7 +292,6 @@ public class Planet extends Celestial {
      * @param e Entity to be converted
      */
     public void addEntityWorld(IEntity e){
-        // TODO: CHECK FOR ERRORS
         // Formula: x = theta, y = radius
         TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
@@ -315,15 +313,15 @@ public class Planet extends Celestial {
 
         // Add body
         bodyComponent.setWorld(physWorld);
+        transform.sync(bodyComponent);
     }
 
     /**
      * Convert the entity to the space planet circular coordinates
      * @param e Entity to be converted
      */
-    public void delEntityWorld(BaseEntity e){
+    public void delEntityWorld(IEntity e){
         // Formula: theta = x, radius = y
-        // TODO: CHECK FOR ERRORS
         TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         if(bodyComponent == null || transform == null) return;
@@ -344,6 +342,7 @@ public class Planet extends Celestial {
 
         // Remove body
         bodyComponent.setWorld(getInfluenceWorld());
+        transform.sync(bodyComponent);
     }
 
     public boolean checkTransferPlanet(IEntity e){

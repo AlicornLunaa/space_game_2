@@ -43,8 +43,8 @@ public class Universe extends Actor {
     // Private functions
     private boolean checkCelestialTransfer(Celestial celestial){
         // Check whether or not this entity has a celestial parent or not
-        Celestial curParent = getParentCelestial(celestial);
-        Array<Celestial> celestialsToCheck = (curParent == null) ? celestials : curParent.getChildren();
+        Celestial currentParent = getParentCelestial(celestial);
+        Array<Celestial> celestialsToCheck = (currentParent == null) ? celestials : currentParent.getChildren();
 
         // Find closest celestial with proper SOI parameters
         Celestial parent = null;
@@ -52,7 +52,7 @@ public class Universe extends Actor {
 
         for(Celestial c : celestialsToCheck){
             // Only transfer to next-level celestials.
-            if(curParent == null && c.getCelestialParent() != null) continue;
+            if(currentParent == null && c.getCelestialParent() != null) continue;
 
             float curDist = c.transform.position.dst2(celestial.transform.position);
             if(curDist < minDist && curDist < Math.pow(c.getSphereOfInfluence(), 2) && c != celestial){
@@ -63,8 +63,8 @@ public class Universe extends Actor {
 
         if(parent == null) return false;
 
-        if(curParent != null){
-            curParent.getChildren().removeValue(celestial, true);
+        if(currentParent != null){
+            currentParent.getChildren().removeValue(celestial, true);
         }
 
         // Update the target's parent to be the parent celestial
@@ -74,7 +74,6 @@ public class Universe extends Actor {
         // Convert the target celestial's body to the new Box2D world
         celestial.transform.position.set(celestial.transform.position.mul(parent.transform.getMatrix().inv()));
         celestial.bodyComponent.setWorld(parent.getInfluenceWorld());
-
         return true;
     }
 
@@ -119,10 +118,14 @@ public class Universe extends Actor {
      * If it is inside a new SOI, transfer to the appropriate child.
      * @param e The entity to check
      */
-    public boolean checkTransfer(BaseEntity e){
+    public boolean checkTransfer(IEntity e){
         // Only transfer active entities
-        if(e.hasComponent(BodyComponent.class) && !e.getComponent(BodyComponent.class).body.isActive()) return false;
         TransformComponent transform = e.getComponent(TransformComponent.class);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+
+        if(transform == null) return false;
+        if(bodyComponent == null) return false;
+        if(bodyComponent.body.isActive()) return false;
 
         // Check whether or not this entity has a celestial parent or not
         Celestial parent = getParentCelestial(e);
@@ -225,41 +228,37 @@ public class Universe extends Actor {
      * @param c Celestial target
      * @param e Entity to be converted
      */
-    public void addToCelestial(Celestial c, BaseEntity e){
-        BodyComponent bodyComponent1 = c.getComponent(BodyComponent.class);
-        BodyComponent bodyComponent2 = e.getComponent(BodyComponent.class);
+    public void addToCelestial(Celestial c, IEntity e){
+        TransformComponent parentTransform = c.getComponent(TransformComponent.class);
+        TransformComponent targetTransform = e.getComponent(TransformComponent.class);
+        BodyComponent targetBodyComponent = e.getComponent(BodyComponent.class);
 
-        if(bodyComponent1 != null && bodyComponent2 != null){
-            bodyComponent2.body.setLinearVelocity(bodyComponent2.body.getLinearVelocity().cpy().sub(bodyComponent1.body.getLinearVelocity()));
-            bodyComponent2.body.setTransform(bodyComponent2.body.getPosition().cpy().sub(bodyComponent1.body.getPosition()), bodyComponent2.body.getAngle());
+        if(targetTransform != null && parentTransform != null && targetBodyComponent != null){
+            targetTransform.velocity.set(targetTransform.velocity.cpy().sub(parentTransform.velocity));
+            targetTransform.position.set(targetTransform.position.cpy().sub(parentTransform.position));
+            targetBodyComponent.setWorld(c.getInfluenceWorld());
         }
-
-        // Add body
-        bodyComponent2.setWorld(c.getInfluenceWorld());
     }
 
     /**
      * Raises the entity up a level in terms of worlds
      * @param e Entity to be converted
      */
-    public void removeFromCelestial(BaseEntity e){
-        Celestial parent = getParentCelestial(e);
-        Celestial celestialParent = getParentCelestial(parent);
-        PhysWorld targetWorld = (celestialParent == null) ? universalWorld : celestialParent.getInfluenceWorld();
+    public void removeFromCelestial(IEntity e){
+        Celestial entityParent = getParentCelestial(e);
+        PhysWorld targetWorld = (getParentCelestial(entityParent) == null) ? universalWorld : getParentCelestial(entityParent).getInfluenceWorld();
 
-        if(parent == null) return;
+        if(entityParent == null) return;
 
-        BodyComponent bodyComponent1 = parent.getComponent(BodyComponent.class);
-        BodyComponent bodyComponent2 = e.getComponent(BodyComponent.class);
+        TransformComponent parentTransform = entityParent.getComponent(TransformComponent.class);
+        TransformComponent targetTransform = e.getComponent(TransformComponent.class);
+        BodyComponent targetBodyComponent = e.getComponent(BodyComponent.class);
 
-        if(bodyComponent1 != null && bodyComponent2 != null){
-            // TODO: bug here
-            bodyComponent2.body.setLinearVelocity(bodyComponent2.body.getLinearVelocity().cpy().add(bodyComponent1.body.getLinearVelocity()));
-            bodyComponent2.body.setTransform(bodyComponent2.body.getPosition().cpy().add(bodyComponent1.body.getPosition()), bodyComponent2.body.getAngle());
+        if(targetTransform != null && parentTransform != null && targetBodyComponent != null){
+            targetTransform.velocity.set(targetTransform.velocity.cpy().add(parentTransform.velocity));
+            targetTransform.position.set(targetTransform.position.cpy().add(parentTransform.position));
+            targetBodyComponent.setWorld(targetWorld);
         }
-
-        // Remove body
-        bodyComponent2.setWorld(targetWorld);
     }
 
     /**
@@ -350,12 +349,6 @@ public class Universe extends Actor {
             }
 
             currentFuture += (timewarp - 1) * 8;
-        }
-    }
-
-    public void setCelestialOpacity(float a){
-        for(Celestial c : getCelestials()){
-            c.setCelestialOpacity(a);
         }
     }
 
