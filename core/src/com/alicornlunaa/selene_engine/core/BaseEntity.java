@@ -4,10 +4,10 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
+@SuppressWarnings("unused")
 public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
 
     // Variables
@@ -17,14 +17,7 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     // Constructors
     public BaseEntity(){}
 
-    // Setters
-    public void setVelocity(float x, float y){
-        transform.velocity.set(x, y);
-    }
-
-    public void setVelocity(Vector2 vel){ setVelocity(vel.x, vel.y); }
-
-    // Component system
+    // Functions
     @Override
     public <T extends IComponent> T addComponent(T component){
         components.add(component);
@@ -100,4 +93,5 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
             }
         }
     }
+
 }

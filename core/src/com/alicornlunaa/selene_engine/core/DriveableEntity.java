@@ -27,10 +27,12 @@ public abstract class DriveableEntity extends BaseEntity {
         this.driver = driver;
         driver.setVehicle(this);
 
+        TransformComponent driverTransform = driver.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
+
         if(bodyComponent != null){
             bodyComponent.body.setActive(false);
-            driver.setVelocity(0, 0);
+            driverTransform.velocity.set(0, 0);
         }
     }
 
