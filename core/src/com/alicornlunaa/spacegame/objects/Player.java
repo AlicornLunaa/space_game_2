@@ -213,7 +213,7 @@ public class Player extends BaseEntity {
 
                     resolveAnimState();
                 } else {
-                    setPosition(vehicle.getComponent(TransformComponent.class).position);
+                    transform.position.set(vehicle.getComponent(TransformComponent.class).position);
                 }
 
                 // Parent camera to the player's position

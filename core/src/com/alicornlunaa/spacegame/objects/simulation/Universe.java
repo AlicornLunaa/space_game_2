@@ -72,7 +72,7 @@ public class Universe extends Actor {
         parent.getChildren().add(celestial);
 
         // Convert the target celestial's body to the new Box2D world
-        celestial.setPosition(celestial.transform.position.mul(parent.transform.getMatrix().inv()));
+        celestial.transform.position.set(celestial.transform.position.mul(parent.transform.getMatrix().inv()));
         celestial.bodyComponent.setWorld(parent.getInfluenceWorld());
 
         return true;
