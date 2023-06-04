@@ -17,15 +17,6 @@ public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
     // Constructors
     public BaseEntity(){}
 
-    // Getters
-    public float getRotation(){
-        return transform.rotation;
-    }
-
-    public Vector2 getVelocity(){
-        return transform.velocity.cpy();
-    }
-
     // Setters
     public void setPosition(float x, float y){
         transform.position.set(x, y);

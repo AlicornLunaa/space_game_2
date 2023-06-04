@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.space_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.App;
@@ -100,9 +101,10 @@ public class SpaceUIPanel extends Stage {
                     ship.stopDriving();
 
                     if(ship.hasComponent(BodyComponent.class)){
+                        TransformComponent shipTransform = ship.getComponent(TransformComponent.class);
                         BodyComponent shipBodyComponent = ship.getComponent(BodyComponent.class);
                         game.player.bodyComponent.setWorld(shipBodyComponent.world);
-                        game.player.setVelocity(ship.getVelocity());
+                        game.player.transform.velocity.set(shipTransform.velocity);
                     }
                 } else {
                     DriveableEntity ship = game.spaceScene.getContent().ship;

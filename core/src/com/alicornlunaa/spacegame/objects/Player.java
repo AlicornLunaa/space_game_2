@@ -306,16 +306,14 @@ public class Player extends BaseEntity {
         return transform.position.cpy();
     }
 
-    @Override
     public float getRotation(){
-        if(isDriving()) return vehicle.getRotation();
-        return super.getRotation();
+        if(isDriving()) return vehicle.getComponent(TransformComponent.class).rotation;
+        return transform.rotation;
     }
 
-    @Override
     public Vector2 getVelocity(){
-        if(isDriving()) return vehicle.getVelocity();
-        return super.getVelocity();
+        if(isDriving()) return vehicle.getComponent(TransformComponent.class).velocity.cpy();
+        return transform.velocity.cpy();
     }
 
 }
