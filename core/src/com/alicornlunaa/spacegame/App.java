@@ -51,6 +51,7 @@ public class App extends Game {
 
 	public Registry registry;
 	public PhysicsSystem simulation;
+	public OrbitSystem orbitSystem;
 	public Universe universe;
 	public OrthographicCamera activeCamera;
 	public Player player;
@@ -164,7 +165,7 @@ public class App extends Game {
 				simulation = registry.registerSystem(new PhysicsSystem());
 				registry.registerSystem(new CustomRenderSystem(this));
 				registry.registerSystem(new ScriptSystem());
-				registry.registerSystem(new OrbitSystem(this));
+				orbitSystem = registry.registerSystem(new OrbitSystem(this));
 				
 				initializeUniverse();
 				// SaveManager.load(this, "dev_world");

@@ -7,6 +7,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
@@ -102,6 +103,7 @@ public class Celestial extends BaseEntity {
                 batch.begin();
             }
         });
+        addComponent(new OrbitComponent(game.universe, this)).patchedConicsDepth = 0;
     }
 
     // Functions

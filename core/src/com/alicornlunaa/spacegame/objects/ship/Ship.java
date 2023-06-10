@@ -11,6 +11,7 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
@@ -138,7 +139,7 @@ public class Ship extends DriveableEntity {
                 }
             }
         });
-
+        addComponent(new OrbitComponent(game.universe, this));
 
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setTransform(x / ppm, y / ppm, rotation);

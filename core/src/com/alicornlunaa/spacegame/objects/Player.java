@@ -55,6 +55,7 @@ public class Player extends BaseEntity {
     private final App game;
     public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
+    public OrbitComponent orbitComponent;
 
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
@@ -254,8 +255,8 @@ public class Player extends BaseEntity {
                 );
             }
         });
-    
-        addComponent(new OrbitComponent(game.universe, this));
+        
+        orbitComponent = addComponent(new OrbitComponent(game.universe, this));
     }
 
     // Functions
@@ -283,7 +284,7 @@ public class Player extends BaseEntity {
 
         if(!(bodyComponent.world instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
             // If the player is on a planet, use the universe-based position system
-            pos.set(OrbitUtils.getUniverseSpaceCenter(game.universe, ent));
+            pos.set(OrbitUtils.getUniverseSpacePosition(game.universe, ent));
         }
 
         if(instant){

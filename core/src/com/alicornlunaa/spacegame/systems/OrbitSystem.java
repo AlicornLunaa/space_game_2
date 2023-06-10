@@ -1,6 +1,5 @@
 package com.alicornlunaa.spacegame.systems;
 
-import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
@@ -13,6 +12,7 @@ public class OrbitSystem implements ISystem {
     // Variables
 	private App game;
     private ShapeRenderer shapeRenderer;
+    public boolean visible = false;
 
 	// Constructor
 	public OrbitSystem(App game){
@@ -29,7 +29,6 @@ public class OrbitSystem implements ISystem {
 
     @Override
     public void update(IEntity entity) {
-        // TransformComponent transform = entity.getComponent(TransformComponent.class);
         OrbitComponent orbitComponent = entity.getComponent(OrbitComponent.class);
         orbitComponent.recalculate();
     }
@@ -47,13 +46,14 @@ public class OrbitSystem implements ISystem {
 
     @Override
     public void render(IEntity entity) {
+        if(!visible) return;
         OrbitComponent orbitComponent = entity.getComponent(OrbitComponent.class);
         orbitComponent.draw(shapeRenderer, 1.5f * game.activeCamera.zoom);
     }
 
     @Override
     public boolean shouldRunOnEntity(IEntity entity) {
-        return entity.hasComponents(TransformComponent.class, OrbitComponent.class);
+        return entity.hasComponents(OrbitComponent.class);
     }
     
 }

@@ -90,7 +90,7 @@ public class PlanetPanel extends Stage {
         Matrix4 invProj = proj.cpy().inv();
 
         // Skybox rendering
-        Vector2 globalPos = OrbitUtils.getUniverseSpaceCenter(game.universe, game.player);
+        Vector2 globalPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
         
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());

@@ -292,20 +292,16 @@ public class Universe extends Actor {
     
                     if(transform == null) continue;
                     if(bodyComponent == null) continue;
-                    
-                    bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
-                    bodyComponent.body.setLinearVelocity(curVel.cpy());
 
                     curPos.scl(128);
                     transform.position.set(curPos);
-                    transform.dp.set(curPos);
                     transform.velocity.set(curVel);
-                    transform.dv.set(curVel);
+                    bodyComponent.sync(transform);
                 }
 
                 for(int i = 0; i < entityPaths.size; i++){
                     Orbit path = entityPaths.get(i);
-                    BaseEntity e = path.getEntity();
+                    IEntity e = path.getEntity();
                     TransformComponent transform = e.getComponent(TransformComponent.class);
                     BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
     
@@ -336,15 +332,11 @@ public class Universe extends Actor {
                             addToCelestial(parent, e);
                         }
                     }
-                    
-                    bodyComponent.body.setTransform(curPos.cpy(), bodyComponent.body.getAngle());
-                    bodyComponent.body.setLinearVelocity(curVel.cpy());
 
                     curPos.scl(128);
                     transform.position.set(curPos);
-                    transform.dp.set(curPos);
                     transform.velocity.set(curVel);
-                    transform.dv.set(curVel);
+                    bodyComponent.sync(transform);
                 }
             }
 

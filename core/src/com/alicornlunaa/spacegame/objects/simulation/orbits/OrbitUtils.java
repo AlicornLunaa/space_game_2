@@ -47,35 +47,6 @@ public class OrbitUtils {
     }
 
     /**
-     * Returns the center position of the entity local to the center of the universe.
-     * This will be prone to float point precision errors, use with caution.
-     * @param u The universe to search in
-     * @param e The entity to transform into universe-space
-     * @return A 2d vector containing the universe space coordinates
-     */
-    public static Vector2 getUniverseSpaceCenter(Universe u, BaseEntity e){
-        Celestial parentOfEntity = u.getParentCelestial(e);
-        TransformComponent transform = e.getComponent(TransformComponent.class);
-        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-        Vector2 systemSpacePosition = transform.position.cpy();//bodyComponent.body.getWorldCenter().cpy().scl(e.getPhysScale());
-
-        if(parentOfEntity == null) return systemSpacePosition; // No parent, its in the universe world.
-
-        if(e instanceof Celestial){
-            // Its a celestial body, return its position directly
-            return new Vector2().mul(((Celestial)e).getUniverseSpaceTransform());
-        }
-
-        if(bodyComponent != null && bodyComponent.world instanceof PlanetaryPhysWorld){
-            // Its on a rectangular phys world, return the position converted
-            Planet planet = (Planet)parentOfEntity;
-            systemSpacePosition.set(planet.getSpacePosition(e));
-        }
-
-        return systemSpacePosition.mul(parentOfEntity.getUniverseSpaceTransform());
-    }
-
-    /**
      * Returns the position of the entity local to the center of the universe.
      * This will be prone to float point precision errors, use with caution.
      * @param u The universe to search in
@@ -134,6 +105,7 @@ public class OrbitUtils {
      * @param universeSpacePosition Universe space coordinates
      * @return Parent celestial for universal coordinates
      */
+    @Deprecated
     public static Celestial getParentFromUniverseSpace(Universe u, Vector2 universeSpacePosition){
         // Simple search
         Celestial closest = null;
@@ -159,6 +131,7 @@ public class OrbitUtils {
     public static void createOrbit(Universe u, IEntity e){
         TransformComponent transform = e.getComponent(TransformComponent.class);
         Celestial parent = u.getParentCelestial(e);
+
         if(parent == null) return; // Cant create an orbit for no parent
         if(transform == null) return; // Cant create an orbit for something that doesnt have a position
         if(!parent.hasComponent(BodyComponent.class)) return; // Cant create an orbit without physics
@@ -179,6 +152,7 @@ public class OrbitUtils {
      * @return True or false
      */
     public static boolean isOrbitDecaying(Celestial parent, BaseEntity entity){
+        // TODO: Switch to velocity approach
         GenericConic gc = OrbitPropagator.getConic(parent, entity);
         return (gc.getPeriapsis() <= (parent.getRadius() * 1.2f) / parent.bodyComponent.world.getPhysScale()) && !(gc instanceof HyperbolicConic);
     }

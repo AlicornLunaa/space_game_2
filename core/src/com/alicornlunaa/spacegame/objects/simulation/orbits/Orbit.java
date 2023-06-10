@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.simulation.orbits;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -20,10 +20,11 @@ public class Orbit {
 
     // Variables
     private final Universe universe;
-    private final BaseEntity entity;
-
+    private final IEntity entity;
     private ArrayList<GenericConic> conics = new ArrayList<>();
     private HashMap<Celestial, GenericConic> celestialConics = new HashMap<>();
+    
+    public int patchedConicsDepth = Constants.PATCHED_CONIC_LIMIT;
 
     // Private functions
     /**
@@ -48,8 +49,8 @@ public class Orbit {
         double endIntersectionGuess = -1.f;
 
         // Find first intersection by the changing value
-        for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-            double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS)) * 2.0 * Math.PI;
+        for(double i = 0; i < patchedConicsDepth; i++){
+            double meanAnomaly = (i / (patchedConicsDepth)) * 2.0 * Math.PI;
 
             if(childConic instanceof HyperbolicConic)
                 meanAnomaly = (Math.pow(childConic.getSemiMajorAxis(), 2.0) * meanAnomaly) / 2.0;
@@ -103,11 +104,11 @@ public class Orbit {
         double startIntersectionGuess = -1.f;
         double endIntersectionGuess = -1.f;
 
-        for(double i = 0; i < Constants.PATCHED_CONIC_STEPS; i++){
-            double meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI;
+        for(double i = 0; i < patchedConicsDepth; i++){
+            double meanAnomaly = (i / (patchedConicsDepth - 1)) * 2.0 * Math.PI;
 
             if(childConic instanceof HyperbolicConic)
-                meanAnomaly = (i / (Constants.PATCHED_CONIC_STEPS - 1)) * 2.0 * Math.PI * 30;
+                meanAnomaly = (i / (patchedConicsDepth - 1)) * 2.0 * Math.PI * 30;
 
             double distInsideSOI = childConic.getPosition(meanAnomaly).len() - (parent.getSphereOfInfluence() / Constants.PPM);
 
@@ -196,9 +197,9 @@ public class Orbit {
     }
 
     // Constructors
-    public Orbit(Universe universe, BaseEntity e){
+    public Orbit(Universe universe, IEntity e){
         this.universe = universe;
-        entity = e;
+        this.entity = e;
         recalculate();
     }
 
@@ -209,11 +210,12 @@ public class Orbit {
 
         // Get first orbit line
         Celestial parent = universe.getParentCelestial(entity);
-        conics.add(OrbitPropagator.getConic(parent, entity));
 
-        // Search the first orbit for an intersection with a new sphere of influence
-        integrateCelestialConics();
-        patchConics(parent, conics.get(0), 1, 0);
+        if(parent != null){
+            conics.add(OrbitPropagator.getConic(parent, entity));
+            integrateCelestialConics();
+            patchConics(parent, conics.get(0), 1, 0);
+        }
     }
 
     public void draw(ShapeRenderer renderer, float lineWidth){
@@ -223,7 +225,7 @@ public class Orbit {
         }
     }
 
-    public BaseEntity getEntity(){ return entity; }
+    public IEntity getEntity(){ return entity; }
 
     public ArrayList<GenericConic> getConics(){ return conics; }
 
