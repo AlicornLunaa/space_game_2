@@ -15,7 +15,6 @@ import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
-import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
@@ -97,10 +96,10 @@ public class Player extends BaseEntity {
                 if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
                     game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
                 } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
-                    game.activeSpaceScreen = game.spaceScene;
+                    game.activeSpaceScreen = game.gameScene;
                 }
 
-                if(game.getScreen() instanceof MapScene) return;
+                // if(game.getScreen() instanceof MapScene) return;
 
                 if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
                     game.setScreen(game.activeSpaceScreen);
@@ -282,7 +281,8 @@ public class Player extends BaseEntity {
             cameraAngle.set(pos.cpy().nor(), 0);
         }
 
-        if(!(bodyComponent.world instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
+        if(!(bodyComponent.world instanceof PlanetaryPhysWorld)){
+            //  || game.getScreen() instanceof MapScene
             // If the player is on a planet, use the universe-based position system
             pos.set(OrbitUtils.getUniverseSpacePosition(game.gameScene.universe, ent));
         }

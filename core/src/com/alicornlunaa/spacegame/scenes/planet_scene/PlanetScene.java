@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.planet_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.scenes.space_scene.SpaceUIPanel;
+import com.alicornlunaa.spacegame.scenes.game_scene.SpaceInterface;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -21,7 +21,7 @@ public class PlanetScene implements Screen {
 
     public PlanetPanel planetPanel;
     public PlanetUIPanel uiPanel;
-    public SpaceUIPanel uiShip;
+    public SpaceInterface uiShip;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
@@ -31,7 +31,7 @@ public class PlanetScene implements Screen {
 
         planetPanel = new PlanetPanel(game, planet);
         uiPanel = new PlanetUIPanel(game);
-        uiShip = new SpaceUIPanel(game);
+        uiShip = new SpaceInterface(game);
 
         inputs.addProcessor(uiPanel);
         inputs.addProcessor(uiShip);

@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.ship_view_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -9,14 +9,14 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
-public class ShipView extends Stage {
+public class ShipViewPanel extends Stage {
 
     // Variables
     private final App game;
-    private final Ship ship;
+    public final Ship ship;
 
     // Constructor
-    public ShipView(final App game, final Ship ship){
+    public ShipViewPanel(final App game, final Ship ship){
         super(new FillViewport(1280, 720));
         this.game = game;
         this.ship = ship;

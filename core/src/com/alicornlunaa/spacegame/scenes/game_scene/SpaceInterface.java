@@ -3,10 +3,7 @@ package com.alicornlunaa.spacegame.scenes.game_scene;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
-import com.alicornlunaa.selene_engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.map_scene.MapScene;
-import com.alicornlunaa.spacegame.scenes.ship_view_scene.ShipViewScene;
 import com.alicornlunaa.spacegame.scenes.transitions.PauseScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.widgets.Compass;
@@ -87,7 +84,8 @@ public class SpaceInterface extends Stage {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(!game.gameScene.player.isDriving()) return;
-                game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, game.gameScene.spacePanel.ship), 0.15f));
+                // game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, game.gameScene.spacePanel.ship), 0.15f));
+                game.gameScene.openShipView(game.gameScene.spacePanel.ship);
             }
         });
 
@@ -162,7 +160,7 @@ public class SpaceInterface extends Stage {
                     game.gameScene.spacePanel.ship.state.throttle = 0;
                     return true;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    game.setScreen(new MapScene(game, game.gameScene.player, game.gameScene.spacePanel));
+                    game.gameScene.openMap();
                     return true;
                 }
 

@@ -9,7 +9,6 @@ import com.alicornlunaa.selene_engine.util.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
 import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
-import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
@@ -40,10 +39,8 @@ public class App extends Game {
 	public Skin skin;
 
 	public LoadingScene loadingScene;
-	public SpaceScene spaceScene;
-	public Screen activeSpaceScreen;
-
 	public GameplayScene gameScene;
+	public Screen activeSpaceScreen;
 
 	public Registry registry;
 	public PhysicsSystem simulation;

@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.map_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
@@ -13,12 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class Marker extends Actor {
+public class MapMarker extends Actor {
 
     private TextureRegion region;
     private Label hoverLabel;
 
-    public Marker(final App game, Celestial parent, Vector2 position, TextureRegion texture, float size, String text){
+    public MapMarker(final App game, Celestial parent, Vector2 position, TextureRegion texture, float size, String text){
         super();
 
         Matrix3 universalSpaceTransform = parent.getUniverseSpaceTransform();

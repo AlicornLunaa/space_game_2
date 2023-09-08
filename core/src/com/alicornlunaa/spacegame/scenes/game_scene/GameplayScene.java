@@ -1,14 +1,17 @@
 package com.alicornlunaa.spacegame.scenes.game_scene;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 /**
  * Handles all normal gameplay in the application,
@@ -18,8 +21,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 public class GameplayScene extends BaseScene {
 
     // Variables
+    private GameplayState state = GameplayState.SPACE;
+
     public SpacePanel spacePanel;
     public SpaceInterface spaceInterface;
+    public ShipViewPanel shipViewPanel;
+    public ShipViewInterface shipViewInteface;
+    public MapPanel mapPanel;
     
 	public Universe universe;
 	public OrthographicCamera activeCamera;
@@ -67,29 +75,95 @@ public class GameplayScene extends BaseScene {
     public GameplayScene(App game) { super(game); }
     
     // Functions
-    // public U getUI(){ return ui; }
-    public SpacePanel getContent(){ return spacePanel; }
-
     public void init(){
         initializeUniverse();
         initializeSpaceScene();
+    }
+
+    public void openMap(){
+        mapPanel = new MapPanel(game, spacePanel);
+        inputs.addProcessor(0, mapPanel);
+        state = GameplayState.MAP;
+    }
+
+    public void closeMap(){
+        inputs.removeProcessor(mapPanel);
+        state = GameplayState.SPACE;
+        mapPanel.dispose();
+        mapPanel = null;
+    }
+
+    public void openShipView(Ship ship){
+        ship.stopDriving();
+        game.gameScene.player.bodyComponent.setWorld(ship.getInteriorWorld());
+        game.gameScene.player.transform.position.set(0, 0);
+        game.gameScene.player.transform.rotation = 0;
+        game.gameScene.player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);
+
+        state = GameplayState.SHIP;
+
+        shipViewPanel = new ShipViewPanel(game, ship);
+        shipViewInteface = new ShipViewInterface(game);
+
+        inputs.clear();
+        inputs.addProcessor(shipViewInteface);
+        inputs.addProcessor(shipViewPanel);
+    }
+
+    public void closeShipView(){
+        game.gameScene.player.bodyComponent.setWorld(shipViewPanel.ship.bodyComponent.world);
+        shipViewPanel.ship.drive(game.gameScene.player);
+
+        state = GameplayState.SPACE;
+        shipViewPanel.dispose();
+        shipViewPanel = null;
+        shipViewInteface.dispose();
+        shipViewInteface = null;
+
+        inputs.clear();
+        inputs.addProcessor(spaceInterface);
+        inputs.addProcessor(spacePanel);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
 
-        spaceInterface.act(delta);
-        spacePanel.act(delta);
+        switch(state){
+            case SPACE:
+                spaceInterface.act(delta);
+                spacePanel.act(delta);
 
-        spacePanel.draw();
-        spaceInterface.draw();
+                spacePanel.draw();
+                spaceInterface.draw();
+                break;
+                
+            case MAP:
+                spaceInterface.act(delta);
+                mapPanel.act(delta);
+
+                mapPanel.draw();
+                spaceInterface.draw();
+                break;
+
+            case SHIP:
+                ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1.0f);
+                shipViewInteface.act(delta);
+                shipViewPanel.act(delta);
+                shipViewPanel.draw();
+                shipViewInteface.draw();
+                break;
+
+            case PLANET:
+                break;
+        }
     }
 
     @Override
     public void resize(int width, int height) {
-        spacePanel.getViewport().update(width, height, true);
-        spaceInterface.getViewport().update(width, height, true);
+        if(spacePanel != null) spacePanel.getViewport().update(width, height, true);
+        if(spaceInterface != null) spaceInterface.getViewport().update(width, height, true);
+        if(mapPanel != null) mapPanel.getViewport().update(width, height, true);
     }
 
     @Override

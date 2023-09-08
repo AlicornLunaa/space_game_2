@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.map_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.vfx.transitions.CameraZoomTransition;
@@ -68,7 +68,7 @@ public class MapPanel extends Stage {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
-                    game.setScreen(game.activeSpaceScreen);
+                    game.gameScene.closeMap();
                     game.vfxManager.add(new CameraZoomTransition(game.gameScene.activeCamera, mapCamera.zoom, game.gameScene.activeCamera.zoom, 0.3f));
                     game.gameScene.activeCamera = oldCamera;
                     game.orbitSystem.visible = false;

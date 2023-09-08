@@ -1,6 +1,5 @@
-package com.alicornlunaa.spacegame.scenes.ship_view_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene;
 
-import com.alicornlunaa.selene_engine.vfx.transitions.FadeTransitionScene;
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,13 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
-public class ShipViewUI extends Stage {
+public class ShipViewInterface extends Stage {
 
     // Variables
     private final Screen previousScreen;
 
     // Constructor
-    public ShipViewUI(final App game){
+    public ShipViewInterface(final App game){
         super(new ScreenViewport());
         previousScreen = game.getScreen();
 
@@ -27,7 +26,8 @@ public class ShipViewUI extends Stage {
         getRoot().findActor("backbutton").addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor a){
-                game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), previousScreen, 0.15f));
+                // game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), previousScreen, 0.15f));
+                game.gameScene.closeShipView();
             }
         });
     }
