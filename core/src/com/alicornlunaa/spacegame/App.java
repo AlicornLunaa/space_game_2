@@ -183,6 +183,7 @@ public class App extends Game {
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
+				// this.setScreen(new EditorScene(this));
 				// this.setScreen(new TestScreen(this));
 				// this.setScreen(new OrbitTest(this));
 				// this.setScreen(new PlanetEditor(this));
