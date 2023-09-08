@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.states;
+package com.alicornlunaa.spacegame.objects.ship;
 
 public class ShipState {
     /** Contains a list of all the ship statistics and variables
@@ -6,8 +6,10 @@ public class ShipState {
      * SAS, and other instance based variables
      */
     public boolean debug = false; // Debug drawings
-    public boolean rcs = false; // RCS thrusters
-    public boolean sas = false; // Stability controller
+    
+    public boolean rcs = true; // RCS thrusters
+    public boolean sas = true; // Stability controller
+
     public float throttle = 0; // Thruster throttle
     public float roll = 0; // Rotational movement intention
     public float vertical = 0; // Translation movement intention

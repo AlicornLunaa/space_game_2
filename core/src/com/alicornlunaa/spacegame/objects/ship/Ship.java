@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
@@ -17,7 +18,6 @@ import com.alicornlunaa.spacegame.objects.ship.parts.Part;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
-import com.alicornlunaa.spacegame.states.ShipState;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
@@ -41,6 +41,7 @@ public class Ship extends DriveableEntity {
     private final App game;
     public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
+    public CameraComponent camComponent;
 
     private Array<Part> parts = new Array<>();
     private AttachmentList attachments = new AttachmentList();
@@ -140,6 +141,7 @@ public class Ship extends DriveableEntity {
             }
         });
         addComponent(new OrbitComponent(game.gameScene.universe, this));
+        camComponent = addComponent(new CameraComponent(1280, 720));
 
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setTransform(x / ppm, y / ppm, rotation);

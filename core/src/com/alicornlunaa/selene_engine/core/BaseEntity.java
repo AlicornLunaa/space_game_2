@@ -2,8 +2,8 @@ package com.alicornlunaa.selene_engine.core;
 
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
-import com.alicornlunaa.selene_engine.util.Assets;
-import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets.Reloadable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 

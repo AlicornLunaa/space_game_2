@@ -7,7 +7,7 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.states.ShipState;
+import com.alicornlunaa.spacegame.objects.ship.ShipState;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

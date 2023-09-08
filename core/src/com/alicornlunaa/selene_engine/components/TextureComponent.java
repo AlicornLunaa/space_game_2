@@ -1,8 +1,8 @@
 package com.alicornlunaa.selene_engine.components;
 
 import com.alicornlunaa.selene_engine.ecs.IComponent;
-import com.alicornlunaa.selene_engine.util.Assets;
-import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets.Reloadable;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 

@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.selene_engine.util.Assets;
-import com.alicornlunaa.selene_engine.util.Assets.ILoader;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
 import com.alicornlunaa.spacegame.scenes.dev.TestScreen;

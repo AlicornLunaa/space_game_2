@@ -2,8 +2,8 @@ package com.alicornlunaa.selene_engine.ecs;
 
 
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.selene_engine.util.Assets;
-import com.alicornlunaa.selene_engine.util.Assets.Reloadable;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
+import com.alicornlunaa.selene_engine.util.asset_manager.Assets.Reloadable;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;

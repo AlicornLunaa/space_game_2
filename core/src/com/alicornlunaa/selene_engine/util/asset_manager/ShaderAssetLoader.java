@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.util.asset_loaders;
+package com.alicornlunaa.selene_engine.util.asset_manager;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.Array;
 
 @SuppressWarnings("all")
 public class ShaderAssetLoader extends SynchronousAssetLoader<ShaderProgram, ShaderAssetLoader.ShaderParameters> {
-
     private static final String VERTEX_SHADER_FILE = "/vertex.vert";
     private static final String FRAGMENT_SHADER_FILE = "/fragment.frag";
 
@@ -37,5 +36,4 @@ public class ShaderAssetLoader extends SynchronousAssetLoader<ShaderProgram, Sha
 
     public static class ShaderParameters extends AssetLoaderParameters<ShaderProgram> {
     }
-
 }

@@ -16,6 +16,8 @@ import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
@@ -60,7 +62,7 @@ public class TestScreen implements Screen {
             addComponent(new SpriteComponent(128, 128, AnchorPoint.CENTER));
             addComponent(new BodyComponent(world, def));
             addComponent(new BoxColliderComponent(getComponent(BodyComponent.class), 0.5f, 0.5f, 1.f));
-            addComponent(new CameraComponent(1280, 720));
+            addComponent(new CameraComponent(1280, 720)).active = false;
 
             addComponent(new IScriptComponent() {
                 TransformComponent tr = getComponent(TransformComponent.class);
@@ -102,10 +104,11 @@ public class TestScreen implements Screen {
 
     private final App game;
     private Stage stage;
-    private PhysWorld world;
     private OrthographicCamera cam;
+    
     private Registry registry;
     private PhysicsSystem simulation;
+    private PhysWorld world;
 
     public TestScreen(final App game){
         this.game = game;
@@ -134,6 +137,7 @@ public class TestScreen implements Screen {
         registry.registerSystem(new CameraSystem(game));
         simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(game));
+        registry.registerSystem(new CustomRenderSystem(game));
         registry.registerSystem(new ScriptSystem());
 
         world = new PhysWorld(128.0f);
@@ -142,6 +146,10 @@ public class TestScreen implements Screen {
 
         registry.addEntity(new TestEntity(game, world));
         registry.addEntity(new WorldEntity(game, world));
+
+        Ship ship = new Ship(game, world, -128, 128, 0);
+        ship.load("./saves/ships/null.ship");
+        registry.addEntity(ship);
     }
 
     @Override
@@ -153,6 +161,8 @@ public class TestScreen implements Screen {
 
         registry.render();
         stage.draw();
+
+        game.debug.render(world.getBox2DWorld(), game.gameScene.activeCamera.combined.cpy().scl(world.getPhysScale()));
     }
 
     @Override

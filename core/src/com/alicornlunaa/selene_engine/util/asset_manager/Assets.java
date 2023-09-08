@@ -1,4 +1,4 @@
-package com.alicornlunaa.selene_engine.util;
+package com.alicornlunaa.selene_engine.util.asset_manager;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
