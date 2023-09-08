@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.space_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
@@ -28,7 +28,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
-public class SpaceUIPanel extends Stage {
+public class SpaceInterface extends Stage {
     
     // Variables
     private final App game;
@@ -47,7 +47,7 @@ public class SpaceUIPanel extends Stage {
 
     // Constructor
     @SuppressWarnings("unchecked")
-    public SpaceUIPanel(final App game){
+    public SpaceInterface(final App game){
         super(new ScreenViewport());
         this.game = game;
 
@@ -176,7 +176,7 @@ public class SpaceUIPanel extends Stage {
     public void draw(){
         super.draw();
 
-        SpacePanel spacePanel = ((SpaceScene)game.spaceScene).getContent();
+        SpacePanel spacePanel = game.gameScene.spacePanel;
         sasBtn.setColor(spacePanel.ship.state.sas ? Color.GREEN : Color.RED);
         rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
         throttleBar.setValue(spacePanel.ship.state.throttle);

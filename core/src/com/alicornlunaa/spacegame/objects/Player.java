@@ -90,7 +90,7 @@ public class Player extends BaseEntity {
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def){
+        bodyComponent = addComponent(new BodyComponent(game.gameScene.universe.getUniversalWorld(), def){
             @Override
             public void afterWorldChange(PhysWorld world){
                 // Change scenes depending on world        
@@ -177,9 +177,9 @@ public class Player extends BaseEntity {
         this.game = game;
 
         camera = new OrthographicCamera(1280, 720);
-        game.activeCamera = camera;
+        game.gameScene.activeCamera = camera;
 
-        initializePhys(game.universe.getUniversalWorld(), x, y);
+        initializePhys(game.gameScene.universe.getUniversalWorld(), x, y);
         initializeAnims();
 
         addComponent(new IScriptComponent() {
@@ -237,7 +237,7 @@ public class Player extends BaseEntity {
 
                 // Render everything relative to the parent space
                 Matrix4 trans = new Matrix4();
-                Celestial parent = game.universe.getParentCelestial(Player.this);
+                Celestial parent = game.gameScene.universe.getParentCelestial(Player.this);
                 if(parent != null) trans.set(parent.getUniverseSpaceTransform());
                 trans.mul(new Matrix4().set(transform.getMatrix()));
 
@@ -256,7 +256,7 @@ public class Player extends BaseEntity {
             }
         });
         
-        orbitComponent = addComponent(new OrbitComponent(game.universe, this));
+        orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
     }
 
     // Functions
@@ -272,7 +272,7 @@ public class Player extends BaseEntity {
         // Update the camera positioning in order to be relative to the player
         BaseEntity ent = (vehicle == null) ? this : vehicle;
         TransformComponent transform = ent.getComponent(TransformComponent.class);
-        Celestial c = game.universe.getParentCelestial(ent);
+        Celestial c = game.gameScene.universe.getParentCelestial(ent);
         Vector2 pos = transform.position.cpy();
 
         if((bodyComponent.world instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
@@ -284,7 +284,7 @@ public class Player extends BaseEntity {
 
         if(!(bodyComponent.world instanceof PlanetaryPhysWorld) || game.getScreen() instanceof MapScene){
             // If the player is on a planet, use the universe-based position system
-            pos.set(OrbitUtils.getUniverseSpacePosition(game.universe, ent));
+            pos.set(OrbitUtils.getUniverseSpacePosition(game.gameScene.universe, ent));
         }
 
         if(instant){

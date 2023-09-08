@@ -47,7 +47,7 @@ public class PlanetPanel extends Stage {
 
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
-        getViewport().setCamera(game.activeCamera);
+        getViewport().setCamera(game.gameScene.activeCamera);
         addActor(planet.getWorldBody());
 
         // Controls
@@ -72,10 +72,10 @@ public class PlanetPanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
-        game.universe.update(delta);
+        game.gameScene.universe.update(delta);
 
-        if(!game.player.isDriving() && game.player.bodyComponent.world instanceof PlanetaryPhysWorld)
-            game.player.transform.rotation = 0;
+        if(!game.gameScene.player.isDriving() && game.gameScene.player.bodyComponent.world instanceof PlanetaryPhysWorld)
+            game.gameScene.player.transform.rotation = 0;
     }
 
     @Override
@@ -90,13 +90,13 @@ public class PlanetPanel extends Stage {
         Matrix4 invProj = proj.cpy().inv();
 
         // Skybox rendering
-        Vector2 globalPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
+        Vector2 globalPos = OrbitUtils.getUniverseSpacePosition(game.gameScene.universe, game.gameScene.player);
         
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
         batch.setTransformMatrix(new Matrix4());
-        game.spaceScene.getContent().getStarfield().setOffset(globalPos.x / 10000000, globalPos.y / 10000000);
-        game.spaceScene.getContent().getStarfield().draw(batch, -1, -1, 2, 2);
+        game.gameScene.spacePanel.getStarfield().setOffset(globalPos.x / 10000000, globalPos.y / 10000000);
+        game.gameScene.spacePanel.getStarfield().draw(batch, -1, -1, 2, 2);
 
         batch.setShader(cartesianAtmosShader);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
@@ -129,7 +129,7 @@ public class PlanetPanel extends Stage {
 
         // Debug rendering
         if(Constants.DEBUG){
-            game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
+            game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.gameScene.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
         }
     }
 

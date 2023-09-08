@@ -128,7 +128,7 @@ public class Ship extends DriveableEntity {
                 // Finish rendering
                 Vector2 pos = bodyComponent.body.getPosition().cpy().scl(bodyComponent.world.getPhysScale());
                 Matrix4 trans = new Matrix4();
-                Celestial parent = game.universe.getParentCelestial(Ship.this);
+                Celestial parent = game.gameScene.universe.getParentCelestial(Ship.this);
                 if(parent != null) trans.set(parent.getUniverseSpaceTransform());
                 trans.translate(pos.x, pos.y, 0.0f);
                 trans.rotateRad(0, 0, 1, bodyComponent.body.getAngle());
@@ -139,7 +139,7 @@ public class Ship extends DriveableEntity {
                 }
             }
         });
-        addComponent(new OrbitComponent(game.universe, this));
+        addComponent(new OrbitComponent(game.gameScene.universe, this));
 
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setTransform(x / ppm, y / ppm, rotation);
@@ -152,7 +152,7 @@ public class Ship extends DriveableEntity {
     // Interior functions
     public void drawWorld(Batch batch, float parentAlpha){
         interior.draw(batch);
-        // game.player.render(batch); TODO: REPLACE WITH RENDER SYSTEM
+        // game.gameScene.player.render(batch); TODO: REPLACE WITH RENDER SYSTEM
     }
 
     public PhysWorld getInteriorWorld(){ return interior.getWorld(); }

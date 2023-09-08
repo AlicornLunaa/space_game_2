@@ -62,18 +62,18 @@ public class ShipViewScene implements Screen {
     public void show() {
         vehicle.stopDriving();
 
-        game.player.bodyComponent.setWorld(vehicle.getInteriorWorld());
-        game.player.transform.position.set(0, 0);
-        game.player.transform.rotation = 0;
-        game.player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);
+        game.gameScene.player.bodyComponent.setWorld(vehicle.getInteriorWorld());
+        game.gameScene.player.transform.position.set(0, 0);
+        game.gameScene.player.transform.rotation = 0;
+        game.gameScene.player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);
 
         Gdx.input.setInputProcessor(inputs);
     }
 
     @Override
     public void hide() {
-        game.player.bodyComponent.setWorld(vehicle.bodyComponent.world);
-        vehicle.drive(game.player);
+        game.gameScene.player.bodyComponent.setWorld(vehicle.bodyComponent.world);
+        vehicle.drive(game.gameScene.player);
     }
 
     @Override

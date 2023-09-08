@@ -35,9 +35,9 @@ public class ConsoleWidget extends VisWindow {
         String[] args = cmd.split("\\s+");
         
         if(args[0].equals("loadship")){
-            game.spaceScene.getContent().ship.load(args[1]);
+            game.gameScene.spacePanel.ship.load(args[1]);
         } else if(args[0].equals("settimewarp")){
-            game.universe.setTimewarp(Float.parseFloat(args[1]));
+            game.gameScene.universe.setTimewarp(Float.parseFloat(args[1]));
         } else if(args[0].equals("reloadshaders")){
         } else if(args[0].equals("parteditor")){
             game.setScreen(new PartEditor(game));

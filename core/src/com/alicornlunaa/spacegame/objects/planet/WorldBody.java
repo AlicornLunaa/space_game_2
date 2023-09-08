@@ -130,7 +130,7 @@ public class WorldBody extends Group {
 
     private void generateChunkHull(){
         // Update based on the player's positioning and time active
-        Vector2 plyPos = game.player.getCenter();
+        Vector2 plyPos = game.gameScene.player.getCenter();
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
@@ -336,11 +336,11 @@ public class WorldBody extends Group {
 
     public void update(){
         // Update based on the player's positioning and time active
-        Vector2 plyPos = game.player.getCenter();
+        Vector2 plyPos = game.gameScene.player.getCenter();
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        int viewDist = (int)(game.activeCamera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
+        int viewDist = (int)(game.gameScene.activeCamera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);

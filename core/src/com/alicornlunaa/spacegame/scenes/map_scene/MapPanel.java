@@ -42,23 +42,23 @@ public class MapPanel extends Stage {
     public MapPanel(final App game, final Stage oldStage){
         super(new ScreenViewport());
         this.game = game;
-        targetEntity = game.player.isDriving() ? game.player.getVehicle() : game.player;
+        targetEntity = game.gameScene.player.isDriving() ? game.gameScene.player.getVehicle() : game.gameScene.player;
 
         mapCamera = (OrthographicCamera)getCamera();
         mapCamera.zoom = 300.f;
         mapCamera.update();
 
-        oldCamera = game.activeCamera;
-        game.activeCamera = mapCamera;
+        oldCamera = game.gameScene.activeCamera;
+        game.gameScene.activeCamera = mapCamera;
 
-        game.vfxManager.add(new CameraZoomTransition(mapCamera, game.activeCamera.zoom, mapCamera.zoom, 0.4f));
+        game.vfxManager.add(new CameraZoomTransition(mapCamera, game.gameScene.activeCamera.zoom, mapCamera.zoom, 0.4f));
         game.orbitSystem.visible = true;
 
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
         // apoapsisMarkerTexture = game.atlas.findRegion("ui/apoapsis");
         // periapsisMarkerTexture = game.atlas.findRegion("ui/periapsis");
-        backgroundTexture = game.spaceScene.getContent().getStarfield();
+        backgroundTexture = game.gameScene.spacePanel.getStarfield();
 
         // Initializations
         addActor(markers);
@@ -69,8 +69,8 @@ public class MapPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.setScreen(game.activeSpaceScreen);
-                    game.vfxManager.add(new CameraZoomTransition(game.activeCamera, mapCamera.zoom, game.activeCamera.zoom, 0.3f));
-                    game.activeCamera = oldCamera;
+                    game.vfxManager.add(new CameraZoomTransition(game.gameScene.activeCamera, mapCamera.zoom, game.gameScene.activeCamera.zoom, 0.3f));
+                    game.gameScene.activeCamera = oldCamera;
                     game.orbitSystem.visible = false;
                     return true;
                 }
@@ -96,7 +96,7 @@ public class MapPanel extends Stage {
     @Override
     public void act(float delta){
         // Update the universe
-        game.universe.update(delta);
+        game.gameScene.universe.update(delta);
 
         // Keep the predicted paths up to date
         markers.clear();
@@ -151,7 +151,7 @@ public class MapPanel extends Stage {
         //     {
         //         Matrix4 mat = new Matrix4();
 
-        //         Celestial parent = game.universe.getParentCelestial(e);
+        //         Celestial parent = game.gameScene.universe.getParentCelestial(e);
         //         if(parent != null){
         //             mat.set(parent.getUniverseSpaceTransform());
 
@@ -178,7 +178,7 @@ public class MapPanel extends Stage {
     @Override
     public void draw(){
         // Update camera
-        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.universe, game.player);
+        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.gameScene.universe, game.gameScene.player);
         mapCamera.position.set(plyPos, 0.0f);
         
         // Draw stars in the map view
@@ -219,7 +219,7 @@ public class MapPanel extends Stage {
             size.y,
             1,
             1,
-            (float)Math.toDegrees(game.player.getRotation())
+            (float)Math.toDegrees(game.gameScene.player.getRotation())
         );
 
         batch.setColor(1, 1, 1, 1);

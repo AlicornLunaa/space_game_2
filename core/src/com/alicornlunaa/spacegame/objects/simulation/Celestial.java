@@ -65,12 +65,12 @@ public class Celestial extends BaseEntity {
         game.simulation.addWorld(influenceWorld);
         
         CircleShape shape = new CircleShape();
-        shape.setRadius(radius / game.universe.getUniversalWorld().getPhysScale());
+        shape.setRadius(radius / game.gameScene.universe.getUniversalWorld().getPhysScale());
         shape.setPosition(Vector2.Zero.cpy());
 
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(game.universe.getUniversalWorld(), def));
+        bodyComponent = addComponent(new BodyComponent(game.gameScene.universe.getUniversalWorld(), def));
         bodyComponent.body.createFixture(shape, 1.0f);
 
         def = new BodyDef();
@@ -103,7 +103,7 @@ public class Celestial extends BaseEntity {
                 batch.begin();
             }
         });
-        addComponent(new OrbitComponent(game.universe, this)).patchedConicsDepth = 0;
+        addComponent(new OrbitComponent(game.gameScene.universe, this)).patchedConicsDepth = 0;
     }
 
     // Functions

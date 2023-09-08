@@ -149,7 +149,7 @@ public class Planet extends Celestial {
         addComponent(new IScriptComponent() {
             @Override
             public void update() {
-                starDirection.set(OrbitUtils.directionToNearestStar(game.universe, Planet.this), 0);
+                starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
 
                 // Remove entities in the world still
                 while(leavingEnts.size() > 0){

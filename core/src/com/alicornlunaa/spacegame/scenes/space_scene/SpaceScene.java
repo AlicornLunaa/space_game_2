@@ -11,7 +11,7 @@ public class SpaceScene extends GameScene<SpacePanel, SpaceUIPanel> {
 
         // Initialize UI
         getUI().shipCompass.setTarget(getContent().ship);
-        getUI().shipCompass.setUniverse(game.universe);
+        getUI().shipCompass.setUniverse(game.gameScene.universe);
     }
 
 }

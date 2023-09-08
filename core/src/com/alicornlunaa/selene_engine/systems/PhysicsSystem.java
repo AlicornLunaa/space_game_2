@@ -69,7 +69,7 @@ public class PhysicsSystem implements ISystem {
     @Override
     public void afterRender() {
         // for(PhysWorld world : physWorlds){
-            // debugRenderer.render(world.getBox2DWorld(), game.activeCamera.combined.cpy().scl(world.getPhysScale()));
+            // debugRenderer.render(world.getBox2DWorld(), game.gameScene.activeCamera.combined.cpy().scl(world.getPhysScale()));
         // }
     }
 

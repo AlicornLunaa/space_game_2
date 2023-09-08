@@ -45,15 +45,15 @@ public class SaveManager {
                 data.put("vx", object.getVelocity().x);
                 data.put("vy", object.getVelocity().y);
                 data.put("physworld_id", game.simulation.getWorldID(object.getWorld()));
-                data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+                data.put("celestial_id", (game.gameScene.universe.getParentCelestial(object) == null) ? -1 : game.gameScene.universe.getParentCelestial(object).getCelestialID());
             }
 
             @Override
             public BaseEntity unserialize(JSONObject data) {
                 BaseEntity e = new BaseEntity();
-                game.universe.addEntity(e);
+                game.gameScene.universe.addEntity(e);
 
-                Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
+                Celestial parent = game.gameScene.universe.getCelestial(data.getInt("celestial_id"));
                 if(parent != null){
                     if(game.simulation.getWorldID(parent.getInfluenceWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
                         game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), e);
@@ -77,15 +77,15 @@ public class SaveManager {
         //         data.put("vx", object.getVelocity().x);
         //         data.put("vy", object.getVelocity().y);
         //         data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
-        //         data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+        //         data.put("celestial_id", (game.gameScene.universe.getParentCelestial(object) == null) ? -1 : game.gameScene.universe.getParentCelestial(object).getCelestialID());
         //     }
 
         //     @Override
         //     public Player unserialize(JSONObject data) {
         //         Player p = new Player(game, 0, 0);
-        //         game.universe.addEntity(p);
+        //         game.gameScene.universe.addEntity(p);
 
-        //         Celestial parent = game.universe.getCelestial(data.getInt("celestial_id"));
+        //         Celestial parent = game.gameScene.universe.getCelestial(data.getInt("celestial_id"));
         //         if(parent != null){
         //             if(game.simulation.getWorldID(parent.getInfluenceWorld()) != data.getInt("physworld_id") && parent instanceof Planet){
         //                 game.simulation.addEntity(((Planet)parent).getInternalPhysWorld(), p);
@@ -109,7 +109,7 @@ public class SaveManager {
         //         data.put("vx", object.getVelocity().x);
         //         data.put("vy", object.getVelocity().y);
         //         data.put("physworld_id", game.simulation.getWorldID(object.getComponent(BodyComponent.class).world));
-        //         data.put("celestial_id", (game.universe.getParentCelestial(object) == null) ? -1 : game.universe.getParentCelestial(object).getCelestialID());
+        //         data.put("celestial_id", (game.gameScene.universe.getParentCelestial(object) == null) ? -1 : game.gameScene.universe.getParentCelestial(object).getCelestialID());
         //         data.put("parent_celestial_id", (object.getCelestialParent() == null) ? -1 : object.getCelestialParent().getCelestialID());
         //         data.put("celestial_radius", object.getRadius());
         //     }
@@ -119,7 +119,7 @@ public class SaveManager {
         //         Celestial c = new Celestial(game, data.getFloat("celestial_radius"));
         //         c.setPosition(data.getFloat("x"), data.getFloat("y"));
         //         c.setVelocity(data.getFloat("vx"), data.getFloat("vy"));
-        //         game.universe.addCelestial(c);
+        //         game.gameScene.universe.addCelestial(c);
         //         return c;
         //     }
         // });
@@ -144,12 +144,12 @@ public class SaveManager {
     public static void save(final App game, String saveName){
         // Save player data
         FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/player.dat");
-        f.writeString(write(Player.class, game.player), false);
+        f.writeString(write(Player.class, game.gameScene.player), false);
 
         // Save entity data
 
         // Save celestial data
-        for(Celestial c : game.universe.getCelestials()){
+        for(Celestial c : game.gameScene.universe.getCelestials()){
             f = Gdx.files.local("./saves/universes/" + saveName + "/planets/celestial_" + c.getCelestialID() + "/level.dat");
             f.writeString(write(Celestial.class, c), false);
         }
@@ -166,7 +166,7 @@ public class SaveManager {
 
         // Load player data
         FileHandle f = Gdx.files.local("./saves/universes/" + saveName + "/player.dat");
-        game.player = read(Player.class, f.readString());
+        game.gameScene.player = read(Player.class, f.readString());
     }
 
 }

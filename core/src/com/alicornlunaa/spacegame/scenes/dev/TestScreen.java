@@ -128,7 +128,7 @@ public class TestScreen implements Screen {
         cam.zoom = 0.5f;
         cam.position.set(0, 0, 0);
         cam.update();
-        game.activeCamera = cam;
+        game.gameScene.activeCamera = cam;
 
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));

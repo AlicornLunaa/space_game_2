@@ -12,15 +12,15 @@ public class DesktopLauncher {
 		Settings settings = new Settings();
 		settings.maxWidth = 1024;
 		settings.maxHeight = 1024;
-		TexturePacker.process(settings, "./assets/textures/", "./assets/textures_packed", "textures");
-		TexturePacker.process(settings, "./assets/particles/", "./assets/particles_packed", "particles");
-		try { Thread.sleep(750); } catch(InterruptedException e){  }
+		// TexturePacker.process(settings, "./assets/textures/", "./assets/textures_packed", "textures");
+		// TexturePacker.process(settings, "./assets/particles/", "./assets/particles_packed", "particles");
+		// try { Thread.sleep(750); } catch(InterruptedException e){  }
 
 		// Load game
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(300);
 		config.useVsync(false);
-		config.setTitle("SpaceGame2");
+		config.setTitle("Space Game");
 		config.setWindowedMode(1280, 720);
 		new Lwjgl3Application(new App(), config);
 	}

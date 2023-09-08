@@ -24,9 +24,9 @@ public class GravityScript implements IScriptComponent {
         if(!(entity.getComponent(BodyComponent.class).world instanceof CelestialPhysWorld)) return;
 
         if(!(entity instanceof Celestial))
-            game.universe.checkTransfer(entity);
+            game.gameScene.universe.checkTransfer(entity);
         
-        Celestial parent = game.universe.getParentCelestial(entity);
+        Celestial parent = game.gameScene.universe.getParentCelestial(entity);
         if(parent != null){
             entity.getComponent(BodyComponent.class).body.applyForceToCenter(parent.applyPhysics(Gdx.graphics.getDeltaTime(), entity), true);
         }

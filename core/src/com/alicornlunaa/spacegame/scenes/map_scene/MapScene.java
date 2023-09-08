@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.map_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.scenes.space_scene.SpaceUIPanel;
+import com.alicornlunaa.spacegame.scenes.game_scene.SpaceInterface;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -16,7 +16,7 @@ public class MapScene implements Screen {
 
     public MapPanel mapPanel;
     // public MapUIPanel uiPanel;
-    public SpaceUIPanel uiShip;
+    public SpaceInterface uiShip;
 
     private InputMultiplexer inputs = new InputMultiplexer();
 
@@ -25,7 +25,7 @@ public class MapScene implements Screen {
         this.game = game;
 
         mapPanel = new MapPanel(game, oldStage);
-        uiShip = game.spaceScene.getUI();
+        uiShip = game.gameScene.spaceInterface;
 
         inputs.addProcessor(mapPanel);
         // inputs.addProcessor(uiPanel);

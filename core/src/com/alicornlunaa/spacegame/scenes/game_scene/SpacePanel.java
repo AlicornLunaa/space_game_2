@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.space_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;

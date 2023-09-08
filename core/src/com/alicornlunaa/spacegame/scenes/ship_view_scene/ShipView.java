@@ -24,14 +24,14 @@ public class ShipView extends Stage {
 
     // Functions
     public void act(float delta){
-        game.universe.update(delta);
+        game.gameScene.universe.update(delta);
     }
 
     public void draw(){
         super.draw();
 
         OrthographicCamera cam = (OrthographicCamera)getCamera();
-        cam.position.set(game.player.getPosition(), 0);
+        cam.position.set(game.gameScene.player.getPosition(), 0);
         cam.zoom = 0.45f;
         cam.update();
 
