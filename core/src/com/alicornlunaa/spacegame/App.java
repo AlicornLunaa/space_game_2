@@ -8,7 +8,7 @@ import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
-import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
+import com.alicornlunaa.spacegame.scenes.game_scene_old.GameplayScene_old;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
@@ -39,7 +39,7 @@ public class App extends Game {
 	public Skin skin;
 
 	public LoadingScene loadingScene;
-	public GameplayScene gameScene;
+	public GameplayScene_old gameScene;
 	public Screen activeSpaceScreen;
 
 	public Registry registry;
@@ -134,7 +134,7 @@ public class App extends Game {
 				// SaveManager.load(this, "dev_world");
 				// SaveManager.save(this, "dev_world");
 
-				gameScene = new GameplayScene(this);
+				gameScene = new GameplayScene_old(this);
 				gameScene.init();
 				this.setScreen(gameScene);
 

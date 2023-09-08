@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.game_scene;
+package com.alicornlunaa.spacegame.scenes.game_scene_old;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
@@ -174,13 +174,13 @@ public class SpaceInterface extends Stage {
     public void draw(){
         super.draw();
 
-        // SpacePanel spacePanel = game.gameScene.spacePanel;
-        // sasBtn.setColor(spacePanel.ship.state.sas ? Color.GREEN : Color.RED);
-        // rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
-        // throttleBar.setValue(spacePanel.ship.state.throttle);
+        SpacePanel spacePanel = game.gameScene.spacePanel;
+        sasBtn.setColor(spacePanel.ship.state.sas ? Color.GREEN : Color.RED);
+        rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
+        throttleBar.setValue(spacePanel.ship.state.throttle);
 
-        // positionLabel.setText(game.gameScene.player.getPosition().toString());
-        // velocityLabel.setText(game.gameScene.player.getVelocity().toString());
+        positionLabel.setText(game.gameScene.player.getPosition().toString());
+        velocityLabel.setText(game.gameScene.player.getVelocity().toString());
         fpsCounter.setText((int)(1 / Gdx.graphics.getDeltaTime()));
     }
 
