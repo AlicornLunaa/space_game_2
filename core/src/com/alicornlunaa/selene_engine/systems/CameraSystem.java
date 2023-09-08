@@ -40,8 +40,8 @@ public class CameraSystem implements ISystem {
         cameraComponent.camera.position.set(transform.position, 0.0f);
         cameraComponent.camera.update();
         
-        if(cameraComponent.active && game.gameScene.activeCamera != cameraComponent.camera){
-            game.gameScene.activeCamera = cameraComponent.camera;
+        if(cameraComponent.active && game.camera != cameraComponent.camera){
+            game.camera = cameraComponent.camera;
         }
     }
 

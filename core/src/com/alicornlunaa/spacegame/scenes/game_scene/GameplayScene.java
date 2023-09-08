@@ -16,7 +16,6 @@ import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 /**
@@ -40,7 +39,6 @@ public class GameplayScene extends BaseScene {
     public MapPanel mapPanel;
     
 	public Universe universe;
-	public OrthographicCamera activeCamera;
 	public Player player;
     
     // Private functions
@@ -154,7 +152,6 @@ public class GameplayScene extends BaseScene {
             case SPACE:
                 spaceInterface.act(delta);
                 spacePanel.act(delta);
-
                 spacePanel.draw();
                 spaceInterface.draw();
                 break;
@@ -162,7 +159,6 @@ public class GameplayScene extends BaseScene {
             case MAP:
                 spaceInterface.act(delta);
                 mapPanel.act(delta);
-
                 mapPanel.draw();
                 spaceInterface.draw();
                 break;

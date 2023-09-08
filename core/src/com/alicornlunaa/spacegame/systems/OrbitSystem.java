@@ -35,7 +35,7 @@ public class OrbitSystem implements ISystem {
 
     @Override
     public void beforeRender() {
-        shapeRenderer.setProjectionMatrix(game.gameScene.activeCamera.combined);
+        shapeRenderer.setProjectionMatrix(game.camera.combined);
         shapeRenderer.begin(ShapeType.Filled);
     }
 
@@ -48,7 +48,7 @@ public class OrbitSystem implements ISystem {
     public void render(IEntity entity) {
         if(!visible) return;
         OrbitComponent orbitComponent = entity.getComponent(OrbitComponent.class);
-        orbitComponent.draw(shapeRenderer, 1.5f * game.gameScene.activeCamera.zoom);
+        orbitComponent.draw(shapeRenderer, 1.5f * game.camera.zoom);
     }
 
     @Override

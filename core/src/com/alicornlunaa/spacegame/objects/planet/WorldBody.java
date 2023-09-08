@@ -340,7 +340,7 @@ public class WorldBody extends Group {
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        int viewDist = (int)(game.gameScene.activeCamera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
+        int viewDist = (int)(game.camera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);

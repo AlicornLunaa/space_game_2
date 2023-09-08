@@ -25,7 +25,7 @@ public class SpacePanel extends Stage {
         super(new FillViewport(1280, 720));
         this.game = game;
 
-        getViewport().setCamera(game.gameScene.activeCamera);
+        getViewport().setCamera(game.camera);
         addActor(game.gameScene.universe);
 
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
@@ -38,7 +38,7 @@ public class SpacePanel extends Stage {
         this.addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                game.gameScene.activeCamera.zoom = Math.min(Math.max(game.gameScene.activeCamera.zoom + (amountY / 30), 0.05f), 3.0f);
+                game.camera.zoom = Math.min(Math.max(game.camera.zoom + (amountY / 30), 0.05f), 3.0f);
                 return true;
             }
         });
@@ -77,7 +77,7 @@ public class SpacePanel extends Stage {
         super.draw();
 
         if(Constants.DEBUG){
-            game.debug.render(game.gameScene.universe.getUniversalWorld().getBox2DWorld(), game.gameScene.activeCamera.combined.cpy().scl(Constants.PPM));
+            game.debug.render(game.gameScene.universe.getUniversalWorld().getBox2DWorld(), game.camera.combined.cpy().scl(Constants.PPM));
         }
     }
     

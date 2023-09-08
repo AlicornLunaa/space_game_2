@@ -176,7 +176,7 @@ public class Player extends BaseEntity {
         this.game = game;
 
         camera = new OrthographicCamera(1280, 720);
-        game.gameScene.activeCamera = camera;
+        game.camera = camera;
 
         initializePhys(game.gameScene.universe.getUniversalWorld(), x, y);
         initializeAnims();

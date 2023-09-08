@@ -31,7 +31,7 @@ public class CustomRenderSystem implements ISystem {
 
 	@Override
 	public void beforeRender() {
-		batch.setProjectionMatrix(game.gameScene.activeCamera.combined);
+		batch.setProjectionMatrix(game.camera.combined);
 		batch.setTransformMatrix(new Matrix4());
 		batch.begin();
 	}

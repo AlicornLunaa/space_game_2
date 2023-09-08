@@ -48,10 +48,10 @@ public class MapPanel extends Stage {
         mapCamera.zoom = 300.f;
         mapCamera.update();
 
-        oldCamera = game.gameScene.activeCamera;
-        game.gameScene.activeCamera = mapCamera;
+        oldCamera = game.camera;
+        game.camera = mapCamera;
 
-        game.vfxManager.add(new CameraZoomTransition(mapCamera, game.gameScene.activeCamera.zoom, mapCamera.zoom, 0.4f));
+        game.vfxManager.add(new CameraZoomTransition(mapCamera, game.camera.zoom, mapCamera.zoom, 0.4f));
         game.gameScene.orbitSystem.visible = true;
 
         // Load textures
@@ -69,8 +69,8 @@ public class MapPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.gameScene.closeMap();
-                    game.vfxManager.add(new CameraZoomTransition(game.gameScene.activeCamera, mapCamera.zoom, game.gameScene.activeCamera.zoom, 0.3f));
-                    game.gameScene.activeCamera = oldCamera;
+                    game.vfxManager.add(new CameraZoomTransition(game.camera, mapCamera.zoom, game.camera.zoom, 0.3f));
+                    game.camera = oldCamera;
                     game.gameScene.orbitSystem.visible = false;
                     return true;
                 }

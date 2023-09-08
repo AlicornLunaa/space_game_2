@@ -131,7 +131,6 @@ public class TestScreen implements Screen {
         cam.zoom = 0.5f;
         cam.position.set(0, 0, 0);
         cam.update();
-        game.gameScene.activeCamera = cam;
 
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));
@@ -162,7 +161,7 @@ public class TestScreen implements Screen {
         registry.render();
         stage.draw();
 
-        game.debug.render(world.getBox2DWorld(), game.gameScene.activeCamera.combined.cpy().scl(world.getPhysScale()));
+        game.debug.render(world.getBox2DWorld(), cam.combined.cpy().scl(world.getPhysScale()));
     }
 
     @Override

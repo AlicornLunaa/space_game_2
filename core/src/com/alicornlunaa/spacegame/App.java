@@ -14,6 +14,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -36,6 +37,7 @@ public class App extends Game {
 	public LoadingScene loadingScene;
 	public GameplayScene gameScene;
 	public Screen activeSpaceScreen;
+	public OrthographicCamera camera;
 
 	public boolean loaded = false;
 	
@@ -118,9 +120,9 @@ public class App extends Game {
 				// SaveManager.load(this, "dev_world");
 				// SaveManager.save(this, "dev_world");
 
-				gameScene = new GameplayScene(this);
-				gameScene.init();
-				this.setScreen(gameScene);
+				// gameScene = new GameplayScene(this);
+				// gameScene.init();
+				// this.setScreen(gameScene);
 				this.setScreen(new TestScreen(this));
 
 				// this.setScreen(new MapScene(this, spaceScene, player));

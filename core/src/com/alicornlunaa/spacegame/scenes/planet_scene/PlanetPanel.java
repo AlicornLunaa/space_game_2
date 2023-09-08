@@ -47,7 +47,7 @@ public class PlanetPanel extends Stage {
 
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
-        getViewport().setCamera(game.gameScene.activeCamera);
+        getViewport().setCamera(game.camera);
         addActor(planet.getWorldBody());
 
         // Controls
@@ -129,7 +129,7 @@ public class PlanetPanel extends Stage {
 
         // Debug rendering
         if(Constants.DEBUG){
-            game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.gameScene.activeCamera.combined.cpy().scl(Constants.PLANET_PPM));
+            game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.camera.combined.cpy().scl(Constants.PLANET_PPM));
         }
     }
 

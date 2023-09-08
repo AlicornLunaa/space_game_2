@@ -39,6 +39,7 @@ public class Ship extends DriveableEntity {
     
     // Variables
     private final App game;
+    
     public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
     public CameraComponent camComponent;

@@ -34,7 +34,7 @@ public class RenderSystem implements ISystem, Disposable {
 
 	@Override
 	public void beforeRender() {
-		batch.setProjectionMatrix(game.gameScene.activeCamera.combined);
+		batch.setProjectionMatrix(game.camera.combined);
 		batch.setTransformMatrix(new Matrix4());
 		batch.begin();
 	}
