@@ -214,7 +214,7 @@ public class EditorScene implements Screen {
         cam.position.set(0, 0, 0);
         cam.update();
 
-        editorWorld = game.simulation.addWorld(Constants.PPM);
+        editorWorld = game.gameScene.simulation.addWorld(Constants.PPM);
         editorShip = new Ship(game, editorWorld, 0, 0, 0);
         shipWrapper = new EntityActorWrapper(editorShip);
         editor.addActor(shipWrapper);

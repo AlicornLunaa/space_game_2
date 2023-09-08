@@ -40,7 +40,7 @@ public class TestScreen implements Screen {
     public static class WorldEntity extends BaseEntity {
 
         public WorldEntity(App game, PhysWorld world){
-            addComponent(new TextureComponent(game.manager, "textures/test_image.png"));
+            addComponent(new TextureComponent(game.manager, "textures/dev_texture_32.png"));
             addComponent(new SpriteComponent(512, 16, AnchorPoint.CENTER));
             addComponent(new BodyComponent(world, new BodyDef()));
             addComponent(new BoxColliderComponent(getComponent(BodyComponent.class), 2.0f, 0.0625f, 1.f));
@@ -56,7 +56,7 @@ public class TestScreen implements Screen {
             BodyDef def = new BodyDef();
             def.type = BodyType.DynamicBody;
 
-            addComponent(new TextureComponent(game.manager, "textures/test_image.png"));
+            addComponent(new TextureComponent(game.manager, "textures/dev_texture_32.png"));
             addComponent(new SpriteComponent(128, 128, AnchorPoint.CENTER));
             addComponent(new BodyComponent(world, def));
             addComponent(new BoxColliderComponent(getComponent(BodyComponent.class), 0.5f, 0.5f, 1.f));

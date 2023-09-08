@@ -52,7 +52,7 @@ public class MapPanel extends Stage {
         game.gameScene.activeCamera = mapCamera;
 
         game.vfxManager.add(new CameraZoomTransition(mapCamera, game.gameScene.activeCamera.zoom, mapCamera.zoom, 0.4f));
-        game.orbitSystem.visible = true;
+        game.gameScene.orbitSystem.visible = true;
 
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
@@ -71,7 +71,7 @@ public class MapPanel extends Stage {
                     game.gameScene.closeMap();
                     game.vfxManager.add(new CameraZoomTransition(game.gameScene.activeCamera, mapCamera.zoom, game.gameScene.activeCamera.zoom, 0.3f));
                     game.gameScene.activeCamera = oldCamera;
-                    game.orbitSystem.visible = false;
+                    game.gameScene.orbitSystem.visible = false;
                     return true;
                 }
 
@@ -142,7 +142,7 @@ public class MapPanel extends Stage {
     }
 
     public void drawUniverse(Batch batch){
-        game.registry.render();
+        game.gameScene.registry.render();
 
         // batch.setTransformMatrix(new Matrix4());
 

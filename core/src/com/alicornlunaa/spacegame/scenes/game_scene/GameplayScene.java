@@ -1,7 +1,11 @@
 package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
+import com.alicornlunaa.selene_engine.systems.CameraSystem;
+import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
+import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
@@ -9,6 +13,8 @@ import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
+import com.alicornlunaa.spacegame.systems.OrbitSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -22,6 +28,10 @@ public class GameplayScene extends BaseScene {
 
     // Variables
     private GameplayState state = GameplayState.SPACE;
+
+	public Registry registry;
+	public PhysicsSystem simulation;
+	public OrbitSystem orbitSystem;
 
     public SpacePanel spacePanel;
     public SpaceInterface spaceInterface;
@@ -72,7 +82,18 @@ public class GameplayScene extends BaseScene {
     }
 
     // Constructors
-    public GameplayScene(App game) { super(game); }
+    public GameplayScene(App game) {
+        // Initialize base scene
+        super(game);
+
+        // Start new engine registry
+        registry = new Registry();
+        registry.registerSystem(new CameraSystem(game));
+        simulation = registry.registerSystem(new PhysicsSystem());
+        registry.registerSystem(new CustomRenderSystem(game));
+        registry.registerSystem(new ScriptSystem());
+        orbitSystem = registry.registerSystem(new OrbitSystem(game));
+    }
     
     // Functions
     public void init(){
@@ -163,6 +184,8 @@ public class GameplayScene extends BaseScene {
     public void resize(int width, int height) {
         if(spacePanel != null) spacePanel.getViewport().update(width, height, true);
         if(spaceInterface != null) spaceInterface.getViewport().update(width, height, true);
+        if(shipViewPanel != null) shipViewPanel.getViewport().update(width, height, true);
+        if(shipViewInteface != null) shipViewInteface.getViewport().update(width, height, true);
         if(mapPanel != null) mapPanel.getViewport().update(width, height, true);
     }
 

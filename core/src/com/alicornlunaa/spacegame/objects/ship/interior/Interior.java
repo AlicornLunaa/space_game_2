@@ -28,7 +28,7 @@ public class Interior {
         // Construct interior cells based on the ship
         this.game = game;
         this.ship = ship;
-        internalWorld = game.simulation.addWorld(Constants.SHIP_PPM);
+        internalWorld = game.gameScene.simulation.addWorld(Constants.SHIP_PPM);
 
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;

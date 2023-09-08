@@ -120,7 +120,7 @@ public class Planet extends Celestial {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
+        physWorld = game.gameScene.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
         worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 

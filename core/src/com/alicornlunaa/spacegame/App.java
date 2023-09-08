@@ -1,17 +1,12 @@
 package com.alicornlunaa.spacegame;
 
-import com.alicornlunaa.selene_engine.ecs.Registry;
-import com.alicornlunaa.selene_engine.systems.CameraSystem;
-import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
-import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.selene_engine.util.Assets;
 import com.alicornlunaa.selene_engine.util.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
+import com.alicornlunaa.spacegame.scenes.dev.TestScreen;
 import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
-import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
-import com.alicornlunaa.spacegame.systems.OrbitSystem;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
 import com.alicornlunaa.spacegame.util.state_management.SaveManager;
@@ -42,10 +37,6 @@ public class App extends Game {
 	public GameplayScene gameScene;
 	public Screen activeSpaceScreen;
 
-	public Registry registry;
-	public PhysicsSystem simulation;
-	public OrbitSystem orbitSystem;
-
 	public boolean loaded = false;
 	
 	public TextureAtlas atlas;
@@ -75,6 +66,7 @@ public class App extends Game {
 				manager.load("effects/rcs", ParticleEffectPool.class);
 				manager.load("effects/rocket", ParticleEffectPool.class);
 				manager.load("textures/test_image.png", Texture.class);
+				manager.load("textures/dev_texture_32.png", Texture.class);
 			}
 		});
 		skin = manager.get("skins/spacecadet/spacecadet.json");
@@ -108,7 +100,7 @@ public class App extends Game {
 				loaded = true;
 				Gdx.app.log("Asset Manager", "Loaded");
 
-				// Get all the particle effects
+				// Load all biomes
 				Biome.register("Desert", Color.YELLOW, 0.5f, 0.0f, 0.2f, 100, 0.2f);
 				Biome.register("Forest", Color.GREEN, 0.4f, 0.4f, 0.2f, 40, 0.8f);
 				Biome.register("Grassland", Color.LIME, 0.3f, 0.5f, 0.2f, 40, 0.8f);
@@ -118,18 +110,10 @@ public class App extends Game {
 				Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
 				Gdx.app.log("Biome Manager", "Loaded");
 
-				// Initialize VisUI for dev screens
+				// Initialize VisUI for development screens
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame");
 				SaveManager.init(this);
-
-				// Start new scene
-				registry = new Registry();
-				registry.registerSystem(new CameraSystem(this));
-				simulation = registry.registerSystem(new PhysicsSystem());
-				registry.registerSystem(new CustomRenderSystem(this));
-				registry.registerSystem(new ScriptSystem());
-				orbitSystem = registry.registerSystem(new OrbitSystem(this));
 				
 				// SaveManager.load(this, "dev_world");
 				// SaveManager.save(this, "dev_world");
@@ -137,12 +121,12 @@ public class App extends Game {
 				gameScene = new GameplayScene(this);
 				gameScene.init();
 				this.setScreen(gameScene);
+				this.setScreen(new TestScreen(this));
 
 				// this.setScreen(new MapScene(this, spaceScene, player));
 				// this.setScreen(new PhysicsEditor(this));
 				// this.setScreen(new ShaderScene(this));
 				// this.setScreen(new EditorScene(this));
-				// this.setScreen(new TestScreen(this));
 				// this.setScreen(new OrbitTest(this));
 				// this.setScreen(new PlanetEditor(this));
 			} else {

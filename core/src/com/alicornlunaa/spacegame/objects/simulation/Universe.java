@@ -80,7 +80,7 @@ public class Universe extends Actor {
     // Constructor
     public Universe(final App game){
         this.game = game;
-        universalWorld = game.simulation.addWorld(new CelestialPhysWorld(null, Constants.PPM));
+        universalWorld = game.gameScene.simulation.addWorld(new CelestialPhysWorld(null, Constants.PPM));
     }
 
     // Functions
@@ -89,7 +89,7 @@ public class Universe extends Actor {
      * @param e The entity to add
      */
     public void addEntity(IEntity e){
-        game.registry.addEntity(e);
+        game.gameScene.registry.addEntity(e);
 
         if(!e.hasComponent(BodyComponent.class)) return;
         e.getComponent(BodyComponent.class).setWorld(universalWorld);
@@ -104,7 +104,7 @@ public class Universe extends Actor {
      * @param parent The celestial to parent it to
      */
     public void addCelestial(Celestial c){
-        game.registry.addEntity(c);
+        game.gameScene.registry.addEntity(c);
         c.bodyComponent.setWorld(universalWorld);
         celestials.add(c);
 
@@ -203,7 +203,7 @@ public class Universe extends Actor {
         // Starting the timewarp for first time
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
-            for(IEntity eRaw : game.registry.getEntities()){
+            for(IEntity eRaw : game.gameScene.registry.getEntities()){
                 BaseEntity e = (BaseEntity)eRaw;
 
                 if(e instanceof Celestial){
@@ -269,7 +269,7 @@ public class Universe extends Actor {
         // Update physics
         if(timewarp == 1){
             // Step the physics on the world
-            game.registry.update(delta);
+            game.gameScene.registry.update(delta);
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             timeWarpAccumulator += Math.min(delta, 0.25f);
@@ -351,7 +351,7 @@ public class Universe extends Actor {
      */
     @Override
     public void draw(Batch batch, float a){
-        game.registry.render();
+        game.gameScene.registry.render();
     }
     
 }

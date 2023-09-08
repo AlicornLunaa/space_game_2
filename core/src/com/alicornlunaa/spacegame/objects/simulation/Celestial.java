@@ -62,7 +62,7 @@ public class Celestial extends BaseEntity {
         transform = getComponent(TransformComponent.class);
 
         influenceWorld = new CelestialPhysWorld(this, Constants.PPM);
-        game.simulation.addWorld(influenceWorld);
+        game.gameScene.simulation.addWorld(influenceWorld);
         
         CircleShape shape = new CircleShape();
         shape.setRadius(radius / game.gameScene.universe.getUniversalWorld().getPhysScale());
