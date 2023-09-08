@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -11,13 +10,9 @@ import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class ShipViewInterface extends Stage {
 
-    // Variables
-    private final Screen previousScreen;
-
     // Constructor
     public ShipViewInterface(final App game){
         super(new ScreenViewport());
-        previousScreen = game.getScreen();
 
         // Initialize UI
         SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
