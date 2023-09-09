@@ -124,7 +124,6 @@ public class Part implements Comparable<Part> {
         obj.put("rotation", rotation);
         obj.put("flipX", flipX);
         obj.put("flipY", flipY);
-
         return obj;
     }
 

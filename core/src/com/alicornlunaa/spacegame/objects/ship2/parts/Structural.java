@@ -12,8 +12,8 @@ public class Structural extends Part {
 
     // Constructor
     public Structural(final App game, final Ship ship, JSONObject obj){
-        super(game);
-        
+        super(game, ship, obj);
+
         JSONObject metadata = obj.optJSONObject("metadata", new JSONObject());
         fuelCapacity = metadata.optFloat("fuelCapacity", 1000);
         batteryCapacity = metadata.optFloat("batteryCapacity", 1000);

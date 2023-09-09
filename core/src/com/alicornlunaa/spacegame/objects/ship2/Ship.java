@@ -19,18 +19,20 @@ public class Ship extends BaseEntity {
     public Ship(final App game){
         this.game = game;
 
-        rootPart = new Part(game);
-        rootPart.attach(0, 1, new Part(game)).attach(0, 1, new Part(game)).attach(2, 3, new Part(game));
+        rootPart = new Part(game, this, game.partManager.get("STRUCTURAL", "BSC_FUSELAGE"));
+        rootPart.attach(3, 1, new Part(game, this, game.partManager.get("STRUCTURAL", "BSC_FUSELAGE")));
         
         addComponent(new CustomSpriteComponent() {
             @Override
             public void render(Batch batch) {
+                rootPart.draw(batch, new Matrix4());
+                
                 batch.end();
                 game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
                 game.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
                 game.shapeRenderer.begin(ShapeType.Filled);
 
-                rootPart.draw(game.shapeRenderer, new Matrix4());
+                rootPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4());
 
                 game.shapeRenderer.end();
                 batch.begin();
