@@ -16,7 +16,7 @@ import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.spacegame.objects.ship2.Ship;
 import com.alicornlunaa.spacegame.scenes.game_scene.ShipViewPanel;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.badlogic.gdx.Gdx;
@@ -141,8 +141,8 @@ public class TestScreen implements Screen {
         registry.addEntity(new TestEntity(game, world));
         registry.addEntity(new WorldEntity(game, world));
 
-        Ship ship = new Ship(game, world, -128, 128, 0);
-        ship.load("./saves/ships/null.ship");
+        Ship ship = new Ship(game);
+        // ship.load("./saves/ships/null.ship");
         registry.addEntity(ship);
     }
 
