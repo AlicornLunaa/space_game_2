@@ -12,10 +12,8 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
-import com.alicornlunaa.spacegame.components.OrbitComponent;
-import com.alicornlunaa.spacegame.objects.ship.interior.Interior;
+import com.alicornlunaa.spacegame.objects.ship.interior.InteriorComponent;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -23,8 +21,6 @@ import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -39,22 +35,23 @@ public class Ship extends DriveableEntity {
     
     // Variables
     private final App game;
+
+    private Array<Part> parts = new Array<>();
+    private AttachmentList attachments = new AttachmentList();
+    
+    public ShipState state = new ShipState(); // Ship controls and stuff
     
     public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
     public CameraComponent camComponent;
+    public InteriorComponent interior;
 
-    private Array<Part> parts = new Array<>();
-    private AttachmentList attachments = new AttachmentList();
-    private Interior interior;
-
-    public ShipState state = new ShipState(); // Ship controls and stuff
-    
     // Private functions
     private void generateExterior(PhysWorld world){
         // Create exterior body for the real-world scenes
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
+        
         bodyComponent = addComponent(new BodyComponent(world, def){
             @Override
             public void afterWorldChange(PhysWorld world){
@@ -65,6 +62,7 @@ public class Ship extends DriveableEntity {
                 }
             }
         });
+        
         bodyComponent.setWorld(world);
     }
 
@@ -73,7 +71,6 @@ public class Ship extends DriveableEntity {
         super(game);
         this.game = game;
         generateExterior(world);
-        interior = new Interior(game, this);
 
         addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
@@ -121,44 +118,32 @@ public class Ship extends DriveableEntity {
                 // Update SAS
                 if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
 
-                // Update parts
                 // TODO: Parts shouldnt be here
                 for(Part p : parts){
                     p.update(Gdx.graphics.getDeltaTime());
                 }
-
-                // Finish rendering
-                Vector2 pos = bodyComponent.body.getPosition().cpy().scl(bodyComponent.world.getPhysScale());
-                Matrix4 trans = new Matrix4();
-                Celestial parent = game.gameScene.universe.getParentCelestial(Ship.this);
-                if(parent != null) trans.set(parent.getUniverseSpaceTransform());
-                trans.translate(pos.x, pos.y, 0.0f);
-                trans.rotateRad(0, 0, 1, bodyComponent.body.getAngle());
-                batch.setTransformMatrix(trans);
 
                 for(Part p : parts){
                     p.draw(batch, Gdx.graphics.getDeltaTime());
                 }
             }
         });
-        addComponent(new OrbitComponent(game.gameScene.universe, this));
         camComponent = addComponent(new CameraComponent(1280, 720));
+        camComponent.active = true;
+        interior = new InteriorComponent(game, this);
 
         float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setTransform(x / ppm, y / ppm, rotation);
-        transform.position.set(x, y);
-        transform.dp.set(x, y);
-        transform.rotation = rotation;
-        transform.dr = rotation;
+        // transform.position.set(x, y);
+        // transform.dp.set(x, y);
+        // transform.rotation = rotation;
+        // transform.dr = rotation;
     }
 
     // Interior functions
-    public void drawWorld(Batch batch, float parentAlpha){
-        interior.draw(batch);
-        // game.gameScene.player.render(batch); TODO: REPLACE WITH RENDER SYSTEM
+    public InteriorComponent getInterior(){
+        return interior;
     }
-
-    public PhysWorld getInteriorWorld(){ return interior.getWorld(); }
 
     // Space functions
     public void assemble(){

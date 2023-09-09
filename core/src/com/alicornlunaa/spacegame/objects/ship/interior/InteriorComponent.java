@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.ship.interior;
 
+import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -11,30 +12,26 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
-/** Drawable class to render the inside of a ship
- * Will also store all user-created objects
- */
-public class Interior {
-
+// Component that allows for building a world within a ship
+public class InteriorComponent implements IScriptComponent {
     // Variables
     private final App game;
     private final Ship ship;
+    private PhysWorld world;
+    private Body body;
     private Array<InteriorCell> cells = new Array<>();
-    private PhysWorld internalWorld;
-    private Body internalBody;
 
     // Constructor
-    public Interior(final App game, final Ship ship){
-        // Construct interior cells based on the ship
+    public InteriorComponent(final App game, final Ship ship){
         this.game = game;
         this.ship = ship;
-        internalWorld = game.gameScene.simulation.addWorld(Constants.SHIP_PPM);
+        world = new PhysWorld(Constants.SHIP_PPM);
 
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
-		internalBody = internalWorld.getBox2DWorld().createBody(def);
+		body = world.getBox2DWorld().createBody(def);
     }
-    
+
     // Functions
     public void assemble(){
         for(InteriorCell cell : cells){
@@ -69,7 +66,7 @@ public class Interior {
                 y++;
             }
 
-            cells.add(new InteriorCell(game, internalBody, x, y, false, false, false, false));
+            cells.add(new InteriorCell(game, body, x, y, false, false, false, false));
             prev = p;
         }
     
@@ -106,12 +103,21 @@ public class Interior {
         }
     }
     
-    public PhysWorld getWorld(){ return internalWorld; }
+    public PhysWorld getWorld(){
+        return world;
+    }
 
     public void draw(Batch batch){
         for(InteriorCell c : cells){
             c.draw(batch);
         }
     }
-    
+
+	@Override
+	public void update() {
+        world.update();
+    }
+
+	@Override
+	public void render() {}
 }

@@ -15,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.Body;
  * Allow the player to build interior walls and cosmetics inside
  */
 public class InteriorCell {
-
     // Variables
     private final App game;
     private final Body body;
@@ -142,5 +141,4 @@ public class InteriorCell {
             y * texture.getRegionHeight() - texture.getRegionHeight() / 2
         );
     }
-    
 }

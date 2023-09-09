@@ -28,7 +28,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -234,16 +233,9 @@ public class Player extends BaseEntity {
                 // Advance animation
                 animationTimer += Gdx.graphics.getDeltaTime();
 
-                // Render everything relative to the parent space
-                Matrix4 trans = new Matrix4();
-                Celestial parent = game.gameScene.universe.getParentCelestial(Player.this);
-                if(parent != null) trans.set(parent.getUniverseSpaceTransform());
-                trans.mul(new Matrix4().set(transform.getMatrix()));
-
                 // Render to screen
                 Animation<TextureRegion> curAnimation = animations.get(animationState);
                 TextureRegion animFrame = curAnimation.getKeyFrame(animationTimer);
-                batch.setTransformMatrix(trans);
                 batch.draw(
                     animFrame,
                     -PLAYER_WIDTH / 2, -PLAYER_HEIGHT / 2,

@@ -4,7 +4,6 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.badlogic.gdx.utils.Null;
 
@@ -30,15 +29,10 @@ public abstract class DriveableEntity extends BaseEntity {
 
         TransformComponent driverTransform = driver.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
-        OrbitComponent orbitComponent = driver.getComponent(OrbitComponent.class);
 
         if(bodyComponent != null){
             bodyComponent.body.setActive(false);
             driverTransform.velocity.set(0, 0);
-        }
-
-        if(orbitComponent != null){
-            orbitComponent.visible = false;
         }
     }
 
@@ -47,15 +41,10 @@ public abstract class DriveableEntity extends BaseEntity {
 
         TransformComponent driverTransform = driver.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
-        OrbitComponent orbitComponent = driver.getComponent(OrbitComponent.class);
 
         if(bodyComponent != null){
             bodyComponent.body.setActive(true);
             driverTransform.velocity.set(getComponent(TransformComponent.class).velocity);
-        }
-
-        if(orbitComponent != null){
-            orbitComponent.visible = true;
         }
         
         driver = null;

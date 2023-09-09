@@ -13,8 +13,8 @@ import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
-import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
+import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -44,6 +44,7 @@ public class GameplayScene extends BaseScene {
     // Private functions
 	private void initializeUniverse(){
 		universe = new Universe(game);
+        registry.registerSystem(new SpaceRenderSystem(game, universe));
 
         universe.addCelestial(new Star(game, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
         universe.addCelestial(new Planet(game, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1)); // Mercury
@@ -88,7 +89,6 @@ public class GameplayScene extends BaseScene {
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));
         simulation = registry.registerSystem(new PhysicsSystem());
-        registry.registerSystem(new CustomRenderSystem(game));
         registry.registerSystem(new ScriptSystem());
         orbitSystem = registry.registerSystem(new OrbitSystem(game));
     }
@@ -114,7 +114,7 @@ public class GameplayScene extends BaseScene {
 
     public void openShipView(Ship ship){
         ship.stopDriving();
-        game.gameScene.player.bodyComponent.setWorld(ship.getInteriorWorld());
+        game.gameScene.player.bodyComponent.setWorld(ship.getInterior().getWorld());
         game.gameScene.player.transform.position.set(0, 0);
         game.gameScene.player.transform.rotation = 0;
         game.gameScene.player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);

@@ -17,6 +17,7 @@ import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.spacegame.scenes.game_scene.ShipViewPanel;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -104,7 +105,6 @@ public class TestScreen implements Screen {
 
     private final App game;
     private Stage stage;
-    private OrthographicCamera cam;
     
     private Registry registry;
     private PhysicsSystem simulation;
@@ -126,11 +126,6 @@ public class TestScreen implements Screen {
                 return false;
             }
         });
-
-        cam = (OrthographicCamera)stage.getCamera();
-        cam.zoom = 0.5f;
-        cam.position.set(0, 0, 0);
-        cam.update();
 
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));
@@ -161,7 +156,7 @@ public class TestScreen implements Screen {
         registry.render();
         stage.draw();
 
-        game.debug.render(world.getBox2DWorld(), cam.combined.cpy().scl(world.getPhysScale()));
+        game.debug.render(world.getBox2DWorld(), game.camera.combined.cpy().scl(world.getPhysScale()));
     }
 
     @Override
