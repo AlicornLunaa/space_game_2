@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects.ship2.parts;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship2.Ship;
@@ -13,9 +14,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Null;
 
-public class Part {
+public class Part implements Disposable {
     // Inner classes
     private static class Node {
         private @Null Node previous = null;
@@ -36,7 +38,7 @@ public class Part {
     };
 
     // Variables
-    private Ship parentShip;
+    protected Ship parent;
     private TextureRegion texture;
     private PhysicsCollider collider;
     private Array<Node> attachments = new Array<>();
@@ -50,11 +52,12 @@ public class Part {
     private boolean freeform = false;
     private boolean flipX = false;
     private boolean flipY = false;
+    private Vector2 pos = new Vector2();
     private float rotation = 0;
 
     // Constructor
-    public Part(final App game, Ship ship, JSONObject data){
-        this.parentShip = ship;
+    public Part(final App game, Ship parent, JSONObject data){
+        this.parent = parent;
 
         type = data.optString("type", "STRUCTURAL");
         id = data.optString("id", "BSC_FUSELAGE");
@@ -117,9 +120,43 @@ public class Part {
 
         return false;
     }
+    
+    public void setParent(Ship ship, float x, float y){
+        BodyComponent bc = ship.getBody();
+        parent = ship;
+        collider.setScale((flipX ? -1 : 1) / bc.world.getPhysScale(), (flipY ? -1 : 1) / bc.world.getPhysScale());
+        collider.setPosition(new Vector2(x, y).scl(1 / bc.world.getPhysScale()));
+        collider.setRotation(rotation);
+        collider.attachCollider(bc.body);
+
+        pos.set(x, y);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                Vector2 position = node.point.cpy().sub(node.next.point.x, node.next.point.y).add(x, y);
+                node.next.part.setParent(ship, position.x, position.y);
+            }
+        }
+    }
+
+    public void tick(float delta){
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.tick(delta);
+            }
+        }
+    }
+
+    @Override
+    public void dispose(){}
+
+    // Rendering functions
+    protected void drawEffectsAbove(Batch batch){}
+    protected void drawEffectsBelow(Batch batch){}
 
     public void draw(Batch batch, Matrix4 trans){
         batch.setTransformMatrix(trans);
+        drawEffectsBelow(batch);
         batch.draw(
             texture,
             texture.getRegionWidth() / -2, texture.getRegionHeight() / -2,
@@ -128,6 +165,7 @@ public class Part {
             flipX ? -1 : 1, flipY ? -1 : 1,
             rotation
         );
+        drawEffectsAbove(batch);
 
         for(Node node : attachments){
             if(node.next != null){
@@ -159,4 +197,33 @@ public class Part {
             }
         }
     }
+
+    public void drawDebug(ShapeRenderer renderer){
+        renderer.setColor(0.2f, 0.2f, 1, 1);
+        renderer.circle(pos.x, pos.y, 1);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.drawDebug(renderer);
+            }
+        }
+    }
+
+    // Getters & setters
+    public boolean getFreeform(){ return freeform; }
+    public int getInteriorSize(){ return interiorSize; }
+    public float getPartScale(){ return partScale; }
+    public void setFlipX(){ flipX = !flipX; }
+    public void setFlipY(){ flipY = !flipY; }
+    public boolean getFlipX(){ return flipX; }
+    public boolean getFlipY(){ return flipY; }
+    public void setRotation(float rot){ rotation = rot; }
+    public Vector2 getPosition(){ return pos; }
+    public float getRotation(){ return rotation; }
+    public TextureRegion getTexture(){ return texture; }
+    public String getType(){ return type; }
+    public String getID(){ return id; }
+    public String getName(){ return name; }
+    public String getDescription(){ return description; }
+    public Array<Node> getAttachments(){ return attachments; }
 }

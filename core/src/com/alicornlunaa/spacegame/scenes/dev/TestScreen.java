@@ -141,14 +141,14 @@ public class TestScreen implements Screen {
         registry.addEntity(new TestEntity(game, world));
         registry.addEntity(new WorldEntity(game, world));
 
-        Ship ship = new Ship(game);
+        Ship ship = new Ship(game, world, -128, 0, 0);
         // ship.load("./saves/ships/null.ship");
         registry.addEntity(ship);
     }
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0, 1);
+        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
 
         registry.update(delta);
         stage.act(delta);

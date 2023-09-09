@@ -7,11 +7,7 @@
   "interiorSize": 3,
   "attachmentPoints": [
     {
-      "x": 0.5,
-      "y": 8
-    },
-    {
-      "x": 8,
+      "x": -7,
       "y": 0
     },
     {
@@ -19,12 +15,46 @@
       "y": -8
     },
     {
-      "x": -7,
+      "x": 8,
       "y": 0
+    },
+    {
+      "x": 0.5,
+      "y": 8
     }
   ],
   "metadata": {
     "fuelCapacity": 1000,
     "batteryCapacity": 1000
+  }
+},
+{
+  "type": "STRUCTURAL",
+  "id": "BSC_DEBUG_STRUCT",
+  "name": "Debug struct",
+  "desc": "you shouldnt see this, if you are something is wrong",
+  "scale": 1.0,
+  "interiorSize": 9,
+  "attachmentPoints": [
+    {
+      "x": -16,
+      "y": 0
+    },
+    {
+      "x": 0,
+      "y": -16
+    },
+    {
+      "x": 16,
+      "y": 0
+    },
+    {
+      "x": 0,
+      "y": 16
+    }
+  ],
+  "metadata": {
+    "fuelCapacity": 100000,
+    "batteryCapacity": 100000
   }
 }]

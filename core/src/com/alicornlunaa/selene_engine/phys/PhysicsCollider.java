@@ -92,7 +92,7 @@ public class PhysicsCollider {
     public Vector2 getPosition() { return position; }
     public void setPosition(Vector2 position) { this.position = position; }
     public Vector2 getScale() { return scale; }
-    public void setScale(Vector2 scale) { this.scale = scale; }
+    public void setScale(float x, float y) { this.scale.set(x, y); }
     public void setScale(float scale) { this.scale.set(scale, scale); }
     public float getRotation() { return rotation; }
     public void setRotation(float rotation) { this.rotation = rotation; }
