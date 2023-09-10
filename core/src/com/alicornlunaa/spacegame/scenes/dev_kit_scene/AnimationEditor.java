@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit;
+package com.alicornlunaa.spacegame.scenes.dev_kit_scene;
 
 import com.kotcrab.vis.ui.widget.VisTable;
 

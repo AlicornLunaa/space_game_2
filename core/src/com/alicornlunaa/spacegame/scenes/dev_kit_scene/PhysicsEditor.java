@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit;
+package com.alicornlunaa.spacegame.scenes.dev_kit_scene;
 
 import org.json.JSONArray;
 

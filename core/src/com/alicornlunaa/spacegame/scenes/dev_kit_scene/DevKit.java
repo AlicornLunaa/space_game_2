@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit;
+package com.alicornlunaa.spacegame.scenes.dev_kit_scene;
 
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.spacegame.App;
@@ -106,15 +106,6 @@ public class DevKit extends BaseScene {
         logoTexture = new Texture("textures/dev_kit_logo.png");
         
         initializeRoot();
-        // root.clear();
-        // root.addActor(new PhysicsEditor(inputs){
-        //     @Override
-        //     public void exit(){
-        //         inputs.setProcessors(root);
-        //         root.clear();
-        //         root.addActor(mainMenu);
-        //     }
-        // });
     }
     
     // Functions

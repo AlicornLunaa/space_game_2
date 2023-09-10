@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.dev_kit.DevKit;
+import com.alicornlunaa.spacegame.scenes.dev_kit_scene.DevKit;
 import com.alicornlunaa.spacegame.util.state_management.SaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
