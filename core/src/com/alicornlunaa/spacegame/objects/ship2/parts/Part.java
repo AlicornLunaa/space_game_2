@@ -4,7 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship2.Ship;
 import com.badlogic.gdx.Gdx;
@@ -40,7 +40,7 @@ public class Part implements Disposable {
     // Variables
     protected Ship parent;
     private TextureRegion texture;
-    private PhysicsCollider collider;
+    private Collider collider;
     private Array<Node> attachments = new Array<>();
 
     private String type;
@@ -67,7 +67,7 @@ public class Part implements Disposable {
         freeform = data.optBoolean("freeform", false);
 
         texture = game.atlas.findRegion("parts/" + id.toLowerCase());
-        collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
+        collider = new Collider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
         
         for(int i = 0; i < data.getJSONArray("attachmentPoints").length(); i++){
             JSONObject vec = data.getJSONArray("attachmentPoints").getJSONObject(i);

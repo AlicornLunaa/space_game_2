@@ -4,7 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.ship.ShipState;
@@ -32,7 +32,7 @@ public class Part implements Comparable<Part> {
     protected float physScale;
 
     private TextureRegion texture;
-    private PhysicsCollider collider;
+    private Collider collider;
     private Array<Vector2> attachmentPoints = new Array<>();
 
     private String type;
@@ -60,7 +60,7 @@ public class Part implements Comparable<Part> {
         this.texture = texture;
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
-        collider = PhysicsCollider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
+        collider = Collider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
     }
     
     public Part(final App game, final Ship ship, JSONObject obj){
@@ -77,7 +77,7 @@ public class Part implements Comparable<Part> {
         texture = game.atlas.findRegion("parts/" + id.toLowerCase());
         size.set(texture.getRegionWidth(), texture.getRegionHeight());
 
-        collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
+        collider = new Collider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
         
         for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
             JSONObject vec = obj.getJSONArray("attachmentPoints").getJSONObject(i);

@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.objects.ship.interior;
 
 import org.json.JSONArray;
 
-import com.alicornlunaa.selene_engine.phys.PhysicsCollider;
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
@@ -21,7 +21,7 @@ public class InteriorCell {
 
     protected int x = 0;
     protected int y = 0;
-    protected PhysicsCollider collider;
+    protected Collider collider;
     private TextureRegion texture;
 
     // Private functions
@@ -34,9 +34,9 @@ public class InteriorCell {
 
         if(connections == 0){
             texture = new TextureRegion(game.atlas.findRegion("interior/cell"));
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
+            collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
         } else if(connections == 1){
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_one.json").readString()));
+            collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_one.json").readString()));
 
             if(left){
                 texture = new TextureRegion(game.atlas.findRegion("interior/cell_one_horizontal"));
@@ -60,7 +60,7 @@ public class InteriorCell {
             if((up || down) && (left || right)){
                 // Corner piece
                 texture = new TextureRegion(game.atlas.findRegion("interior/cell_corner"));
-                collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_corner.json").readString()));
+                collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_corner.json").readString()));
 
                 if(right && down){
                     texture.flip(false, false);
@@ -77,7 +77,7 @@ public class InteriorCell {
                 }
             } else {
                 // Through piece
-                collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
+                collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
 
                 if(left || right){
                     texture = new TextureRegion(game.atlas.findRegion("interior/cell_through_horizontal"));
@@ -89,7 +89,7 @@ public class InteriorCell {
             }
         } else if(connections == 3){
             // Wall piece
-            collider = new PhysicsCollider(new JSONArray(Gdx.files.internal("colliders/interior/cell_wall.json").readString()));
+            collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_wall.json").readString()));
 
             if(!up){
                 texture = new TextureRegion(game.atlas.findRegion("interior/cell_wall_horizontal"));
@@ -110,7 +110,7 @@ public class InteriorCell {
             }
         } else if(connections == 4){
             texture = new TextureRegion(game.atlas.findRegion("interior/cell_all"));
-            collider = new PhysicsCollider();
+            collider = new Collider();
         }
     
         collider.setScale(1 / Constants.SHIP_PPM);

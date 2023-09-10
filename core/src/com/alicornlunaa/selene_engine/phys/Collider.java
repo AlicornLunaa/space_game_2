@@ -231,6 +231,15 @@ public class Collider {
         rotation = c.rotation;
     }
 
+    // Getters & setters
+    public Vector2 getPosition() { return position; }
+    public void setPosition(Vector2 position) { this.position = position; }
+    public Vector2 getScale() { return scale; }
+    public void setScale(float x, float y) { this.scale.set(x, y); }
+    public void setScale(float scale) { this.scale.set(scale, scale); }
+    public float getRotation() { return rotation; }
+    public void setRotation(float rotation) { this.rotation = rotation; }
+
     // Physics functions
     public void detachCollider(){
         // Remove existing body
@@ -310,5 +319,16 @@ public class Collider {
         }
 
         return arr;
+    }
+
+    // Static functions
+    public static Collider box(Vector2 pos, Vector2 size, float rotation){
+        Collider c = new Collider();
+        Shape s = c.addShape();
+        s.addVertex(new Vector2(-1, -1));
+        s.addVertex(new Vector2(1, -1));
+        s.addVertex(new Vector2(1, 1));
+        s.addVertex(new Vector2(-1, 1));
+        return c;
     }
 }

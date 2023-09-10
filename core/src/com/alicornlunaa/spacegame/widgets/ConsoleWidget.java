@@ -1,9 +1,7 @@
 package com.alicornlunaa.spacegame.widgets;
 
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.scenes.dev.part_editor.PartEditor;
-import com.alicornlunaa.spacegame.scenes.dev.physics_editor.PhysicsEditor;
-import com.alicornlunaa.spacegame.scenes.editor_scene.EditorScene;
+import com.alicornlunaa.spacegame.scenes.dev_kit.DevKit;
 import com.alicornlunaa.spacegame.util.state_management.SaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -38,13 +36,8 @@ public class ConsoleWidget extends VisWindow {
             game.gameScene.spacePanel.ship.load(args[1]);
         } else if(args[0].equals("settimewarp")){
             game.gameScene.universe.setTimewarp(Float.parseFloat(args[1]));
-        } else if(args[0].equals("reloadshaders")){
-        } else if(args[0].equals("parteditor")){
-            game.setScreen(new PartEditor(game));
-        } else if(args[0].equals("physeditor")){
-            game.setScreen(new PhysicsEditor(game));
-        } else if(args[0].equals("shipeditor")){
-            game.setScreen(new EditorScene(game));
+        } else if(args[0].equals("devkit")){
+            game.setScreen(new DevKit(game));
         } else if(args[0].equals("save")){
             SaveManager.save(game, "dev_world");
         }
