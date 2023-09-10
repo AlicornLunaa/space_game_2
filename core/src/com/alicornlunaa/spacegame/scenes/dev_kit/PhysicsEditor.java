@@ -7,17 +7,28 @@ import com.alicornlunaa.selene_engine.phys.Collider.Shape;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Null;
 import com.kotcrab.vis.ui.util.Validators;
 import com.kotcrab.vis.ui.widget.Menu;
@@ -36,24 +47,153 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 
 public class PhysicsEditor extends VisTable {
+    // Static variables
+    private static ShapeRenderer shapeRenderer = new ShapeRenderer();
+
+    // Inner classes
+    private static class Cursor extends Actor {
+        // Functions
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            batch.end();
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+            shapeRenderer.begin(ShapeType.Filled);
+            shapeRenderer.setColor(getColor());
+            shapeRenderer.circle(getX(), getY(), 0.5f, 16);
+            shapeRenderer.end();
+            batch.begin();
+        }
+    };
+
+    private static class ShapeOutline extends Actor {
+        // Variables
+        private Shape shape;
+
+        // Constructor
+        private ShapeOutline(Shape shape){
+            this.shape = shape;
+        }
+
+        // Functions
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            batch.end();
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+            shapeRenderer.begin(ShapeType.Filled);
+            
+            shapeRenderer.setColor(getColor());
+            for(int j = 0; j < shape.getIndexCount(); j++){
+                if(shape.getIndex(j) >= shape.getVertexCount() || shape.getIndex((j + 1) % shape.getIndexCount()) >= shape.getVertexCount()) continue;
+                Vector2 v1 = shape.getVertex(shape.getIndex(j));
+                Vector2 v2 = shape.getVertex(shape.getIndex((j + 1) % shape.getIndexCount()));
+                shapeRenderer.rectLine(v1.x, v1.y, v2.x, v2.y, 0.4f);
+            }
+    
+            for(int j = 0; j < shape.getVertexCount(); j++){
+                Vector2 v = shape.getVertex(j);
+                shapeRenderer.circle(v.x, v.y, 0.6f, 16);
+            }
+
+            shapeRenderer.end();
+            batch.begin();
+        }
+    }
+
     // Variables
     private FileChooser fileChooser;
 
     private Collider collider = new Collider();
     private @Null Shape shape = null;
     private float snapDistance = 2;
-    private float partSize = 1;
     private Texture referenceTexture = new Texture(1, 1, Format.RGBA8888);
     private Image referenceImage;
 
+    private Stage editorStage;
+    private OrthographicCamera editorCamera;
+    private @Null Vector2 panningVector = null;
+    private VisSplitPane splitPane;
+    
+    private Cursor cursor = new Cursor();
+    private VisTextField snapField;
+    private VisTextField frictionField;
+    private VisTextField restitutionField;
+    private VisTextField densityField;
+    private VisCheckBox convexCheck;
+    private VisCheckBox sensorCheck;
+    private VerticalGroup shapesList = new VerticalGroup();
+    private Group shapeOutlines = new Group();
+
     // Private functions
+    private void loadShapeOutlines(){
+        shapeOutlines.clear();
+
+        for(int i = 0; i < collider.getShapeCount(); i++){
+            Shape s = collider.getShape(i);
+            ShapeOutline outline = new ShapeOutline(s);
+            outline.setColor((s == this.shape) ? Color.GREEN : Color.RED);
+            shapeOutlines.addActor(outline);
+        }
+    }
+
+    private void refreshShapes(){
+        shapesList.clear();
+
+        for(int i = 0; i < collider.getShapeCount(); i++){
+            final int index = i;
+
+            VisTextButton btn = new VisTextButton("Select " + index);
+            btn.addListener(new ChangeListener(){
+                @Override
+                public void changed(ChangeEvent e, Actor a){
+                    selectShape(collider.getShape(index));
+                }
+            });
+            btn.pad(5);
+            shapesList.addActor(btn);
+        }
+
+        loadShapeOutlines();
+    }
+
+    private void selectShape(Shape shape){
+        this.shape = shape;
+        loadShapeOutlines();
+
+        if(shape == null){
+            frictionField.setText("0.0");
+            restitutionField.setText("0.0");
+            densityField.setText("0.0");
+            convexCheck.setChecked(false);
+            sensorCheck.setChecked(false);
+        } else {
+            frictionField.setText(String.valueOf(shape.getFriction()));
+            restitutionField.setText(String.valueOf(shape.getRestitution()));
+            densityField.setText(String.valueOf(shape.getDensity()));
+            convexCheck.setChecked(shape.getConvex());
+            sensorCheck.setChecked(shape.getSensor());
+        }
+    }
+
     private void save(FileHandle handle){
-        handle.writeString(collider.serialize().toString(), false);
+        try {
+            handle.writeString(collider.serialize().toString(), false);
+        } catch(GdxRuntimeException e){
+            Gdx.app.log("Physics Editor", "Cannot save here");
+        }
     }
 
     private void load(FileHandle handle){
         collider.clear();
-        collider = new Collider(new JSONArray(handle.readString()));
+
+        try {
+            collider = new Collider(new JSONArray(handle.readString()));
+        } catch(GdxRuntimeException e){
+            Gdx.app.log("Physics Editor", "Cannot load file");
+        }
+
+        refreshShapes();
     }
 
     private void initMenu(){
@@ -64,7 +204,7 @@ public class PhysicsEditor extends VisTable {
         Menu fileMenu = new Menu("File");
         menu.addMenu(fileMenu);
         
-        fileChooser = new FileChooser(Gdx.files.internal("./assets/parts/"), Mode.OPEN);
+        fileChooser = new FileChooser(Gdx.files.internal("./assets/textures/"), Mode.OPEN);
         fileChooser.setSelectionMode(SelectionMode.FILES);
 
         fileMenu.addItem(new MenuItem("Load image", new ChangeListener(){
@@ -81,6 +221,8 @@ public class PhysicsEditor extends VisTable {
                         referenceTexture = new Texture(handle);
                         referenceImage.setDrawable(new TextureRegionDrawable(new TextureRegion(referenceTexture)));
                         referenceImage.setOrigin(Align.center);
+                        referenceImage.setSize(referenceTexture.getWidth(), referenceTexture.getHeight());
+                        referenceImage.setPosition(referenceImage.getWidth() / -2, referenceImage.getHeight() / -2);
                     }
                 });
                 PhysicsEditor.this.addActor(fileChooser);
@@ -125,8 +267,9 @@ public class PhysicsEditor extends VisTable {
             @Override
             public void changed(ChangeEvent event, Actor a){
                 // Clear shape
-                // shapeBeingEdited = -1;
                 collider.clear();
+                selectShape(null);
+                refreshShapes();
             }
         }));
 
@@ -145,7 +288,7 @@ public class PhysicsEditor extends VisTable {
         settings.top();
 
         // Editor properties
-        final VisTextField snapField = new VisValidatableTextField(true, Validators.FLOATS);
+        snapField = new VisValidatableTextField(true, Validators.FLOATS);
         snapField.setText(String.valueOf(snapDistance));
         snapField.addListener(new ChangeListener(){
             @Override
@@ -157,7 +300,7 @@ public class PhysicsEditor extends VisTable {
         settings.add(snapField).expandX().fillX().padRight(10).row();
 
         // Shape properties
-        final VisTextField frictionField = new VisValidatableTextField(true, Validators.FLOATS);
+        frictionField = new VisValidatableTextField(true, Validators.FLOATS);
         frictionField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
@@ -167,7 +310,7 @@ public class PhysicsEditor extends VisTable {
         settings.add(new VisLabel("Friction")).pad(10).right();
         settings.add(frictionField).expandX().fillX().padRight(10).row();
         
-        final VisTextField restitutionField = new VisValidatableTextField(true, Validators.FLOATS);
+        restitutionField = new VisValidatableTextField(true, Validators.FLOATS);
         restitutionField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
@@ -178,7 +321,7 @@ public class PhysicsEditor extends VisTable {
         settings.add(new VisLabel("Restitution")).pad(10).right();
         settings.add(restitutionField).expandX().fillX().padRight(10).row();
 
-        final VisTextField densityField = new VisValidatableTextField(Validators.FLOATS);
+        densityField = new VisValidatableTextField(Validators.FLOATS);
         densityField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
@@ -189,28 +332,30 @@ public class PhysicsEditor extends VisTable {
         settings.add(new VisLabel("Density")).pad(10).right();
         settings.add(densityField).expandX().fillX().padRight(10).row();
         
-        final VisCheckBox convexCheck = new VisCheckBox("Convex");
+        convexCheck = new VisCheckBox("Convex");
         convexCheck.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
-                shape.setConvex(!shape.getConvex());
+                shape.setConvex(convexCheck.isChecked());
+                shape.simplify();
+                loadShapeOutlines();
             }
         });
         settings.add(convexCheck).expandX().fillX().padRight(10);
 
-        final VisCheckBox sensorCheck = new VisCheckBox("Sensor");
+        sensorCheck = new VisCheckBox("Sensor");
         sensorCheck.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
-                shape.setSensor(!shape.getSensor());
+                shape.setSensor(sensorCheck.isChecked());
             }
         });
         settings.add(sensorCheck).expandX().fillX().padRight(10).row();
 
         // Shape UI
-        final VerticalGroup shapesList = new VerticalGroup();
+        shapesList = new VerticalGroup();
         settings.add(new VisLabel("Shapes")).pad(10, 10, 0, 10).center().colspan(2).row();
 
         VisTextButton newShapeBtn = new VisTextButton("New Shape");
@@ -218,29 +363,8 @@ public class PhysicsEditor extends VisTable {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 shape = collider.addShape();
-
-                frictionField.setText(String.valueOf(shape.getFriction()));
-                restitutionField.setText(String.valueOf(shape.getRestitution()));
-                densityField.setText(String.valueOf(shape.getDensity()));
-                convexCheck.setChecked(shape.getConvex());
-                sensorCheck.setChecked(shape.getSensor());
-
-                VisTextButton btn = new VisTextButton("Select " + collider.getShapeCount());
-                btn.addListener(new ChangeListener(){
-                    final Shape thisShape = shape;
-
-                    @Override
-                    public void changed(ChangeEvent e, Actor a){
-                        PhysicsEditor.this.shape = thisShape;
-                        frictionField.setText(String.valueOf(thisShape.getFriction()));
-                        restitutionField.setText(String.valueOf(thisShape.getRestitution()));
-                        densityField.setText(String.valueOf(thisShape.getDensity()));
-                        convexCheck.setChecked(thisShape.getConvex());
-                        sensorCheck.setChecked(thisShape.getSensor());
-                    }
-                });
-                btn.pad(5);
-                shapesList.addActor(btn);
+                selectShape(shape);
+                refreshShapes();
             }
         });
         settings.add(new VisLabel("New Shape")).pad(10).right();
@@ -258,34 +382,95 @@ public class PhysicsEditor extends VisTable {
                     }
                 }
                 
-                for(int i = 0; i < shapesList.getChildren().size; i++){
-                    VisTextButton btn = ((VisTextButton)shapesList.getChild(i));
-                    btn.setText("Select " + (i + 1));
-                }
-
-                shape = null;
+                refreshShapes();
+                selectShape(null);
             }
         });
         settings.add(new VisLabel("Delete Shape")).pad(10).right();
         settings.add(delShapeBtn).expandX().fillX().padRight(10).row();
         settings.add(shapesList).expandX().fillX().pad(10).colspan(2).row();
 
-        VisTable placeholder = new VisTable();
-        referenceImage = new Image(referenceTexture);
-        placeholder.add(referenceImage).expand();
-
-        VisSplitPane splitPane = new VisSplitPane(settings, placeholder, false);
+        splitPane = new VisSplitPane(settings, new VisTable(), false);
         splitPane.setSplitAmount(0.3f);
         this.add(splitPane).fill().expand().row();
     }
 
+    private void initEditor(){
+        // Create a new stage for the editor to function in
+        editorStage = new Stage();
+
+        editorCamera = (OrthographicCamera)editorStage.getCamera();
+        editorCamera.position.set(0, 0, 0);
+        editorCamera.zoom = 0.1f;
+        editorCamera.update();
+        
+        referenceTexture = new Texture("./assets/textures/dev_texture_32.png");
+        referenceImage = new Image(referenceTexture);
+        referenceImage.setPosition(referenceImage.getWidth() / -2, referenceImage.getHeight() / -2);
+        editorStage.addActor(referenceImage);
+
+        editorStage.addActor(shapeOutlines);
+
+        cursor = new Cursor();
+        editorStage.addActor(cursor);
+    }
+
     private void initControls(InputMultiplexer inputs){
-        inputs.addProcessor(0, new InputAdapter(){
+        inputs.addProcessor(new InputAdapter(){
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                if(button == Buttons.MIDDLE){
+                    panningVector = new Vector2(screenX, screenY);
+                    return true;
+                }
+
+                if(shape == null) return false;
+
+                if(button == Buttons.LEFT){
+                    shape.addVertex(new Vector2(cursor.getX(), cursor.getY()));
+                    shape.simplify();
+                    loadShapeOutlines();
+                } else if(button == Buttons.RIGHT){
+                    shape.removeVertex(new Vector2(cursor.getX(), cursor.getY()));
+                    shape.simplify();
+                    loadShapeOutlines();
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                if(panningVector != null){
+                    panningVector = null;
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                if(panningVector != null){
+                    panningVector.sub(screenX, screenY).scl(editorCamera.zoom);
+                    editorCamera.position.add(panningVector.x, -panningVector.y, 0);
+                    editorCamera.update();
+                    panningVector.set(screenX, screenY);
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                Vector2 pos = editorStage.screenToStageCoordinates(new Vector2(screenX, screenY));
+                cursor.setPosition((int)(pos.x / snapDistance) * snapDistance, (int)(pos.y / snapDistance) * snapDistance);
+                return false;
+            }
+
             @Override
             public boolean scrolled(float amountX, float amountY) {
-                partSize = Math.min(Math.max(partSize - amountY * 0.25f, 0.1f), 500);
-                referenceImage.setScale(partSize);
-                referenceImage.setOrigin(Align.center);
+                editorCamera.zoom = Math.min(Math.max(editorCamera.zoom + amountY * 0.01f, 0.01f), 50);
                 return true;
             }
         });
@@ -298,9 +483,29 @@ public class PhysicsEditor extends VisTable {
         this.debug();
         initMenu();
         initProperties();
+        initEditor();
         initControls(inputs);
     }
 
     // Functions
+    @Override
+    public void draw(Batch batch, float parentAlpha){
+        Rectangle bounds = splitPane.getSecondWidgetBounds();
+        editorStage.getViewport().setScreenBounds((int)bounds.getX(), (int)bounds.getY(), (int)bounds.getWidth(), (int)bounds.getHeight());
+        editorStage.getViewport().apply(false);
+        editorStage.draw();
+
+        this.getStage().getCamera().update();
+        this.getStage().getViewport().apply();
+        batch.setProjectionMatrix(this.getStage().getCamera().combined);
+        super.draw(batch, parentAlpha);
+    }
+
+    @Override
+    public void act(float delta){
+        super.act(delta);
+        editorStage.act(delta);
+    }
+
     public void exit(){}
 }

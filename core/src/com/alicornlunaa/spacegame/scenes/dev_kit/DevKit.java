@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.dev_kit;
 
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.spacegame.App;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -51,7 +52,7 @@ public class DevKit extends BaseScene {
                 root.addActor(new PhysicsEditor(inputs){
                     @Override
                     public void exit(){
-                        inputs.removeProcessor(0);
+                        inputs.setProcessors(root);
                         root.clear();
                         root.addActor(mainMenu);
                     }
@@ -82,6 +83,16 @@ public class DevKit extends BaseScene {
         });
         mainMenu.row().left().pad(0, 40, 10, 40);
         mainMenu.add(btn);
+
+        btn = new VisTextButton("Quit");
+        btn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.exit();
+            }
+        });
+        mainMenu.row().left().pad(0, 40, 10, 40);
+        mainMenu.add(btn);
     }
 
     // Constructor
@@ -98,7 +109,7 @@ public class DevKit extends BaseScene {
         root.addActor(new PhysicsEditor(inputs){
             @Override
             public void exit(){
-                inputs.removeProcessor(0);
+                inputs.setProcessors(root);
                 root.clear();
                 root.addActor(mainMenu);
             }
@@ -109,6 +120,8 @@ public class DevKit extends BaseScene {
     @Override
     public void render(float delta) {
         super.render(delta);
+
+        root.getViewport().apply();
         root.act(delta);
         root.draw();
     }
