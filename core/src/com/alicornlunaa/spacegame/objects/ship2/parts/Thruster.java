@@ -63,13 +63,13 @@ public class Thruster extends Part {
             true
         );
         
-        // stateRef.liquidFuelStored -= (fuelUsage * power * -throttle * delta);
+        parent.getState().liquidFuelStored -= (fuelUsage * power * -throttle * delta);
     }
     
     @Override
     public void tick(float delta){
-        // float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
-        // this.setTargetAngle(compRoll);
+        float compRoll = (parent.getState().roll == 0) ? parent.getState().artifRoll : parent.getState().roll;
+        this.setTargetAngle(compRoll);
         this.thrust(delta, 0.0f);
         super.tick(delta);
     }

@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev;
+package com.alicornlunaa.spacegame.scenes.dev_kit.testing;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.BoxColliderComponent;

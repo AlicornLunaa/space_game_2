@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev.planet_editor;
+package com.alicornlunaa.spacegame.scenes.dev_kit;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.planet.Planet;

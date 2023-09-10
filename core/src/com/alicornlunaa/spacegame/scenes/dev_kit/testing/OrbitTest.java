@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev;
+package com.alicornlunaa.spacegame.scenes.dev_kit.testing;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;

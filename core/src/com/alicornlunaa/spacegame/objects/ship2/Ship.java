@@ -20,10 +20,36 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 // Ship is a tree of parts, doublely linked
 public class Ship extends DriveableEntity {
+    // Static classes
+    public static class State {
+        /** Contains a list of all the ship statistics and variables
+         * such as fuel level, electricity level, thrust level, RCS,
+         * SAS, and other instance based variables
+         */
+        public boolean debug = false; // Debug drawings
+        
+        public boolean rcs = true; // RCS thrusters
+        public boolean sas = true; // Stability controller
+    
+        public float throttle = 0; // Thruster throttle
+        public float roll = 0; // Rotational movement intention
+        public float vertical = 0; // Translation movement intention
+        public float horizontal = 0; // Translation movement intention
+        public float artifRoll = 0; // Artificial roll, used by computer control
+    
+        public float rcsStored = 0.0f;
+        public float rcsCapacity = 0.0f;
+        public float liquidFuelStored = 0.0f;
+        public float liquidFuelCapacity = 0.0f;
+        public float batteryStored = 0.0f;
+        public float batteryCapacity = 0.0f;
+    }
+
     // Variables
     private TransformComponent transform = getComponent(TransformComponent.class);
     private BodyComponent bodyComponent;
     private Part rootPart;
+    private State state = new State();
 
     // Private functions
     private void generateExterior(PhysWorld world){
@@ -99,5 +125,9 @@ public class Ship extends DriveableEntity {
 
     public BodyComponent getBody(){
         return bodyComponent;
+    }
+
+    public State getState(){
+        return state;
     }
 }
