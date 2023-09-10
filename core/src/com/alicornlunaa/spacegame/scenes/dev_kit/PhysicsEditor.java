@@ -480,7 +480,6 @@ public class PhysicsEditor extends VisTable {
     public PhysicsEditor(InputMultiplexer inputs){
         super();
         this.setFillParent(true);
-        this.debug();
         initMenu();
         initProperties();
         initEditor();
@@ -490,8 +489,10 @@ public class PhysicsEditor extends VisTable {
     // Functions
     @Override
     public void draw(Batch batch, float parentAlpha){
+        float ratio = getHeight() / getWidth();
         Rectangle bounds = splitPane.getSecondWidgetBounds();
-        editorStage.getViewport().setScreenBounds((int)bounds.getX(), (int)bounds.getY(), (int)bounds.getWidth(), (int)bounds.getHeight());
+        editorStage.getViewport().setScreenBounds((int)bounds.getX(), (int)bounds.getY(), (int)bounds.getWidth(), (int)bounds.getWidth());
+        editorStage.getViewport().setWorldSize(1280, 720 / ratio);
         editorStage.getViewport().apply(false);
         editorStage.draw();
 

@@ -30,6 +30,7 @@ public class DevKit extends BaseScene {
         root.addActor(mainMenu);
 
         Image logo = new Image(logoTexture);
+        logo.scaleBy(2);
         mainMenu.row().expandX().top().left().pad(20);
         mainMenu.add(logo);
 
@@ -105,15 +106,15 @@ public class DevKit extends BaseScene {
         logoTexture = new Texture("textures/dev_kit_logo.png");
         
         initializeRoot();
-        root.clear();
-        root.addActor(new PhysicsEditor(inputs){
-            @Override
-            public void exit(){
-                inputs.setProcessors(root);
-                root.clear();
-                root.addActor(mainMenu);
-            }
-        });
+        // root.clear();
+        // root.addActor(new PhysicsEditor(inputs){
+        //     @Override
+        //     public void exit(){
+        //         inputs.setProcessors(root);
+        //         root.clear();
+        //         root.addActor(mainMenu);
+        //     }
+        // });
     }
     
     // Functions
