@@ -11,7 +11,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
     // Variables
     @SuppressWarnings("unused")
-    private final App game;
+    protected final App game;
     private @Null Player driver;
 
     // Constructor

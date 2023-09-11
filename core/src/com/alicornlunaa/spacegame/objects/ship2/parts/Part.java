@@ -146,7 +146,7 @@ public class Part implements Disposable {
             }
         }
     }
-
+    
     @Override
     public void dispose(){}
 
@@ -226,4 +226,87 @@ public class Part implements Disposable {
     public String getName(){ return name; }
     public String getDescription(){ return description; }
     public Array<Node> getAttachments(){ return attachments; }
+
+    // Serialization functions
+    public JSONObject serialize(){
+        JSONObject obj = new JSONObject();
+        obj.put("type", type);
+        obj.put("id", id);
+        obj.put("rotation", rotation);
+        obj.put("flipX", flipX);
+        obj.put("flipY", flipY);
+
+        JSONArray children = new JSONArray();
+        for(Node node : attachments){
+            if(node.next != null){
+                int connectingIndex = 0;
+                for(Node nextNodes : node.next.part.attachments){
+                    if(nextNodes.previous != node){
+                        connectingIndex++;
+                    } else {
+                        break;
+                    }
+                }
+
+                JSONObject attachment = new JSONObject();
+                attachment.put("nodeData", node.next.part.serialize());
+                attachment.put("connectingIndex", connectingIndex);
+                children.put(attachment);
+            } else {
+                children.put(JSONObject.NULL);
+            }
+        }
+        obj.put("attachments", children);
+
+        return obj;
+    }
+
+    public static Part spawn(final App game, final Ship ship, String type, String id){
+        // Load part information from the json object
+        switch(type){
+            case "AERO":
+                return new Aero(game, ship, game.partManager.get(type, id));
+                
+            case "STRUCTURAL":
+                return new Structural(game, ship, game.partManager.get(type, id));
+                
+            case "THRUSTER":
+                return new Thruster(game, ship, game.partManager.get(type, id));
+                
+            // case "RCSPORT":
+            //     return new RCSPort(game, ship, game.partManager.get(type, id));
+
+            default:
+                return null;
+        }
+    }
+
+    public static Part unserialize(final App game, final Ship ship, JSONObject obj){
+        String type = obj.getString("type");
+        String id = obj.getString("id");
+        float rotation = obj.getFloat("rotation");
+        boolean flipX = obj.getBoolean("flipX");
+        boolean flipY = obj.getBoolean("flipY");
+
+        Part newPart = Part.spawn(game, ship, type, id);
+        newPart.rotation = rotation;
+        newPart.flipX = flipX;
+        newPart.flipY = flipY;
+
+        // Spawn every child
+        JSONArray arr = obj.getJSONArray("attachments");
+        for(int i = 0; i < arr.length(); i++){
+            Object rawData = arr.get(i);
+
+            if(!rawData.equals(null)){
+                // Create part for the children
+                JSONObject data = (JSONObject)rawData;
+                JSONObject nodeData = data.getJSONObject("nodeData");
+                int connectingIndex = data.getInt("connectingIndex");
+                newPart.attach(i, connectingIndex, unserialize(game, ship, nodeData));
+            }
+        }
+
+        return newPart;
+    }
 }

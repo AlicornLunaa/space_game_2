@@ -142,7 +142,8 @@ public class TestScreen implements Screen {
         registry.addEntity(new WorldEntity(game, world));
 
         Ship ship = new Ship(game, world, -128, 0, 0);
-        // ship.load("./saves/ships/null.ship");
+        // ship.save("./saves/ships/test.ship");
+        ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);
     }
 
