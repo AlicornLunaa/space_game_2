@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Null;
 
 public class Part implements Disposable {
     // Inner classes
-    private static class Node {
+    public static class Node {
         private @Null Node previous = null;
         private @Null Node next = null;
 
@@ -47,7 +47,7 @@ public class Part implements Disposable {
     private String id;
     private String name;
     private String description;
-    private float partScale;
+    private float partScale = 1;
     private int interiorSize;
     private boolean freeform = false;
     private boolean flipX = false;
@@ -213,6 +213,8 @@ public class Part implements Disposable {
     public boolean getFreeform(){ return freeform; }
     public int getInteriorSize(){ return interiorSize; }
     public float getPartScale(){ return partScale; }
+    public float getWidth(){ return texture.getRegionWidth() * partScale; }
+    public float getHeight(){ return texture.getRegionHeight() * partScale; }
     public void setFlipX(){ flipX = !flipX; }
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }

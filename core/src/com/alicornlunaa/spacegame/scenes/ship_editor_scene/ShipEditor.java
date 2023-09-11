@@ -55,10 +55,6 @@ public class ShipEditor extends BaseScene {
     private Ship ship;
     
     // Private functions
-    private Part getNearestPart(Part p){
-        return null;
-    }
-
     private void populateParts(){
         parts.clear();
 
@@ -185,6 +181,20 @@ public class ShipEditor extends BaseScene {
                 if(button == Buttons.MIDDLE){
                     panningVector = new Vector2(screenX, screenY);
                     return true;
+                }
+
+                if(button == Buttons.LEFT){
+                    if(selectedPart != null){
+                        // Trying to place something
+                        selectedPart = null;
+                    } else {
+                        // Trying to pick something up?
+                        Part rootPart = ship.getRootPart();
+                        Vector2 localCenter = ship.getBody().body.getLocalCenter().cpy().scl(ship.getBody().world.getPhysScale());
+                        Rectangle bounds = new Rectangle(rootPart.getWidth() / -2.f - localCenter.x, rootPart.getHeight() / -2.f - localCenter.y, rootPart.getWidth(), rootPart.getHeight());
+                        Vector2 cursorPos = editorStage.screenToStageCoordinates(new Vector2(screenX, screenY)).sub(1280 / 2.f, 720 / 2.f);
+                        System.out.println(bounds.contains(cursorPos.x, cursorPos.y));
+                    }
                 }
 
                 return false;
