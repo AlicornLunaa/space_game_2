@@ -20,11 +20,11 @@ import com.badlogic.gdx.utils.Null;
 public class Part implements Disposable {
     // Inner classes
     public static class Node {
-        private @Null Node previous = null;
-        private @Null Node next = null;
+        public @Null Node previous = null;
+        public @Null Node next = null;
 
-        private Vector2 point;
-        private Part part;
+        public Vector2 point;
+        public Part part;
 
         private Node(Part part, Vector2 point){
             this.part = part;

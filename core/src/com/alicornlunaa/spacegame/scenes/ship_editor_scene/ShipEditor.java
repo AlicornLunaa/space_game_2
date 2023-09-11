@@ -7,6 +7,7 @@ import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship2.Ship;
 import com.alicornlunaa.spacegame.objects.ship2.parts.Part;
+import com.alicornlunaa.spacegame.objects.ship2.parts.Part.Node;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Gdx;
@@ -34,6 +35,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 
 public class ShipEditor extends BaseScene {
+    // Interfaces
+    private static interface RecursiveNodeInterface {
+        abstract void run(Part part);
+        abstract Part.Node getNode();
+    }
+
     // Variables
     private Stage root;
     private Stage editorStage;
@@ -55,6 +62,37 @@ public class ShipEditor extends BaseScene {
     private Ship ship;
     
     // Private functions
+    private Part.Node closestNode(final Vector2 pos, Part part){
+        RecursiveNodeInterface lambda = new RecursiveNodeInterface(){
+            private Part.Node res = null;
+            private float distance = Float.MAX_VALUE;
+
+			@Override
+			public void run(Part currentPart) {
+                for(Part.Node node : currentPart.getAttachments()){
+                    float curDistance = currentPart.getPosition().cpy().add(node.point).dst(pos);
+    
+                    if(curDistance < distance){
+                        distance = curDistance;
+                        res = node;
+                    }
+
+                    if(node.next != null){
+                        run(node.next.part);
+                    }
+                }
+            }
+
+			@Override
+			public Node getNode() {
+                return res;
+			}
+        };
+
+        lambda.run(part);
+        return lambda.getNode();
+    }
+
     private void populateParts(){
         parts.clear();
 
@@ -278,6 +316,22 @@ public class ShipEditor extends BaseScene {
             game.shapeRenderer.setTransformMatrix(new Matrix4());
             game.shapeRenderer.begin(ShapeType.Filled);
             selectedPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4().translate(pos.x, pos.y, 0.0f));
+
+            // Test closest
+            game.shapeRenderer.setProjectionMatrix(editorCamera.combined);
+            game.shapeRenderer.setTransformMatrix(new Matrix4());
+            game.shapeRenderer.setColor(Color.MAGENTA);
+            Part.Node node = this.closestNode(pos.cpy().sub(1280/2, 720/2), ship.getRootPart());
+            if(node != null){
+                Vector2 p = node.part.getPosition().cpy().add(node.point);
+                game.shapeRenderer.circle(p.x + 1280/2, p.y + 720/2, 1.5f, 16);
+                
+                node = this.closestNode(p, selectedPart);
+                if(node != null){
+                    p.set(node.part.getPosition().cpy().add(node.point));
+                    game.shapeRenderer.circle(p.x + 1280/2, p.y + 720/2, 1.5f, 16);
+                }
+            }
             
             game.shapeRenderer.setTransformMatrix(new Matrix4());
             game.shapeRenderer.setColor(0.2f, 0.2f, 0.9f, 1.0f);
