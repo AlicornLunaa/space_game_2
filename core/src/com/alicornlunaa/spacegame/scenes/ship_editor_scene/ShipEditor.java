@@ -10,6 +10,7 @@ import com.alicornlunaa.spacegame.objects.ship2.parts.Part;
 import com.alicornlunaa.spacegame.objects.ship2.parts.Part.Node;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
@@ -70,7 +71,7 @@ public class ShipEditor extends BaseScene {
                 for(Part.Node node : currentPart.getAttachments()){
                     float curDistance = currentPart.getPosition().cpy().add(node.point).dst(pos);
     
-                    if(curDistance < distance){
+                    if(curDistance < distance && node.next == null && node.previous == null){
                         distance = curDistance;
                         res = node;
                     }
@@ -233,9 +234,12 @@ public class ShipEditor extends BaseScene {
                             if(node2 != null){
                                 Vector2 nodePos2 = new Vector2(node2.part.getPosition().cpy().add(node2.point));
                                 
-                                // Connect both nodes
-                                node1.part.attach(node1, node2);
-                                ship.assemble();
+                                // Both exist, check dist
+                                if(nodePos1.dst(nodePos2) < snapDistance){
+                                    // Connect both nodes
+                                    node1.part.attach(node1, node2);
+                                    ship.assemble();
+                                }
                             }
                         }
 
@@ -281,6 +285,27 @@ public class ShipEditor extends BaseScene {
                     camOffset.add(panningVector.x, -panningVector.y);
                     editorCamera.update();
                     panningVector.set(screenX, screenY);
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean keyDown(int keycode) {
+                if(selectedPart != null){
+                    switch(keycode){
+                        case Keys.R:
+                            selectedPart.setRotation(selectedPart.getRotation() + (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -45 : 45));
+                            break;
+                            
+                        case Keys.F:
+                            selectedPart.setFlipX();
+                            break;
+                            
+                        case Keys.C:
+                            selectedPart.setFlipY();
+                            break;
+                    }
                 }
 
                 return false;

@@ -201,10 +201,6 @@ public class Part implements Disposable {
 
     public Part hit(Vector2 position){
         // Returns the part hit in the tree
-        if(this.getBounds().contains(position)){
-            return this;
-        }
-
         for(Node node : attachments){
             if(node.next != null){
                 Part res = node.next.part.hit(position);
@@ -213,6 +209,10 @@ public class Part implements Disposable {
                     return res;
                 }
             }
+        }
+
+        if(this.getBounds().contains(position)){
+            return this;
         }
 
         return null;
@@ -234,6 +234,7 @@ public class Part implements Disposable {
     protected void drawEffectsBelow(Batch batch){}
 
     public void draw(Batch batch, Matrix4 trans){
+        trans.rotate(0, 0, 1, rotation);
         batch.setTransformMatrix(trans);
         drawEffectsBelow(batch);
         batch.draw(
@@ -242,7 +243,7 @@ public class Part implements Disposable {
             texture.getRegionWidth() / 2, texture.getRegionHeight() / 2,
             texture.getRegionWidth(), texture.getRegionHeight(),
             flipX ? -1 : 1, flipY ? -1 : 1,
-            rotation
+            0
         );
         drawEffectsAbove(batch);
 
@@ -264,6 +265,7 @@ public class Part implements Disposable {
                 renderer.setColor(0, 1, 0, 1);
             }
 
+            trans.rotate(0, 0, 1, rotation);
             renderer.setTransformMatrix(trans);
             renderer.circle(node.point.x, node.point.y, 1);
 
