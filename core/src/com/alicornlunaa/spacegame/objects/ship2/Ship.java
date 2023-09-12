@@ -68,10 +68,7 @@ public class Ship extends DriveableEntity {
             @Override
             public void afterWorldChange(PhysWorld world){
                 Ship.super.afterWorldChange(world);
-
-                if(rootPart != null){
-                    rootPart.setParent(Ship.this, 0, 0);
-                }
+                Ship.this.assemble();
             }
         });
         
@@ -87,7 +84,7 @@ public class Ship extends DriveableEntity {
         rootPart = new Part(game, this, game.partManager.get("STRUCTURAL", "BSC_FUSELAGE"));
         rootPart.attach(1, 3, new Part(game, this, game.partManager.get("STRUCTURAL", "BSC_DEBUG_STRUCT")))
             .attach(1, 0, new Thruster(game, this, game.partManager.get("THRUSTER", "BSC_THRUSTER")));
-        rootPart.setParent(this, 0, 0);
+        rootPart.setParent(this, new Matrix4());
         
         addComponent(new CustomSpriteComponent() {
             @Override
@@ -95,7 +92,7 @@ public class Ship extends DriveableEntity {
                 if(rootPart == null) return;
 
                 Vector2 localCenter = bodyComponent.body.getLocalCenter().cpy().scl(bodyComponent.world.getPhysScale());
-                Matrix4 trans = batch.getTransformMatrix().cpy();
+                Matrix4 trans = batch.getTransformMatrix().cpy().rotate(0, 0, 1, rootPart.getRotation());
                 rootPart.draw(batch, trans.cpy());
                 
                 batch.end();
@@ -155,7 +152,7 @@ public class Ship extends DriveableEntity {
 
             // Load body data
             rootPart = Part.unserialize(game, this, data.getJSONObject("assembly"));
-            rootPart.setParent(this, 0, 0);
+            this.assemble();
 
             System.out.printf("Ship %s loaded\n", path);
             return true;
@@ -171,7 +168,7 @@ public class Ship extends DriveableEntity {
     public Part getRootPart(){ return rootPart; }
     public void assemble(){
         if(rootPart != null){
-            rootPart.setParent(this, 0, 0);
+            rootPart.setParent(this, new Matrix4());
         }
     }
 

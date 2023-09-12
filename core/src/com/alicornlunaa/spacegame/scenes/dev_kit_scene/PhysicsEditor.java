@@ -293,7 +293,9 @@ public class PhysicsEditor extends VisTable {
         snapField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                snapDistance = Float.parseFloat(((VisTextField)a).getText());
+                try {
+                    snapDistance = Float.parseFloat(((VisTextField)a).getText());
+                } catch(NumberFormatException exception){}
             }
         });
         settings.add(new VisLabel("Snap Distance")).pad(10).right();
@@ -305,6 +307,9 @@ public class PhysicsEditor extends VisTable {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
+                try {
+                    shape.setFriction(Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
             }
         });
         settings.add(new VisLabel("Friction")).pad(10).right();
@@ -315,18 +320,22 @@ public class PhysicsEditor extends VisTable {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
-                shape.setRestitution(Float.parseFloat(((VisTextField)a).getText()));
+                try {
+                    shape.setRestitution(Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
             }
         });
         settings.add(new VisLabel("Restitution")).pad(10).right();
         settings.add(restitutionField).expandX().fillX().padRight(10).row();
 
-        densityField = new VisValidatableTextField(Validators.FLOATS);
+        densityField = new VisValidatableTextField(true, Validators.FLOATS);
         densityField.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
-                shape.setDensity(Float.parseFloat(((VisTextField)a).getText()));
+                try {
+                    shape.setDensity(Float.parseFloat(((VisTextField)a).getText()));
+                } catch(NumberFormatException exception){}
             }
         });
         settings.add(new VisLabel("Density")).pad(10).right();

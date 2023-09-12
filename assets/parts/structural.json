@@ -57,4 +57,30 @@
     "fuelCapacity": 100000,
     "batteryCapacity": 100000
   }
+},
+{
+  "type": "STRUCTURAL",
+  "id": "BSC_SPLITTER",
+  "name": "Splitter",
+  "desc": "Turn one into two!",
+  "scale": 1.0,
+  "interiorSize": 1,
+  "attachmentPoints": [
+    {
+      "x": 0,
+      "y": 10
+    },
+    {
+      "x": -10,
+      "y": -10
+    },
+    {
+      "x": 10,
+      "y": -10
+    }
+  ],
+  "metadata": {
+    "fuelCapacity": 100,
+    "batteryCapacity": 100
+  }
 }]

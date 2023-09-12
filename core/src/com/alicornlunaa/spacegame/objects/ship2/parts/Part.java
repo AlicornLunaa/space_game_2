@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Null;
@@ -150,20 +151,27 @@ public class Part implements Disposable {
         return false;
     }
     
-    public void setParent(Ship ship, float x, float y){
+    public void setParent(Ship ship, Matrix4 trans){
+        Vector3 temp = new Vector3();
+        trans.getTranslation(temp);
+        pos.set(temp.x, temp.y);
+
         BodyComponent bc = ship.getBody();
         parent = ship;
         collider.setScale((flipX ? -1 : 1) / bc.world.getPhysScale(), (flipY ? -1 : 1) / bc.world.getPhysScale());
-        collider.setPosition(new Vector2(x, y).scl(1 / bc.world.getPhysScale()));
+        collider.setPosition(pos.cpy().scl(1 / bc.world.getPhysScale()));
         collider.setRotation(rotation);
         collider.attachCollider(bc.body);
 
-        pos.set(x, y);
-
         for(Node node : attachments){
             if(node.next != null){
-                Vector2 position = node.point.cpy().sub(node.next.point.x, node.next.point.y).add(x, y);
-                node.next.part.setParent(ship, position.x, position.y);
+                trans.translate(node.point.x, node.point.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                node.next.part.setParent(ship, trans);
+                trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
+                trans.translate(-node.point.x, -node.point.y, 0);
             }
         }
     }
@@ -177,6 +185,10 @@ public class Part implements Disposable {
         }
 
         return null;
+    }
+
+    public Vector2 getNodePosition(Node node){
+        return this.getPosition().cpy().add(node.point.cpy().rotateDeg(getRotation()));
     }
 
     public Rectangle getBounds(){
@@ -234,7 +246,6 @@ public class Part implements Disposable {
     protected void drawEffectsBelow(Batch batch){}
 
     public void draw(Batch batch, Matrix4 trans){
-        trans.rotate(0, 0, 1, rotation);
         batch.setTransformMatrix(trans);
         drawEffectsBelow(batch);
         batch.draw(
@@ -249,10 +260,13 @@ public class Part implements Disposable {
 
         for(Node node : attachments){
             if(node.next != null){
-                Vector2 position = node.point.cpy().sub(node.next.point.x, node.next.point.y);
-                trans.translate(position.x, position.y, 0);
+                trans.translate(node.point.x, node.point.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.draw(batch, trans);
-                trans.translate(-position.x, -position.y, 0);
+                trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
+                trans.translate(-node.point.x, -node.point.y, 0);
             }
         }
     }
@@ -270,12 +284,18 @@ public class Part implements Disposable {
             renderer.circle(node.point.x, node.point.y, 1);
 
             if(node.next != null){
-                Vector2 position = node.point.cpy().sub(node.next.point.x, node.next.point.y);
-
-                trans.translate(position.x, position.y, 0);
+                trans.translate(node.point.x, node.point.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 node.next.part.drawAttachmentPoints(renderer, trans);
-                trans.translate(-position.x, -position.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
+                trans.translate(-node.point.x, -node.point.y, 0);
             }
+            
+            trans.rotate(0, 0, 1, -rotation);
         }
     }
 

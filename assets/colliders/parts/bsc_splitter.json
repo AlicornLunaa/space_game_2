@@ -1,0 +1,1 @@
+[{"indices":[0,3,4,2,1,5],"restitution":0.2,"density":0.2,"vertices":[-15,-10,-8,-2,8,-2,15,-10,11,-4,-11,-4],"convex":true,"sensor":false,"friction":0.2},{"indices":[0,3,2,1],"restitution":0.2,"density":0.2,"vertices":[-8,10,8,10,8,-2,-8,-2],"convex":true,"sensor":false,"friction":0.2}]
