@@ -169,6 +169,11 @@ public class Ship extends DriveableEntity {
     
     public void setRootPart(Part p){ this.rootPart = p; }
     public Part getRootPart(){ return rootPart; }
+    public void assemble(){
+        if(rootPart != null){
+            rootPart.setParent(this, 0, 0);
+        }
+    }
 
     public TransformComponent getTransform(){
         return transform;

@@ -195,9 +195,6 @@ public class ShipEditor extends BaseScene {
 
         Table t = new Table();
         t.setFillParent(true);
-        Image i = new Image(new Texture("./assets/textures/dev_texture_32.png"));
-        i.setPosition(i.getWidth() / -2, i.getHeight() / -2);
-        // t.add(i).row();
         editorStage.addActor(t);
 
         world = new PhysWorld(128);
@@ -216,6 +213,9 @@ public class ShipEditor extends BaseScene {
         inputs.addProcessor(new InputAdapter(){
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                Vector2 editorCursorPos = editorStage.screenToStageCoordinates(new Vector2(screenX, screenY));
+                Vector2 editorCenterPos = new Vector2(1280 / 2.f, 720 / 2.f);
+
                 if(button == Buttons.MIDDLE){
                     panningVector = new Vector2(screenX, screenY);
                     return true;
@@ -224,6 +224,23 @@ public class ShipEditor extends BaseScene {
                 if(button == Buttons.LEFT){
                     if(selectedPart != null){
                         // Trying to place something
+                        Part.Node node1 = ShipEditor.this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.getRootPart());
+
+                        if(node1 != null){
+                            // Attachment point exists, get the other side
+                            Vector2 nodePos1 = node1.part.getPosition().cpy().add(node1.point).add(editorCenterPos);
+                            
+                            selectedPart.setPosition(editorCursorPos.x, editorCursorPos.y);
+                            Part.Node node2 = ShipEditor.this.closestNode(nodePos1, selectedPart);
+                            if(node2 != null){
+                                Vector2 nodePos2 = new Vector2(node2.part.getPosition().cpy().add(node2.point));
+                                
+                                // Connect both nodes
+                                node1.part.attach(node1, node2);
+                                ship.assemble();
+                            }
+                        }
+
                         selectedPart = null;
                     } else {
                         // Trying to pick something up?
@@ -299,15 +316,40 @@ public class ShipEditor extends BaseScene {
         registry.update(delta);
         registry.render();
         
-        Vector2 pos = editorStage.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-        // pos.set((int)(pos.x / snapDistance) * snapDistance, (int)(pos.y / snapDistance) * snapDistance);
+        Vector2 editorCursorPos = editorStage.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        Vector2 editorCenterPos = new Vector2(1280 / 2.f, 720 / 2.f);
 
         if(selectedPart != null){
             Batch batch = editorStage.getBatch();
             batch.setProjectionMatrix(editorCamera.combined);
             batch.setColor(1.0f, 0.8f, 0.8f, 0.4f);
             batch.begin();
-            selectedPart.draw(batch, new Matrix4().translate(pos.x, pos.y, 0.0f));
+
+            // Draw snapped part or free
+            boolean renderedPart = false;
+            Part.Node node1 = ShipEditor.this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.getRootPart());
+            if(node1 != null){
+                // Attachment point exists, get the other side
+                Vector2 nodePos1 = node1.part.getPosition().cpy().add(node1.point).add(editorCenterPos);
+                
+                selectedPart.setPosition(editorCursorPos.x, editorCursorPos.y);
+                Part.Node node2 = ShipEditor.this.closestNode(nodePos1, selectedPart);
+                if(node2 != null){
+                    Vector2 nodePos2 = new Vector2(node2.part.getPosition().cpy().add(node2.point));
+                    
+                    // Both exist, check dist
+                    if(nodePos1.dst(nodePos2) < snapDistance){
+                        Vector2 renderPos = node1.point.cpy().sub(node2.point.x, node2.point.y);
+                        selectedPart.draw(batch, new Matrix4().translate(node1.part.getPosition().x + renderPos.x + editorCenterPos.x, node1.part.getPosition().y + renderPos.y + editorCenterPos.y, 0.0f));
+                        renderedPart = true;
+                    }
+                }
+            }
+
+            if(!renderedPart){
+                selectedPart.draw(batch, new Matrix4().translate(editorCursorPos.x, editorCursorPos.y, 0.0f));
+            }
+
             batch.end();
         }
 
@@ -315,28 +357,35 @@ public class ShipEditor extends BaseScene {
             game.shapeRenderer.setProjectionMatrix(editorCamera.combined);
             game.shapeRenderer.setTransformMatrix(new Matrix4());
             game.shapeRenderer.begin(ShapeType.Filled);
-            selectedPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4().translate(pos.x, pos.y, 0.0f));
-
-            // Test closest
-            game.shapeRenderer.setProjectionMatrix(editorCamera.combined);
-            game.shapeRenderer.setTransformMatrix(new Matrix4());
-            game.shapeRenderer.setColor(Color.MAGENTA);
-            Part.Node node = this.closestNode(pos.cpy().sub(1280/2, 720/2), ship.getRootPart());
-            if(node != null){
-                Vector2 p = node.part.getPosition().cpy().add(node.point);
-                game.shapeRenderer.circle(p.x + 1280/2, p.y + 720/2, 1.5f, 16);
+            
+            // Draw snapped part or free
+            boolean renderedPart = false;
+            Part.Node node1 = ShipEditor.this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.getRootPart());
+            if(node1 != null){
+                // Attachment point exists, get the other side
+                Vector2 nodePos1 = node1.part.getPosition().cpy().add(node1.point).add(editorCenterPos);
                 
-                node = this.closestNode(p, selectedPart);
-                if(node != null){
-                    p.set(node.part.getPosition().cpy().add(node.point));
-                    game.shapeRenderer.circle(p.x + 1280/2, p.y + 720/2, 1.5f, 16);
+                selectedPart.setPosition(editorCursorPos.x, editorCursorPos.y);
+                Part.Node node2 = ShipEditor.this.closestNode(nodePos1, selectedPart);
+                if(node2 != null){
+                    Vector2 nodePos2 = new Vector2(node2.part.getPosition().cpy().add(node2.point));
+                    
+                    // Both exist, check dist
+                    if(nodePos1.dst(nodePos2) < snapDistance){
+                        Vector2 renderPos = node1.point.cpy().sub(node2.point.x, node2.point.y);
+                        selectedPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4().translate(node1.part.getPosition().x + renderPos.x + editorCenterPos.x, node1.part.getPosition().y + renderPos.y + editorCenterPos.y, 0.0f));
+                        renderedPart = true;
+                    }
                 }
+            }
+
+            if(!renderedPart){
+                selectedPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4().translate(editorCursorPos.x, editorCursorPos.y, 0.0f));
             }
             
             game.shapeRenderer.setTransformMatrix(new Matrix4());
             game.shapeRenderer.setColor(0.2f, 0.2f, 0.9f, 1.0f);
-            game.shapeRenderer.circle(pos.x, pos.y, 0.7f, 16);
-
+            game.shapeRenderer.circle(editorCursorPos.x, editorCursorPos.y, 0.7f, 16);
             game.shapeRenderer.end();
         }
 

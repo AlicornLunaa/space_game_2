@@ -88,6 +88,16 @@ public class Part implements Disposable {
         return null;
     }
 
+    public Part attach(Node fromNode, Node toNode){
+        if(fromNode.next != null) return null;
+        if(toNode.previous != null) return null;
+
+        fromNode.next = toNode;
+        toNode.previous = fromNode;
+
+        return toNode.part;
+    }
+
     public Part attach(int from, int to, Part part){
         Node fromNode = attachments.get(from);
         Node toNode = part.attachments.get(to);
@@ -99,6 +109,24 @@ public class Part implements Disposable {
         toNode.previous = fromNode;
 
         return part;
+    }
+
+    public boolean deattach(Node thisNode){
+        if(thisNode.next != null){
+            // This node is the parent, orphan the child
+            Node toNode = thisNode.next;
+            toNode.previous = null;
+            thisNode.next = null;
+            return true;
+        } else if(thisNode.previous != null){
+            // This node is the child, run away from home
+            Node fromNode = thisNode.previous;
+            fromNode.next = null;
+            thisNode.previous = null;
+            return true;
+        }
+
+        return false;
     }
 
     public boolean deattach(int index){
@@ -221,6 +249,7 @@ public class Part implements Disposable {
     public boolean getFlipY(){ return flipY; }
     public void setRotation(float rot){ rotation = rot; }
     public Vector2 getPosition(){ return pos; }
+    public void setPosition(float x, float y){ pos.set(x, y); }
     public float getRotation(){ return rotation; }
     public TextureRegion getTexture(){ return texture; }
     public String getType(){ return type; }
