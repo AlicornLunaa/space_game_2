@@ -14,7 +14,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
@@ -22,7 +21,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -242,13 +240,24 @@ public class ShipEditor extends BaseScene {
                         }
 
                         selectedPart = null;
+                        return true;
                     } else {
                         // Trying to pick something up?
-                        Part rootPart = ship.getRootPart();
-                        Vector2 localCenter = ship.getBody().body.getLocalCenter().cpy().scl(ship.getBody().world.getPhysScale());
-                        Rectangle bounds = new Rectangle(rootPart.getWidth() / -2.f - localCenter.x, rootPart.getHeight() / -2.f - localCenter.y, rootPart.getWidth(), rootPart.getHeight());
-                        Vector2 cursorPos = editorStage.screenToStageCoordinates(new Vector2(screenX, screenY)).sub(1280 / 2.f, 720 / 2.f);
-                        System.out.println(bounds.contains(cursorPos.x, cursorPos.y));
+                        if(ship.getRootPart() == null) return false;
+
+                        Part hoveredPart = ship.getRootPart().hit(editorCursorPos.cpy().sub(editorCenterPos));
+                        if(hoveredPart != null){
+                            if(hoveredPart == ship.getRootPart()){
+                                // Delete part
+                                ship.setRootPart(null);
+                            } else {
+                                Part.Node parentConnectingNode = hoveredPart.getParentNode();
+                                hoveredPart.deattach(parentConnectingNode);
+                                selectedPart = hoveredPart;
+                            }
+
+                            return true;
+                        }
                     }
                 }
 
@@ -351,6 +360,11 @@ public class ShipEditor extends BaseScene {
             }
 
             batch.end();
+        } else {
+            if(ship.getRootPart() != null){
+                Part hoveredPart = ship.getRootPart().hit(editorCursorPos.cpy().sub(editorCenterPos));
+                System.out.println(hoveredPart);
+            }
         }
 
         if(selectedPart != null){

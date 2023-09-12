@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -165,6 +166,56 @@ public class Part implements Disposable {
                 node.next.part.setParent(ship, position.x, position.y);
             }
         }
+    }
+
+    public Node getParentNode(){
+        // Returns a node that has a previous one, indicating a parent
+        for(Node node : attachments){
+            if(node.previous != null){
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    public Rectangle getBounds(){
+        return new Rectangle(pos.x - getWidth() / 2.f, pos.y - getHeight() / 2.f, getWidth(), getHeight());
+    }
+
+    public boolean contains(Vector2 position){
+        if(this.getBounds().contains(position)){
+            return true;
+        }
+
+        for(Node node : attachments){
+            if(node.next != null){
+                if(node.next.part.contains(position)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Part hit(Vector2 position){
+        // Returns the part hit in the tree
+        if(this.getBounds().contains(position)){
+            return this;
+        }
+
+        for(Node node : attachments){
+            if(node.next != null){
+                Part res = node.next.part.hit(position);
+
+                if(res != null){
+                    return res;
+                }
+            }
+        }
+
+        return null;
     }
 
     public void tick(float delta){
