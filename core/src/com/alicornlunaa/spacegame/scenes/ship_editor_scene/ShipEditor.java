@@ -382,16 +382,27 @@ public class ShipEditor extends BaseScene {
                     
                     // Both exist, check dist
                     if(nodePos1.dst(nodePos2) < snapDistance){
-                        Vector2 renderPos = node1.point.cpy().rotateDeg(node2.part.getRotation());
-                        renderPos.sub(node2.point.x, node2.point.y);
-                        selectedPart.draw(batch, new Matrix4().translate(node1.part.getPosition().x + renderPos.x + editorCenterPos.x, node1.part.getPosition().y + renderPos.y + editorCenterPos.y, 0.0f).rotate(0, 0, 1, selectedPart.getRotation()));
+                        Matrix4 trans = new Matrix4();
+                        trans.translate(editorCenterPos.x, editorCenterPos.y, 0);
+                        trans.translate(node1.part.getPosition().x, node1.part.getPosition().y, 0);
+                        trans.translate(node1.point.x, node1.point.y, 0);
+                        trans.rotate(0, 0, 1, node2.part.getRotation());
+                        trans.scale(selectedPart.getFlipX() ? -1 : 1, selectedPart.getFlipY() ? -1 : 1, 1);
+                        trans.translate(-node2.point.x, -node2.point.y, 0);
+
+                        selectedPart.draw(batch, trans);
                         renderedPart = true;
                     }
                 }
             }
 
             if(!renderedPart){
-                selectedPart.draw(batch, new Matrix4().translate(editorCursorPos.x, editorCursorPos.y, 0.0f).rotate(0, 0, 1, selectedPart.getRotation()));
+                Matrix4 trans = new Matrix4();
+                trans.translate(editorCursorPos.x, editorCursorPos.y, 0.f);
+                trans.rotate(0, 0, 1, selectedPart.getRotation());
+                trans.scale(selectedPart.getFlipX() ? -1 : 1, selectedPart.getFlipY() ? -1 : 1, 1);
+
+                selectedPart.draw(batch, trans);
             }
 
             batch.end();
@@ -405,7 +416,7 @@ public class ShipEditor extends BaseScene {
 
         if(selectedPart != null){
             game.shapeRenderer.setProjectionMatrix(editorCamera.combined);
-            game.shapeRenderer.setTransformMatrix(new Matrix4());
+            game.shapeRenderer.setTransformMatrix(editorStage.getBatch().getTransformMatrix());
             game.shapeRenderer.begin(ShapeType.Filled);
             
             // Draw snapped part or free
@@ -419,22 +430,30 @@ public class ShipEditor extends BaseScene {
                 Part.Node node2 = this.closestNode(nodePos1, selectedPart);
                 if(node2 != null){
                     Vector2 nodePos2 = node2.part.getNodePosition(node2).cpy();
-
-                    game.shapeRenderer.circle(nodePos1.x, nodePos1.y, 2, 16);
-                    game.shapeRenderer.circle(nodePos2.x, nodePos2.y, 2, 16);
                     
                     // Both exist, check dist
                     if(nodePos1.dst(nodePos2) < snapDistance){
-                        Vector2 renderPos = node1.point.cpy().rotateDeg(node2.part.getRotation());
-                        renderPos.sub(node2.point.x, node2.point.y);
-                        selectedPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4().translate(node1.part.getPosition().x + renderPos.x + editorCenterPos.x, node1.part.getPosition().y + renderPos.y + editorCenterPos.y, 0.0f));
+                        Matrix4 trans = new Matrix4();
+                        trans.translate(editorCenterPos.x, editorCenterPos.y, 0);
+                        trans.translate(node1.part.getPosition().x, node1.part.getPosition().y, 0);
+                        trans.translate(node1.point.x, node1.point.y, 0);
+                        trans.rotate(0, 0, 1, node2.part.getRotation());
+                        trans.scale(selectedPart.getFlipX() ? -1 : 1, selectedPart.getFlipY() ? -1 : 1, 1);
+                        trans.translate(-node2.point.x, -node2.point.y, 0);
+
+                        selectedPart.drawAttachmentPoints(game.shapeRenderer, trans);
                         renderedPart = true;
                     }
                 }
             }
 
             if(!renderedPart){
-                selectedPart.drawAttachmentPoints(game.shapeRenderer, new Matrix4().translate(editorCursorPos.x, editorCursorPos.y, 0.0f));
+                Matrix4 trans = new Matrix4();
+                trans.translate(editorCursorPos.x, editorCursorPos.y, 0.f);
+                trans.rotate(0, 0, 1, selectedPart.getRotation());
+                trans.scale(selectedPart.getFlipX() ? -1 : 1, selectedPart.getFlipY() ? -1 : 1, 1);
+
+                selectedPart.drawAttachmentPoints(game.shapeRenderer, trans);
             }
             
             game.shapeRenderer.setTransformMatrix(new Matrix4());

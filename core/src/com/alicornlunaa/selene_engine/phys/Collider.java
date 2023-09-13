@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import com.badlogic.gdx.math.DelaunayTriangulator;
 import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -30,11 +31,25 @@ public class Collider {
         // Variables
         private Array<Vector2> vertices = new Array<>();
         private Array<Integer> indices = new Array<>();
+        private Polygon polygon = new Polygon();
         private boolean convex = true;
         private boolean sensor = false;
         private float friction = 0.2f;
         private float restitution = 0.0f;
         private float density = 0.0f;
+
+        // Private functions
+        private void updatePolygon(){
+            float rawVertices[] = new float[vertices.size * 2];
+
+            for(int i = 0; i < vertices.size; i++){
+                Vector2 v = vertices.get(i);
+                rawVertices[(i * 2)] = v.x;
+                rawVertices[(i * 2) + 1] = v.y;
+            }
+
+            polygon.setVertices(rawVertices);
+        }
 
         // Constructor
         private Shape(){}
@@ -44,10 +59,12 @@ public class Collider {
             for(Vector2 v : s.vertices){
                 vertices.add(v.cpy());
             }
+
             for(int i : s.indices){
                 indices.add(i);
             }
 
+            polygon = new Polygon(s.polygon.getVertices());
             convex = s.convex;
             sensor = s.sensor;
             friction = s.friction;
@@ -56,6 +73,7 @@ public class Collider {
         }
 
         // Getters & Setters
+        public Polygon getPolygon(){ return polygon; }
         public boolean getConvex(){ return convex; }
         public boolean getSensor(){ return sensor; }
         public float getFriction(){ return friction; }
@@ -71,10 +89,14 @@ public class Collider {
         // Functions
         public int addVertex(Vector2 vertex){
             vertices.add(vertex.cpy());
+            updatePolygon();
             return vertices.size - 1;
         }
     
-        public void removeVertex(Vector2 vertex){ vertices.removeValue(vertex, false); }
+        public void removeVertex(Vector2 vertex){
+            vertices.removeValue(vertex, false);
+            updatePolygon();
+        }
     
         public Vector2 getVertex(int vertex){ return vertices.get(vertex); }
     
@@ -90,6 +112,7 @@ public class Collider {
             } else {
                 giftwrap();
             }
+            updatePolygon();
         }
 
         private int orientation(Vector2 p, Vector2 q, Vector2 r){
@@ -193,6 +216,7 @@ public class Collider {
                 float y = vertexData.getFloat(i + 1);
                 s.vertices.add(new Vector2(x, y));
             }
+            s.updatePolygon();
 
             JSONArray indexData = obj.getJSONArray("indices");
             for(int i = 0; i < indexData.length(); i++){
@@ -216,7 +240,8 @@ public class Collider {
 
     public Collider(JSONArray arr){
         for(int i = 0; i < arr.length(); i++){
-            shapes.add(Shape.unserialize(arr.getJSONObject(i)));
+            Shape s = Shape.unserialize(arr.getJSONObject(i));
+            shapes.add(s);
         }
     }
 
@@ -291,6 +316,20 @@ public class Collider {
     public void reattach(){ attachCollider(bodyRef); }
 
     // Shape functions
+    public boolean contains(Vector2 p){
+        // Checks if this collider contains the point
+        Matrix3 trans = new Matrix3().translate(position).rotate(rotation);
+        Vector2 point = p.cpy().mul(trans.inv());
+
+        for(Shape s : shapes){
+            if(s.getPolygon().contains(point)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public Shape addShape(){
         shapes.add(new Shape());
         return shapes.peek();

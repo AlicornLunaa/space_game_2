@@ -11,8 +11,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -167,9 +167,11 @@ public class Part implements Disposable {
             if(node.next != null){
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.setParent(ship, trans);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
             }
@@ -188,15 +190,15 @@ public class Part implements Disposable {
     }
 
     public Vector2 getNodePosition(Node node){
-        return this.getPosition().cpy().add(node.point.cpy().rotateDeg(getRotation()));
-    }
-
-    public Rectangle getBounds(){
-        return new Rectangle(pos.x - getWidth() / 2.f, pos.y - getHeight() / 2.f, getWidth(), getHeight());
+        return this.getPosition().cpy().add(node.point.cpy().scl(node.part.getFlipX() ? -1 : 1, node.part.getFlipY() ? -1 : 1).rotateDeg(getRotation()));
     }
 
     public boolean contains(Vector2 position){
-        if(this.getBounds().contains(position)){
+        Matrix3 trans = new Matrix3();
+        trans.translate(pos.x, pos.y);
+        trans.rotate(getRotation());
+
+        if(this.collider.contains(position.cpy().mul(trans.inv()))){
             return true;
         }
 
@@ -223,7 +225,10 @@ public class Part implements Disposable {
             }
         }
 
-        if(this.getBounds().contains(position)){
+        Matrix3 trans = new Matrix3();
+        trans.translate(pos.x, pos.y);
+        trans.rotate(getRotation());
+        if(this.collider.contains(position.cpy().mul(trans.inv()))){
             return this;
         }
 
@@ -253,7 +258,7 @@ public class Part implements Disposable {
             texture.getRegionWidth() / -2, texture.getRegionHeight() / -2,
             texture.getRegionWidth() / 2, texture.getRegionHeight() / 2,
             texture.getRegionWidth(), texture.getRegionHeight(),
-            flipX ? -1 : 1, flipY ? -1 : 1,
+            1, 1,
             0
         );
         drawEffectsAbove(batch);
@@ -262,9 +267,11 @@ public class Part implements Disposable {
             if(node.next != null){
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.draw(batch, trans);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
             }
@@ -279,23 +286,20 @@ public class Part implements Disposable {
                 renderer.setColor(0, 1, 0, 1);
             }
 
-            trans.rotate(0, 0, 1, rotation);
             renderer.setTransformMatrix(trans);
             renderer.circle(node.point.x, node.point.y, 1);
 
             if(node.next != null){
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
-                trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 node.next.part.drawAttachmentPoints(renderer, trans);
-                trans.rotate(0, 0, 1, node.next.part.getRotation());
                 trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
             }
-            
-            trans.rotate(0, 0, 1, -rotation);
         }
     }
 
@@ -377,8 +381,9 @@ public class Part implements Disposable {
             case "THRUSTER":
                 return new Thruster(game, ship, game.partManager.get(type, id));
                 
-            // case "RCSPORT":
-            //     return new RCSPort(game, ship, game.partManager.get(type, id));
+            case "RCSPORT":
+                // return new RCSPort(game, ship, game.partManager.get(type, id));
+                return new Structural(game, ship, game.partManager.get(type, id));
 
             default:
                 return null;
