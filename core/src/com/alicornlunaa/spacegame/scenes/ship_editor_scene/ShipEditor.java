@@ -13,6 +13,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -41,6 +42,7 @@ public class ShipEditor extends BaseScene {
     }
 
     // Variables
+    private Screen previousScreen;
     private Stage root;
     private Stage editorStage;
     private OrthographicCamera editorCamera;
@@ -173,6 +175,12 @@ public class ShipEditor extends BaseScene {
 
         TextButton quitBtn = new TextButton("Quit", game.skin);
         quitBtn.setColor(Color.RED);
+        quitBtn.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent event, Actor actor){
+                game.setScreen(previousScreen);
+            }
+        });
         topBar.add(quitBtn).right().pad(10);
 
         ui.add(topBar).expandX().fillX().row();
@@ -335,6 +343,7 @@ public class ShipEditor extends BaseScene {
         initializeControls();
         
         backgroundColor.set(0.1f, 0.1f, 0.1f, 1.0f);
+        previousScreen = game.getScreen();
         
         root.setDebugAll(true);
         editorStage.setDebugAll(true);
@@ -412,7 +421,7 @@ public class ShipEditor extends BaseScene {
             }
         }
 
-        game.debug.render(world.getBox2DWorld(), editorCamera.combined.cpy().translate(editorCenterPos.x, editorCenterPos.y, 0).scl(world.getPhysScale()));
+        game.debug.render(world.getBox2DWorld(), editorCamera.combined.cpy().translate(editorCenterPos.x + 128, editorCenterPos.y, 0).scl(world.getPhysScale()));
 
         if(selectedPart != null){
             game.shapeRenderer.setProjectionMatrix(editorCamera.combined);

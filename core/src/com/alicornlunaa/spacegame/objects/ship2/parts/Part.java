@@ -190,7 +190,7 @@ public class Part implements Disposable {
     }
 
     public Vector2 getNodePosition(Node node){
-        return this.getPosition().cpy().add(node.point.cpy().scl(node.part.getFlipX() ? -1 : 1, node.part.getFlipY() ? -1 : 1).rotateDeg(getRotation()));
+        return this.getPosition().cpy().add(node.point.cpy().rotateDeg(getRotation()).scl(node.part.getFlipX() ? -1 : 1, node.part.getFlipY() ? -1 : 1));
     }
 
     public boolean contains(Vector2 position){
