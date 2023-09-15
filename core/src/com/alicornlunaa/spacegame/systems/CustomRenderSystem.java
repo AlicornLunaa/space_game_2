@@ -54,13 +54,13 @@ public class CustomRenderSystem implements ISystem {
 		// Get global position
 		Matrix4 trans = new Matrix4();
 		trans.translate(transform.position.x, transform.position.y, 0.0f);
+		trans.rotateRad(0, 0, 1, transform.rotation);
 
 		if(bodyComponent != null){
 			Vector2 localCenter = bodyComponent.body.getLocalCenter().cpy().scl(bodyComponent.world.getPhysScale());
 			trans.translate(-localCenter.x, -localCenter.y, 0);
 		}
-
-		trans.rotateRad(0, 0, 1, transform.rotation);
+		
 		batch.setTransformMatrix(trans);
 
 		// Render every sprite
