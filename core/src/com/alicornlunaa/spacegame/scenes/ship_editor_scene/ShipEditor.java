@@ -8,7 +8,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship2.Ship;
 import com.alicornlunaa.spacegame.objects.ship2.parts.Part;
 import com.alicornlunaa.spacegame.objects.ship2.parts.Part.Node;
-import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
+import com.alicornlunaa.spacegame.systems.EditorRenderSystem;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
@@ -240,7 +240,7 @@ public class ShipEditor extends BaseScene {
 
         registry = new Registry();
         registry.registerSystem(new RenderSystem(game));
-        registry.registerSystem(new CustomRenderSystem(game));
+        registry.registerSystem(new EditorRenderSystem(game));
         registry.addEntity(ship);
     }
 

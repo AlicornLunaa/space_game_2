@@ -89,8 +89,7 @@ public class Ship extends DriveableEntity {
             public void render(Batch batch) {
                 if(rootPart == null) return;
 
-                // Vector2 localCenter = bodyComponent.body.getLocalCenter().cpy().scl(bodyComponent.world.getPhysScale());
-                Matrix4 trans = batch.getTransformMatrix().cpy().rotate(0, 0, 1, rootPart.getRotation());//.translate(-localCenter.x, -localCenter.y, 0);
+                Matrix4 trans = batch.getTransformMatrix().cpy().rotate(0, 0, 1, rootPart.getRotation());
                 rootPart.draw(batch, trans.cpy());
                 
                 batch.end();

@@ -19,6 +19,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship2.Ship;
 import com.alicornlunaa.spacegame.scenes.game_scene.ShipViewPanel;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
+import com.alicornlunaa.spacegame.systems.EditorRenderSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
