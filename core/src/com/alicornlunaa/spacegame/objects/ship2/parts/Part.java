@@ -39,6 +39,17 @@ public class Part implements Disposable {
         }
     };
 
+    // Private functions
+    private void deleteAllColliders(){
+        collider.detachCollider();
+
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.deleteAllColliders();
+            }
+        }
+    }
+
     // Variables
     protected Ship parent;
     private TextureRegion texture;
@@ -114,6 +125,8 @@ public class Part implements Disposable {
     }
 
     public boolean deattach(Node thisNode){
+        deleteAllColliders();
+
         if(thisNode.next != null){
             // This node is the parent, orphan the child
             Node toNode = thisNode.next;
@@ -133,22 +146,7 @@ public class Part implements Disposable {
 
     public boolean deattach(int index){
         Node thisNode = attachments.get(index);
-
-        if(thisNode.next != null){
-            // This node is the parent, orphan the child
-            Node toNode = thisNode.next;
-            toNode.previous = null;
-            thisNode.next = null;
-            return true;
-        } else if(thisNode.previous != null){
-            // This node is the child, run away from home
-            Node fromNode = thisNode.previous;
-            fromNode.next = null;
-            thisNode.previous = null;
-            return true;
-        }
-
-        return false;
+        return deattach(thisNode);
     }
     
     public void setParent(Ship ship, Matrix4 trans){
@@ -160,7 +158,7 @@ public class Part implements Disposable {
         parent = ship;
         collider.setScale((flipX ? -1 : 1) / bc.world.getPhysScale(), (flipY ? -1 : 1) / bc.world.getPhysScale());
         collider.setPosition(pos.cpy().scl(1 / bc.world.getPhysScale()));
-        collider.setRotation(rotation);
+        collider.setRotation(rotation * ((getFlipX() ^ getFlipY()) ? -1 : 1));
         collider.attachCollider(bc.body);
 
         for(Node node : attachments){
@@ -168,9 +166,11 @@ public class Part implements Disposable {
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.setParent(ship, trans);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, node.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
@@ -197,6 +197,7 @@ public class Part implements Disposable {
         Matrix3 trans = new Matrix3();
         trans.translate(pos.x, pos.y);
         trans.rotate(getRotation());
+        trans.scale(flipX ? -1 : 1, flipY ? -1 : 1);
 
         if(this.collider.contains(position.cpy().mul(trans.inv()))){
             return true;
@@ -252,6 +253,7 @@ public class Part implements Disposable {
 
     public void draw(Batch batch, Matrix4 trans){
         batch.setTransformMatrix(trans);
+        
         drawEffectsBelow(batch);
         batch.draw(
             texture,
@@ -268,9 +270,11 @@ public class Part implements Disposable {
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.draw(batch, trans);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, node.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
@@ -293,9 +297,11 @@ public class Part implements Disposable {
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.drawAttachmentPoints(renderer, trans);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, node.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);

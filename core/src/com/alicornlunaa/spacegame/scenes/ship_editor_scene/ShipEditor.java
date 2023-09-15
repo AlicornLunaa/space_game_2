@@ -93,6 +93,27 @@ public class ShipEditor extends BaseScene {
         lambda.run(part);
         return lambda.getNode();
     }
+    
+    private Part.Node rotateAllChildren(Part part, final float rotation){
+        RecursiveNodeInterface lambda = new RecursiveNodeInterface(){
+			@Override
+			public void run(Part currentPart) {
+                currentPart.setRotation(currentPart.getRotation() + rotation * ((currentPart.getFlipX() ^ currentPart.getFlipY()) ? -1 : 1));
+
+                for(Part.Node node : currentPart.getAttachments()){
+                    if(node.next != null){
+                        run(node.next.part);
+                    }
+                }
+            }
+
+            @Override
+            public Node getNode() { return null; }
+        };
+
+        lambda.run(part);
+        return lambda.getNode();
+    }
 
     private void populateParts(){
         parts.clear();
@@ -311,7 +332,7 @@ public class ShipEditor extends BaseScene {
                 if(selectedPart != null){
                     switch(keycode){
                         case Keys.R:
-                            selectedPart.setRotation(selectedPart.getRotation() + (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -45 : 45));
+                            rotateAllChildren(selectedPart, (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -45 : 45));
                             break;
                             
                         case Keys.F:
@@ -392,11 +413,9 @@ public class ShipEditor extends BaseScene {
                     // Both exist, check dist
                     if(nodePos1.dst(nodePos2) < snapDistance){
                         Matrix4 trans = new Matrix4();
-                        trans.translate(editorCenterPos.x, editorCenterPos.y, 0);
-                        trans.translate(node1.part.getPosition().x, node1.part.getPosition().y, 0);
-                        trans.translate(node1.point.x, node1.point.y, 0);
+                        trans.translate(nodePos1.x, nodePos1.y, 0);
                         trans.rotate(0, 0, 1, node2.part.getRotation());
-                        trans.scale(selectedPart.getFlipX() ? -1 : 1, selectedPart.getFlipY() ? -1 : 1, 1);
+                        trans.scale(node2.part.getFlipX() ? -1 : 1, node2.part.getFlipY() ? -1 : 1, 1);
                         trans.translate(-node2.point.x, -node2.point.y, 0);
 
                         selectedPart.draw(batch, trans);
@@ -417,7 +436,7 @@ public class ShipEditor extends BaseScene {
             batch.end();
         } else {
             if(ship.getRootPart() != null){
-                Part hoveredPart = ship.getRootPart().hit(editorCursorPos.cpy().sub(editorCenterPos));
+                // Part hoveredPart = ship.getRootPart().hit(editorCursorPos.cpy().sub(editorCenterPos));
             }
         }
 
@@ -443,11 +462,9 @@ public class ShipEditor extends BaseScene {
                     // Both exist, check dist
                     if(nodePos1.dst(nodePos2) < snapDistance){
                         Matrix4 trans = new Matrix4();
-                        trans.translate(editorCenterPos.x, editorCenterPos.y, 0);
-                        trans.translate(node1.part.getPosition().x, node1.part.getPosition().y, 0);
-                        trans.translate(node1.point.x, node1.point.y, 0);
+                        trans.translate(nodePos1.x, nodePos1.y, 0);
                         trans.rotate(0, 0, 1, node2.part.getRotation());
-                        trans.scale(selectedPart.getFlipX() ? -1 : 1, selectedPart.getFlipY() ? -1 : 1, 1);
+                        trans.scale(node2.part.getFlipX() ? -1 : 1, node2.part.getFlipY() ? -1 : 1, 1);
                         trans.translate(-node2.point.x, -node2.point.y, 0);
 
                         selectedPart.drawAttachmentPoints(game.shapeRenderer, trans);
