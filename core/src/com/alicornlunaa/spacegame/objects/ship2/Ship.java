@@ -11,6 +11,7 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.objects.ship2.interior.InteriorComponent;
 import com.alicornlunaa.spacegame.objects.ship2.parts.Part;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
@@ -56,6 +57,7 @@ public class Ship extends DriveableEntity {
     // Variables
     private TransformComponent transform = getComponent(TransformComponent.class);
     private BodyComponent bodyComponent;
+    private InteriorComponent interior;
     private @Null Part rootPart = null;
     private State state = new State();
 
@@ -175,6 +177,7 @@ public class Ship extends DriveableEntity {
             }
         });
         addComponent(new CameraComponent(1280, 720)).camera.zoom = 0.4f;
+        interior = new InteriorComponent(game, this);
     
         transform.position.set(x, y);
         transform.rotation = rotation;
@@ -227,9 +230,11 @@ public class Ship extends DriveableEntity {
     public void setRootPart(Part p){ this.rootPart = p; }
     public Part getRootPart(){ return rootPart; }
     public void assemble(){
-        if(rootPart != null){
+        if(rootPart != null)
             rootPart.setParent(this, new Matrix4());
-        }
+
+        if(interior != null)
+            interior.assemble();
     }
 
     public TransformComponent getTransform(){
@@ -238,6 +243,10 @@ public class Ship extends DriveableEntity {
 
     public BodyComponent getBody(){
         return bodyComponent;
+    }
+
+    public InteriorComponent getInterior(){
+        return interior;
     }
 
     public State getState(){

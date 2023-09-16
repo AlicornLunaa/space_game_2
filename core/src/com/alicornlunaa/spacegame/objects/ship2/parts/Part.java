@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Null;
 
-public class Part implements Disposable {
+public class Part implements Disposable,Comparable<Part> {
     // Inner classes
     public static class Node {
         public @Null Node previous = null;
@@ -340,6 +340,25 @@ public class Part implements Disposable {
     public String getName(){ return name; }
     public String getDescription(){ return description; }
     public Array<Node> getAttachments(){ return attachments; }
+
+    public void addParts(Array<Part> parts){
+        // Adds all the parts recursively to the array
+        parts.add(this);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.addParts(parts);
+            }
+        }
+    }
+
+    @Override
+    public int compareTo(Part o) {
+        if(o.pos.x == pos.x && o.pos.y == pos.y) return 0;
+        if(o.pos.x + o.pos.y > pos.x + pos.y) return 1;
+        if(o.pos.x + o.pos.y < pos.x + pos.y) return -1;
+        return 0;
+    }
 
     // Serialization functions
     public JSONObject serialize(){
