@@ -388,8 +388,7 @@ public class Part implements Disposable {
                 return new Thruster(game, ship, game.partManager.get(type, id));
                 
             case "RCSPORT":
-                // return new RCSPort(game, ship, game.partManager.get(type, id));
-                return new Structural(game, ship, game.partManager.get(type, id));
+                return new RCSPort(game, ship, game.partManager.get(type, id));
 
             default:
                 return null;

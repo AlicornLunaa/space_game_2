@@ -70,7 +70,7 @@ public class Thruster extends Part {
     public void tick(float delta){
         float compRoll = (parent.getState().roll == 0) ? parent.getState().artifRoll : parent.getState().roll;
         this.setTargetAngle(compRoll);
-        this.thrust(delta, 0.0f);
+        this.thrust(delta, parent.getState().throttle);
         super.tick(delta);
     }
 

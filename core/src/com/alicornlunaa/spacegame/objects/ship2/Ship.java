@@ -12,6 +12,9 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.ship2.parts.Part;
+import com.alicornlunaa.spacegame.scripts.GravityScript;
+import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
+import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -74,16 +77,23 @@ public class Ship extends DriveableEntity {
         bodyComponent.body.setTransform(-1, 0, 3.14f / 4 * 0);
     }
 
+    private void computeSAS(){
+        // Reduce angular velocity with controls
+        float angVel = bodyComponent.body.getAngularVelocity();
+        angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
+
+        if(Math.abs(angVel) <= 0.005f) angVel = 0;
+
+        state.artifRoll = angVel;
+    }
+
     // Constructor
     public Ship(final App game, PhysWorld world, float x, float y, float rotation){
         super(game);
         generateExterior(world);
-
-        // rootPart = new Part(game, this, game.partManager.get("STRUCTURAL", "BSC_FUSELAGE"));
-        // rootPart.attach(1, 3, new Part(game, this, game.partManager.get("STRUCTURAL", "BSC_DEBUG_STRUCT")))
-        //     .attach(1, 0, new Thruster(game, this, game.partManager.get("THRUSTER", "BSC_THRUSTER")));
-        // rootPart.setParent(this, new Matrix4());
         
+        addComponent(new GravityScript(game, this));
+        addComponent(new PlanetPhysScript(this));
         addComponent(new CustomSpriteComponent() {
             @Override
             public void render(Batch batch) {
@@ -107,14 +117,67 @@ public class Ship extends DriveableEntity {
         addComponent(new IScriptComponent() {
             @Override
             public void update() {
+                // Ship controls
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
+                    state.throttle = Math.min(state.throttle + 0.01f, 1);
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
+                    state.throttle = Math.max(state.throttle - 0.01f, 0);
+                }
+                
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_LEFT)){
+                    state.roll = -1;
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_RIGHT)){
+                    state.roll = 1;
+                } else {
+                    state.roll = 0;
+                }
+                
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)){
+                    state.vertical = 1;
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)){
+                    state.vertical = -1;
+                } else {
+                    state.vertical = 0;
+                }
+                
+                if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)){
+                    state.horizontal = -1;
+                } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)){
+                    state.horizontal = 1;
+                } else {
+                    state.horizontal = 0;
+                }
+
+                if(state.sas){
+                    computeSAS();
+                } else {
+                    state.artifRoll = 0;
+                }
+
                 if(rootPart != null)
                     rootPart.tick(Gdx.graphics.getDeltaTime());
             }
 
             @Override
-            public void render() {}
+            public void render() {
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_RCS)){
+                    state.rcs = !state.rcs;
+                }
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_SAS)){
+                    state.sas = !state.sas;
+                }
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_FULL_THROTTLE)){
+                    state.throttle = 1;
+                }
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_NO_THROTTLE)){
+                    state.throttle = 0;
+                }
+            }
         });
         addComponent(new CameraComponent(1280, 720)).camera.zoom = 0.4f;
+    
+        transform.position.set(x, y);
+        transform.rotation = rotation;
     }
 
     // Functions

@@ -72,29 +72,29 @@ public class TestScreen implements Screen {
 
                 @Override
                 public void update(){
-                    if(Gdx.input.isKeyPressed(Keys.W)){
-                        rb.body.applyForceToCenter(0, 1.5f, true);
-                    }
+                    // if(Gdx.input.isKeyPressed(Keys.W)){
+                    //     rb.body.applyForceToCenter(0, 1.5f, true);
+                    // }
     
-                    if(Gdx.input.isKeyPressed(Keys.S)){
-                        rb.body.applyForceToCenter(0, -1.5f, true);
-                    }
+                    // if(Gdx.input.isKeyPressed(Keys.S)){
+                    //     rb.body.applyForceToCenter(0, -1.5f, true);
+                    // }
     
-                    if(Gdx.input.isKeyPressed(Keys.A)){
-                        rb.body.applyForceToCenter(-1.5f, 0, true);
-                    }
+                    // if(Gdx.input.isKeyPressed(Keys.A)){
+                    //     rb.body.applyForceToCenter(-1.5f, 0, true);
+                    // }
     
-                    if(Gdx.input.isKeyPressed(Keys.D)){
-                        rb.body.applyForceToCenter(1.5f, 0, true);
-                    }
+                    // if(Gdx.input.isKeyPressed(Keys.D)){
+                    //     rb.body.applyForceToCenter(1.5f, 0, true);
+                    // }
 
-                    if(Gdx.input.isKeyPressed(Keys.SPACE)){
-                        rb.body.applyForceToCenter(0, 15.f, true);
-                    }
+                    // if(Gdx.input.isKeyPressed(Keys.SPACE)){
+                    //     rb.body.applyForceToCenter(0, 15.f, true);
+                    // }
 
-                    if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)){
-                        tr.position.y += 0.4f;
-                    }
+                    // if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)){
+                    //     tr.position.y += 0.4f;
+                    // }
                 }
     
                 @Override
@@ -142,7 +142,7 @@ public class TestScreen implements Screen {
         registry.addEntity(new TestEntity(game, world));
         registry.addEntity(new WorldEntity(game, world));
 
-        Ship ship = new Ship(game, world, -128, 0, 0);
+        Ship ship = new Ship(game, world, -64, 0, 0);
         // ship.save("./saves/ships/test.ship");
         ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);

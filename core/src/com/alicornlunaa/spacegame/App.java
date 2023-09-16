@@ -6,7 +6,6 @@ import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
 import com.alicornlunaa.spacegame.scenes.dev_kit_scene.testing.TestScreen;
 import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
-import com.alicornlunaa.spacegame.scenes.ship_editor_scene.ShipEditor;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
@@ -126,7 +125,6 @@ public class App extends Game {
 				// this.setScreen(gameScene);
 				this.setScreen(new TestScreen(this));
 				// this.setScreen(new DevKit(this));
-				this.setScreen(new ShipEditor(this));
 				// this.setScreen(new OrbitTest(this));
 				// this.setScreen(new ShaderScene(this));
 			} else {
