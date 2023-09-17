@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,8 +20,7 @@ public class MapMarker extends Actor {
     public MapMarker(final App game, Celestial parent, Vector2 position, TextureRegion texture, float size, String text){
         super();
 
-        Matrix3 universalSpaceTransform = parent.getUniverseSpaceTransform();
-        Vector2 universalSpacePosition = position.cpy().scl(Constants.PPM).mul(universalSpaceTransform);
+        Vector2 universalSpacePosition = position.cpy().scl(Constants.PPM);
 
         setSize(size, size);
         setOrigin(getWidth() / 2, 0);

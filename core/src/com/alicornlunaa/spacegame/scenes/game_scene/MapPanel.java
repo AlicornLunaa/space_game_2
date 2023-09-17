@@ -4,7 +4,6 @@ import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -69,7 +68,6 @@ public class MapPanel extends Stage {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.gameScene.closeMap();
-                    game.vfxManager.add(new CameraZoomTransition(game.camera, mapCamera.zoom, game.camera.zoom, 0.3f));
                     game.camera = oldCamera;
                     game.gameScene.orbitSystem.visible = false;
                     return true;
@@ -178,7 +176,7 @@ public class MapPanel extends Stage {
     @Override
     public void draw(){
         // Update camera
-        Vector2 plyPos = OrbitUtils.getUniverseSpacePosition(game.gameScene.universe, game.gameScene.player);
+        Vector2 plyPos = game.gameScene.player.transform.position;
         mapCamera.position.set(plyPos, 0.0f);
         
         // Draw stars in the map view

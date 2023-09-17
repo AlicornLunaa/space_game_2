@@ -1,6 +1,7 @@
 package com.alicornlunaa.selene_engine.core;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -29,10 +30,17 @@ public abstract class DriveableEntity extends BaseEntity {
 
         TransformComponent driverTransform = driver.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
+        CameraComponent driverCamera = driver.getComponent(CameraComponent.class);
+        CameraComponent shipCamera = this.getComponent(CameraComponent.class);
 
         if(bodyComponent != null){
             bodyComponent.body.setActive(false);
             driverTransform.velocity.set(0, 0);
+        }
+
+        if(driverCamera != null && shipCamera != null){
+            driverCamera.active = false;
+            shipCamera.active = true;
         }
     }
 
@@ -41,10 +49,18 @@ public abstract class DriveableEntity extends BaseEntity {
 
         TransformComponent driverTransform = driver.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
+        CameraComponent driverCamera = driver.getComponent(CameraComponent.class);
+        CameraComponent shipCamera = this.getComponent(CameraComponent.class);
 
         if(bodyComponent != null){
             bodyComponent.body.setActive(true);
             driverTransform.velocity.set(getComponent(TransformComponent.class).velocity);
+            driverTransform.position.add(64, 0);
+        }
+
+        if(driverCamera != null && shipCamera != null){
+            driverCamera.active = true;
+            shipCamera.active = false;
         }
         
         driver = null;

@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.objects;
 import java.util.HashMap;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.IScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
@@ -70,7 +71,7 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 0.05f;
+    private static final float MOVEMENT_SPEED = 0.5f;//0.05f;
     private static final float JUMP_FORCE = 1.25f;
 
     // Private functions
@@ -184,7 +185,7 @@ public class Player extends BaseEntity {
             @Override
             public void update() {
                 // Groundchecking
-                grounded = false;
+                grounded = true;
                 bodyComponent.world.getBox2DWorld().rayCast(jumpCallback, bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / bodyComponent.world.getPhysScale())).cpy(), bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / bodyComponent.world.getPhysScale())));
 
                 // Movement
@@ -246,6 +247,8 @@ public class Player extends BaseEntity {
                 );
             }
         });
+
+        addComponent(new CameraComponent(1280, 720));
         
         orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
     }
@@ -276,7 +279,7 @@ public class Player extends BaseEntity {
         if(!(bodyComponent.world instanceof PlanetaryPhysWorld)){
             //  || game.getScreen() instanceof MapScene
             // If the player is on a planet, use the universe-based position system
-            pos.set(OrbitUtils.getUniverseSpacePosition(game.gameScene.universe, ent));
+            pos.set(transform.position);
         }
 
         if(instant){

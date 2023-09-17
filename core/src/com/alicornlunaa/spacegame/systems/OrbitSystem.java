@@ -47,8 +47,8 @@ public class OrbitSystem implements ISystem {
     @Override
     public void render(IEntity entity) {
         if(!visible) return;
-        OrbitComponent orbitComponent = entity.getComponent(OrbitComponent.class);
-        orbitComponent.draw(shapeRenderer, 1.5f * game.camera.zoom);
+        // OrbitComponent orbitComponent = entity.getComponent(OrbitComponent.class);
+        // orbitComponent.draw(shapeRenderer, 1.5f * game.camera.zoom);
     }
 
     @Override

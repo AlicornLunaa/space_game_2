@@ -125,8 +125,8 @@ public class Planet extends Celestial {
     }
 
     // Constructor
-    public Planet(final App game, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
-        super(game, terraRadius);
+    public Planet(final App game, PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
+        super(game, world, terraRadius);
         this.game = game;
 
         float ppm = bodyComponent.world.getPhysScale();
@@ -168,16 +168,13 @@ public class Planet extends Celestial {
             public void render(Batch batch) {
                 // Save rendering state
                 Matrix4 proj = batch.getProjectionMatrix().cpy();
-                Matrix4 trans = new Matrix4().set(getUniverseSpaceTransform());
                 Matrix4 invProj = proj.cpy().inv();
-                Vector2 worldPos = getUniverseSpaceTransform().getTranslation(new Vector2());
                 
                 // Shade the planet in
-                batch.setTransformMatrix(trans);
                 batch.setShader(terraShader);
                 terraShader.setUniformMatrix("u_invCamTrans", invProj);
                 terraShader.setUniformf("u_starDirection", starDirection);
-                terraShader.setUniformf("u_planetWorldPos", worldPos);
+                terraShader.setUniformf("u_planetWorldPos", transform.position);
                 terraShader.setUniformf("u_planetRadius", getRadius());
                 batch.draw(surfaceRender, radius * -1, radius * -1, radius * 2, radius * 2);
 
@@ -187,7 +184,7 @@ public class Planet extends Celestial {
                 batch.setShader(atmosShader);
                 atmosShader.setUniformMatrix("u_invCamTrans", invProj);
                 atmosShader.setUniformf("u_starDirection", starDirection);
-                atmosShader.setUniformf("u_planetWorldPos", worldPos);
+                atmosShader.setUniformf("u_planetWorldPos", transform.position);
                 atmosShader.setUniformf("u_planetRadius", getRadius());
                 atmosShader.setUniformf("u_atmosRadius", getAtmosphereRadius());
                 atmosShader.setUniformf("u_atmosColor", getAtmosphereColor());
@@ -341,7 +338,7 @@ public class Planet extends Celestial {
         bodyComponent.body.setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
-        bodyComponent.setWorld(getInfluenceWorld());
+        bodyComponent.setWorld(bodyComponent.world);
         transform.sync(bodyComponent);
     }
 

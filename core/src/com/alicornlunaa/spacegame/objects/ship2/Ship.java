@@ -122,6 +122,8 @@ public class Ship extends DriveableEntity {
             @Override
             public void update() {
                 // Ship controls
+                if(getDriver() == null) return;
+
                 if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
                     state.throttle = Math.min(state.throttle + 0.01f, 1);
                 } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
@@ -178,7 +180,7 @@ public class Ship extends DriveableEntity {
                 }
             }
         });
-        addComponent(new CameraComponent(1280, 720)).camera.zoom = 0.4f;
+        addComponent(new CameraComponent(1280, 720)).active = false;
         interior = new InteriorComponent(game, this);
     
         transform.position.set(x, y);

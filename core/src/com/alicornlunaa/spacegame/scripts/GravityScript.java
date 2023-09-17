@@ -20,15 +20,15 @@ public class GravityScript implements IScriptComponent {
 
     @Override
     public void update() {
-        if(!entity.hasComponent(BodyComponent.class)) return;
-        if(!(entity.getComponent(BodyComponent.class).world instanceof CelestialPhysWorld)) return;
+        BodyComponent bc = entity.getComponent(BodyComponent.class);
 
-        if(!(entity instanceof Celestial))
-            game.gameScene.universe.checkTransfer(entity);
+        if(bc == null) return;
+        if(!(bc.world instanceof CelestialPhysWorld)) return;
         
         Celestial parent = game.gameScene.universe.getParentCelestial(entity);
-        if(parent != null){
-            entity.getComponent(BodyComponent.class).body.applyForceToCenter(parent.applyPhysics(Gdx.graphics.getDeltaTime(), entity), true);
+
+        if(parent != null && parent != entity){
+            bc.body.applyForceToCenter(parent.applyPhysics(Gdx.graphics.getDeltaTime(), entity), true);
         }
     }
 

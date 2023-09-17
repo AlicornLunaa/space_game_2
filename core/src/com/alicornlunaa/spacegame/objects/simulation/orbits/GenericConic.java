@@ -85,7 +85,11 @@ public abstract class GenericConic {
     }
 
     public GenericConic(Celestial parent, IEntity child) {
-        this(parent.getComponent(BodyComponent.class).body.getMass(), child.getComponent(BodyComponent.class).body.getWorldCenter(), child.getComponent(BodyComponent.class).body.getLinearVelocity());
+        this(
+            parent.getComponent(BodyComponent.class).body.getMass(),
+            child.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(parent.bodyComponent.body.getWorldCenter()),
+            child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(parent.bodyComponent.body.getLinearVelocity())
+        );
         this.parent = parent;
         this.child = child;
     }
@@ -227,7 +231,7 @@ public abstract class GenericConic {
         Matrix4 m = new Matrix4();
 
         if(parent != null)
-            m.set(parent.getUniverseSpaceTransform());
+            m.set(parent.transform.getMatrix());
 
         // Render position at initial anomaly
         if(Constants.DEBUG){

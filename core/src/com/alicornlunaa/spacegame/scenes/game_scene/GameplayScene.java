@@ -1,20 +1,22 @@
 package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.selene_engine.systems.CameraSystem;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
+import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.spacegame.objects.ship2.Ship;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
-import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -44,23 +46,35 @@ public class GameplayScene extends BaseScene {
     // Private functions
 	private void initializeUniverse(){
 		universe = new Universe(game);
-        registry.registerSystem(new SpaceRenderSystem(game, universe));
+        // registry.registerSystem(new SpaceRenderSystem(game, universe));
 
-        universe.addCelestial(new Star(game, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
-        universe.addCelestial(new Planet(game, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1)); // Mercury
-        OrbitUtils.createOrbit(universe, universe.getCelestial(1));
-        universe.addCelestial(new Planet(game, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1)); // Venus
-        OrbitUtils.createOrbit(universe, universe.getCelestial(2));
-        universe.addCelestial(new Planet(game, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1)); // Earth
-        OrbitUtils.createOrbit(universe, universe.getCelestial(3));
-        universe.addCelestial(new Planet(game, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1)); // Mars
-        OrbitUtils.createOrbit(universe, universe.getCelestial(4));
-        universe.addCelestial(new Planet(game, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0)); // Moon
-        OrbitUtils.createOrbit(universe, universe.getCelestial(5));
+        // universe.addCelestial(new Star(game, 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
+        // universe.addCelestial(new Planet(game, 1000000 - 5632704 * Constants.CONVERSION_FACTOR, 0, 24390 * Constants.CONVERSION_FACTOR, 29400 * Constants.CONVERSION_FACTOR, 1)); // Mercury
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+        // universe.addCelestial(new Planet(game, 1000000 - 10782604 * Constants.CONVERSION_FACTOR, 0, 60518 * Constants.CONVERSION_FACTOR, 62700 * Constants.CONVERSION_FACTOR, 1)); // Venus
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(2));
+        // universe.addCelestial(new Planet(game, 1000000 - 14966899 * Constants.CONVERSION_FACTOR, 0, 63780 * Constants.CONVERSION_FACTOR, 68000 * Constants.CONVERSION_FACTOR, 1)); // Earth
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(3));
+        // universe.addCelestial(new Planet(game, 1000000 - 22852684 * Constants.CONVERSION_FACTOR, 0, 33890 * Constants.CONVERSION_FACTOR, 36890 * Constants.CONVERSION_FACTOR, 1)); // Mars
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(4));
+        // universe.addCelestial(new Planet(game, 1000000 - 14966899 * Constants.CONVERSION_FACTOR + 405400 * Constants.CONVERSION_FACTOR, 0, 17374 * Constants.CONVERSION_FACTOR, 0, 0)); // Moon
+        // OrbitUtils.createOrbit(universe, universe.getCelestial(5));
 
         // universe.addCelestial(new Star(this, 1400, 0, 500));
         // universe.addCelestial(new Planet(this, 6400, 0, 500, 800, 1.0f));
         // OrbitUtils.createOrbit(universe, universe.getCelestial(1));
+
+        universe.addCelestial(new Star(game, universe.getUniversalWorld(), 1000000, 0, 695700 * Constants.CONVERSION_FACTOR));
+
+        Celestial c = new Celestial(game, universe.getUniversalWorld(), 24390 * Constants.CONVERSION_FACTOR);
+        c.transform.position.x = 1000000 - 5632704 * Constants.CONVERSION_FACTOR;
+        universe.addCelestial(c);
+        OrbitUtils.createOrbit(universe, c);
+
+        // c = new Celestial(game, universe.getUniversalWorld(), 10);
+        // c.transform.position.x = 3200;
+        // universe.addCelestial(c);
+		// OrbitUtils.createOrbit(universe, c);
 
 		player = new Player(game, -50, 0);
 		universe.addEntity(player);
@@ -69,14 +83,14 @@ public class GameplayScene extends BaseScene {
 
     private void initializeSpaceScene(){
         spacePanel = new SpacePanel(game);
-        spacePanel.setDebugAll(Constants.DEBUG);
         spaceInterface = new SpaceInterface(game);
-        spaceInterface.setDebugAll(Constants.DEBUG);
+        spacePanel.setDebugAll(true);
+        spaceInterface.setDebugAll(false);
 
         inputs.addProcessor(spaceInterface);
         inputs.addProcessor(spacePanel);
 
-        spacePanel.ship.drive(player);
+        // spacePanel.ship.drive(player);
         OrbitUtils.createOrbit(universe, spacePanel.ship);
     }
 
@@ -89,6 +103,8 @@ public class GameplayScene extends BaseScene {
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));
         simulation = registry.registerSystem(new PhysicsSystem());
+        registry.registerSystem(new RenderSystem(game));
+        registry.registerSystem(new CustomRenderSystem(game));
         registry.registerSystem(new ScriptSystem());
         orbitSystem = registry.registerSystem(new OrbitSystem(game));
     }
@@ -103,6 +119,7 @@ public class GameplayScene extends BaseScene {
         mapPanel = new MapPanel(game, spacePanel);
         inputs.addProcessor(0, mapPanel);
         state = GameplayState.MAP;
+        player.getComponent(CameraComponent.class).active = false;
     }
 
     public void closeMap(){
@@ -110,6 +127,7 @@ public class GameplayScene extends BaseScene {
         state = GameplayState.SPACE;
         mapPanel.dispose();
         mapPanel = null;
+        player.getComponent(CameraComponent.class).active = true;
     }
 
     public void openShipView(Ship ship){
@@ -130,7 +148,7 @@ public class GameplayScene extends BaseScene {
     }
 
     public void closeShipView(){
-        game.gameScene.player.bodyComponent.setWorld(shipViewPanel.ship.bodyComponent.world);
+        game.gameScene.player.bodyComponent.setWorld(shipViewPanel.ship.getBody().world);
         shipViewPanel.ship.drive(game.gameScene.player);
 
         state = GameplayState.SPACE;

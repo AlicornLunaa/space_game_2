@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.spacegame.objects.ship2.Ship;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -30,8 +30,8 @@ public class SpacePanel extends Stage {
 
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
 
-        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), -49009, 0, 0);
-        ship.load("./saves/ships/null.ship");
+        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), -100, 0, 0);
+        ship.load("./saves/ships/test.ship");
         game.gameScene.universe.addEntity(ship);
 
         // Controls

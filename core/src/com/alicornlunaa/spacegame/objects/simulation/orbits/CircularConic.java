@@ -51,7 +51,7 @@ public class CircularConic extends GenericConic {
         Matrix4 m = new Matrix4();
 
         if(parent != null)
-            m.set(parent.getUniverseSpaceTransform());
+            m.set(parent.transform.getMatrix());
 
         // Render position at initial anomaly
         renderer.setTransformMatrix(m);

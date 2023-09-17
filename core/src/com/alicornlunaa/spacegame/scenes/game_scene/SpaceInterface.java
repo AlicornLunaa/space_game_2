@@ -69,14 +69,14 @@ public class SpaceInterface extends Stage {
         sasBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.gameScene.spacePanel.ship.state.sas = !game.gameScene.spacePanel.ship.state.sas;
+                game.gameScene.spacePanel.ship.getState().sas = !game.gameScene.spacePanel.ship.getState().sas;
             }
         });
 
         rcsBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.gameScene.spacePanel.ship.state.rcs = !game.gameScene.spacePanel.ship.state.rcs;
+                game.gameScene.spacePanel.ship.getState().rcs = !game.gameScene.spacePanel.ship.getState().rcs;
             }
         });
 
@@ -145,19 +145,7 @@ public class SpaceInterface extends Stage {
                     setKeyboardFocus(console);
                     return true;
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
-                    game.gameScene.spacePanel.ship.state.debug = !game.gameScene.spacePanel.ship.state.debug;
-                    return true;
-                } else if(keycode == ControlSchema.SHIP_TOGGLE_RCS){
-                    game.gameScene.spacePanel.ship.state.rcs = !game.gameScene.spacePanel.ship.state.rcs;
-                    return true;
-                } else if(keycode == ControlSchema.SHIP_TOGGLE_SAS){
-                    game.gameScene.spacePanel.ship.state.sas = !game.gameScene.spacePanel.ship.state.sas;
-                    return true;
-                } else if(keycode == ControlSchema.SHIP_FULL_THROTTLE){
-                    game.gameScene.spacePanel.ship.state.throttle = 1;
-                    return true;
-                } else if(keycode == ControlSchema.SHIP_NO_THROTTLE){
-                    game.gameScene.spacePanel.ship.state.throttle = 0;
+                    game.gameScene.spacePanel.ship.getState().debug = !game.gameScene.spacePanel.ship.getState().debug;
                     return true;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.gameScene.openMap();
@@ -175,9 +163,9 @@ public class SpaceInterface extends Stage {
         super.draw();
 
         SpacePanel spacePanel = game.gameScene.spacePanel;
-        sasBtn.setColor(spacePanel.ship.state.sas ? Color.GREEN : Color.RED);
-        rcsBtn.setColor(spacePanel.ship.state.rcs ? Color.GREEN : Color.RED);
-        throttleBar.setValue(spacePanel.ship.state.throttle);
+        sasBtn.setColor(spacePanel.ship.getState().sas ? Color.GREEN : Color.RED);
+        rcsBtn.setColor(spacePanel.ship.getState().rcs ? Color.GREEN : Color.RED);
+        throttleBar.setValue(spacePanel.ship.getState().throttle);
 
         positionLabel.setText(game.gameScene.player.getPosition().toString());
         velocityLabel.setText(game.gameScene.player.getVelocity().toString());
