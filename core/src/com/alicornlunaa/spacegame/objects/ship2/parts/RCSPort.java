@@ -20,7 +20,6 @@ import com.badlogic.gdx.math.Vector2;
  * unit circle.
  */
 public class RCSPort extends Part {
-
     // Variables
     private float power;
     private float fuelUsage;
@@ -38,7 +37,7 @@ public class RCSPort extends Part {
         fuelUsage = metadata.getFloat("fuelUsage");
         
         effect = game.manager.get("effects/rcs", ParticleEffectPool.class).obtain();
-        effect.setPosition(0, getHeight() / 2);
+        effect.setPosition(0, 0);
         effect.scaleEffect(initial_scale);
         effect.start();
         
@@ -95,11 +94,11 @@ public class RCSPort extends Part {
 
         for(ParticleEmitter emitter : effect.getEmitters()){
             ScaledNumericValue emitterAngle = emitter.getAngle();
-            emitterAngle.setHigh(getRotation() - 180);
-            emitterAngle.setLow(getRotation() - 180);
+            emitterAngle.setHigh(180);
+            emitterAngle.setLow(180);
         }
 
-        effect.setPosition(getPosition().x, getPosition().y);
+        effect.setPosition(0, 0);
         effect.setFlip(getFlipX(), getFlipY());
         effect.update(Gdx.graphics.getDeltaTime());
         effect.draw(batch, Gdx.graphics.getDeltaTime());
@@ -108,8 +107,9 @@ public class RCSPort extends Part {
     @Override
     public void tick(float delta){
         if(parent.getState().rcs){
-            Vector2 portPos = new Vector2(getPosition().x / parent.getBody().world.getPhysScale(), getPosition().y / parent.getBody().world.getPhysScale()).rotateDeg((float)Math.toDegrees(parent.getBody().body.getAngle())).add(parent.getTransform().position);
-            Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getBody().body.getAngle()) + getRotation()) * getWidth() / 2).scl(getFlipX() ? -1 : 1, getFlipY() ? -1 : 1);
+            float scl = parent.getBody().world.getPhysScale();
+            Vector2 portPos = getPosition().cpy().scl(1 / scl).sub(parent.getBody().body.getLocalCenter()).rotateRad(parent.getBody().body.getAngle()).add(parent.getBody().body.getWorldCenter());
+            Vector2 portDir = new Vector2(getFlipX() ? -1 : 1, 0).rotateRad(parent.getBody().body.getAngle() + (float)Math.toRadians(getRotation()));
 
             float compRoll = (parent.getState().roll == 0) ? parent.getState().artifRoll : parent.getState().roll;
 
@@ -133,5 +133,4 @@ public class RCSPort extends Part {
     public void dispose(){
         effect.free();
     }
-    
 }

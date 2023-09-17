@@ -136,7 +136,7 @@ public class TestScreen implements Screen {
         registry.registerSystem(new ScriptSystem());
 
         world = new PhysWorld(128.0f);
-        world.getBox2DWorld().setGravity(new Vector2(0, -0.5f));
+        // world.getBox2DWorld().setGravity(new Vector2(0, -0.5f));
         simulation.addWorld(world);
 
         registry.addEntity(new TestEntity(game, world));

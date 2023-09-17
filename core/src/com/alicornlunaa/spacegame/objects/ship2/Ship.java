@@ -37,8 +37,8 @@ public class Ship extends DriveableEntity {
          */
         public boolean debug = false; // Debug drawings
         
-        public boolean rcs = true; // RCS thrusters
-        public boolean sas = true; // Stability controller
+        public boolean rcs = false; // RCS thrusters
+        public boolean sas = false; // Stability controller
     
         public float throttle = 0; // Thruster throttle
         public float roll = 0; // Rotational movement intention
@@ -76,7 +76,7 @@ public class Ship extends DriveableEntity {
         });
         
         bodyComponent.setWorld(world);
-        bodyComponent.body.setTransform(-1, 0, 3.14f / 4 * 0);
+        bodyComponent.body.setTransform(-1, 1, 0);
     }
 
     private void computeSAS(){
@@ -109,8 +109,10 @@ public class Ship extends DriveableEntity {
                 game.shapeRenderer.setTransformMatrix(trans);
                 game.shapeRenderer.begin(ShapeType.Filled);
 
-                rootPart.drawDebug(game.shapeRenderer);
                 rootPart.drawAttachmentPoints(game.shapeRenderer, trans.cpy());
+
+                game.shapeRenderer.setTransformMatrix(new Matrix4());
+                rootPart.drawDebug(game.shapeRenderer);
 
                 game.shapeRenderer.end();
                 batch.begin();
