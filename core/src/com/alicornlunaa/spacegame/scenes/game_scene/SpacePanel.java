@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.ship2.Ship;
+import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;

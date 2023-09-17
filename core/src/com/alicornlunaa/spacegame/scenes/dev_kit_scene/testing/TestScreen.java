@@ -16,7 +16,7 @@ import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.ship2.Ship;
+import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.scenes.game_scene.ShipViewPanel;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.EditorRenderSystem;

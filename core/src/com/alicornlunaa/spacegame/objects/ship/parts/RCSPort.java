@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
@@ -19,7 +20,6 @@ import com.badlogic.gdx.math.Vector2;
  * unit circle.
  */
 public class RCSPort extends Part {
-
     // Variables
     private float power;
     private float fuelUsage;
@@ -37,7 +37,7 @@ public class RCSPort extends Part {
         fuelUsage = metadata.getFloat("fuelUsage");
         
         effect = game.manager.get("effects/rcs", ParticleEffectPool.class).obtain();
-        effect.setPosition(0, getHeight() / 2);
+        effect.setPosition(0, 0);
         effect.scaleEffect(initial_scale);
         effect.start();
         
@@ -48,30 +48,30 @@ public class RCSPort extends Part {
 
     // Functions
     private int getSignAtPos(){
-        Vector2 center = parent.getLocalCenter();
-        Vector2 posOfCenter = new Vector2(getX() / physScale - center.x, getY() / physScale - center.y);
+        Vector2 center = parent.getBody().body.getLocalCenter();
+        Vector2 posOfCenter = new Vector2(getPosition().x / parent.getBody().world.getPhysScale() - center.x, getPosition().y / parent.getBody().world.getPhysScale() - center.y);
         float tanVal = (float)Math.atan(posOfCenter.y / posOfCenter.x);
         return Math.round(Math.abs(tanVal) / tanVal);
     }
 
     private float verticalThrust(float delta, float direction, Vector2 portPos, Vector2 portDir){
-        Vector2 parentVert = new Vector2(0, direction).rotateRad(parent.getAngle());
+        Vector2 parentVert = new Vector2(0, direction).rotateRad(parent.getBody().body.getAngle());
         float adj = portDir.dot(parentVert);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / physScale), true);
-        stateRef.rcsStored -= (fuelUsage * power * -adj * delta);
+        parent.getBody().body.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / parent.getBody().world.getPhysScale()), true);
+        parent.getState().rcsStored -= (fuelUsage * power * -adj * delta);
 
         return adj;
     }
 
     private float horizontalThrust(float delta, float direction, Vector2 portPos, Vector2 portDir){
-        Vector2 parentHori = new Vector2(direction, 0).rotateRad(parent.getAngle());
+        Vector2 parentHori = new Vector2(direction, 0).rotateRad(parent.getBody().body.getAngle());
         float adj = portDir.dot(parentHori);
         if(adj >= 0) return 0.0f;
 
-        parent.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / physScale), true);
-        stateRef.rcsStored -= (fuelUsage * power * -adj * delta);
+        parent.getBody().body.applyForceToCenter(portDir.cpy().scl(power * -adj * delta / parent.getBody().world.getPhysScale()), true);
+        parent.getState().rcsStored -= (fuelUsage * power * -adj * delta);
 
         return adj;
     }
@@ -79,43 +79,44 @@ public class RCSPort extends Part {
     private float rollThrust(float delta, float direction, Vector2 portPos, Vector2 portDir){
         if(direction >= 0) return 0.0f; // Cant thrust negative
 
-        Vector2 parentRight = new Vector2(1, 0).rotateRad(parent.getAngle());
+        Vector2 parentRight = new Vector2(1, 0).rotateRad(parent.getBody().body.getAngle());
         float adj = Math.abs(portDir.dot(parentRight)) * -1;
 
-        parent.applyForce(portDir.cpy().scl(power * -adj * delta / physScale), portPos, true);
-        stateRef.rcsStored -= (fuelUsage * power * -adj * delta);
+        parent.getBody().body.applyForce(portDir.cpy().scl(power * -adj * delta / parent.getBody().world.getPhysScale()), portPos, true);
+        parent.getState().rcsStored -= (fuelUsage * power * -adj * delta);
 
         return adj;
     }
     
     @Override
-    protected void drawEffectsBelow(Batch batch, float deltaTime){
+    protected void drawEffectsBelow(Batch batch){
         if(scale <= 0.01f) return;
 
         for(ParticleEmitter emitter : effect.getEmitters()){
             ScaledNumericValue emitterAngle = emitter.getAngle();
-            emitterAngle.setHigh(getRotation() - 180);
-            emitterAngle.setLow(getRotation() - 180);
+            emitterAngle.setHigh(180);
+            emitterAngle.setLow(180);
         }
 
-        effect.setPosition(getX(), getY());
+        effect.setPosition(0, 0);
         effect.setFlip(getFlipX(), getFlipY());
-        effect.update(deltaTime);
-        effect.draw(batch, deltaTime);
+        effect.update(Gdx.graphics.getDeltaTime());
+        effect.draw(batch, Gdx.graphics.getDeltaTime());
     }
 
     @Override
-    public void update(float delta){
-        if(stateRef.rcs){
-            Vector2 portPos = new Vector2(getX() / physScale, getY() / physScale).rotateDeg((float)Math.toDegrees(parent.getAngle())).add(parent.getPosition());
-            Vector2 portDir = new Vector2(1, 0).rotateDeg(((float)Math.toDegrees(parent.getAngle()) + getRotation()) * getWidth() / 2).scl(getFlipX() ? -1 : 1, getFlipY() ? -1 : 1);
+    public void tick(float delta){
+        if(parent.getState().rcs){
+            float scl = parent.getBody().world.getPhysScale();
+            Vector2 portPos = getPosition().cpy().scl(1 / scl).sub(parent.getBody().body.getLocalCenter()).rotateRad(parent.getBody().body.getAngle()).add(parent.getBody().body.getWorldCenter());
+            Vector2 portDir = new Vector2(getFlipX() ? -1 : 1, 0).rotateRad(parent.getBody().body.getAngle() + (float)Math.toRadians(getRotation()));
 
-            float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
+            float compRoll = (parent.getState().roll == 0) ? parent.getState().artifRoll : parent.getState().roll;
 
             float thrust = 0.0f;
             thrust += rollThrust(delta, getSignAtPos() * compRoll, portPos, portDir);
-            thrust += verticalThrust(delta, -stateRef.vertical, portPos, portDir);
-            thrust += horizontalThrust(delta, -stateRef.horizontal, portPos, portDir);
+            thrust += verticalThrust(delta, -parent.getState().vertical, portPos, portDir);
+            thrust += horizontalThrust(delta, -parent.getState().horizontal, portPos, portDir);
             thrust = Math.min(Math.max(thrust, -1), 1);
 
             effect.scaleEffect(1 / scale);
@@ -132,5 +133,4 @@ public class RCSPort extends Part {
     public void dispose(){
         effect.free();
     }
-    
 }

@@ -40,7 +40,8 @@ public class InteriorComponent implements IScriptComponent {
 
         cells.clear();
 
-        Array<Part> partsSorted = new Array<>(ship.getParts());
+        Array<Part> partsSorted = new Array<>();
+        ship.getRootPart().addParts(partsSorted);
         partsSorted.sort();
 
         // Expand cells into each direction, adding based on cell count in each direction
@@ -51,8 +52,8 @@ public class InteriorComponent implements IScriptComponent {
 
         for(Part p : partsSorted){
             if(p.getInteriorSize() == 0) continue;
-            int xDirection = (int)((p.getX() - prev.getX()) / Math.abs(p.getX() - prev.getX()));
-            int yDirection = (int)((p.getY() - prev.getY()) / Math.abs(p.getY() - prev.getY()));
+            int xDirection = (int)((p.getPosition().x - prev.getPosition().x) / Math.abs(p.getPosition().x - prev.getPosition().x));
+            int yDirection = (int)((p.getPosition().y - prev.getPosition().y) / Math.abs(p.getPosition().y - prev.getPosition().y));
             
             if(xDirection < 0){
                 x--;

@@ -4,14 +4,9 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter.ScaledNumericValue;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 public class Thruster extends Part {
     // Variables
@@ -19,7 +14,6 @@ public class Thruster extends Part {
     private float coneAngle;
     private float coneSpeed;
     private float fuelUsage;
-    private float rotationOffset;
 
     private float currentAngle;
 
@@ -36,7 +30,6 @@ public class Thruster extends Part {
         coneAngle = metadata.getFloat("coneAngle");
         coneSpeed = metadata.getFloat("coneSpeed");
         fuelUsage = metadata.getFloat("fuelUsage");
-        rotationOffset = getRotation();
 
         currentAngle = 0.f;
 
@@ -58,77 +51,31 @@ public class Thruster extends Part {
     public void thrust(float delta, float throttle){
         if(throttle == 0) return;
 
+        float physScale = parent.getBody().world.getPhysScale();
         Vector2 dir = new Vector2(
-            (float)Math.cos((currentAngle - 90) * (Math.PI / 180.f) + parent.getAngle()),
-            (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getAngle())
+            (float)Math.cos((currentAngle - 90) * (Math.PI / 180.f) + parent.getTransform().rotation),
+            (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getTransform().rotation)
         );
 
-        parent.applyForce(
+        parent.getBody().body.applyForce(
             dir.scl(power * -throttle * delta / physScale),
-            parent.getWorldPoint(
-                new Vector2(
-                    getX() / physScale,
-                    getY() / physScale
-                )
-            ),
+            parent.getBody().body.getWorldPoint(getPosition().cpy().scl(1 / physScale)),
             true
         );
-        stateRef.liquidFuelStored -= (fuelUsage * power * -throttle * delta);
+        
+        parent.getState().liquidFuelStored -= (fuelUsage * power * -throttle * delta);
     }
     
     @Override
-    protected void drawEffectsBelow(Batch batch, float deltaTime){
-        // Reset angle to draw
-        Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
-        batch.setTransformMatrix(batch.getTransformMatrix().mul(batchMatrix.inv()));
-
-        // Set emitter positions and angles
-        for(ParticleEmitter emitter : effect.getEmitters()){
-            ScaledNumericValue emitterAngle = emitter.getAngle();
-            float a = (rotationOffset + currentAngle + (float)Math.toDegrees(parent.getAngle())) - 90;
-
-            emitterAngle.setHigh(a - 15, a + 15);
-            emitterAngle.setLow(a);
-        }
-
-        // Draw effects
-        Vector3 pos = new Vector3(getX(), getY() - getHeight() / 2, 0).rotate(currentAngle, 0, 0, 1).mul(batchMatrix.inv());
-        effect.setPosition(pos.x, pos.y);
-        effect.update(deltaTime);
-        effect.draw(batch, deltaTime);
-        
-        // Adjust thruster angle
-        batchMatrix.translate(getX(), getY(), 0);
-        batchMatrix.rotate(0, 0, 1, currentAngle);
-        batchMatrix.translate(-getX(), -getY(), 0);
-        batch.setTransformMatrix(batchMatrix);
-    }
-
-    @Override
-    protected void drawEffectsAbove(Batch batch, float deltaTime){
-        // Reset matrix
-        Matrix4 batchMatrix = new Matrix4(batch.getTransformMatrix());
-        batchMatrix.translate(getX(), getY(), 0);
-        batchMatrix.rotate(0, 0, 1, -currentAngle);
-        batchMatrix.translate(-getX(), -getY(), 0);
-        batch.setTransformMatrix(batchMatrix);
-    }
-
-    @Override
-    public void update(float delta){
-        float compRoll = (stateRef.roll == 0) ? stateRef.artifRoll : stateRef.roll;
-
+    public void tick(float delta){
+        float compRoll = (parent.getState().roll == 0) ? parent.getState().artifRoll : parent.getState().roll;
         this.setTargetAngle(compRoll);
-        this.thrust(delta, stateRef.throttle);
-
-        effect.scaleEffect(1 / scale);
-        scale = (stateRef.throttle + 0.001f);
-        effect.scaleEffect(scale);
+        this.thrust(delta, parent.getState().throttle);
+        super.tick(delta);
     }
 
     @Override
     public void dispose(){
         effect.free();
     }
-
 }

@@ -1,6 +1,5 @@
 package com.alicornlunaa.spacegame.objects.ship;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,35 +15,51 @@ import com.alicornlunaa.spacegame.objects.ship.interior.InteriorComponent;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Null;
 
-/**
- * The ship class will hold the physical ship in space as well as
- * a tilemap and physics world for the player inside the ship
- */
+// Ship is a tree of parts, doublely linked
 public class Ship extends DriveableEntity {
+    // Static classes
+    public static class State {
+        /** Contains a list of all the ship statistics and variables
+         * such as fuel level, electricity level, thrust level, RCS,
+         * SAS, and other instance based variables
+         */
+        public boolean debug = false; // Debug drawings
+        
+        public boolean rcs = false; // RCS thrusters
+        public boolean sas = false; // Stability controller
     
-    // Variables
-    private final App game;
+        public float throttle = 0; // Thruster throttle
+        public float roll = 0; // Rotational movement intention
+        public float vertical = 0; // Translation movement intention
+        public float horizontal = 0; // Translation movement intention
+        public float artifRoll = 0; // Artificial roll, used by computer control
+    
+        public float rcsStored = 0.0f;
+        public float rcsCapacity = 0.0f;
+        public float liquidFuelStored = 0.0f;
+        public float liquidFuelCapacity = 0.0f;
+        public float batteryStored = 0.0f;
+        public float batteryCapacity = 0.0f;
+    }
 
-    private Array<Part> parts = new Array<>();
-    private AttachmentList attachments = new AttachmentList();
-    
-    public ShipState state = new ShipState(); // Ship controls and stuff
-    
-    public TransformComponent transform = getComponent(TransformComponent.class);
-    public BodyComponent bodyComponent;
-    public CameraComponent camComponent;
-    public InteriorComponent interior;
+    // Variables
+    private TransformComponent transform = getComponent(TransformComponent.class);
+    private BodyComponent bodyComponent;
+    private InteriorComponent interior;
+    private @Null Part rootPart = null;
+    private State state = new State();
 
     // Private functions
     private void generateExterior(PhysWorld world){
@@ -56,28 +71,59 @@ public class Ship extends DriveableEntity {
             @Override
             public void afterWorldChange(PhysWorld world){
                 Ship.super.afterWorldChange(world);
-
-                for(Part p : parts){
-                    p.setParent(bodyComponent.body, bodyComponent.world.getPhysScale());
-                }
+                Ship.this.assemble();
             }
         });
         
         bodyComponent.setWorld(world);
+        bodyComponent.body.setTransform(-1, 1, 0);
+    }
+
+    private void computeSAS(){
+        // Reduce angular velocity with controls
+        float angVel = bodyComponent.body.getAngularVelocity();
+        angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
+
+        if(Math.abs(angVel) <= 0.005f) angVel = 0;
+
+        state.artifRoll = angVel;
     }
 
     // Constructor
     public Ship(final App game, PhysWorld world, float x, float y, float rotation){
         super(game);
-        this.game = game;
         generateExterior(world);
-
+        
         addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
+        addComponent(new CustomSpriteComponent() {
+            @Override
+            public void render(Batch batch) {
+                if(rootPart == null) return;
+
+                Matrix4 trans = batch.getTransformMatrix().cpy().rotate(0, 0, 1, rootPart.getRotation());
+                rootPart.draw(batch, trans.cpy());
+                
+                batch.end();
+                game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                game.shapeRenderer.setTransformMatrix(trans);
+                game.shapeRenderer.begin(ShapeType.Filled);
+
+                rootPart.drawAttachmentPoints(game.shapeRenderer, trans.cpy());
+
+                game.shapeRenderer.setTransformMatrix(new Matrix4());
+                rootPart.drawDebug(game.shapeRenderer);
+
+                game.shapeRenderer.end();
+                batch.begin();
+            }
+        });
         addComponent(new IScriptComponent() {
             @Override
-            public void update(){
+            public void update() {
                 // Ship controls
+                if(getDriver() == null) return;
+
                 if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)){
                     state.throttle = Math.min(state.throttle + 0.01f, 1);
                 } else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)){
@@ -107,79 +153,46 @@ public class Ship extends DriveableEntity {
                 } else {
                     state.horizontal = 0;
                 }
+
+                if(state.sas){
+                    computeSAS();
+                } else {
+                    state.artifRoll = 0;
+                }
+
+                if(rootPart != null)
+                    rootPart.tick(Gdx.graphics.getDeltaTime());
             }
 
             @Override
-            public void render(){}
-        });
-        addComponent(new CustomSpriteComponent() {
-            @Override
-            public void render(Batch batch) {
-                // Update SAS
-                if(state.sas){ computeSAS(); } else { state.artifRoll = 0; }
-
-                // TODO: Parts shouldnt be here
-                for(Part p : parts){
-                    p.update(Gdx.graphics.getDeltaTime());
+            public void render() {
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_RCS)){
+                    state.rcs = !state.rcs;
                 }
-
-                for(Part p : parts){
-                    p.draw(batch, Gdx.graphics.getDeltaTime());
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_SAS)){
+                    state.sas = !state.sas;
+                }
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_FULL_THROTTLE)){
+                    state.throttle = 1;
+                }
+                if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_NO_THROTTLE)){
+                    state.throttle = 0;
                 }
             }
         });
-        camComponent = addComponent(new CameraComponent(1280, 720));
-        camComponent.active = true;
+        addComponent(new CameraComponent(1280, 720)).active = false;
         interior = new InteriorComponent(game, this);
-
-        float ppm = bodyComponent.world.getPhysScale();
-        bodyComponent.body.setTransform(x / ppm, y / ppm, rotation);
-        // transform.position.set(x, y);
-        // transform.dp.set(x, y);
-        // transform.rotation = rotation;
-        // transform.dr = rotation;
+    
+        transform.position.set(x, y);
+        transform.rotation = rotation;
     }
 
-    // Interior functions
-    public InteriorComponent getInterior(){
-        return interior;
-    }
-
-    // Space functions
-    public void assemble(){
-        // Puts all the parts together with their respective physics bodies
-        for(Part p : parts){
-            p.setParent(bodyComponent.body, Constants.PPM);
-        }
-
-        interior.assemble();
-    }
-
-    public AttachmentList getAttachments(){ return attachments; }
-
-    public Array<Part> getParts(){ return parts; }
-
-    public void addPart(Part p){
-        parts.add(p);
-        attachments.addPart(p);
-    }
-
-    public void removePart(Part p){
-        parts.removeValue(p, true);
-        attachments.removePart(p);
-    }
-
+    // Functions
     public boolean save(String path){
         try {
             FileHandle file = Gdx.files.local(path);
             JSONObject data = new JSONObject();
-            JSONArray arr = new JSONArray();
-
-            for(Part p : parts){
-                arr.put(p.serialize());
-            }
-
-            data.put("assembly", arr);
+            data.put("assembly", rootPart.serialize());
             file.writeString(data.toString(2), false);
             return true;
         } catch(GdxRuntimeException|JSONException e){
@@ -205,12 +218,8 @@ public class Ship extends DriveableEntity {
             bodyComponent.body.setAngularVelocity(0);
 
             // Load body data
-            JSONArray partArray = data.getJSONArray("assembly");
-            parts.clear();
-            for(int i = 0; i < partArray.length(); i++){
-                addPart(Part.unserialize(game, this, partArray.getJSONObject(i)));
-            }
-            assemble();
+            rootPart = Part.unserialize(game, this, data.getJSONObject("assembly"));
+            this.assemble();
 
             System.out.printf("Ship %s loaded\n", path);
             return true;
@@ -221,22 +230,30 @@ public class Ship extends DriveableEntity {
 
         return false;
     }
+    
+    public void setRootPart(Part p){ this.rootPart = p; }
+    public Part getRootPart(){ return rootPart; }
+    public void assemble(){
+        if(rootPart != null)
+            rootPart.setParent(this, new Matrix4());
 
-    private void computeSAS(){
-        // Reduce angular velocity with controls
-        float angVel = bodyComponent.body.getAngularVelocity();
-        angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
-
-        if(Math.abs(angVel) <= 0.005f) angVel = 0;
-
-        state.artifRoll = angVel;
+        if(interior != null)
+            interior.assemble();
     }
 
-    @Override
-    public void dispose(){
-        for(Part p : parts){
-            p.dispose();
-        }
+    public TransformComponent getTransform(){
+        return transform;
     }
 
+    public BodyComponent getBody(){
+        return bodyComponent;
+    }
+
+    public InteriorComponent getInterior(){
+        return interior;
+    }
+
+    public State getState(){
+        return state;
+    }
 }

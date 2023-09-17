@@ -7,160 +7,393 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.objects.ship.ShipState;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Null;
 
-/**
- * A Part is an object that gets attached to a ship. It should
- * contain a collider of its self, attachment points, physics
- * information, and a reference to the ship's state.
- * 
- * Drawing this shape is always in ship-local coordinates
- * as the batch will use a transformation matrix at the ship
- */
-public class Part implements Comparable<Part> {
+public class Part implements Disposable,Comparable<Part> {
+    // Inner classes
+    public static class Node {
+        public @Null Node previous = null;
+        public @Null Node next = null;
+
+        public Vector2 point;
+        public Part part;
+
+        private Node(Part part, Vector2 point){
+            this.part = part;
+            this.point = point.cpy();
+        }
+
+        private Node(Part part, float x, float y){
+            this.part = part;
+            this.point = new Vector2(x, y);
+        }
+    };
+
+    // Private functions
+    private void deleteAllColliders(){
+        collider.detachCollider();
+
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.deleteAllColliders();
+            }
+        }
+    }
 
     // Variables
-    protected Body parent;
-    protected ShipState stateRef;
-    protected float physScale;
-
+    protected Ship parent;
     private TextureRegion texture;
     private Collider collider;
-    private Array<Vector2> attachmentPoints = new Array<>();
+    private Array<Node> attachments = new Array<>();
 
     private String type;
     private String id;
     private String name;
     private String description;
+    private float partScale = 1;
     private int interiorSize;
     private boolean freeform = false;
     private boolean flipX = false;
     private boolean flipY = false;
-    private Vector2 position = new Vector2();
-    private Vector2 size = new Vector2();
-    private float rotation = 0.0f;
+    private Vector2 pos = new Vector2();
+    private float rotation = 0;
 
-    // Constructors
-    public Part(final Ship ship, final TextureRegion texture, String type, String id, String name, String desc){
-        parent = ship.getComponent(BodyComponent.class).body;
-        stateRef = ship.state;
+    // Constructor
+    public Part(final App game, Ship parent, JSONObject data){
+        this.parent = parent;
 
-        this.type = type;
-        this.id = id;
-        this.name = name;
-        this.description = desc;
-
-        this.texture = texture;
-        size.set(texture.getRegionWidth(), texture.getRegionHeight());
-
-        collider = Collider.box(Vector2.Zero.cpy(), size.cpy(), 0.0f);
-    }
-    
-    public Part(final App game, final Ship ship, JSONObject obj){
-        parent = ship.getComponent(BodyComponent.class).body;
-        stateRef = ship.state;
-
-        type = obj.getString("type");
-        id = obj.getString("id");
-        name = obj.getString("name");
-        description = obj.getString("desc");
-        interiorSize = obj.getInt("interiorSize");
-        freeform = obj.optBoolean("freeform", false);
+        type = data.optString("type", "STRUCTURAL");
+        id = data.optString("id", "BSC_FUSELAGE");
+        name = data.optString("name", "Basic Fuselage");
+        description = data.optString("desc", "Ol' reliable with its 1000 fuel and battery!");
+        interiorSize = data.optInt("interiorSize", 3);
+        freeform = data.optBoolean("freeform", false);
 
         texture = game.atlas.findRegion("parts/" + id.toLowerCase());
-        size.set(texture.getRegionWidth(), texture.getRegionHeight());
-
         collider = new Collider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
         
-        for(int i = 0; i < obj.getJSONArray("attachmentPoints").length(); i++){
-            JSONObject vec = obj.getJSONArray("attachmentPoints").getJSONObject(i);
-            attachmentPoints.add(new Vector2(vec.getFloat("x"), vec.getFloat("y")));
+        for(int i = 0; i < data.getJSONArray("attachmentPoints").length(); i++){
+            JSONObject vec = data.getJSONArray("attachmentPoints").getJSONObject(i);
+            attachments.add(new Node(this, vec.getFloat("x"), vec.getFloat("y")));
         }
     }
 
     // Functions
-    public void setParent(Body b, float physScale){
-        parent = b;
-        collider.setScale(1 / physScale);
-        collider.setPosition(position.cpy().scl(1 / physScale));
-        collider.setRotation(rotation);
-        collider.attachCollider(b);
-        this.physScale = physScale;
+    public Part get(int index){
+        Node thisNode = attachments.get(index);
+        
+        if(thisNode.next != null){
+            return thisNode.next.part;
+        } else if(thisNode.previous != null){
+            return thisNode.previous.part;
+        }
+
+        return null;
     }
 
-    public void draw(Batch batch, float delta){
-        drawEffectsBelow(batch, delta);
-        batch.draw(
-            texture,
-            position.x - size.x / 2, position.y - size.y / 2,
-            size.x / 2, size.y / 2,
-            size.x, size.y,
-            flipX ? -1 : 1, flipY ? -1 : 1,
-            rotation
-        );
-        drawEffectsAbove(batch, delta);
+    public Part attach(Node fromNode, Node toNode){
+        if(fromNode.next != null) return null;
+        if(toNode.previous != null) return null;
+
+        fromNode.next = toNode;
+        toNode.previous = fromNode;
+
+        return toNode.part;
     }
 
-    public boolean hit(Vector2 p){
-        // Convert point into part-space coordinates
-        Matrix3 trans = new Matrix3().translate(getX(), getY()).rotate(getRotation()).scale(flipX ? -1 : 1, flipY ? -1 : 1).inv();
-        Vector2 localPoint = p.cpy().mul(trans);
-        return ((localPoint.x < size.x / 2 && localPoint.x > size.x / -2) && (localPoint.y < size.y / 2 && localPoint.y > size.y / -2));
+    public Part attach(int from, int to, Part part){
+        Node fromNode = attachments.get(from);
+        Node toNode = part.attachments.get(to);
+
+        if(fromNode.next != null) return null;
+        if(toNode.previous != null) return null;
+
+        fromNode.next = toNode;
+        toNode.previous = fromNode;
+
+        return part;
     }
 
-    public JSONObject serialize(){
-        JSONObject obj = new JSONObject();
-        obj.put("type", type);
-        obj.put("id", id);
-        obj.put("x", position.x);
-        obj.put("y", position.y);
-        obj.put("rotation", rotation);
-        obj.put("flipX", flipX);
-        obj.put("flipY", flipY);
-        return obj;
+    public boolean deattach(Node thisNode){
+        deleteAllColliders();
+
+        if(thisNode.next != null){
+            // This node is the parent, orphan the child
+            Node toNode = thisNode.next;
+            toNode.previous = null;
+            thisNode.next = null;
+            return true;
+        } else if(thisNode.previous != null){
+            // This node is the child, run away from home
+            Node fromNode = thisNode.previous;
+            fromNode.next = null;
+            thisNode.previous = null;
+            return true;
+        }
+
+        return false;
     }
 
-    protected void drawEffectsAbove(Batch batch, float delta){}
-    protected void drawEffectsBelow(Batch batch, float delta){}
-    public void update(float delta){}
+    public boolean deattach(int index){
+        Node thisNode = attachments.get(index);
+        return deattach(thisNode);
+    }
+    
+    public void setParent(Ship ship, Matrix4 trans){
+        Vector3 temp = new Vector3();
+        trans.getTranslation(temp);
+        pos.set(temp.x, temp.y);
+
+        BodyComponent bc = ship.getBody();
+        parent = ship;
+        collider.setScale((flipX ? -1 : 1) / bc.world.getPhysScale(), (flipY ? -1 : 1) / bc.world.getPhysScale());
+        collider.setPosition(pos.cpy().scl(1 / bc.world.getPhysScale()));
+        collider.setRotation(rotation * ((getFlipX() ^ getFlipY()) ? -1 : 1));
+        collider.attachCollider(bc.body);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                trans.translate(node.point.x, node.point.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.part.getRotation());
+                trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                node.next.part.setParent(ship, trans);
+                trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, node.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
+                trans.translate(-node.point.x, -node.point.y, 0);
+            }
+        }
+    }
+
+    public Node getParentNode(){
+        // Returns a node that has a previous one, indicating a parent
+        for(Node node : attachments){
+            if(node.previous != null){
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    public Vector2 getNodePosition(Node node){
+        return this.getPosition().cpy().add(node.point.cpy().rotateDeg(getRotation()).scl(node.part.getFlipX() ? -1 : 1, node.part.getFlipY() ? -1 : 1));
+    }
+
+    public boolean contains(Vector2 position){
+        Matrix3 trans = new Matrix3();
+        trans.translate(pos.x, pos.y);
+        trans.rotate(getRotation());
+        trans.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+
+        if(this.collider.contains(position.cpy().mul(trans.inv()))){
+            return true;
+        }
+
+        for(Node node : attachments){
+            if(node.next != null){
+                if(node.next.part.contains(position)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Part hit(Vector2 position){
+        // Returns the part hit in the tree
+        for(Node node : attachments){
+            if(node.next != null){
+                Part res = node.next.part.hit(position);
+
+                if(res != null){
+                    return res;
+                }
+            }
+        }
+
+        Matrix3 trans = new Matrix3();
+        trans.translate(pos.x, pos.y);
+        trans.rotate(getRotation());
+        if(this.collider.contains(position.cpy().mul(trans.inv()))){
+            return this;
+        }
+
+        return null;
+    }
+
+    public void tick(float delta){
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.tick(delta);
+            }
+        }
+    }
+    
+    @Override
     public void dispose(){}
 
+    // Rendering functions
+    protected void drawEffectsAbove(Batch batch){}
+    protected void drawEffectsBelow(Batch batch){}
+
+    public void draw(Batch batch, Matrix4 trans){
+        batch.setTransformMatrix(trans);
+        
+        drawEffectsBelow(batch);
+        batch.draw(
+            texture,
+            texture.getRegionWidth() / -2, texture.getRegionHeight() / -2,
+            texture.getRegionWidth() / 2, texture.getRegionHeight() / 2,
+            texture.getRegionWidth(), texture.getRegionHeight(),
+            1, 1,
+            0
+        );
+        drawEffectsAbove(batch);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                trans.translate(node.point.x, node.point.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.part.getRotation());
+                trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                node.next.part.draw(batch, trans);
+                trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, node.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
+                trans.translate(-node.point.x, -node.point.y, 0);
+            }
+        }
+    }
+
+    public void drawAttachmentPoints(ShapeRenderer renderer, Matrix4 trans){
+        for(Node node : attachments){
+            if(node.previous != null || node.next != null){
+                renderer.setColor(1, 0, 0, 1);
+            } else {
+                renderer.setColor(0, 1, 0, 1);
+            }
+
+            renderer.setTransformMatrix(trans);
+            renderer.circle(node.point.x, node.point.y, 1);
+
+            if(node.next != null){
+                trans.translate(node.point.x, node.point.y, 0);
+                trans.rotate(0, 0, 1, node.next.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.part.getRotation());
+                trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                node.next.part.drawAttachmentPoints(renderer, trans);
+                trans.translate(node.next.point.x, node.next.point.y, 0);
+                trans.rotate(0, 0, 1, node.part.getRotation());
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.rotate(0, 0, 1, -node.next.part.getRotation());
+                trans.translate(-node.point.x, -node.point.y, 0);
+            }
+        }
+    }
+
+    public void drawDebug(ShapeRenderer renderer){
+        renderer.setColor(0.2f, 0.2f, 1, 1);
+        renderer.circle(pos.x, pos.y, 1);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.drawDebug(renderer);
+            }
+        }
+    }
 
     // Getters & setters
     public boolean getFreeform(){ return freeform; }
     public int getInteriorSize(){ return interiorSize; }
+    public float getPartScale(){ return partScale; }
+    public float getWidth(){ return texture.getRegionWidth() * partScale; }
+    public float getHeight(){ return texture.getRegionHeight() * partScale; }
     public void setFlipX(){ flipX = !flipX; }
     public void setFlipY(){ flipY = !flipY; }
     public boolean getFlipX(){ return flipX; }
     public boolean getFlipY(){ return flipY; }
-    public void setX(float x){ position.x = x; }
-    public void setY(float y){ position.y = y; }
-    public float getX(){ return position.x; }
-    public float getY(){ return position.y; }
-    public float getWidth(){ return size.x; }
-    public float getHeight(){ return size.y; }
     public void setRotation(float rot){ rotation = rot; }
+    public Vector2 getPosition(){ return pos; }
+    public void setPosition(float x, float y){ pos.set(x, y); }
     public float getRotation(){ return rotation; }
+    public TextureRegion getTexture(){ return texture; }
+    public String getType(){ return type; }
+    public String getID(){ return id; }
     public String getName(){ return name; }
     public String getDescription(){ return description; }
-    public Array<Vector2> getAttachmentPoints(){ return attachmentPoints; }
+    public Array<Node> getAttachments(){ return attachments; }
+
+    public void addParts(Array<Part> parts){
+        // Adds all the parts recursively to the array
+        parts.add(this);
+
+        for(Node node : attachments){
+            if(node.next != null){
+                node.next.part.addParts(parts);
+            }
+        }
+    }
 
     @Override
     public int compareTo(Part o) {
-        if(o.getX() == getX() && o.getY() == getY()) return 0;
-        if(o.getX() + o.getY() > getX() + getY()) return 1;
-        if(o.getX() + o.getY() < getX() + getY()) return -1;
+        if(o.pos.x == pos.x && o.pos.y == pos.y) return 0;
+        if(o.pos.x + o.pos.y > pos.x + pos.y) return 1;
+        if(o.pos.x + o.pos.y < pos.x + pos.y) return -1;
         return 0;
     }
 
-    // Static functions
+    // Serialization functions
+    public JSONObject serialize(){
+        JSONObject obj = new JSONObject();
+        obj.put("type", type);
+        obj.put("id", id);
+        obj.put("rotation", rotation);
+        obj.put("flipX", flipX);
+        obj.put("flipY", flipY);
+
+        JSONArray children = new JSONArray();
+        for(Node node : attachments){
+            if(node.next != null){
+                int connectingIndex = 0;
+                for(Node nextNodes : node.next.part.attachments){
+                    if(nextNodes.previous != node){
+                        connectingIndex++;
+                    } else {
+                        break;
+                    }
+                }
+
+                JSONObject attachment = new JSONObject();
+                attachment.put("nodeData", node.next.part.serialize());
+                attachment.put("connectingIndex", connectingIndex);
+                children.put(attachment);
+            } else {
+                children.put(JSONObject.NULL);
+            }
+        }
+        obj.put("attachments", children);
+
+        return obj;
+    }
+
     public static Part spawn(final App game, final Ship ship, String type, String id){
         // Load part information from the json object
         switch(type){
@@ -184,19 +417,29 @@ public class Part implements Comparable<Part> {
     public static Part unserialize(final App game, final Ship ship, JSONObject obj){
         String type = obj.getString("type");
         String id = obj.getString("id");
-        float x = obj.getFloat("x");
-        float y = obj.getFloat("y");
         float rotation = obj.getFloat("rotation");
         boolean flipX = obj.getBoolean("flipX");
         boolean flipY = obj.getBoolean("flipY");
 
         Part newPart = Part.spawn(game, ship, type, id);
-        newPart.position.set(x, y);
         newPart.rotation = rotation;
         newPart.flipX = flipX;
         newPart.flipY = flipY;
 
+        // Spawn every child
+        JSONArray arr = obj.getJSONArray("attachments");
+        for(int i = 0; i < arr.length(); i++){
+            Object rawData = arr.get(i);
+
+            if(!rawData.equals(null)){
+                // Create part for the children
+                JSONObject data = (JSONObject)rawData;
+                JSONObject nodeData = data.getJSONObject("nodeData");
+                int connectingIndex = data.getInt("connectingIndex");
+                newPart.attach(i, connectingIndex, unserialize(game, ship, nodeData));
+            }
+        }
+
         return newPart;
     }
-    
 }

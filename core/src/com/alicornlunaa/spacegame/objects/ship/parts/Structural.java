@@ -14,13 +14,12 @@ public class Structural extends Part {
     public Structural(final App game, final Ship ship, JSONObject obj){
         super(game, ship, obj);
 
-        JSONObject metadata = obj.getJSONObject("metadata");
-        fuelCapacity = metadata.getFloat("fuelCapacity");
-        batteryCapacity = metadata.getFloat("batteryCapacity");
+        JSONObject metadata = obj.optJSONObject("metadata", new JSONObject());
+        fuelCapacity = metadata.optFloat("fuelCapacity", 1000);
+        batteryCapacity = metadata.optFloat("batteryCapacity", 1000);
     }
 
     // Getters
     public float getFuelCapacity(){ return fuelCapacity; }
     public float getBatteryCapacity(){ return batteryCapacity; }
-
 }
