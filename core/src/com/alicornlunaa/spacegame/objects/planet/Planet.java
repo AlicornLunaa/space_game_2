@@ -15,7 +15,6 @@ import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -138,7 +137,7 @@ public class Planet extends Celestial {
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
-        generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE / 2, terrestrialHeight * Constants.CHUNK_SIZE / 2, terrainSeed);
+        generator = new TerrainGenerator(terrestrialWidth * Constants.CHUNK_SIZE / 20, terrestrialHeight * Constants.CHUNK_SIZE / 20, terrainSeed);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
@@ -148,6 +147,9 @@ public class Planet extends Celestial {
         generatePhysWorld();
         addComponent(new IScriptComponent() {
             @Override
+            public void start(){}
+
+            @Override
             public void update() {
                 starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
 
@@ -156,8 +158,8 @@ public class Planet extends Celestial {
                     delEntityWorld(leavingEnts.pop());
                 }
 
-                worldBlocks.act(Gdx.graphics.getDeltaTime());
-                worldBlocks.update();
+                // worldBlocks.act(Gdx.graphics.getDeltaTime());
+                // worldBlocks.update();
             }
 
             @Override
@@ -345,14 +347,14 @@ public class Planet extends Celestial {
     public boolean checkTransferPlanet(IEntity e){
         // This function checks if the entity supplied
         // is within range to change its physics system to the planet's
-        TransformComponent transform = e.getComponent(TransformComponent.class);
-        float dist = transform.position.len();
+        // TransformComponent transform = e.getComponent(TransformComponent.class);
+        // float dist = transform.position.len();
 
-        if(dist < radius * 1.2f){
-            // Move it into this world
-            addEntityWorld(e);
-            return true;
-        }
+        // if(dist < radius * 1.2f){
+        //     // Move it into this world
+        //     addEntityWorld(e);
+        //     return true;
+        // }
 
         return false;
     }

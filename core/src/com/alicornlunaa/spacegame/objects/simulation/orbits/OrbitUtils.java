@@ -56,7 +56,7 @@ public class OrbitUtils {
         float orbitalRadius = entityTransform.position.dst(celestialTransform.position) / celestialBodyComponent.world.getPhysScale();
         float speed = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * celestialBodyComponent.body.getMass()) / orbitalRadius);
 
-        entityTransform.velocity.set(tangentDirection.scl(speed));
+        // entityTransform.velocity.set(tangentDirection.scl(speed).add(parent.transform.velocity));
     }
 
     /**

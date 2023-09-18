@@ -71,6 +71,9 @@ public class TestScreen implements Screen {
                 BodyComponent rb = getComponent(BodyComponent.class);
 
                 @Override
+                public void start(){}
+                
+                @Override
                 public void update(){
                     // if(Gdx.input.isKeyPressed(Keys.W)){
                     //     rb.body.applyForceToCenter(0, 1.5f, true);

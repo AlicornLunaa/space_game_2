@@ -114,6 +114,9 @@ public class InteriorComponent implements IScriptComponent {
         }
     }
 
+    @Override
+    public void start(){}
+    
 	@Override
 	public void update() {
         world.update();

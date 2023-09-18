@@ -25,6 +25,9 @@ public class PlanetPhysScript implements IScriptComponent {
     }
 
     @Override
+    public void start(){}
+    
+    @Override
     public void update() {
         if(entityBody == null || transform == null) return;
         if(!(entityBody.world instanceof PlanetaryPhysWorld)) return;

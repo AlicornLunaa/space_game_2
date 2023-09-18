@@ -120,6 +120,9 @@ public class Ship extends DriveableEntity {
         });
         addComponent(new IScriptComponent() {
             @Override
+            public void start(){}
+            
+            @Override
             public void update() {
                 // Ship controls
                 if(getDriver() == null) return;

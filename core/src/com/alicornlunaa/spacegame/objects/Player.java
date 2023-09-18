@@ -12,6 +12,7 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.OrbitComponent;
+import com.alicornlunaa.spacegame.components.SimulatedPathScript;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
@@ -183,6 +184,9 @@ public class Player extends BaseEntity {
 
         addComponent(new IScriptComponent() {
             @Override
+            public void start(){}
+            
+            @Override
             public void update() {
                 // Groundchecking
                 grounded = true;
@@ -249,6 +253,7 @@ public class Player extends BaseEntity {
         });
 
         addComponent(new CameraComponent(1280, 720));
+        addComponent(new SimulatedPathScript());
         
         orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
     }
