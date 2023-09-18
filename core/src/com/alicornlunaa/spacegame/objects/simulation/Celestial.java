@@ -86,7 +86,7 @@ public class Celestial extends BaseEntity {
             }
         });
         addComponent(new OrbitComponent(game.gameScene.universe, this)).patchedConicsDepth = 0;
-        addComponent(new SimulatedPathScript());
+        // addComponent(new SimulatedPathScript());
     }
 
     // Functions
@@ -119,6 +119,7 @@ public class Celestial extends BaseEntity {
     }
 
     public Vector2 applyPhysics(float delta, IEntity e){
-        return applyGravity(delta, e.getComponent(BodyComponent.class));
+        // return applyGravity(delta, e.getComponent(BodyComponent.class));
+        return Vector2.Zero.cpy();
     }
 }

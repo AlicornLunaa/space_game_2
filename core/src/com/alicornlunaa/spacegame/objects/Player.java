@@ -62,7 +62,6 @@ public class Player extends BaseEntity {
     private boolean grounded = false;
 
     private @Null DriveableEntity vehicle = null;
-    private OrthographicCamera camera;
     private Vector3 cameraAngle = new Vector3(0, 1, 0);
 
     private RayCastCallback jumpCallback;
@@ -72,8 +71,8 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 0.5f;//0.05f;
-    private static final float JUMP_FORCE = 1.25f;
+    private static final float MOVEMENT_SPEED = 0.05f;//1.f;
+    private static final float JUMP_FORCE = 0.05f;//1.25f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
@@ -90,7 +89,7 @@ public class Player extends BaseEntity {
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(game.gameScene.universe.getUniversalWorld(), def){
+        bodyComponent = addComponent(new BodyComponent(world, def){
             @Override
             public void afterWorldChange(PhysWorld world){
                 // Change scenes depending on world        
@@ -172,14 +171,11 @@ public class Player extends BaseEntity {
     }
 
     // Constructor
-    public Player(final App game, float x, float y){
+    public Player(final App game, PhysWorld world, float x, float y){
         super();
         this.game = game;
 
-        camera = new OrthographicCamera(1280, 720);
-        game.camera = camera;
-
-        initializePhys(game.gameScene.universe.getUniversalWorld(), x, y);
+        initializePhys(world, x, y);
         initializeAnims();
 
         addComponent(new IScriptComponent() {
@@ -255,7 +251,7 @@ public class Player extends BaseEntity {
         addComponent(new CameraComponent(1280, 720));
         addComponent(new SimulatedPathScript());
         
-        orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
+        // orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
     }
 
     // Functions
@@ -265,36 +261,36 @@ public class Player extends BaseEntity {
 
     public void setVehicle(DriveableEntity de){ vehicle = de; }
 
-    public OrthographicCamera getCamera(){ return camera; }
+    public OrthographicCamera getCamera(){ return null; }
 
     public void updateCamera(boolean instant){
         // Update the camera positioning in order to be relative to the player
-        BaseEntity ent = (vehicle == null) ? this : vehicle;
-        TransformComponent transform = ent.getComponent(TransformComponent.class);
-        Celestial c = game.gameScene.universe.getParentCelestial(ent);
-        Vector2 pos = transform.position.cpy();
+        // BaseEntity ent = (vehicle == null) ? this : vehicle;
+        // TransformComponent transform = ent.getComponent(TransformComponent.class);
+        // // Celestial c = game.gameScene.universe.getParentCelestial(ent);
+        // Vector2 pos = transform.position.cpy();
 
-        if((bodyComponent.world instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
-            // Set the desired camera angle to upright if the orbit is not decaying
-            cameraAngle.set(0, 1, 0);
-        } else {
-            cameraAngle.set(pos.cpy().nor(), 0);
-        }
+        // // if((bodyComponent.world instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
+        // //     // Set the desired camera angle to upright if the orbit is not decaying
+        // //     cameraAngle.set(0, 1, 0);
+        // // } else {
+        // //     cameraAngle.set(pos.cpy().nor(), 0);
+        // // }
 
-        if(!(bodyComponent.world instanceof PlanetaryPhysWorld)){
-            //  || game.getScreen() instanceof MapScene
-            // If the player is on a planet, use the universe-based position system
-            pos.set(transform.position);
-        }
+        // if(!(bodyComponent.world instanceof PlanetaryPhysWorld)){
+        //     //  || game.getScreen() instanceof MapScene
+        //     // If the player is on a planet, use the universe-based position system
+        //     pos.set(transform.position);
+        // }
 
-        if(instant){
-            camera.up.set(cameraAngle);
-        } else {
-            camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
-        }
+        // if(instant){
+        //     camera.up.set(cameraAngle);
+        // } else {
+        //     camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
+        // }
 
-        camera.position.set(pos, 0);
-        camera.update();
+        // camera.position.set(pos, 0);
+        // camera.update();
     }
 
     public void updateCamera(){ updateCamera(false); }

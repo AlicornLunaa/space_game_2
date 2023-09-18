@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,8 +12,8 @@ public class CircularConic extends GenericConic {
 
     public CircularConic(double parentMass, double a, double e, double w, double v, double i) { super(parentMass, a, e, w, v, i); }
     public CircularConic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
-    public CircularConic(Celestial parent, IEntity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
-    public CircularConic(Celestial parent, IEntity child) { super(parent, child); }
+    public CircularConic(IEntity parent, IEntity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
+    public CircularConic(IEntity parent, IEntity child) { super(parent, child); }
 
     @Override
     public double meanAnomalyToEccentricAnomaly(double ma) {
@@ -51,7 +51,7 @@ public class CircularConic extends GenericConic {
         Matrix4 m = new Matrix4();
 
         if(parent != null)
-            m.set(parent.transform.getMatrix());
+            m.set(parent.getComponent(TransformComponent.class).getMatrix());
 
         // Render position at initial anomaly
         renderer.setTransformMatrix(m);

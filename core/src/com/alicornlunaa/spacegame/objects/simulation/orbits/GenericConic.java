@@ -1,8 +1,8 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Null;
 public abstract class GenericConic {
 
     // Variables
-    protected @Null Celestial parent = null;
+    protected @Null IEntity parent = null;
     protected @Null IEntity child = null;
 
     protected double mu; // Gravitational constant
@@ -84,17 +84,17 @@ public abstract class GenericConic {
         endTime = meanAnomalyToTime(endMeanAnomaly);
     }
 
-    public GenericConic(Celestial parent, IEntity child) {
+    public GenericConic(IEntity parent, IEntity child) {
         this(
             parent.getComponent(BodyComponent.class).body.getMass(),
-            child.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(parent.bodyComponent.body.getWorldCenter()),
-            child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(parent.bodyComponent.body.getLinearVelocity())
+            parent.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(child.getComponent(BodyComponent.class).body.getWorldCenter()),
+            parent.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(child.getComponent(BodyComponent.class).body.getLinearVelocity())
         );
         this.parent = parent;
         this.child = child;
     }
 
-    public GenericConic(Celestial parent, IEntity child, Vector2 position, Vector2 velocity) {
+    public GenericConic(IEntity parent, IEntity child, Vector2 position, Vector2 velocity) {
         this(parent.getComponent(BodyComponent.class).body.getMass(), position, velocity);
         this.parent = parent;
         this.child = child;
@@ -228,10 +228,12 @@ public abstract class GenericConic {
      */
     public void draw(ShapeRenderer renderer, float lineWidth){
         // Set drawing transform
+        TransformComponent transform = parent.getComponent(TransformComponent.class);
         Matrix4 m = new Matrix4();
 
         if(parent != null)
-            m.set(parent.transform.getMatrix());
+            // m.set(parent.getComponent(TransformComponent.class).getMatrix());
+            m.translate(transform.position.x, transform.position.y, 0);
 
         // Render position at initial anomaly
         if(Constants.DEBUG){
@@ -278,7 +280,7 @@ public abstract class GenericConic {
     }
 
     // Getters
-    public Celestial getParent(){ return parent; }
+    public IEntity getParent(){ return parent; }
     public IEntity getChild(){ return child; }
     public double getSemiMajorAxis() { return a; }
     public double getEccentricity() { return e; }

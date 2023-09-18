@@ -51,7 +51,7 @@ public class GameplayScene extends BaseScene {
         universe.addCelestial(new Planet(game, universe.getUniversalWorld(), 1000000 - 1500000, 0, 7000, 6000, 1));
         // universe.addCelestial(new Planet(game, universe.getUniversalWorld(), 1000000 - 1700000, 0, 5000, 10000, 1));
 
-		player = new Player(game, -50, 0);
+		player = new Player(game, universe.getUniversalWorld(), -50, 0);
 		universe.addEntity(player);
 
         // universe.getCelestial(0).getComponent(GravityScript.class).start();

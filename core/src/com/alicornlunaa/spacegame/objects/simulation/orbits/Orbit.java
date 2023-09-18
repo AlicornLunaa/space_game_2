@@ -95,7 +95,7 @@ public class Orbit {
      * @return null if not exitted, or the anomaly if it did
      */
     private Double getExitAnomaly(final GenericConic childConic, final GenericConic parentConic, final double currentTime){
-        Celestial parent = childConic.getParent();
+        Celestial parent = (Celestial)childConic.getParent();
 
         // Error check
         if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getSphereOfInfluence() / 2 / Constants.PPM) || parent.getCelestialParent() == null) return null;
@@ -129,7 +129,7 @@ public class Orbit {
         double intersection = RootSolver.bisection(startIntersectionGuess, endIntersectionGuess, new EquationInterface() {
             @Override
             public double func(double x){
-                return (childConic.getPosition(x).len() - (childConic.getParent().getSphereOfInfluence() / Constants.PPM));
+                return (childConic.getPosition(x).len() - (((Celestial)childConic.getParent()).getSphereOfInfluence() / Constants.PPM));
             }
         });
 
@@ -268,7 +268,7 @@ public class Orbit {
     }
     
     private Celestial getParent(float t, int conicIndex, double timeIntoFuture){
-        if(conicIndex == conics.size()) return conics.get(conics.size() - 1).getParent();
+        if(conicIndex == conics.size()) return (Celestial)conics.get(conics.size() - 1).getParent();
 
         GenericConic c = conics.get(conicIndex);
         double deltaT = c.meanAnomalyToTime(Math.abs(c.getEndAnomaly() - c.getStartAnomaly()));
@@ -277,7 +277,7 @@ public class Orbit {
             return getParent(t, conicIndex + 1, timeIntoFuture + deltaT);
         }
 
-        return c.getParent();
+        return (Celestial)c.getParent();
     }
     
     public Celestial getParent(float t){

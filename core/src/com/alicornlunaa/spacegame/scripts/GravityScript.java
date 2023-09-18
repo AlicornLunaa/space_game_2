@@ -25,6 +25,16 @@ public class GravityScript implements IScriptComponent {
         a.applyForceToCenter(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)), true);
     }
 
+    private void applyGravity(IEntity a, IEntity b){
+        TransformComponent aTrans = a.getComponent(TransformComponent.class);
+        TransformComponent bTrans = b.getComponent(TransformComponent.class);
+        float m1 = a.getComponent(BodyComponent.class).body.getMass();
+        float m2 = b.getComponent(BodyComponent.class).body.getMass();
+        float r = bTrans.position.dst(aTrans.position);
+        Vector2 direction = bTrans.position.cpy().sub(aTrans.position).cpy().nor();
+        aTrans.velocity.add(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)));
+    }
+
     // Constructor
     public GravityScript(App game, IEntity entity){
         this.game = game;
@@ -61,7 +71,8 @@ public class GravityScript implements IScriptComponent {
 
         for(Celestial other : game.gameScene.universe.getCelestials()){
             if(other == entity) continue;
-            applyGravity(bc.body, other.bodyComponent.body);
+            // applyGravity(bc.body, other.bodyComponent.body);
+            // applyGravity(entity, other);
         }
     }
 
