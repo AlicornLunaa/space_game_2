@@ -19,6 +19,7 @@ import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.scenes.game_scene.ShipViewPanel;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
@@ -33,6 +34,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -48,7 +50,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 @SuppressWarnings("unused")
 public class TestScreen implements Screen {
 
-    public static final float GRAV_C = 10;
+    public static final float GRAV_C = 0.02f;
 
     public static class WorldEntity extends BaseEntity {
 
@@ -118,6 +120,12 @@ public class TestScreen implements Screen {
     private PhysWorld world;
     private ShapeRenderer shapes = new ShapeRenderer();
 
+    public Array<Celestial2> celestials = new Array<>();
+    private EllipticalConic conic1;
+    private EllipticalConic conic2;
+    private EllipticalConic conic3;
+    private float iter = 0;
+
     private void createOrbit(IEntity parent, IEntity entity){
         BodyComponent b1 = entity.getComponent(BodyComponent.class);
         BodyComponent b2 = parent.getComponent(BodyComponent.class);
@@ -127,6 +135,46 @@ public class TestScreen implements Screen {
         float speed = (float)Math.sqrt((GRAV_C * b2.body.getMass()) / orbitalRadius);
 
         b1.body.setLinearVelocity(tangentDirection.scl(speed).add(b1.body.getLinearVelocity()));
+    }
+
+    public Vector2 startVel(IEntity parent, IEntity entity){
+        TransformComponent entityTransform = entity.getComponent(TransformComponent.class);
+        TransformComponent celestialTransform = parent.getComponent(TransformComponent.class);
+        BodyComponent celestialBodyComponent = parent.getComponent(BodyComponent.class);
+
+        Vector2 tangentDirection = entityTransform.position.cpy().sub(celestialTransform.position).nor().rotateDeg(90);
+        float orbitalRadius = entityTransform.position.dst(celestialTransform.position) / celestialBodyComponent.world.getPhysScale();
+        float speed = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * celestialBodyComponent.body.getMass()) / orbitalRadius);
+
+        return tangentDirection.scl(speed);
+    }
+
+    public Celestial2 getParentCelestial(IEntity e){
+        TransformComponent transform = e.getComponent(TransformComponent.class);
+        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+        
+        if(bodyComponent == null) return null;
+
+        // Find closest
+        Celestial2 parent = null;
+        float minDistance = Float.MAX_VALUE;
+        float minSOISize = Float.MAX_VALUE;
+
+        for(Celestial2 c : celestials){
+            float curDistance = c.getComponent(TransformComponent.class).position.dst(transform.position);
+            float curSOI = c.getSphereOfInfluence();
+            
+            if(e == c) continue;
+            if(curDistance >= minDistance || curDistance >= curSOI) continue;
+            if(curSOI >= minSOISize) continue;
+            if(bodyComponent.body.getMass() >= c.getComponent(BodyComponent.class).body.getMass()) continue;
+
+            parent = c;
+            minDistance = curDistance;
+            minSOISize = curSOI;
+        }
+
+        return parent;
     }
 
     public TestScreen(final App game){
@@ -172,14 +220,90 @@ public class TestScreen implements Screen {
         // registry.getEntity(0).addComponent(new CameraComponent(1280, 720));
         // registry.getEntity(0).getComponent(TransformComponent.class).velocity.x += 5.f;
 
+        registry.getEntity(1).getComponent(BodyComponent.class).body.getFixtureList().get(0).setFriction(0);
+        registry.getEntity(1).addComponent(new IScriptComponent() {
+            @Override
+            public void start() {}
+
+            @Override
+            public void render() {
+            }
+
+            @Override
+            public void update() {
+                Celestial2 parent = getParentCelestial(registry.getEntity(1));
+
+                if(parent != null){
+                    Body a = registry.getEntity(1).getComponent(BodyComponent.class).body;
+                    Body b = parent.getComponent(BodyComponent.class).body;
+                    
+                    float m1 = a.getMass();
+                    float m2 = b.getMass();
+                    float r = b.getPosition().dst(a.getPosition());
+                    Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
+                    a.applyForceToCenter(direction.scl(GRAV_C * (m1 * m2) / (r * r)), true);
+                    
+                    registry.getEntity(1).getComponent(TransformComponent.class).sync(registry.getEntity(1).getComponent(BodyComponent.class));
+                    conic3 = new EllipticalConic(parent, registry.getEntity(1));
+                }
+            }
+        });
+
+        conic1 = new EllipticalConic(
+            registry.getEntity(0),
+            registry.getEntity(1),
+            registry.getEntity(1).getComponent(BodyComponent.class).body.getPosition().cpy().sub(registry.getEntity(0).getComponent(BodyComponent.class).body.getPosition()),
+            new Vector2(0, 200)
+        );
+        conic2 = new EllipticalConic(
+            registry.getEntity(1),
+            registry.getEntity(2),
+            registry.getEntity(2).getComponent(BodyComponent.class).body.getPosition().cpy().sub(registry.getEntity(1).getComponent(BodyComponent.class).body.getPosition()),
+            new Vector2(0, 80)
+        );
+
         Ship ship = new Ship(game, world, -64, 0, 0);
         ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);
 
-        Player p = new Player(game, world, -100, 0);
+        final Player p = new Player(game, world, -100, 0);
         p.getComponent(CameraComponent.class).active = true;
         p.getComponent(CameraComponent.class).camera.zoom = 1.f;
+        p.addComponent(new IScriptComponent() {
+            @Override
+            public void start() {}
+
+            @Override
+            public void render() {}
+
+            @Override
+            public void update() {
+                Celestial2 parent = getParentCelestial(p);
+
+                if(parent != null){
+                    Body a = p.getComponent(BodyComponent.class).body;
+                    Body b = parent.getComponent(BodyComponent.class).body;
+                    
+                    float m1 = a.getMass();
+                    float m2 = b.getMass();
+                    float r = b.getPosition().dst(a.getPosition());
+                    Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
+                    a.applyForceToCenter(direction.scl(GRAV_C * (m1 * m2) / (r * r)), true);
+                    
+                    p.getComponent(TransformComponent.class).sync(p.getComponent(BodyComponent.class));
+                    // conic3 = new EllipticalConic(parent, p);
+                }
+            }
+        });
         registry.addEntity(p);
+
+        Celestial2 celestial = new Celestial2(world, 100, 500, 0);
+        celestials.add(celestial);
+        registry.addEntity(celestial);
+
+        celestial = new Celestial2(world, celestial, 20, 800, 0, 0, 1.2f);
+        celestials.add(celestial);
+        registry.addEntity(celestial);
     }
 
     @Override
@@ -196,22 +320,19 @@ public class TestScreen implements Screen {
         shapes.setProjectionMatrix(game.camera.combined);
         shapes.setTransformMatrix(new Matrix4());
         
-        EllipticalConic conic1 = new EllipticalConic(
-            registry.getEntity(0),
-            registry.getEntity(1),
-            registry.getEntity(1).getComponent(BodyComponent.class).body.getPosition().cpy().sub(registry.getEntity(0).getComponent(BodyComponent.class).body.getPosition()),
-            new Vector2(0, 180)
-        );
-        EllipticalConic conic2 = new EllipticalConic(
-            registry.getEntity(1),
-            registry.getEntity(2),
-            registry.getEntity(2).getComponent(BodyComponent.class).body.getPosition().cpy().sub(registry.getEntity(1).getComponent(BodyComponent.class).body.getPosition()),
-            new Vector2(0, 80)
-        );
         Constants.DEBUG = false;
         conic1.draw(shapes, 1);
         conic2.draw(shapes, 1);
+        if(conic3 != null) conic3.draw(shapes, 1);
         Constants.DEBUG = true;
+
+        registry.getEntity(1).getComponent(TransformComponent.class).position.set(conic1.getPosition(conic1.timeToMeanAnomaly(iter)).cpy().scl(128)).add(registry.getEntity(0).getComponent(TransformComponent.class).position);
+        registry.getEntity(2).getComponent(TransformComponent.class).position.set(conic2.getPosition(conic2.timeToMeanAnomaly(iter)).cpy().scl(128)).add(registry.getEntity(1).getComponent(TransformComponent.class).position);
+        iter += delta / 100;
+        
+        for(Celestial2 c : celestials){
+            c.update(delta / 5000);
+        }
 
         shapes.end();
 
