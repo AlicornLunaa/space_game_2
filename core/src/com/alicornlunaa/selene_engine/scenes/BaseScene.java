@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public abstract class BaseScene implements IScene {
-
     // Variables
     protected final App game;
     protected Color backgroundColor = new Color(0, 0, 0, 1);
@@ -44,5 +43,4 @@ public abstract class BaseScene implements IScene {
 
     @Override
     public void resume() {}
-    
 }
