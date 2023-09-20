@@ -13,11 +13,8 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.components.SimulatedPathScript;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
-import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetScene;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -29,9 +26,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -62,7 +57,7 @@ public class Player extends BaseEntity {
     private boolean grounded = false;
 
     private @Null DriveableEntity vehicle = null;
-    private Vector3 cameraAngle = new Vector3(0, 1, 0);
+    // private Vector3 cameraAngle = new Vector3(0, 1, 0);
 
     private RayCastCallback jumpCallback;
     private float animationTimer = 0.f;
@@ -93,16 +88,16 @@ public class Player extends BaseEntity {
             @Override
             public void afterWorldChange(PhysWorld world){
                 // Change scenes depending on world        
-                if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
-                    game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
-                } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
-                    game.activeSpaceScreen = game.gameScene;
-                }
+                // if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
+                //     game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
+                // } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
+                //     game.activeSpaceScreen = game.gameScene;
+                // }
 
                 // if(game.getScreen() instanceof MapScene) return;
 
                 if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
-                    game.setScreen(game.activeSpaceScreen);
+                    // game.setScreen(game.activeSpaceScreen);
                     updateCamera(true);
                 }
             }

@@ -9,10 +9,8 @@ import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
-import com.alicornlunaa.spacegame.util.state_management.SaveManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,6 +25,8 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 
 public class App extends Game {
+	// Static variable
+	public static App instance;
 
 	// Variables
 	public Assets manager;
@@ -36,7 +36,6 @@ public class App extends Game {
 
 	public LoadingScene loadingScene;
 	public GameplayScene gameScene;
-	public Screen activeSpaceScreen;
 	public OrthographicCamera camera;
 
 	public boolean loaded = false;
@@ -82,6 +81,7 @@ public class App extends Game {
 		shapeRenderer = new ShapeRenderer();
 		debug = new Box2DDebugRenderer();
 		
+		App.instance = this;
         ShaderProgram.pedantic = false;
 
 		loadingScene = new LoadingScene(this);
@@ -115,18 +115,11 @@ public class App extends Game {
 				// Initialize VisUI for development screens
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame");
-				SaveManager.init(this);
-				
-				// SaveManager.load(this, "dev_world");
-				// SaveManager.save(this, "dev_world");
 
 				// gameScene = new GameplayScene(this);
 				// gameScene.init();
 				// this.setScreen(gameScene);
 				this.setScreen(new TestScreen(this));
-				// this.setScreen(new DevKit(this));
-				// this.setScreen(new OrbitTest(this));
-				// this.setScreen(new ShaderScene(this));
 			} else {
 				// Loading is not complete, update progress bar
 				loadingScene.progressBar.setValue(manager.getProgress());
@@ -138,9 +131,10 @@ public class App extends Game {
 	
 	@Override
 	public void dispose(){
-		// spaceScene.dispose();
 		loadingScene.dispose();
 		manager.dispose();
 		VisUI.dispose();
+
+		App.instance = null;
 	}
 }

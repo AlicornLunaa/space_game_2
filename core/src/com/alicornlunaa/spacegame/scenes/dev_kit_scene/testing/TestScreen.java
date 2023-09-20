@@ -21,37 +21,26 @@ import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
-import com.alicornlunaa.spacegame.scenes.game_scene.ShipViewPanel;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
-import com.alicornlunaa.spacegame.systems.EditorRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-@SuppressWarnings("unused")
 public class TestScreen implements Screen {
-
-    public static final float GRAV_C = 0.02f;
-
     public static class WorldEntity extends BaseEntity {
         public WorldEntity(App game, PhysWorld world){
             addComponent(new TextureComponent(game.manager, "textures/dev_texture_32.png"));
@@ -100,7 +89,7 @@ public class TestScreen implements Screen {
 
         Vector2 tangentDirection = b1.body.getPosition().cpy().sub(b2.body.getPosition()).nor().rotateDeg(90);
         float orbitalRadius = b1.body.getPosition().dst(b2.body.getPosition().cpy());
-        float speed = (float)Math.sqrt((GRAV_C * b2.body.getMass()) / orbitalRadius);
+        float speed = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * b2.body.getMass()) / orbitalRadius);
 
         b1.body.setLinearVelocity(tangentDirection.scl(speed).add(b1.body.getLinearVelocity()));
     }
@@ -198,7 +187,7 @@ public class TestScreen implements Screen {
                     float m2 = b.getMass();
                     float r = b.getPosition().dst(a.getPosition());
                     Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
-                    a.applyForceToCenter(direction.scl(GRAV_C * (m1 * m2) / (r * r)), true);
+                    a.applyForceToCenter(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)), true);
                     
                     p.getComponent(TransformComponent.class).sync(p.getComponent(BodyComponent.class));
                     conic = new EllipticalConic(parent, p);
@@ -209,6 +198,7 @@ public class TestScreen implements Screen {
 
         Celestial2 celestial1 = new Celestial2(world, 1000, 2000, 0);
         celestials.add(celestial1);
+        createOrbit(celestial1, p);
         registry.addEntity(celestial1);
 
         Celestial2 celestial2 = new Celestial2(world, celestial1, 200, 49000, 0, 0, 0.2f);
