@@ -8,6 +8,7 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -88,14 +89,25 @@ public class Celestial2 extends BaseEntity {
             public void update() {
                 if(conicRails == null) return;
 
+                elapsedTime += Gdx.graphics.getDeltaTime();
                 double anomaly = conicRails.timeToMeanAnomaly(elapsedTime);
 
                 if(!Double.isNaN(anomaly)){
                     transform.position.set(conicRails.getPosition(anomaly).scl(bodyComponent.world.getPhysScale()));
                     transform.position.add(conicRails.getParent().getComponent(TransformComponent.class).position);
+
+
+                    // Vector2 updatedVelocity = conicRails.getVelocity(anomaly);//.add(transform.velocity);
+                    // conicRails = new EllipticalConic(
+                    //     conicRails.getParent(),
+                    //     Celestial2.this,
+                    //     transform.position,
+                    //     updatedVelocity
+                    // );
                     transform.velocity.scl(0);
-                    // transform.velocity.set(conicRails.getVelocity(anomaly));
-                    // transform.velocity.add(conicRails.getParent().getComponent(TransformComponent.class).velocity);
+                    transform.velocity.set(conicRails.getVelocity(anomaly));
+                    transform.velocity.add(conicRails.getParent().getComponent(TransformComponent.class).velocity);
+                    
                     bodyComponent.sync(transform);
                 }
             }
@@ -113,6 +125,11 @@ public class Celestial2 extends BaseEntity {
     }
 
     // Functions
+    public void updateConic(){
+        // Initialize rails
+        conicRails = new EllipticalConic(conicRails.getParent(), this);
+    }
+
     public EllipticalConic getConic(){
         return conicRails;
     }
@@ -126,7 +143,7 @@ public class Celestial2 extends BaseEntity {
             return (float)((conicRails.getSemiMajorAxis() * bodyComponent.world.getPhysScale()) * Math.pow(bodyComponent.body.getMass() / conicRails.getParent().getComponent(BodyComponent.class).body.getMass(), 2.f/5.f));
         }
 
-        return radius * 4;
+        return radius * 4000;
     }
     
     public void update(float delta){

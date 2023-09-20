@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.Null;
  * implement the equations for every kind of orbit.
  */
 public abstract class GenericConic {
-
     // Variables
     protected @Null IEntity parent = null;
     protected @Null IEntity child = null;
@@ -87,8 +86,6 @@ public abstract class GenericConic {
     public GenericConic(IEntity parent, IEntity child) {
         this(
             parent.getComponent(BodyComponent.class).body.getMass(),
-            // parent.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(child.getComponent(BodyComponent.class).body.getWorldCenter()),
-            // parent.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(child.getComponent(BodyComponent.class).body.getLinearVelocity())
             child.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(parent.getComponent(BodyComponent.class).body.getWorldCenter()),
             child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(parent.getComponent(BodyComponent.class).body.getLinearVelocity())
         );
@@ -297,5 +294,4 @@ public abstract class GenericConic {
     public double getStartTime(){ return startTime; }
     public double getEndAnomaly(){ return endMeanAnomaly; }
     public double getEndTime(){ return endTime; }
-
 }

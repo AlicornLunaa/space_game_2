@@ -53,7 +53,6 @@ public class TestScreen implements Screen {
     public static final float GRAV_C = 0.02f;
 
     public static class WorldEntity extends BaseEntity {
-
         public WorldEntity(App game, PhysWorld world){
             addComponent(new TextureComponent(game.manager, "textures/dev_texture_32.png"));
             addComponent(new SpriteComponent(512, 16, AnchorPoint.CENTER));
@@ -62,11 +61,9 @@ public class TestScreen implements Screen {
             
             getComponent(BodyComponent.class).body.setTransform(0, -1, 0);
         }
-
     }
 
     public static class TestEntity extends BaseEntity {
-
         public static Array<TestEntity> ents = new Array<>();
 
         public TestEntity(final App game, PhysWorld world, float x, float y, float density){
@@ -78,38 +75,12 @@ public class TestScreen implements Screen {
             addComponent(new BodyComponent(world, def));
             addComponent(new BoxColliderComponent(getComponent(BodyComponent.class), 0.05f, 0.05f, density));
 
-            addComponent(new IScriptComponent() {
-                @Override
-                public void start() {}
-
-                @Override
-                public void render() {}
-
-                @Override
-                public void update() {
-                    for(IEntity entity : ents){
-                        BodyComponent b1 = getComponent(BodyComponent.class);
-                        BodyComponent b2 = entity.getComponent(BodyComponent.class);
-
-                        if(b1 == b2) continue;
-                        if(!(entity instanceof TestEntity)) continue;
-
-                        Vector2 relative = b1.body.getPosition().cpy().sub(b2.body.getPosition());
-                        Vector2 dir = relative.cpy().nor().scl(-1);
-                        float radius = relative.len();
-
-                        // b1.body.applyForceToCenter(dir.scl(GRAV_C * (b1.body.getMass() * b2.body.getMass()) / (radius * radius)), true);
-                    }
-                }
-            });
-
             TransformComponent trans = getComponent(TransformComponent.class);
             BodyComponent b1 = getComponent(BodyComponent.class);
             trans.position.set(x, y);
             b1.sync(trans);
             ents.add(this);
         }
-
     }
 
     private final App game;
@@ -121,10 +92,7 @@ public class TestScreen implements Screen {
     private ShapeRenderer shapes = new ShapeRenderer();
 
     public Array<Celestial2> celestials = new Array<>();
-    private EllipticalConic conic1;
-    private EllipticalConic conic2;
-    private EllipticalConic conic3;
-    private float iter = 0;
+    private EllipticalConic conic;
 
     private void createOrbit(IEntity parent, IEntity entity){
         BodyComponent b1 = entity.getComponent(BodyComponent.class);
@@ -202,65 +170,7 @@ public class TestScreen implements Screen {
         registry.registerSystem(new ScriptSystem());
 
         world = new PhysWorld(128.0f);
-        // world.getBox2DWorld().setGravity(new Vector2(0, -0.5f));
         simulation.addWorld(world);
-
-        registry.addEntity(new TestEntity(game, world, 0, 100, 1000));
-        registry.addEntity(new TestEntity(game, world, 100, 100, 100));
-        registry.addEntity(new TestEntity(game, world, 150, 100, 0.0001f));
-        // registry.addEntity(new TestEntity(game, world, -300, 400));
-        // registry.addEntity(new TestEntity(game, world, 202, 400));
-        // registry.addEntity(new TestEntity(game, world, -332, 10));
-        // registry.addEntity(new TestEntity(game, world, 300, 43));
-        // registry.addEntity(new TestEntity(game, world, 232, 23));
-        // registry.addEntity(new TestEntity(game, world, 111, 159));
-        // registry.addEntity(new TestEntity(game, world, -400, 600));
-        // registry.addEntity(new WorldEntity(game, world));
-
-        // registry.getEntity(0).addComponent(new CameraComponent(1280, 720));
-        // registry.getEntity(0).getComponent(TransformComponent.class).velocity.x += 5.f;
-
-        registry.getEntity(1).getComponent(BodyComponent.class).body.getFixtureList().get(0).setFriction(0);
-        registry.getEntity(1).addComponent(new IScriptComponent() {
-            @Override
-            public void start() {}
-
-            @Override
-            public void render() {
-            }
-
-            @Override
-            public void update() {
-                Celestial2 parent = getParentCelestial(registry.getEntity(1));
-
-                if(parent != null){
-                    Body a = registry.getEntity(1).getComponent(BodyComponent.class).body;
-                    Body b = parent.getComponent(BodyComponent.class).body;
-                    
-                    float m1 = a.getMass();
-                    float m2 = b.getMass();
-                    float r = b.getPosition().dst(a.getPosition());
-                    Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
-                    a.applyForceToCenter(direction.scl(GRAV_C * (m1 * m2) / (r * r)), true);
-                    
-                    registry.getEntity(1).getComponent(TransformComponent.class).sync(registry.getEntity(1).getComponent(BodyComponent.class));
-                    conic3 = new EllipticalConic(parent, registry.getEntity(1));
-                }
-            }
-        });
-
-        conic1 = new EllipticalConic(
-            registry.getEntity(0),
-            registry.getEntity(1),
-            registry.getEntity(1).getComponent(BodyComponent.class).body.getPosition().cpy().sub(registry.getEntity(0).getComponent(BodyComponent.class).body.getPosition()),
-            new Vector2(0, 200)
-        );
-        conic2 = new EllipticalConic(
-            registry.getEntity(1),
-            registry.getEntity(2),
-            registry.getEntity(2).getComponent(BodyComponent.class).body.getPosition().cpy().sub(registry.getEntity(1).getComponent(BodyComponent.class).body.getPosition()),
-            new Vector2(0, 80)
-        );
 
         Ship ship = new Ship(game, world, -64, 0, 0);
         ship.load("./saves/ships/test.ship");
@@ -268,7 +178,6 @@ public class TestScreen implements Screen {
 
         final Player p = new Player(game, world, -100, 0);
         p.getComponent(CameraComponent.class).active = true;
-        p.getComponent(CameraComponent.class).camera.zoom = 1.f;
         p.addComponent(new IScriptComponent() {
             @Override
             public void start() {}
@@ -278,8 +187,9 @@ public class TestScreen implements Screen {
 
             @Override
             public void update() {
-                Celestial2 parent = getParentCelestial(p);
+                p.getComponent(CameraComponent.class).camera.zoom = 10.1f;
 
+                Celestial2 parent = getParentCelestial(p);
                 if(parent != null){
                     Body a = p.getComponent(BodyComponent.class).body;
                     Body b = parent.getComponent(BodyComponent.class).body;
@@ -291,19 +201,22 @@ public class TestScreen implements Screen {
                     a.applyForceToCenter(direction.scl(GRAV_C * (m1 * m2) / (r * r)), true);
                     
                     p.getComponent(TransformComponent.class).sync(p.getComponent(BodyComponent.class));
-                    // conic3 = new EllipticalConic(parent, p);
+                    conic = new EllipticalConic(parent, p);
                 }
             }
         });
         registry.addEntity(p);
 
-        Celestial2 celestial = new Celestial2(world, 100, 500, 0);
-        celestials.add(celestial);
-        registry.addEntity(celestial);
+        Celestial2 celestial1 = new Celestial2(world, 1000, 2000, 0);
+        celestials.add(celestial1);
+        registry.addEntity(celestial1);
 
-        celestial = new Celestial2(world, celestial, 20, 800, 0, 0, 1.2f);
-        celestials.add(celestial);
-        registry.addEntity(celestial);
+        Celestial2 celestial2 = new Celestial2(world, celestial1, 200, 49000, 0, 0, 0.2f);
+        celestial2.getComponent(TransformComponent.class).velocity.set(startVel(celestial1, celestial2));
+        celestial2.getComponent(BodyComponent.class).sync(celestial2.getComponent(TransformComponent.class));
+        celestial2.updateConic();
+        celestials.add(celestial2);
+        registry.addEntity(celestial2);
     }
 
     @Override
@@ -321,18 +234,8 @@ public class TestScreen implements Screen {
         shapes.setTransformMatrix(new Matrix4());
         
         Constants.DEBUG = false;
-        conic1.draw(shapes, 1);
-        conic2.draw(shapes, 1);
-        if(conic3 != null) conic3.draw(shapes, 1);
+        if(conic != null) conic.draw(shapes, 40);
         Constants.DEBUG = true;
-
-        registry.getEntity(1).getComponent(TransformComponent.class).position.set(conic1.getPosition(conic1.timeToMeanAnomaly(iter)).cpy().scl(128)).add(registry.getEntity(0).getComponent(TransformComponent.class).position);
-        registry.getEntity(2).getComponent(TransformComponent.class).position.set(conic2.getPosition(conic2.timeToMeanAnomaly(iter)).cpy().scl(128)).add(registry.getEntity(1).getComponent(TransformComponent.class).position);
-        iter += delta / 100;
-        
-        for(Celestial2 c : celestials){
-            c.update(delta / 5000);
-        }
 
         shapes.end();
 
