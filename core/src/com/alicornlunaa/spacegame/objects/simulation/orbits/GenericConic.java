@@ -99,6 +99,12 @@ public abstract class GenericConic {
         this.child = child;
     }
 
+    public GenericConic(IEntity parent, IEntity child, double a, double e, double w, double v, double i) {
+        this(parent.getComponent(BodyComponent.class).body.getMass(), a, e, w, v, i);
+        this.parent = parent;
+        this.child = child;
+    }
+
     // Functions
     /**
      * Converts mean anomaly to eccentric anomaly

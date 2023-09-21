@@ -13,14 +13,11 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.components.SimulatedPathScript;
-import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
-import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -42,7 +39,6 @@ import com.badlogic.gdx.utils.Null;
  * player related events.
  */
 public class Player extends BaseEntity {
-
     // Enums
     public enum State { IDLE, MOVE_LEFT, MOVE_RIGHT, JUMP };
 
@@ -87,22 +83,10 @@ public class Player extends BaseEntity {
         bodyComponent = addComponent(new BodyComponent(world, def){
             @Override
             public void afterWorldChange(PhysWorld world){
-                // Change scenes depending on world        
-                // if(world instanceof PlanetaryPhysWorld && !(game.activeSpaceScreen instanceof PlanetScene)){
-                //     game.activeSpaceScreen = new PlanetScene(game, ((PlanetaryPhysWorld)world).getPlanet());
-                // } else if(world instanceof CelestialPhysWorld && !(game.activeSpaceScreen instanceof CelestialPhysWorld)){
-                //     game.activeSpaceScreen = game.gameScene;
-                // }
-
-                // if(game.getScreen() instanceof MapScene) return;
-
-                if(world instanceof CelestialPhysWorld || world instanceof PlanetaryPhysWorld){
-                    // game.setScreen(game.activeSpaceScreen);
-                    updateCamera(true);
-                }
+                
             }
         });
-        addComponent(new GravityScript(game, this));
+        // addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
 
         float ppm = bodyComponent.world.getPhysScale();
@@ -211,9 +195,6 @@ public class Player extends BaseEntity {
                 } else {
                     transform.position.set(vehicle.getComponent(TransformComponent.class).position);
                 }
-
-                // Parent camera to the player's position
-                updateCamera();
             }
 
             @Override
@@ -256,40 +237,6 @@ public class Player extends BaseEntity {
 
     public void setVehicle(DriveableEntity de){ vehicle = de; }
 
-    public OrthographicCamera getCamera(){ return null; }
-
-    public void updateCamera(boolean instant){
-        // Update the camera positioning in order to be relative to the player
-        // BaseEntity ent = (vehicle == null) ? this : vehicle;
-        // TransformComponent transform = ent.getComponent(TransformComponent.class);
-        // // Celestial c = game.gameScene.universe.getParentCelestial(ent);
-        // Vector2 pos = transform.position.cpy();
-
-        // // if((bodyComponent.world instanceof PlanetaryPhysWorld) || c == null || !OrbitUtils.isOrbitDecaying(c, ent)){
-        // //     // Set the desired camera angle to upright if the orbit is not decaying
-        // //     cameraAngle.set(0, 1, 0);
-        // // } else {
-        // //     cameraAngle.set(pos.cpy().nor(), 0);
-        // // }
-
-        // if(!(bodyComponent.world instanceof PlanetaryPhysWorld)){
-        //     //  || game.getScreen() instanceof MapScene
-        //     // If the player is on a planet, use the universe-based position system
-        //     pos.set(transform.position);
-        // }
-
-        // if(instant){
-        //     camera.up.set(cameraAngle);
-        // } else {
-        //     camera.up.interpolate(cameraAngle, 0.25f, Interpolation.circle);
-        // }
-
-        // camera.position.set(pos, 0);
-        // camera.update();
-    }
-
-    public void updateCamera(){ updateCamera(false); }
-
     // Overrides
     public Vector2 getCenter(){
         if(isDriving()) return vehicle.getComponent(TransformComponent.class).position.cpy();
@@ -310,5 +257,4 @@ public class Player extends BaseEntity {
         if(isDriving()) return vehicle.getComponent(TransformComponent.class).velocity.cpy();
         return transform.velocity.cpy();
     }
-
 }

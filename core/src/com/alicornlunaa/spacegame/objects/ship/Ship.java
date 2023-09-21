@@ -15,12 +15,16 @@ import com.alicornlunaa.spacegame.objects.ship.interior.InteriorComponent;
 import com.alicornlunaa.spacegame.objects.ship.parts.Part;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
+import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -94,7 +98,6 @@ public class Ship extends DriveableEntity {
         super(game);
         generateExterior(world);
         
-        addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
         addComponent(new CustomSpriteComponent() {
             @Override
@@ -177,6 +180,17 @@ public class Ship extends DriveableEntity {
                 }
                 if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_NO_THROTTLE)){
                     state.throttle = 0;
+                }
+
+                // Entering the ship
+                if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
+                    Vector3 clickPosInWorld = game.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+                    Vector2 position = new Vector2(clickPosInWorld.x, clickPosInWorld.y).sub(transform.position).add(bodyComponent.body.getLocalCenter().cpy().scl(Constants.PPM));
+                    
+                    if(rootPart.contains(position)){
+                        System.out.println("Drive");
+                        // drive(getDriver());
+                    }
                 }
             }
         });

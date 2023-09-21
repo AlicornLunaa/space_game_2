@@ -149,10 +149,10 @@ public class SaveManager {
         // Save entity data
 
         // Save celestial data
-        for(Celestial c : game.gameScene.universe.getCelestials()){
-            f = Gdx.files.local("./saves/universes/" + saveName + "/planets/celestial_" + c.getCelestialID() + "/level.dat");
-            f.writeString(write(Celestial.class, c), false);
-        }
+        // for(Celestial c : game.gameScene.universe.getCelestials()){
+        //     f = Gdx.files.local("./saves/universes/" + saveName + "/planets/celestial_" + c.getCelestialID() + "/level.dat");
+        //     f.writeString(write(Celestial.class, c), false);
+        // }
     }
 
     public static void load(final App game, String saveName){

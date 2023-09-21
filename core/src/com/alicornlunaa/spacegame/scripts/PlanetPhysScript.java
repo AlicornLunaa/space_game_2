@@ -46,7 +46,7 @@ public class PlanetPhysScript implements IScriptComponent {
         
         // Taken from Celestial.java to correctly apply the right force
         Vector2 dragForce = planet.applyDrag(entityBody);
-        float height = Math.max(entityBody.body.getPosition().y, planet.getRadius() / planet.bodyComponent.world.getPhysScale());
+        float height = Math.max(entityBody.body.getPosition().y, planet.getRadius() / planet.getComponent(BodyComponent.class).world.getPhysScale());
         float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / (height * height));
         entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / entityBody.world.getPhysScale() * 1.f)) + dragForce.y, true);
     }

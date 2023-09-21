@@ -10,11 +10,8 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-public class Star extends Celestial {
-
+public class Star extends Celestial2 {
     // Variables
-    // private final App game;
-
     // private float temperature = 0.0f;
     private Pixmap pixmap;
     private Texture starTexture;
@@ -30,14 +27,9 @@ public class Star extends Celestial {
     }
 
     // Constructor
-    public Star(App game, PhysWorld world, float x, float y, float radius){
-        super(game, world, radius);
+    public Star(PhysWorld world, float radius, float x, float y){
+        super(world, radius, x, y);
         generateSprite();
-
-        float ppm = bodyComponent.world.getPhysScale();
-        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
-        transform.position.set(x, y);
-        transform.dp.set(x, y);
 
         addComponent(new CustomSpriteComponent() {
             @Override
@@ -48,14 +40,12 @@ public class Star extends Celestial {
             }
         });
 
-        shader = game.manager.get("shaders/star", ShaderProgram.class);
+        shader = App.instance.manager.get("shaders/star", ShaderProgram.class);
     }
 
     // Functions
     @Override
     public void dispose(){
         starTexture.dispose();
-        shader.dispose();
     }
-    
 }

@@ -1,6 +1,5 @@
 package com.alicornlunaa.selene_engine.ecs;
 
-
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.Reloadable;
@@ -8,25 +7,25 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
-public class Registry implements Disposable, Reloadable {
-    
+public class Registry implements Disposable,Reloadable {
     // Variables
     private Array<IEntity> entities = new Array<>();
     private Array<ISystem> systems = new Array<>();
     private float accumulator = 0.0f;
 
     // Functions
-    public int addEntity(IEntity entity){
+    public IEntity addEntity(IEntity entity){
         entities.add(entity);
-        return (entities.size - 1);
+        return entity;
     }
 
     public IEntity getEntity(int entity){
         return entities.get(entity);
     }
 
-    public IEntity removeEntity(int entity){
-        return entities.removeIndex(entity);
+    public IEntity removeEntity(IEntity entity){
+        entities.removeValue(entity, true);
+        return entity;
     }
 
     public Array<IEntity> getEntities(){ return entities; }
@@ -95,5 +94,4 @@ public class Registry implements Disposable, Reloadable {
             ((Reloadable)system).reload(assets);
         }
     }
-
 }

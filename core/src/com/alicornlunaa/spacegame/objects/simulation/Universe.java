@@ -4,16 +4,14 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
+import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
-import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -25,14 +23,11 @@ import com.badlogic.gdx.utils.Array;
  * entities designed to interact with them.
  */
 public class Universe extends Actor {
-
     // Variables
-    private final App game;
-
-    private Array<Celestial> celestials = new Array<>();
-    private Array<GenericConic> celestialPaths = new Array<>();
+    private Array<Celestial2> celestials = new Array<>();
     private Array<Orbit> entityPaths = new Array<>();
-
+    
+    private Registry registry;
     private PhysWorld universalWorld;
 
     private float timeWarpAccumulator = 0.0f;
@@ -40,46 +35,43 @@ public class Universe extends Actor {
     private float timewarp = 1.0f;
 
     // Constructor
-    public Universe(final App game){
-        this.game = game;
-        universalWorld = game.gameScene.simulation.addWorld(new CelestialPhysWorld(null, Constants.PPM));
+    public Universe(Registry registry){
+        this.registry = registry;
+        universalWorld = new CelestialPhysWorld(null, Constants.PPM);
     }
 
     // Functions
     public void addEntity(IEntity e){
-        game.gameScene.registry.addEntity(e);
-
         if(!e.hasComponent(BodyComponent.class)) return;
         e.getComponent(BodyComponent.class).setWorld(universalWorld);
     }
 
-    public void addCelestial(Celestial c){
-        game.gameScene.registry.addEntity(c);
-        c.bodyComponent.setWorld(universalWorld);
+    public void addCelestial(Celestial2 c){
+        // c.getComponent(BodyComponent.class).setWorld(universalWorld);
         celestials.add(c);
     }
 
-    public Array<Celestial> getCelestials(){ return celestials; }
+    public Array<Celestial2> getCelestials(){ return celestials; }
 
-    public Celestial getCelestial(int i){
+    public Celestial2 getCelestial(int i){
         if(i >= celestials.size) return null;
         return celestials.get(i);
     }
 
-    public Celestial getParentCelestial(IEntity e){
+    public Celestial2 getParentCelestial(IEntity e){
         TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         
         if(bodyComponent == null) return null;
-        if(bodyComponent.world instanceof PlanetaryPhysWorld) return ((PlanetaryPhysWorld)bodyComponent.world).getPlanet();
+        // if(bodyComponent.world instanceof PlanetaryPhysWorld) return ((PlanetaryPhysWorld)bodyComponent.world).getPlanet();
 
         // Find closest
-        Celestial parent = null;
+        Celestial2 parent = null;
         float minDistance = Float.MAX_VALUE;
         float minSOISize = Float.MAX_VALUE;
 
-        for(Celestial c : celestials){
-            float curDistance = c.transform.position.dst(transform.position);
+        for(Celestial2 c : celestials){
+            float curDistance = c.getComponent(TransformComponent.class).position.dst(transform.position);
             float curSOI = c.getSphereOfInfluence();
             
             if(e == c) continue;
@@ -98,7 +90,6 @@ public class Universe extends Actor {
     public void setTimewarp(float warp){
         // Reset timewarp
         if(warp == 1){
-            celestialPaths.clear();
             entityPaths.clear();
             currentFuture = 0.0f;
         }
@@ -106,16 +97,13 @@ public class Universe extends Actor {
         // Starting the timewarp for first time
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
-            for(IEntity e : game.gameScene.registry.getEntities()){
-                if(e instanceof Celestial){
-                    Celestial parent = getParentCelestial(e);
-                    if(parent == null) continue;
-                    GenericConic path = OrbitPropagator.getConic(parent, e);
-                    celestialPaths.add(path);
-                } else {
-                    Celestial parent = getParentCelestial(e);
-                    if(parent == null) continue;
-                    entityPaths.add(new Orbit(this, e));
+            for(IEntity e : registry.getEntities()){
+                if(!(e instanceof Celestial2)){
+                    Celestial2 parent = getParentCelestial(e);
+
+                    if(parent != null){
+                        entityPaths.add(new Orbit(this, e));
+                    }
                 }
             }
         }
@@ -127,7 +115,7 @@ public class Universe extends Actor {
         // Update physics
         if(timewarp == 1){
             // Step the physics on the world
-            game.gameScene.registry.update(delta);
+            registry.update(delta);
         } else if(timewarp >= 0){
             // Freezes everything and starts using the predicted path
             timeWarpAccumulator += Math.min(delta, 0.25f);
@@ -135,8 +123,8 @@ public class Universe extends Actor {
             while(timeWarpAccumulator >= Constants.TIME_STEP){
                 timeWarpAccumulator -= Constants.TIME_STEP;
 
-                for(int i = 0; i < celestialPaths.size; i++){
-                    GenericConic path = celestialPaths.get(i);
+                for(int i = 0; i < celestials.size; i++){
+                    GenericConic path = celestials.get(i).getConic();
                     IEntity e = path.getChild();
 
                     if(e instanceof Planet){
@@ -145,13 +133,12 @@ public class Universe extends Actor {
     
                     TransformComponent transform = e.getComponent(TransformComponent.class);
                     BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-                    Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+                    Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture)).scl(universalWorld.getPhysScale());
                     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
     
                     if(transform == null) continue;
                     if(bodyComponent == null) continue;
 
-                    curPos.scl(128);
                     transform.position.set(curPos);
                     transform.velocity.set(curVel);
                     bodyComponent.sync(transform);
@@ -160,6 +147,7 @@ public class Universe extends Actor {
                 for(int i = 0; i < entityPaths.size; i++){
                     Orbit path = entityPaths.get(i);
                     IEntity e = path.getEntity();
+
                     TransformComponent transform = e.getComponent(TransformComponent.class);
                     BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
     
@@ -176,8 +164,8 @@ public class Universe extends Actor {
                         continue;
                     }
     
-                    // Celestial parent = path.getParent(currentFuture);
-                    Vector2 curPos = path.getPosition(currentFuture);
+                    // Celestial2 parent = path.getParent(currentFuture);
+                    Vector2 curPos = path.getPosition(currentFuture).scl(universalWorld.getPhysScale());
                     Vector2 curVel = path.getVelocity(currentFuture);
 
                     // if(parent != getParentCelestial(e)){
@@ -191,7 +179,6 @@ public class Universe extends Actor {
                     //     }
                     // }
 
-                    curPos.scl(128);
                     transform.position.set(curPos);
                     transform.velocity.set(curVel);
                     bodyComponent.sync(transform);
@@ -206,7 +193,6 @@ public class Universe extends Actor {
 
     @Override
     public void draw(Batch batch, float a){
-        game.gameScene.registry.render();
+        registry.render();
     }
-    
 }

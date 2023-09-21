@@ -10,11 +10,8 @@ import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.systems.CustomRenderSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
@@ -45,10 +42,10 @@ public class GameplayScene extends BaseScene {
     
     // Private functions
 	private void initializeUniverse(){
-		universe = new Universe(game);
+		universe = new Universe(registry);
 
         // universe.addCelestial(new Star(game, universe.getUniversalWorld(), 1000000, 0, 80000));
-        universe.addCelestial(new Planet(game, universe.getUniversalWorld(), 1000000 - 1500000, 0, 7000, 6000, 1));
+        // universe.addCelestial(new Planet(game, universe.getUniversalWorld(), 1000000 - 1500000, 0, 7000, 6000, 1));
         // universe.addCelestial(new Planet(game, universe.getUniversalWorld(), 1000000 - 1700000, 0, 5000, 10000, 1));
 
 		player = new Player(game, universe.getUniversalWorld(), -50, 0);

@@ -1,10 +1,9 @@
 package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.RootSolver;
@@ -17,25 +16,14 @@ import com.badlogic.gdx.math.Vector2;
  * It will take an entity and a universe, allowing it to simulate every body in the system
  */
 public class Orbit {
-
     // Variables
     private final Universe universe;
     private final IEntity entity;
+
     private ArrayList<GenericConic> conics = new ArrayList<>();
-    private HashMap<Celestial, GenericConic> celestialConics = new HashMap<>();
-    
     public int patchedConicsDepth = Constants.PATCHED_CONIC_LIMIT;
 
     // Private functions
-    /**
-     * Gets conics for every celestial in the system
-     */
-    private void integrateCelestialConics(){
-        for(Celestial child : universe.getCelestials()){
-            celestialConics.put(child, OrbitPropagator.getConic(child.getCelestialParent(), child));
-        }
-    }
-
     /**
      * Runs an intersection algorithm to get the start and the end of a conic, if there is any
      * @param childConic The conic to intersect with the parent. This is the entity.
@@ -44,7 +32,7 @@ public class Orbit {
      */
     private Double getPatchAnomaly(final GenericConic childConic, final GenericConic parentConic, final double currentTime){
         // Variables
-        final Celestial celestial = (Celestial)parentConic.getChild();
+        final Celestial2 celestial = (Celestial2)parentConic.getChild();
         double startIntersectionGuess = -1.f;
         double endIntersectionGuess = -1.f;
 
@@ -95,10 +83,10 @@ public class Orbit {
      * @return null if not exitted, or the anomaly if it did
      */
     private Double getExitAnomaly(final GenericConic childConic, final GenericConic parentConic, final double currentTime){
-        Celestial parent = (Celestial)childConic.getParent();
+        Celestial2 parent = (Celestial2)childConic.getParent();
 
         // Error check
-        if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getSphereOfInfluence() / 2 / Constants.PPM) || parent.getCelestialParent() == null) return null;
+        if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getSphereOfInfluence() / 2 / Constants.PPM) || parent.getConic().getParent() == null) return null;
         
         // Find first intersection by the changing value
         double startIntersectionGuess = -1.f;
@@ -129,7 +117,7 @@ public class Orbit {
         double intersection = RootSolver.bisection(startIntersectionGuess, endIntersectionGuess, new EquationInterface() {
             @Override
             public double func(double x){
-                return (childConic.getPosition(x).len() - (((Celestial)childConic.getParent()).getSphereOfInfluence() / Constants.PPM));
+                return (childConic.getPosition(x).len() - (((Celestial2)childConic.getParent()).getSphereOfInfluence() / Constants.PPM));
             }
         });
 
@@ -143,56 +131,63 @@ public class Orbit {
      * @param depth How deep the approximation has gone
      * @param currentTime Current time for this iteration
      */
-    private void patchConics(final Celestial parent, final GenericConic section, int depth, double currentTime){
+    private void patchConics(final Celestial2 parent, final GenericConic section, int depth, double currentTime){
         // Checks whether or not the entity in question exits or enters the sphere of influence
         if(parent == null) return;
         if(depth > Constants.PATCHED_CONIC_LIMIT) return;
 
-        GenericConic parentConic = celestialConics.get(parent);
-        Double exitAnomaly = getExitAnomaly(section, parentConic, currentTime);
+        GenericConic parentConic = parent.getConic();
+        // Double exitAnomaly = getExitAnomaly(section, parentConic, currentTime);
 
-        if(exitAnomaly != null){
-            // Get state vectors at the moment of intersection
-            double futureTime = currentTime + section.meanAnomalyToTime(exitAnomaly - section.getMeanAnomaly());
-            double celestialAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
-            Vector2 posAtSOITransfer = section.getPosition(exitAnomaly).add(parentConic.getPosition(celestialAnomaly));
-            Vector2 velAtSOITransfer = section.getVelocity(exitAnomaly).add(parentConic.getVelocity(celestialAnomaly));
+        // if(exitAnomaly != null){
+        //     // Get state vectors at the moment of intersection
+        //     double futureTime = currentTime + section.meanAnomalyToTime(exitAnomaly - section.getMeanAnomaly());
+        //     double celestialAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
+        //     Vector2 posAtSOITransfer = section.getPosition(exitAnomaly).add(parentConic.getPosition(celestialAnomaly));
+        //     Vector2 velAtSOITransfer = section.getVelocity(exitAnomaly).add(parentConic.getVelocity(celestialAnomaly));
 
-            section.setStart(section.getMeanAnomaly());
-            section.setEnd(exitAnomaly);
+        //     section.setStart(section.getMeanAnomaly());
+        //     section.setEnd(exitAnomaly);
 
-            // Add new conic relative to the child as a new parent
-            conics.add(OrbitPropagator.getConic(parent.getCelestialParent(), entity, posAtSOITransfer, velAtSOITransfer));
-            patchConics(parent.getCelestialParent(), conics.get(conics.size() - 1), depth + 1, futureTime);
-            return;
-        }
+        //     // Add new conic relative to the child as a new parent
+        //     conics.add(OrbitPropagator.getConic((Celestial2)parent.getConic().getParent(), entity, posAtSOITransfer, velAtSOITransfer));
+        //     patchConics((Celestial2)parent.getConic().getParent(), conics.get(conics.size() - 1), depth + 1, futureTime);
+        //     return;
+        // }
 
-        for(final Celestial child : parent.getChildren()){
-            //ඞ
-            GenericConic celestialConic = celestialConics.get(child);
-            Double enterAnomaly = getPatchAnomaly(section, celestialConic, currentTime);
+        // for(final Celestial2 child : parent.getChildren()){
+        //     //ඞ
+        //     GenericConic celestialConic = celestialConics.get(child);
+        //     Double enterAnomaly = getPatchAnomaly(section, celestialConic, currentTime);
 
-            if(enterAnomaly != null){
-                // Get state vectors at the moment of intersection
-                double futureTime = currentTime + section.meanAnomalyToTime(enterAnomaly - section.getMeanAnomaly()); // Subject anomaly to get distance travelled
-                double celestialAnomaly = celestialConic.timeToMeanAnomaly(futureTime) + celestialConic.getMeanAnomaly();
-                Vector2 posAtSOITransfer = section.getPosition(enterAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
-                Vector2 velAtSOITransfer = section.getVelocity(enterAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
+        //     if(enterAnomaly != null){
+        //         // Get state vectors at the moment of intersection
+        //         double futureTime = currentTime + section.meanAnomalyToTime(enterAnomaly - section.getMeanAnomaly()); // Subject anomaly to get distance travelled
+        //         double celestialAnomaly = celestialConic.timeToMeanAnomaly(futureTime) + celestialConic.getMeanAnomaly();
+        //         Vector2 posAtSOITransfer = section.getPosition(enterAnomaly).sub(celestialConic.getPosition(celestialAnomaly));
+        //         Vector2 velAtSOITransfer = section.getVelocity(enterAnomaly).sub(celestialConic.getVelocity(celestialAnomaly));
 
-                section.setStart(section.getMeanAnomaly());
-                section.setEnd(enterAnomaly);
+        //         section.setStart(section.getMeanAnomaly());
+        //         section.setEnd(enterAnomaly);
                 
-                // Add new conic relative to the child as a new parent
-                GenericConic c = OrbitPropagator.getConic(child, entity, posAtSOITransfer, velAtSOITransfer);
-                c.setStart(c.getMeanAnomaly());
+        //         // Add new conic relative to the child as a new parent
+        //         GenericConic c = OrbitPropagator.getConic(child, entity, posAtSOITransfer, velAtSOITransfer);
+        //         c.setStart(c.getMeanAnomaly());
 
-                if(c instanceof HyperbolicConic)
-                    c.setEnd(c.getMeanAnomaly() * -1);
+        //         if(c instanceof HyperbolicConic)
+        //             c.setEnd(c.getMeanAnomaly() * -1);
 
-                conics.add(c);
-                patchConics(child, c, depth + 1, futureTime);
-                return;
-            }
+        //         conics.add(c);
+        //         patchConics(child, c, depth + 1, futureTime);
+        //         return;
+        //     }
+        // }
+
+        for(Celestial2 celestial : universe.getCelestials()){
+            if(celestial == parent) continue;
+
+            double enterAnomaly = getPatchAnomaly(section, celestial.getConic(), currentTime);
+            System.out.println(enterAnomaly);
         }
     }
 
@@ -209,12 +204,11 @@ public class Orbit {
         conics.clear();
 
         // Get first orbit line
-        Celestial parent = universe.getParentCelestial(entity);
+        Celestial2 parent = universe.getParentCelestial(entity);
 
         if(parent != null){
             conics.add(OrbitPropagator.getConic(parent, entity));
-            integrateCelestialConics();
-            patchConics(parent, conics.get(0), 1, 0);
+            // patchConics(parent, conics.get(0), 1, 0);
         }
     }
 
@@ -267,8 +261,8 @@ public class Orbit {
         return getVelocity(t, 0, 0);    
     }
     
-    private Celestial getParent(float t, int conicIndex, double timeIntoFuture){
-        if(conicIndex == conics.size()) return (Celestial)conics.get(conics.size() - 1).getParent();
+    private Celestial2 getParent(float t, int conicIndex, double timeIntoFuture){
+        if(conicIndex == conics.size()) return (Celestial2)conics.get(conics.size() - 1).getParent();
 
         GenericConic c = conics.get(conicIndex);
         double deltaT = c.meanAnomalyToTime(Math.abs(c.getEndAnomaly() - c.getStartAnomaly()));
@@ -277,12 +271,11 @@ public class Orbit {
             return getParent(t, conicIndex + 1, timeIntoFuture + deltaT);
         }
 
-        return (Celestial)c.getParent();
+        return (Celestial2)c.getParent();
     }
     
-    public Celestial getParent(float t){
+    public Celestial2 getParent(float t){
         if(conics.size() == 0) return null;
         return getParent(t, 0, 0);    
     }
-
 }

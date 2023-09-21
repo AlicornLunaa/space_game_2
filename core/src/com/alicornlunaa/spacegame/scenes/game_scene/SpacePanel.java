@@ -71,8 +71,6 @@ public class SpacePanel extends Stage {
 
     @Override
     public void draw(){
-        game.gameScene.player.updateCamera();
-
         drawSkybox();
         super.draw();
 

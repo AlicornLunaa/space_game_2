@@ -12,6 +12,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -26,10 +27,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-public class Planet extends Celestial {
-
+public class Planet extends Celestial2 {
     // Variables
-    private final App game;
+    private TransformComponent transform = getComponent(TransformComponent.class);
 
     private int terrestrialWidth; // Chunk-size
     private int terrestrialHeight; // Chunk-size
@@ -119,21 +119,15 @@ public class Planet extends Celestial {
     }
 
     private void generatePhysWorld(){
-        physWorld = game.gameScene.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
-        worldBlocks = new WorldBody(game, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
+        // physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
+        // worldBlocks = new WorldBody(App.instance, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Constructor
-    public Planet(final App game, PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
-        super(game, world, terraRadius);
-        this.game = game;
+    public Planet(PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
+        super(world, terraRadius, x, y);
 
-        float ppm = bodyComponent.world.getPhysScale();
-        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
-        transform.position.set(x, y);
-        transform.dp.set(x, y);
-
-        terrestrialHeight = (int)Math.floor(radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
+        terrestrialHeight = (int)Math.floor(getRadius() / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
         terrestrialWidth = (int)(2.0 * Math.PI * terrestrialHeight);
         atmosphereRadius = atmosRadius;
         atmosphereDensity = atmosDensity;
@@ -151,7 +145,8 @@ public class Planet extends Celestial {
 
             @Override
             public void update() {
-                starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
+                // starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
+                starDirection.set(1, 0, 0);
 
                 // Remove entities in the world still
                 while(leavingEnts.size() > 0){
@@ -178,7 +173,7 @@ public class Planet extends Celestial {
                 terraShader.setUniformf("u_starDirection", starDirection);
                 terraShader.setUniformf("u_planetWorldPos", transform.position);
                 terraShader.setUniformf("u_planetRadius", getRadius());
-                batch.draw(surfaceRender, radius * -1, radius * -1, radius * 2, radius * 2);
+                batch.draw(surfaceRender, getRadius() * -1, getRadius() * -1, getRadius() * 2, getRadius() * 2);
 
                 batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
                 batch.setTransformMatrix(new Matrix4());
@@ -200,8 +195,8 @@ public class Planet extends Celestial {
 
         debugTexture = new Texture(generator.getBiomeMap());
 
-        atmosShader = game.manager.get("shaders/atmosphere", ShaderProgram.class);
-        terraShader = game.manager.get("shaders/planet", ShaderProgram.class);
+        atmosShader = App.instance.manager.get("shaders/atmosphere", ShaderProgram.class);
+        terraShader = App.instance.manager.get("shaders/planet", ShaderProgram.class);
     }
 
     // Functions
@@ -364,7 +359,7 @@ public class Planet extends Celestial {
         TransformComponent transform = e.getComponent(TransformComponent.class);
 
         // is far enough to leave the planet's physics world
-        if(transform != null && transform.position.y > radius * 1.3f){
+        if(transform != null && transform.position.y > getRadius() * 1.3f){
             // Move it into this world
             leavingEnts.push(e);
             return true;
@@ -394,12 +389,6 @@ public class Planet extends Celestial {
         float force = (1.0f / 2.0f) * (density * velSqr * Constants.DRAG_COEFFICIENT);
 
         return velDir.scl(-1 * force);
-    }
-
-    @Override
-    public Vector2 applyPhysics(float delta, IEntity e){
-        checkTransferPlanet(e);
-        return super.applyPhysics(delta, e).add(applyDrag(e.getComponent(BodyComponent.class)));
     }
 
     @Override

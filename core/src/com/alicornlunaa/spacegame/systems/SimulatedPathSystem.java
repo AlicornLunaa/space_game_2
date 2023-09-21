@@ -8,7 +8,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.SimulatedPathScript;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -40,7 +40,7 @@ public class SimulatedPathSystem implements ISystem {
         Vector2 vel = transform.velocity.cpy();
 
         for(int i = 0; i < MAX_STEPS; i++){
-            for(Celestial other : game.gameScene.universe.getCelestials()){
+            for(Celestial2 other : game.gameScene.universe.getCelestials()){
                 if(other == entity) continue;
 
                 Body a = bodyComponent.body;

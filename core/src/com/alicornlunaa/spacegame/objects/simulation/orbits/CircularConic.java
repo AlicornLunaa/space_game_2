@@ -14,6 +14,7 @@ public class CircularConic extends GenericConic {
     public CircularConic(double parentMass, Vector2 position, Vector2 velocity) { super(parentMass, position, velocity); }
     public CircularConic(IEntity parent, IEntity child, Vector2 position, Vector2 velocity) { super(parent, child, position, velocity); }
     public CircularConic(IEntity parent, IEntity child) { super(parent, child); }
+    public CircularConic(IEntity parent, IEntity child, double a, double e, double w, double v, double i) { super(parent, child, a, e, w, v, i); }
 
     @Override
     public double meanAnomalyToEccentricAnomaly(double ma) {

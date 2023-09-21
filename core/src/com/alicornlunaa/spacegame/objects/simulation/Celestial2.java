@@ -96,15 +96,6 @@ public class Celestial2 extends BaseEntity {
                     transform.position.set(conicRails.getPosition(anomaly).scl(bodyComponent.world.getPhysScale()));
                     transform.position.add(conicRails.getParent().getComponent(TransformComponent.class).position);
 
-
-                    // Vector2 updatedVelocity = conicRails.getVelocity(anomaly);//.add(transform.velocity);
-                    // conicRails = new EllipticalConic(
-                    //     conicRails.getParent(),
-                    //     Celestial2.this,
-                    //     transform.position,
-                    //     updatedVelocity
-                    // );
-                    transform.velocity.scl(0);
                     transform.velocity.set(conicRails.getVelocity(anomaly));
                     transform.velocity.add(conicRails.getParent().getComponent(TransformComponent.class).velocity);
                     
@@ -122,6 +113,12 @@ public class Celestial2 extends BaseEntity {
 
         // Initialize rails
         conicRails = new EllipticalConic(parent, this);
+    }
+
+    public Celestial2(PhysWorld world, Celestial2 parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
+        // Create celestial that orbits around another
+        this(world, radius, parent.getComponent(TransformComponent.class).position.x + semiMajorAxis, parent.getComponent(TransformComponent.class).position.y);
+        conicRails = new EllipticalConic(parent, this, semiMajorAxis, eccentricity, periapsis, trueAnomaly, inclination);
     }
 
     // Functions

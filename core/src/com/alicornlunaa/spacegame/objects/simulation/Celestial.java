@@ -63,7 +63,7 @@ public class Celestial extends BaseEntity {
 
         shape.dispose();
 
-        addComponent(new GravityScript(game, this));
+        // addComponent(new GravityScript(game, this));
         // addComponent(new PlanetPhysScript(this));
         addComponent(new CustomSpriteComponent() {
             @Override
@@ -102,8 +102,9 @@ public class Celestial extends BaseEntity {
         // TODO: TEMP
         bodyComponent.sync(transform);
 
-        GenericConic c = OrbitPropagator.getConic(getCelestialParent(), this);
-        return (float)(c.getSemiMajorAxis() * Math.pow(bodyComponent.body.getMass() / getCelestialParent().bodyComponent.body.getMass(), 2.0 / 5.0)) * Constants.PPM;
+        // GenericConic c = OrbitPropagator.getConic(getCelestialParent(), this);
+        // return (float)(c.getSemiMajorAxis() * Math.pow(bodyComponent.body.getMass() / getCelestialParent().bodyComponent.body.getMass(), 2.0 / 5.0)) * Constants.PPM;
+        return 1;
     }
 
     // Physics functions
