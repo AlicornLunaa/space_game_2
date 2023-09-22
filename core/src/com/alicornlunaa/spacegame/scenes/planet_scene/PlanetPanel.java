@@ -25,7 +25,6 @@ public class PlanetPanel extends Stage {
     // Variables
     private final App game;
     private Planet planet;
-
     private Texture texture;
     private ShaderProgram cartesianAtmosShader;
 
@@ -71,7 +70,6 @@ public class PlanetPanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
-        game.gameScene.universe.update(delta);
 
         if(!game.gameScene.player.isDriving() && game.gameScene.player.bodyComponent.world instanceof PlanetaryPhysWorld)
             game.gameScene.player.transform.rotation = 0;
@@ -81,7 +79,7 @@ public class PlanetPanel extends Stage {
     public void draw(){
         // Draw every map tile
         Batch batch = getBatch();
-        batch.setProjectionMatrix(getCamera().combined);
+        batch.setProjectionMatrix(game.camera.combined);
         batch.setTransformMatrix(new Matrix4());
         
         // Save rendering state
@@ -108,10 +106,12 @@ public class PlanetPanel extends Stage {
         cartesianAtmosShader.setUniformf("u_atmosColor", planet.getAtmosphereColor());
         batch.draw(texture, 0, 0, 1280, 720);
         batch.setShader(null);
+        
+        App.instance.gameScene.registry.render();
 
         // World rendering
         WorldBody worldBody = planet.getWorldBody();
-        batch.setProjectionMatrix(proj);
+        batch.setProjectionMatrix(game.camera.combined);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));

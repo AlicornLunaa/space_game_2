@@ -402,9 +402,12 @@ public class WorldBody extends Group {
                     chunks[wrappedX][wrappedY] = new Chunk(game, world, wrappedX, wrappedY);
                 }
 
-                chunks[wrappedX][wrappedY].setVisible(true);
-                visibleChunks.add(chunks[wrappedX][wrappedY]);
-                this.addActor(chunks[wrappedX][wrappedY]);
+                // Only add if not visible already
+                if(!visibleChunks.contains(chunks[wrappedX][wrappedY], true)){
+                    chunks[wrappedX][wrappedY].setVisible(true);
+                    visibleChunks.add(chunks[wrappedX][wrappedY]);
+                    this.addActor(chunks[wrappedX][wrappedY]);
+                }
             }
         }
     
@@ -423,6 +426,27 @@ public class WorldBody extends Group {
     public void draw(Batch batch, float a){
         Matrix4 trans = batch.getTransformMatrix().cpy();
         super.draw(batch, a);
+        batch.setTransformMatrix(trans);
+    }
+
+    public void drawAll(Batch batch, float a){
+        Matrix4 trans = batch.getTransformMatrix().cpy();
+
+        int y = 0;
+        for(Chunk row[] : chunks){
+            int x = 0;
+            y++;
+
+            for(Chunk chunk : row){
+                x++;
+                if(chunk == null){
+                    chunk = new Chunk(game, world, x, y);
+                }
+
+                chunk.draw(batch, a);
+            }
+        }
+
         batch.setTransformMatrix(trans);
     }
     

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
-import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
@@ -13,7 +13,6 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.components.SimulatedPathScript;
-import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -157,7 +156,7 @@ public class Player extends BaseEntity {
         initializePhys(world, x, y);
         initializeAnims();
 
-        addComponent(new IScriptComponent() {
+        addComponent(new ScriptComponent(this) {
             @Override
             public void start(){}
             

@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.objects.simulation.orbits;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -54,7 +54,7 @@ public class OrbitPropagator {
         return new EllipticalConic(parentMass, position, velocity);
     }
 
-    public static GenericConic getConic(Celestial2 parent, IEntity child, Vector2 position, Vector2 velocity){
+    public static GenericConic getConic(Celestial parent, IEntity child, Vector2 position, Vector2 velocity){
         if(parent == null) return null;
 
         ConicType type = getConicType(parent.getComponent(BodyComponent.class).body.getMass(), position, velocity);
@@ -68,7 +68,7 @@ public class OrbitPropagator {
         return new EllipticalConic(parent, child, position, velocity);
     }
 
-    public static GenericConic getConic(Celestial2 parent, IEntity child){
+    public static GenericConic getConic(Celestial parent, IEntity child){
         if(parent == null) return null;
 
         ConicType type = getConicType(

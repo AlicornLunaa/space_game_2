@@ -5,7 +5,6 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -25,7 +24,7 @@ public class OrbitUtils {
         Vector2 dir = new Vector2();
         Vector2 absPos = e.getComponent(TransformComponent.class).position.cpy();
 
-        for(Celestial2 c : u.getCelestials()){
+        for(Celestial c : u.getCelestials()){
             Vector2 cAbsPos = c.getComponent(TransformComponent.class).position.cpy();
             float curDist = cAbsPos.dst2(absPos);
 
@@ -44,7 +43,7 @@ public class OrbitUtils {
      * @param e The entity to stablize into a near-circular orbit
      */
     public static void createOrbit(Universe u, IEntity e){
-        Celestial2 parent = u.getParentCelestial(e);
+        Celestial parent = u.getParentCelestial(e);
         if(parent == null) return; // Cant create an orbit for no parent
 
         TransformComponent celestialTransform = parent.getComponent(TransformComponent.class);
@@ -66,7 +65,7 @@ public class OrbitUtils {
      * @param entity
      * @return True or false
      */
-    public static boolean isOrbitDecaying(Celestial2 parent, BaseEntity entity){
+    public static boolean isOrbitDecaying(Celestial parent, BaseEntity entity){
         // TODO: Switch to velocity approach
         GenericConic gc = OrbitPropagator.getConic(parent, entity);
         return (gc.getPeriapsis() <= (parent.getRadius() * 1.2f) / parent.getComponent(BodyComponent.class).world.getPhysScale()) && !(gc instanceof HyperbolicConic);

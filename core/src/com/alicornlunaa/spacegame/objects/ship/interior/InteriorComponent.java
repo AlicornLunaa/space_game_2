@@ -1,6 +1,6 @@
 package com.alicornlunaa.spacegame.objects.ship.interior;
 
-import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
 // Component that allows for building a world within a ship
-public class InteriorComponent implements IScriptComponent {
+public class InteriorComponent extends ScriptComponent {
     // Variables
     private final App game;
     private final Ship ship;
@@ -23,6 +23,7 @@ public class InteriorComponent implements IScriptComponent {
 
     // Constructor
     public InteriorComponent(final App game, final Ship ship){
+        super(ship);
         this.game = game;
         this.ship = ship;
         world = new PhysWorld(Constants.SHIP_PPM);

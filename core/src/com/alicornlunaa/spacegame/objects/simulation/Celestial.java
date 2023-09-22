@@ -1,26 +1,22 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
-import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
-import com.alicornlunaa.spacegame.components.OrbitComponent;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
-import com.alicornlunaa.spacegame.scripts.GravityScript;
+import com.alicornlunaa.spacegame.components.RailsComponent;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Null;
 
 /**
  * A celstial is one of the super massive objects in space, ex. star, planet, moon
@@ -28,98 +24,109 @@ import com.badlogic.gdx.utils.Null;
  * when they are in the sphere of influence, and removed when they leave
  */
 public class Celestial extends BaseEntity {
-    // Static vars
-    private static int NEXT_CELESTIAL_ID = 0;
-    
     // Variables
-    protected final App game;
-    public TransformComponent transform;
-    public BodyComponent bodyComponent;
+    private TransformComponent transform = getComponent(TransformComponent.class);
+    private BodyComponent bodyComponent;
+    private RailsComponent railsComponent = addComponent(new RailsComponent());
 
-    // Planet variables
-    protected float radius;
-    protected float opacity = 1.f;
-    private int celestialID;
+    private float radius = 100.f;
 
-    // Physics variables
-    private @Null Celestial parent = null;
-    private Array<Celestial> children = new Array<>();
-    
-    // Constructor
-    public Celestial(final App game, PhysWorld world, float radius){
-        this.game = game;
+    // Constructors
+    public Celestial(PhysWorld world, float radius, float x, float y){
+        // Initialize self
         this.radius = radius;
-        this.celestialID = NEXT_CELESTIAL_ID++;
-        transform = getComponent(TransformComponent.class);
+        transform.position.x = x;
+        transform.position.y = y;
         
+        // Initialize body
         CircleShape shape = new CircleShape();
         shape.setRadius(radius / world.getPhysScale());
-        shape.setPosition(Vector2.Zero.cpy());
 
-        BodyDef def = new BodyDef();
-        def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(world, def));
-        bodyComponent.body.createFixture(shape, 1.0f);
+        bodyComponent = addComponent(new BodyComponent(world, new BodyDef()));
+        bodyComponent.body.setType(BodyType.DynamicBody);
+        bodyComponent.body.createFixture(shape, 100.0f);
+        bodyComponent.sync(transform);
 
         shape.dispose();
 
-        // addComponent(new GravityScript(game, this));
-        // addComponent(new PlanetPhysScript(this));
+        // Initialize components
         addComponent(new CustomSpriteComponent() {
             @Override
             public void render(Batch batch) {
                 if(!Constants.DEBUG) return;
                 batch.end();
-        
-                ShapeRenderer s = game.shapeRenderer;
-                s.begin(ShapeRenderer.ShapeType.Line);
-                s.setProjectionMatrix(batch.getProjectionMatrix());
-                s.setTransformMatrix(batch.getTransformMatrix());
-                s.setColor(Color.RED);
-                s.circle(0, 0, getSphereOfInfluence(), 500);
-                s.setColor(Color.YELLOW);
-                s.circle(0, 0, getRadius(), 500);
-                s.end();
-        
+                App.instance.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+
+                App.instance.shapeRenderer.setColor(Color.RED);
+                App.instance.shapeRenderer.circle(0, 0, getSphereOfInfluence(), 500);
+                App.instance.shapeRenderer.setColor(Color.YELLOW);
+                App.instance.shapeRenderer.circle(0, 0, getRadius(), 500);
+
+                if(railsComponent.conic != null){
+                    Constants.DEBUG = false;
+                    railsComponent.conic.draw(App.instance.shapeRenderer, 1);
+                    Constants.DEBUG = true;
+                }
+                
+                App.instance.shapeRenderer.end();
                 batch.begin();
             }
         });
-        addComponent(new OrbitComponent(game.gameScene.universe, this)).patchedConicsDepth = 0;
-        // addComponent(new SimulatedPathScript());
+        addComponent(new ScriptComponent(this) {
+            @Override
+            public void start() {}
+
+            @Override
+            public void render() {}
+
+            @Override
+            public void update() {
+                if(railsComponent.conic == null) return;
+
+                railsComponent.elapsedTime += Gdx.graphics.getDeltaTime();
+                double anomaly = railsComponent.conic.timeToMeanAnomaly(railsComponent.elapsedTime);
+
+                if(!Double.isNaN(anomaly)){
+                    transform.position.set(railsComponent.conic.getPosition(anomaly).scl(bodyComponent.world.getPhysScale()));
+                    transform.position.add(railsComponent.conic.getParent().getComponent(TransformComponent.class).position);
+
+                    transform.velocity.set(railsComponent.conic.getVelocity(anomaly));
+                    transform.velocity.add(railsComponent.conic.getParent().getComponent(TransformComponent.class).velocity);
+                    
+                    bodyComponent.sync(transform);
+                }
+            }
+        });
+    }
+
+    public Celestial(PhysWorld world, Celestial parent, float radius, float x, float y, float vx, float vy){
+        // Create celestial that orbits around another
+        this(world, radius, x, y);
+        transform.velocity.set(vx, vy);
+        bodyComponent.sync(transform);
+
+        // Initialize rails
+        railsComponent.conic = new EllipticalConic(parent, this);
+    }
+
+    public Celestial(PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
+        // Create celestial that orbits around another
+        this(world, radius, parent.getComponent(TransformComponent.class).position.x + semiMajorAxis, parent.getComponent(TransformComponent.class).position.y);
+        railsComponent.conic = new EllipticalConic(parent, this, semiMajorAxis, eccentricity, periapsis, trueAnomaly, inclination);
     }
 
     // Functions
-    public float getRadius(){ return radius; }
-    public int getCelestialID(){ return celestialID; }
-    public Array<Celestial> getChildren(){ return children; }
-    public Celestial getCelestialParent(){ return parent; }
-    public void setCelestialParent(Celestial c){ parent = c; }
-    public void setCelestialOpacity(float a){ opacity = a; }
+    public float getRadius(){
+        return radius;
+    }
 
     public float getSphereOfInfluence(){
-        if(getCelestialParent() == null) return radius * 200; // Star radius
+        if(railsComponent.conic != null){
+            return (float)((railsComponent.conic.getSemiMajorAxis() * bodyComponent.world.getPhysScale()) * Math.pow(bodyComponent.body.getMass() / railsComponent.conic.getParent().getComponent(BodyComponent.class).body.getMass(), 2.f/5.f));
+        }
 
-        // TODO: TEMP
-        bodyComponent.sync(transform);
-
-        // GenericConic c = OrbitPropagator.getConic(getCelestialParent(), this);
-        // return (float)(c.getSemiMajorAxis() * Math.pow(bodyComponent.body.getMass() / getCelestialParent().bodyComponent.body.getMass(), 2.0 / 5.0)) * Constants.PPM;
-        return 1;
-    }
-
-    // Physics functions
-    public Vector2 applyGravity(float delta, BodyComponent bc){
-        // Newtons gravitational law: F = (G(m1 * m2)) / r^2
-        if(bc == null) return new Vector2();
-        
-        float orbitRadius = bc.body.getPosition().dst(bodyComponent.body.getPosition()); // Entity radius in physics scale
-        Vector2 direction = bc.body.getPosition().cpy().sub(bodyComponent.body.getPosition()).cpy().nor().scl(-1);
-        float force = Constants.GRAVITY_CONSTANT * ((bc.body.getMass() * bodyComponent.body.getMass()) / (orbitRadius * orbitRadius));
-        return direction.scl(force);
-    }
-
-    public Vector2 applyPhysics(float delta, IEntity e){
-        // return applyGravity(delta, e.getComponent(BodyComponent.class));
-        return Vector2.Zero.cpy();
+        return radius * 4000;
     }
 }

@@ -69,14 +69,14 @@ public class SpaceInterface extends Stage {
         sasBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.gameScene.spacePanel.ship.getState().sas = !game.gameScene.spacePanel.ship.getState().sas;
+                game.gameScene.ship.getState().sas = !game.gameScene.ship.getState().sas;
             }
         });
 
         rcsBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                game.gameScene.spacePanel.ship.getState().rcs = !game.gameScene.spacePanel.ship.getState().rcs;
+                game.gameScene.ship.getState().rcs = !game.gameScene.ship.getState().rcs;
             }
         });
 
@@ -84,8 +84,8 @@ public class SpaceInterface extends Stage {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(!game.gameScene.player.isDriving()) return;
-                // game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, game.gameScene.spacePanel.ship), 0.15f));
-                game.gameScene.openShipView(game.gameScene.spacePanel.ship);
+                // game.vfxManager.add(new FadeTransitionScene(game, game.getScreen(), new ShipViewScene(game, game.gameScene.ship), 0.15f));
+                game.gameScene.openShipView(game.gameScene.ship);
             }
         });
 
@@ -95,7 +95,7 @@ public class SpaceInterface extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y){
                 if(game.gameScene.player.isDriving()){
-                    DriveableEntity ship = game.gameScene.spacePanel.ship;
+                    DriveableEntity ship = game.gameScene.ship;
                     ship.stopDriving();
 
                     if(ship.hasComponent(BodyComponent.class)){
@@ -105,7 +105,7 @@ public class SpaceInterface extends Stage {
                         game.gameScene.player.transform.velocity.set(shipTransform.velocity);
                     }
                 } else {
-                    DriveableEntity ship = game.gameScene.spacePanel.ship;
+                    DriveableEntity ship = game.gameScene.ship;
                     ship.drive(game.gameScene.player);
 
                     if(ship.hasComponent(BodyComponent.class)){
@@ -145,7 +145,7 @@ public class SpaceInterface extends Stage {
                     setKeyboardFocus(console);
                     return true;
                 } else if(keycode == ControlSchema.DEBUG_TOGGLE){
-                    game.gameScene.spacePanel.ship.getState().debug = !game.gameScene.spacePanel.ship.getState().debug;
+                    game.gameScene.ship.getState().debug = !game.gameScene.ship.getState().debug;
                     return true;
                 } else if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.gameScene.openMap();
@@ -162,10 +162,9 @@ public class SpaceInterface extends Stage {
     public void draw(){
         super.draw();
 
-        SpacePanel spacePanel = game.gameScene.spacePanel;
-        sasBtn.setColor(spacePanel.ship.getState().sas ? Color.GREEN : Color.RED);
-        rcsBtn.setColor(spacePanel.ship.getState().rcs ? Color.GREEN : Color.RED);
-        throttleBar.setValue(spacePanel.ship.getState().throttle);
+        sasBtn.setColor(game.gameScene.ship.getState().sas ? Color.GREEN : Color.RED);
+        rcsBtn.setColor(game.gameScene.ship.getState().rcs ? Color.GREEN : Color.RED);
+        throttleBar.setValue(game.gameScene.ship.getState().throttle);
 
         positionLabel.setText(game.gameScene.player.getPosition().toString());
         velocityLabel.setText(game.gameScene.player.getVelocity().toString());

@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.scripts;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -11,15 +11,13 @@ import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Vector2;
 
-public class PlanetPhysScript implements IScriptComponent {
+public class PlanetPhysScript extends ScriptComponent {
 
-    private IEntity entity;
     private TransformComponent transform;
     private BodyComponent entityBody;
 
     public PlanetPhysScript(IEntity entity){
-        this.entity = entity;
-
+        super((BaseEntity)entity);
         transform = entity.getComponent(TransformComponent.class);
         entityBody = entity.getComponent(BodyComponent.class);
     }
@@ -35,7 +33,7 @@ public class PlanetPhysScript implements IScriptComponent {
         Planet planet = ((PlanetaryPhysWorld)entityBody.world).getPlanet();
         float worldWidthPixels = planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
-        BaseEntity e = (BaseEntity)entity;
+        BaseEntity e = getEntity();
         if(transform.position.x > worldWidthPixels){
             transform.position.x -= worldWidthPixels;
         } else if(transform.position.x < 0){

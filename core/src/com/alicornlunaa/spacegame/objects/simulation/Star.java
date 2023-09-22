@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-public class Star extends Celestial2 {
+public class Star extends Celestial {
     // Variables
     // private float temperature = 0.0f;
     private Pixmap pixmap;

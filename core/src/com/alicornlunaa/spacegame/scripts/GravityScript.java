@@ -1,19 +1,19 @@
 package com.alicornlunaa.spacegame.scripts;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
+import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
+import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
-public class GravityScript implements IScriptComponent {
+public class GravityScript extends ScriptComponent {
     // Variables
     private Universe universe;
-    private IEntity entity;
 
     // Private functions
     private void applyGravity(Body a, Body b){
@@ -26,8 +26,8 @@ public class GravityScript implements IScriptComponent {
 
     // Constructor
     public GravityScript(Universe universe, IEntity entity){
+        super((BaseEntity)entity);
         this.universe = universe;
-        this.entity = entity;
     }
 
     // Functions
@@ -36,8 +36,8 @@ public class GravityScript implements IScriptComponent {
 
     @Override
     public void update() {
-        BodyComponent bc = entity.getComponent(BodyComponent.class);
-        Celestial2 parent = universe.getParentCelestial(entity);
+        BodyComponent bc = getEntity().getComponent(BodyComponent.class);
+        Celestial parent = universe.getParentCelestial(getEntity());
 
         if(bc == null) return;
         if(!(bc.world instanceof CelestialPhysWorld)) return;

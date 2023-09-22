@@ -7,11 +7,9 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
+import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -24,7 +22,7 @@ import com.badlogic.gdx.utils.Array;
  */
 public class Universe extends Actor {
     // Variables
-    private Array<Celestial2> celestials = new Array<>();
+    private Array<Celestial> celestials = new Array<>();
     private Array<Orbit> entityPaths = new Array<>();
     
     private Registry registry;
@@ -46,19 +44,19 @@ public class Universe extends Actor {
         e.getComponent(BodyComponent.class).setWorld(universalWorld);
     }
 
-    public void addCelestial(Celestial2 c){
+    public void addCelestial(Celestial c){
         // c.getComponent(BodyComponent.class).setWorld(universalWorld);
         celestials.add(c);
     }
 
-    public Array<Celestial2> getCelestials(){ return celestials; }
+    public Array<Celestial> getCelestials(){ return celestials; }
 
-    public Celestial2 getCelestial(int i){
+    public Celestial getCelestial(int i){
         if(i >= celestials.size) return null;
         return celestials.get(i);
     }
 
-    public Celestial2 getParentCelestial(IEntity e){
+    public Celestial getParentCelestial(IEntity e){
         TransformComponent transform = e.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
         
@@ -66,11 +64,11 @@ public class Universe extends Actor {
         // if(bodyComponent.world instanceof PlanetaryPhysWorld) return ((PlanetaryPhysWorld)bodyComponent.world).getPlanet();
 
         // Find closest
-        Celestial2 parent = null;
+        Celestial parent = null;
         float minDistance = Float.MAX_VALUE;
         float minSOISize = Float.MAX_VALUE;
 
-        for(Celestial2 c : celestials){
+        for(Celestial c : celestials){
             float curDistance = c.getComponent(TransformComponent.class).position.dst(transform.position);
             float curSOI = c.getSphereOfInfluence();
             
@@ -98,8 +96,8 @@ public class Universe extends Actor {
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
             for(IEntity e : registry.getEntities()){
-                if(!(e instanceof Celestial2)){
-                    Celestial2 parent = getParentCelestial(e);
+                if(e.hasComponent(GravityScript.class)){
+                    Celestial parent = getParentCelestial(e);
 
                     if(parent != null){
                         entityPaths.add(new Orbit(this, e));
@@ -123,41 +121,46 @@ public class Universe extends Actor {
             while(timeWarpAccumulator >= Constants.TIME_STEP){
                 timeWarpAccumulator -= Constants.TIME_STEP;
 
-                for(int i = 0; i < celestials.size; i++){
-                    GenericConic path = celestials.get(i).getConic();
-                    IEntity e = path.getChild();
+                // for(int i = 0; i < celestials.size; i++){
+                //     GenericConic path = celestials.get(i).getConic();
 
-                    if(e instanceof Planet){
-                        ((Planet)e).getStarDirection().set(OrbitUtils.directionToNearestStar(this, e), 0);
-                    }
-    
-                    TransformComponent transform = e.getComponent(TransformComponent.class);
-                    BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-                    Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture)).scl(universalWorld.getPhysScale());
-                    Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
-    
-                    if(transform == null) continue;
-                    if(bodyComponent == null) continue;
+                //     if(path == null) continue;
 
-                    transform.position.set(curPos);
-                    transform.velocity.set(curVel);
-                    bodyComponent.sync(transform);
-                }
+                //     IEntity parent = path.getParent();
+                //     IEntity entity = path.getChild();
+
+                //     if(entity instanceof Planet){
+                //         ((Planet)entity).getStarDirection().set(OrbitUtils.directionToNearestStar(this, entity), 0);
+                //     }
+    
+                //     TransformComponent transform = entity.getComponent(TransformComponent.class);
+                //     BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
+                //     Vector2 curPos = path.getPosition(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture)).scl(universalWorld.getPhysScale()).add(parent.getComponent(TransformComponent.class).position);
+                //     Vector2 curVel = path.getVelocity(path.getMeanAnomaly() + path.timeToMeanAnomaly(currentFuture));
+    
+                //     if(transform == null) continue;
+                //     if(bodyComponent == null) continue;
+
+                //     transform.position.set(curPos);
+                //     transform.velocity.set(curVel);
+                //     bodyComponent.sync(transform);
+                // }
 
                 for(int i = 0; i < entityPaths.size; i++){
                     Orbit path = entityPaths.get(i);
-                    IEntity e = path.getEntity();
+                    IEntity parent = path.getParent(currentFuture);
+                    IEntity entity = path.getEntity();
 
-                    TransformComponent transform = e.getComponent(TransformComponent.class);
-                    BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
+                    TransformComponent transform = entity.getComponent(TransformComponent.class);
+                    BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
     
                     if(transform == null) continue;
                     if(bodyComponent == null) continue;
                     if(!(bodyComponent.world instanceof CelestialPhysWorld)) continue; // Skip entities on a planet surface
 
-                    if(e instanceof Player && ((Player)e).isDriving()){
+                    if(entity instanceof Player && ((Player)entity).isDriving()){
                         // Skip player if player is inside a vehicle after parenting to vehicle
-                        DriveableEntity vehicle = ((Player)e).getVehicle();
+                        DriveableEntity vehicle = ((Player)entity).getVehicle();
                         TransformComponent vehicleTrans = vehicle.getComponent(TransformComponent.class);
                         transform.position.set(vehicleTrans.position);
                         transform.velocity.set(vehicleTrans.velocity);
@@ -165,19 +168,8 @@ public class Universe extends Actor {
                     }
     
                     // Celestial2 parent = path.getParent(currentFuture);
-                    Vector2 curPos = path.getPosition(currentFuture).scl(universalWorld.getPhysScale());
+                    Vector2 curPos = path.getPosition(currentFuture).scl(universalWorld.getPhysScale()).add(parent.getComponent(TransformComponent.class).position);;
                     Vector2 curVel = path.getVelocity(currentFuture);
-
-                    // if(parent != getParentCelestial(e)){
-                    //     // Transfer to new world
-                    //     if(parent == getParentCelestial(e).getCelestialParent()){
-                    //         // Tranferring to the parent
-                    //         removeFromCelestial(e);
-                    //     } else {
-                    //         // Transferring to a child
-                    //         addToCelestial(parent, e);
-                    //     }
-                    // }
 
                     transform.position.set(curPos);
                     transform.velocity.set(curVel);

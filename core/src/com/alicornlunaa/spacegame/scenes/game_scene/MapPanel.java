@@ -4,6 +4,7 @@ import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
+import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,6 +30,7 @@ public class MapPanel extends Stage {
     private @Null BaseEntity targetEntity = null;
     
     private float entityOpacity = 0.f;
+    private Orbit orbit;
 
     private TextureRegion shipIcon;
     // private TextureRegion apoapsisMarkerTexture;
@@ -43,6 +45,7 @@ public class MapPanel extends Stage {
         this.game = game;
         targetEntity = game.gameScene.player.isDriving() ? game.gameScene.player.getVehicle() : game.gameScene.player;
 
+        getViewport().setCamera(game.camera);
         mapCamera = (OrthographicCamera)getCamera();
         mapCamera.zoom = 300.f;
         mapCamera.update();
@@ -53,6 +56,8 @@ public class MapPanel extends Stage {
         game.vfxManager.add(new CameraZoomTransition(mapCamera, game.camera.zoom, mapCamera.zoom, 0.4f));
         game.gameScene.orbitSystem.visible = true;
 
+        orbit = new Orbit(game.gameScene.universe, game.gameScene.ship);
+
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
         // apoapsisMarkerTexture = game.atlas.findRegion("ui/apoapsis");
@@ -60,6 +65,7 @@ public class MapPanel extends Stage {
         backgroundTexture = game.gameScene.spacePanel.getStarfield();
 
         // Initializations
+        addActor(game.gameScene.universe);
         addActor(markers);
 
         // Controls
@@ -94,7 +100,6 @@ public class MapPanel extends Stage {
     @Override
     public void act(float delta){
         // Update the universe
-        game.gameScene.universe.update(delta);
 
         // Keep the predicted paths up to date
         markers.clear();
@@ -141,43 +146,10 @@ public class MapPanel extends Stage {
 
     public void drawUniverse(Batch batch){
         game.gameScene.registry.render();
-
-        // batch.setTransformMatrix(new Matrix4());
-
-        // for(IEntity eRaw : game.registry.getEntities()){
-        //     BaseEntity e = (BaseEntity)eRaw;
-        //     {
-        //         Matrix4 mat = new Matrix4();
-
-        //         Celestial parent = game.gameScene.universe.getParentCelestial(e);
-        //         if(parent != null){
-        //             mat.set(parent.getUniverseSpaceTransform());
-
-        //             if(e.getWorld() instanceof PlanetaryPhysWorld){
-        //                 // mat.mul(new Matrix4().set(e.getTransform().inv()));
-    
-        //                 // Convert the planetary coords to space coords
-        //                 double theta = ((e.getX() / (((Planet)parent).getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-        //                 float radius = e.getY();
-    
-        //                 // Convet to space position
-        //                 float x = (float)(Math.cos(theta) * radius);
-        //                 float y = (float)(Math.sin(theta) * radius);
-        //                 mat.translate(x, y, 0);
-        //             }
-        //         }
-
-        //         batch.setTransformMatrix(mat);
-        //         // e.render(batch);
-        //     }
-        // }
     }
 
     @Override
     public void draw(){
-        // Update camera
-        Vector2 plyPos = game.gameScene.player.transform.position;
-        mapCamera.position.set(plyPos, 0.0f);
         
         // Draw stars in the map view
         drawSkybox();
@@ -186,18 +158,6 @@ public class MapPanel extends Stage {
         // celestialOpacity = 1 - Math.min(Math.max(mapCamera.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_CELESTIAL, 0), 1);
         entityOpacity = Math.min(Math.max(mapCamera.zoom / Constants.MAP_VIEW_SIMPLE_ICONS_ENTS, 0), 1);
 
-        // Begin a shape drawing pass
-        game.shapeRenderer.setProjectionMatrix(mapCamera.combined);
-        game.shapeRenderer.begin(ShapeType.Filled);
-        // for(GenericConic o : orbits){
-        //     o.draw(game.shapeRenderer, mapCamera.zoom);
-        // }
-        // for(Orbit cs : patchedConics){
-        //     cs.draw(game.shapeRenderer, 1.5f * mapCamera.zoom);
-        // }
-        game.shapeRenderer.setTransformMatrix(new Matrix4());
-        game.shapeRenderer.end();
-
         // Begin a batch renderer pass
         Batch batch = getBatch();
         batch.setProjectionMatrix(mapCamera.combined);
@@ -205,12 +165,14 @@ public class MapPanel extends Stage {
         batch.begin();
         batch.setColor(1, 1, 1, entityOpacity);
 
+        drawUniverse(batch);
+
         Vector2 size = new Vector2(512, 512).scl(1.f / 20.f).scl(mapCamera.zoom);
         batch.setTransformMatrix(new Matrix4());
         batch.draw(
             shipIcon,
-            plyPos.x - size.x / 2.f,
-            plyPos.y - size.y / 2.f,
+            game.camera.position.x - size.x / 2.f,
+            game.camera.position.y - size.y / 2.f,
             size.x / 2.f,
             size.y / 2.f,
             size.x,
@@ -222,8 +184,14 @@ public class MapPanel extends Stage {
 
         batch.setColor(1, 1, 1, 1);
         batch.end();
+
+        App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+        App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+        App.instance.shapeRenderer.begin(ShapeType.Filled);
+        orbit.draw(App.instance.shapeRenderer, 5000);
+        orbit.recalculate();
+        App.instance.shapeRenderer.end();
         
-        drawUniverse(batch);
         super.draw();
     }
     

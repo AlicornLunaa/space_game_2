@@ -10,19 +10,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 
-public class CustomRenderSystem implements ISystem {
+public class SpaceRenderSystem implements ISystem {
 
 	// Variables
-	private final App game;
+	private boolean active = true;
 	private SpriteBatch batch;
 
 	// Constructor
-	public CustomRenderSystem(App game){
-		this.game = game;
+	public SpaceRenderSystem(){
 		batch = new SpriteBatch();
 	}
 	
 	// Functions
+	public void setActive(boolean a){
+		this.active = a;
+	}
+
 	@Override
 	public void beforeUpdate() {}
 
@@ -34,7 +37,7 @@ public class CustomRenderSystem implements ISystem {
 
 	@Override
 	public void beforeRender() {
-		batch.setProjectionMatrix(game.camera.combined);
+		batch.setProjectionMatrix(App.instance.camera.combined);
 		batch.setTransformMatrix(new Matrix4());
 		batch.begin();
 	}
@@ -46,6 +49,9 @@ public class CustomRenderSystem implements ISystem {
 
 	@Override
 	public void render(IEntity entity) {
+		// Skip if not active
+		if(!active) return;
+
 		// Get components
 		TransformComponent transform = entity.getComponent(TransformComponent.class);
 		BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
@@ -70,7 +76,7 @@ public class CustomRenderSystem implements ISystem {
 
 	@Override
 	public boolean shouldRunOnEntity(IEntity entity) {
-		return entity.hasComponent(CustomSpriteComponent.class);
+		return entity.hasComponent(CustomSpriteComponent.class) && active;
 	}
 	
 }

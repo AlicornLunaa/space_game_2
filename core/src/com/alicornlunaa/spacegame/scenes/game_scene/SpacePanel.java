@@ -2,7 +2,6 @@ package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -18,8 +17,6 @@ public class SpacePanel extends Stage {
     private final App game;
     private Starfield backgroundTexture;
 
-    public Ship ship;
-
     // Constructor
     public SpacePanel(final App game){
         super(new FillViewport(1280, 720));
@@ -29,10 +26,6 @@ public class SpacePanel extends Stage {
         addActor(game.gameScene.universe);
 
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
-
-        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), -100, 0, 0);
-        ship.load("./saves/ships/test.ship");
-        game.gameScene.universe.addEntity(ship);
 
         // Controls
         this.addListener(new InputListener(){
@@ -50,7 +43,6 @@ public class SpacePanel extends Stage {
     @Override
     public void act(float delta){
         super.act(delta);
-        game.gameScene.universe.update(delta);
     }
 
     public void drawSkybox(){

@@ -33,7 +33,7 @@ public class ConsoleWidget extends VisWindow {
         String[] args = cmd.split("\\s+");
         
         if(args[0].equals("loadship")){
-            game.gameScene.spacePanel.ship.load(args[1]);
+            game.gameScene.ship.load(args[1]);
         } else if(args[0].equals("settimewarp")){
             game.gameScene.universe.setTimewarp(Float.parseFloat(args[1]));
         } else if(args[0].equals("devkit")){

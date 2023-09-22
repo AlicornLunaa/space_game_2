@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.planet;
 import java.util.Stack;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.IScriptComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -12,10 +12,9 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
-import com.alicornlunaa.spacegame.objects.simulation.Celestial2;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -27,7 +26,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-public class Planet extends Celestial2 {
+public class Planet extends Celestial {
     // Variables
     private TransformComponent transform = getComponent(TransformComponent.class);
 
@@ -50,6 +49,7 @@ public class Planet extends Celestial2 {
     private Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
 
     private PhysWorld physWorld;
+    private Array<IEntity> entitiesOnPlanet = new Array<>();
     private Stack<BaseEntity> leavingEnts = new Stack<>();
     private WorldBody worldBlocks;
 
@@ -119,8 +119,8 @@ public class Planet extends Celestial2 {
     }
 
     private void generatePhysWorld(){
-        // physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
-        // worldBlocks = new WorldBody(App.instance, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
+        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld(this, Constants.PLANET_PPM));
+        worldBlocks = new WorldBody(App.instance, physWorld, terrestrialWidth, (int)(getAtmosphereRadius() / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Constructor
@@ -139,7 +139,7 @@ public class Planet extends Celestial2 {
         generateTexture();
         generateSurface();
         generatePhysWorld();
-        addComponent(new IScriptComponent() {
+        addComponent(new ScriptComponent(this) {
             @Override
             public void start(){}
 
@@ -153,8 +153,8 @@ public class Planet extends Celestial2 {
                     delEntityWorld(leavingEnts.pop());
                 }
 
-                // worldBlocks.act(Gdx.graphics.getDeltaTime());
-                // worldBlocks.update();
+                worldBlocks.act(Gdx.graphics.getDeltaTime());
+                worldBlocks.update();
             }
 
             @Override
@@ -174,6 +174,7 @@ public class Planet extends Celestial2 {
                 terraShader.setUniformf("u_planetWorldPos", transform.position);
                 terraShader.setUniformf("u_planetRadius", getRadius());
                 batch.draw(surfaceRender, getRadius() * -1, getRadius() * -1, getRadius() * 2, getRadius() * 2);
+                // worldBlocks.draw(batch, batch.getColor().a);
 
                 batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
                 batch.setTransformMatrix(new Matrix4());
@@ -308,6 +309,7 @@ public class Planet extends Celestial2 {
         // Add body
         bodyComponent.setWorld(physWorld);
         transform.sync(bodyComponent);
+        entitiesOnPlanet.add(e);
     }
 
     /**
@@ -337,6 +339,11 @@ public class Planet extends Celestial2 {
         // Remove body
         bodyComponent.setWorld(bodyComponent.world);
         transform.sync(bodyComponent);
+        entitiesOnPlanet.removeValue(e, true);
+    }
+
+    public boolean isOnPlanet(IEntity e){
+        return entitiesOnPlanet.contains(e, true);
     }
 
     public boolean checkTransferPlanet(IEntity e){
@@ -361,7 +368,7 @@ public class Planet extends Celestial2 {
         // is far enough to leave the planet's physics world
         if(transform != null && transform.position.y > getRadius() * 1.3f){
             // Move it into this world
-            leavingEnts.push(e);
+            // leavingEnts.push(e);
             return true;
         }
 

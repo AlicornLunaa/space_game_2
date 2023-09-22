@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.util;
 
 public class Constants {
-
     // Physics constants
     public static final float TIME_STEP = 1/512.f;
     public static final int VELOCITY_ITERATIONS = 8;
@@ -26,7 +25,7 @@ public class Constants {
     public static final int PATCHED_CONIC_STEPS = 256;
     public static final float MAP_VIEW_ZOOM_SENSITIVITY = 0.2f;
     public static final float MAP_VIEW_MIN_ZOOM = 1;
-    public static final float MAP_VIEW_MAX_ZOOM = 3000;
+    public static final float MAP_VIEW_MAX_ZOOM = 30000;
     public static final float MAP_VIEW_SIMPLE_ICONS_CELESTIAL = 1000;
     public static final float MAP_VIEW_SIMPLE_ICONS_ENTS = 20;
 
@@ -35,5 +34,4 @@ public class Constants {
 
     // Debug constants
     public static boolean DEBUG = true;
-
 }

@@ -5,7 +5,6 @@ import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.spacegame.objects.planet.Biome;
 import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
-import com.alicornlunaa.spacegame.scenes.testing_scene.TestScreen;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.alicornlunaa.spacegame.util.PartManager;
@@ -57,6 +56,7 @@ public class App extends Game {
 			public void loadAssets(Assets manager) {
 				manager.load("shaders/star", ShaderProgram.class);
 				manager.load("shaders/planet", ShaderProgram.class);
+				manager.load("shaders/terrain", ShaderProgram.class);
 				manager.load("shaders/starfield", ShaderProgram.class);
 				manager.load("shaders/atmosphere", ShaderProgram.class);
 				manager.load("shaders/cartesian_atmosphere", ShaderProgram.class);
@@ -116,10 +116,10 @@ public class App extends Game {
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame");
 
-				// gameScene = new GameplayScene(this);
-				// gameScene.init();
-				// this.setScreen(gameScene);
-				this.setScreen(new TestScreen());
+				gameScene = new GameplayScene(this);
+				gameScene.init();
+				this.setScreen(gameScene);
+				// this.setScreen(new TestScreen());
 			} else {
 				// Loading is not complete, update progress bar
 				loadingScene.progressBar.setValue(manager.getProgress());
