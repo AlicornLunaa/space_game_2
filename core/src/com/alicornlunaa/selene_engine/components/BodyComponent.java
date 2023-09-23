@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.utils.Array;
 
 public class BodyComponent implements IComponent {
-
     // Variables
     public Body body;
     public PhysWorld world;
@@ -117,5 +116,4 @@ public class BodyComponent implements IComponent {
         transform.dv.set(transform.velocity);
         transform.dr = transform.rotation;
     }
-
 }

@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
@@ -39,8 +40,6 @@ public class PlanetRenderSystem implements ISystem {
 
 	@Override
 	public void beforeRender() {
-		batch.setProjectionMatrix(App.instance.camera.combined);
-		batch.setTransformMatrix(new Matrix4());
 		batch.begin();
 	}
 
@@ -55,6 +54,9 @@ public class PlanetRenderSystem implements ISystem {
 		TransformComponent transform = entity.getComponent(TransformComponent.class);
 		BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
 		CustomSpriteComponent[] sprites = entity.getComponents(CustomSpriteComponent.class);
+		
+		batch.setProjectionMatrix(App.instance.camera.combined);
+		batch.setTransformMatrix(new Matrix4());
 
 		// Get global position
 		Matrix4 trans = new Matrix4();
@@ -76,7 +78,7 @@ public class PlanetRenderSystem implements ISystem {
 	@Override
 	public boolean shouldRunOnEntity(IEntity entity) {
 		if(planet == null) return false;
-		if(!planet.isOnPlanet(entity)) return false;
+		if(!planet.getComponent(PlanetComponent.class).isOnPlanet(entity)) return false;
 		return entity.hasComponent(CustomSpriteComponent.class);
 	}
 	

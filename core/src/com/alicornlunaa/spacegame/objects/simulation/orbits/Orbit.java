@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.simulation.orbits;
 import java.util.ArrayList;
 
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.components.RailsComponent;
+import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -47,7 +47,7 @@ public class Orbit {
             double futureTime = childConic.meanAnomalyToTime(meanAnomaly) + currentTime;
             double parentAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
             double childAnomaly = meanAnomaly + childConic.getMeanAnomaly();
-            double distInsideSOI = childConic.getPosition(childAnomaly).dst(parentConic.getPosition(parentAnomaly)) - (celestial.getSphereOfInfluence() / Constants.PPM);
+            double distInsideSOI = childConic.getPosition(childAnomaly).dst(parentConic.getPosition(parentAnomaly)) - (celestial.getComponent(CelestialComponent.class).getSphereOfInfluence() / Constants.PPM);
 
             if(distInsideSOI > 0.05){
                 startIntersectionGuess = meanAnomaly;
@@ -69,7 +69,7 @@ public class Orbit {
                 double futureTime = childConic.meanAnomalyToTime(x) + currentTime;
                 double parentAnomaly = parentConic.timeToMeanAnomaly(futureTime) + parentConic.getMeanAnomaly();
                 double childAnomaly = x + childConic.getMeanAnomaly();
-                return (childConic.getPosition(childAnomaly).dst(parentConic.getPosition(parentAnomaly)) - (celestial.getSphereOfInfluence() / Constants.PPM));
+                return (childConic.getPosition(childAnomaly).dst(parentConic.getPosition(parentAnomaly)) - (celestial.getComponent(CelestialComponent.class).getSphereOfInfluence() / Constants.PPM));
             }
         });
         intersection += childConic.getMeanAnomaly(); // Convert to periapsis-based anomaly
@@ -87,7 +87,7 @@ public class Orbit {
         Celestial parent = (Celestial)childConic.getParent();
 
         // Error check
-        if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getSphereOfInfluence() / 2 / Constants.PPM) || parent.getComponent(RailsComponent.class).conic.getParent() == null) return null;
+        if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getComponent(CelestialComponent.class).getSphereOfInfluence() / 2 / Constants.PPM) || parent.getComponent(CelestialComponent.class).conic.getParent() == null) return null;
         
         // Find first intersection by the changing value
         double startIntersectionGuess = -1.f;
@@ -99,7 +99,7 @@ public class Orbit {
             if(childConic instanceof HyperbolicConic)
                 meanAnomaly = (i / (patchedConicsDepth - 1)) * 2.0 * Math.PI * 30;
 
-            double distInsideSOI = childConic.getPosition(meanAnomaly).len() - (parent.getSphereOfInfluence() / Constants.PPM);
+            double distInsideSOI = childConic.getPosition(meanAnomaly).len() - (parent.getComponent(CelestialComponent.class).getSphereOfInfluence() / Constants.PPM);
 
             if(distInsideSOI < -0.05){
                 startIntersectionGuess = meanAnomaly;
@@ -118,7 +118,7 @@ public class Orbit {
         double intersection = RootSolver.bisection(startIntersectionGuess, endIntersectionGuess, new EquationInterface() {
             @Override
             public double func(double x){
-                return (childConic.getPosition(x).len() - (((Celestial)childConic.getParent()).getSphereOfInfluence() / Constants.PPM));
+                return (childConic.getPosition(x).len() - (childConic.getParent().getComponent(CelestialComponent.class).getSphereOfInfluence() / Constants.PPM));
             }
         });
 
@@ -137,7 +137,7 @@ public class Orbit {
         if(parent == null) return;
         if(depth > Constants.PATCHED_CONIC_LIMIT) return;
 
-        GenericConic parentConic = parent.getComponent(RailsComponent.class).conic;
+        GenericConic parentConic = parent.getComponent(CelestialComponent.class).conic;
         // Double exitAnomaly = getExitAnomaly(section, parentConic, currentTime);
 
         // if(exitAnomaly != null){
@@ -187,7 +187,7 @@ public class Orbit {
         for(Celestial celestial : universe.getCelestials()){
             if(celestial == parent) continue;
 
-            double enterAnomaly = getPatchAnomaly(section, celestial.getComponent(RailsComponent.class).conic, currentTime);
+            double enterAnomaly = getPatchAnomaly(section, celestial.getComponent(CelestialComponent.class).conic, currentTime);
             System.out.println(enterAnomaly);
         }
     }

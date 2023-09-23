@@ -5,11 +5,12 @@ import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
+import com.alicornlunaa.spacegame.components.CelestialComponent;
+import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.math.Vector2;
 
 public class PlanetPhysScript extends ScriptComponent {
 
@@ -31,7 +32,9 @@ public class PlanetPhysScript extends ScriptComponent {
         if(!(entityBody.world instanceof PlanetaryPhysWorld)) return;
 
         Planet planet = ((PlanetaryPhysWorld)entityBody.world).getPlanet();
-        float worldWidthPixels = planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
+        CelestialComponent celestialComponent = planet.getComponent(CelestialComponent.class);
+        PlanetComponent planetComponent = planet.getComponent(PlanetComponent.class);
+        float worldWidthPixels = planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
         BaseEntity e = getEntity();
         if(transform.position.x > worldWidthPixels){
@@ -40,13 +43,14 @@ public class PlanetPhysScript extends ScriptComponent {
             transform.position.x += worldWidthPixels;
         }
 
-        planet.checkLeavePlanet(e);
+        planetComponent.checkLeavePlanet(e);
         
         // Taken from Celestial.java to correctly apply the right force
-        Vector2 dragForce = planet.applyDrag(entityBody);
-        float height = Math.max(entityBody.body.getPosition().y, planet.getRadius() / planet.getComponent(BodyComponent.class).world.getPhysScale());
+        // Vector2 dragForce = planet.applyDrag(entityBody);
+        // entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / entityBody.world.getPhysScale() * 1.f)) + dragForce.y, true);
+        float height = Math.max(entityBody.body.getPosition().y, celestialComponent.radius / planet.getComponent(BodyComponent.class).world.getPhysScale());
         float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / (height * height));
-        entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / entityBody.world.getPhysScale() * 1.f)) + dragForce.y, true);
+        entityBody.body.applyForceToCenter(0.0f, -force, true);
     }
 
     @Override

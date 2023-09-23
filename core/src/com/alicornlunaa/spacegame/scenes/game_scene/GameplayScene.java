@@ -8,6 +8,7 @@ import com.alicornlunaa.selene_engine.systems.CameraSystem;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -116,7 +117,6 @@ public class GameplayScene extends BaseScene {
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
         planetRenderSystem = registry.registerSystem(new PlanetRenderSystem());
         orbitSystem = registry.registerSystem(new OrbitSystem(game));
-        // registry.registerSystem(new SimulatedPathSystem(game));
         registry.registerSystem(new ScriptSystem());
     }
     
@@ -175,14 +175,14 @@ public class GameplayScene extends BaseScene {
     }
 
     public void openPlanetView(Planet planet){
-        player.bodyComponent.setWorld(planet.getInternalPhysWorld());
+        player.bodyComponent.setWorld(planet.getComponent(PlanetComponent.class).physWorld);
         player.transform.position.set(0, 800);
         player.transform.rotation = 0;
         player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);
 
         state = GameplayState.PLANET;
 
-        planet.addEntityWorld(player);
+        planet.getComponent(PlanetComponent.class).addEntityWorld(player);
         planetViewPanel = new PlanetPanel(game, planet);
         planetViewInteface = new PlanetUIPanel(game);
         planetViewPanel.getViewport().setCamera(player.getComponent(CameraComponent.class).camera);

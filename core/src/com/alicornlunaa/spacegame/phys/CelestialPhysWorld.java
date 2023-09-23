@@ -4,7 +4,6 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 
 public class CelestialPhysWorld extends PhysWorld {
-
     // Variables
     private Celestial parent;
 
@@ -15,6 +14,7 @@ public class CelestialPhysWorld extends PhysWorld {
     }
 
     // Functions
-    public Celestial getParent(){ return parent; }
-
+    public Celestial getParent(){
+        return parent;
+    }
 }

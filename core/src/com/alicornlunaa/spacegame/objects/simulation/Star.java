@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -16,6 +17,7 @@ public class Star extends Celestial {
     private Pixmap pixmap;
     private Texture starTexture;
     private ShaderProgram shader;
+    private CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
 
     // Private functions
     public void generateSprite(){
@@ -35,7 +37,7 @@ public class Star extends Celestial {
             @Override
             public void render(Batch batch) {
                 batch.setShader(shader);
-                batch.draw(starTexture, getRadius() * -1, getRadius() * -1, getRadius() * 2, getRadius() * 2);
+                batch.draw(starTexture, celestialComponent.radius * -1, celestialComponent.radius * -1, celestialComponent.radius * 2, celestialComponent.radius * 2);
                 batch.setShader(null);
             }
         });

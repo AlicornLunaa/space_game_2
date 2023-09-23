@@ -7,7 +7,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 
 public class BoxColliderComponent implements IComponent, Disposable {
-    
     public PolygonShape shape = new PolygonShape();
     public Fixture fixture;
     
@@ -24,5 +23,4 @@ public class BoxColliderComponent implements IComponent, Disposable {
     public void dispose() {
         shape.dispose();
     }
-
 }

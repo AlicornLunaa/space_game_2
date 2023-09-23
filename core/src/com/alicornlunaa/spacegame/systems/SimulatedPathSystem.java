@@ -7,7 +7,6 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.components.SimulatedPathScript;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -98,7 +97,7 @@ public class SimulatedPathSystem implements ISystem {
 
     @Override
     public boolean shouldRunOnEntity(IEntity entity) {
-        return entity.hasComponent(SimulatedPathScript.class);
+        return false;
     }
     
 }

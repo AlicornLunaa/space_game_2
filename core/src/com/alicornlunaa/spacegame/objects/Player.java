@@ -12,7 +12,6 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.OrbitComponent;
-import com.alicornlunaa.spacegame.components.SimulatedPathScript;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -199,7 +198,6 @@ public class Player extends BaseEntity {
             @Override
             public void render() {}
         });
-    
         addComponent(new CustomSpriteComponent() {
             @Override
             public void render(Batch batch) {
@@ -222,9 +220,7 @@ public class Player extends BaseEntity {
                 );
             }
         });
-
         addComponent(new CameraComponent(1280, 720));
-        addComponent(new SimulatedPathScript());
         
         // orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
     }

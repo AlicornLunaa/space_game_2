@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 @SuppressWarnings("unused")
-public abstract class BaseEntity implements IEntity, Disposable, Reloadable {
+public class BaseEntity implements IEntity, Disposable, Reloadable {
     // Variables
     private Array<IComponent> components = new Array<>();
     private TransformComponent transform = addComponent(new TransformComponent());

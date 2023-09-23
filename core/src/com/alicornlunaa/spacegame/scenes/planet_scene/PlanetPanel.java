@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.scenes.planet_scene;
 
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
@@ -21,10 +22,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
 public class PlanetPanel extends Stage {
-    
     // Variables
     private final App game;
     private Planet planet;
+    private PlanetComponent planetComponent;
     private Texture texture;
     private ShaderProgram cartesianAtmosShader;
 
@@ -42,11 +43,12 @@ public class PlanetPanel extends Stage {
         super(new FillViewport(1280, 720));
         this.game = game;
         this.planet = planet;
+        planetComponent = planet.getComponent(PlanetComponent.class);
 
         cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
         generateTexture();
         getViewport().setCamera(game.camera);
-        addActor(planet.getWorldBody());
+        addActor(planetComponent.worldBody);
 
         // Controls
         this.addListener(new InputListener(){
@@ -99,36 +101,31 @@ public class PlanetPanel extends Stage {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
         batch.setTransformMatrix(new Matrix4());
         cartesianAtmosShader.setUniformMatrix("u_invCamTrans", invProj);
-        cartesianAtmosShader.setUniformf("u_starDirection", planet.getStarDirection());
-        cartesianAtmosShader.setUniformf("u_planetRadius", planet.getTerrestrialHeight() * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
-        cartesianAtmosShader.setUniformf("u_planetCircumference", planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
-        cartesianAtmosShader.setUniformf("u_atmosRadius", planet.getAtmosphereRadius());
-        cartesianAtmosShader.setUniformf("u_atmosColor", planet.getAtmosphereColor());
+        cartesianAtmosShader.setUniformf("u_starDirection", planetComponent.starDirection);
+        cartesianAtmosShader.setUniformf("u_planetRadius", planetComponent.chunkHeight * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.setUniformf("u_planetCircumference", planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.setUniformf("u_atmosRadius", planetComponent.atmosphereRadius);
+        cartesianAtmosShader.setUniformf("u_atmosColor", planetComponent.getAtmosphereColor());
         batch.draw(texture, 0, 0, 1280, 720);
         batch.setShader(null);
         
         App.instance.gameScene.registry.render();
 
         // World rendering
-        WorldBody worldBody = planet.getWorldBody();
+        WorldBody worldBody = planetComponent.worldBody;
         batch.setProjectionMatrix(game.camera.combined);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
+        batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(planet.getTerrestrialWidth() * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
+        batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4());
-
-        // TODO: Replace
-        // for(IEntity e : planet.getInternalPhysWorld().getEntities()){
-        //     e.render(batch);
-        // }
 
         batch.end();
         super.draw();
 
         // Debug rendering
         if(Constants.DEBUG){
-            game.debug.render(planet.getInternalPhysWorld().getBox2DWorld(), game.camera.combined.cpy().scl(Constants.PLANET_PPM));
+            game.debug.render(planetComponent.physWorld.getBox2DWorld(), game.camera.combined.cpy().scl(Constants.PLANET_PPM));
         }
     }
 
@@ -137,5 +134,4 @@ public class PlanetPanel extends Stage {
         texture.dispose();
         super.dispose();
     }
-
 }

@@ -51,6 +51,8 @@ public class SpaceRenderSystem implements ISystem {
 	public void render(IEntity entity) {
 		// Skip if not active
 		if(!active) return;
+		batch.setProjectionMatrix(App.instance.camera.combined);
+		batch.setTransformMatrix(new Matrix4());
 
 		// Get components
 		TransformComponent transform = entity.getComponent(TransformComponent.class);

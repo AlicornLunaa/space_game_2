@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
@@ -69,11 +70,12 @@ public class Universe extends Actor {
         float minSOISize = Float.MAX_VALUE;
 
         for(Celestial c : celestials){
+            CelestialComponent celestialComponent = c.getComponent(CelestialComponent.class);
             float curDistance = c.getComponent(TransformComponent.class).position.dst(transform.position);
-            float curSOI = c.getSphereOfInfluence();
+            float curSOI = celestialComponent.getSphereOfInfluence();
             
             if(e == c) continue;
-            if(curDistance >= minDistance || curDistance >= c.getSphereOfInfluence()) continue;
+            if(curDistance >= minDistance || curDistance >= celestialComponent.getSphereOfInfluence()) continue;
             if(curSOI >= minSOISize) continue;
             if(bodyComponent.body.getMass() >= c.getComponent(BodyComponent.class).body.getMass()) continue;
 

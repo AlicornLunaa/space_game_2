@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TextureComponent implements IComponent, Reloadable {
-
     public String textureName;
     public TextureRegion texture;
 
@@ -21,5 +20,4 @@ public class TextureComponent implements IComponent, Reloadable {
     public void reload(Assets manager) {
         texture.setRegion(manager.get(textureName, Texture.class));
     }
-
 }
