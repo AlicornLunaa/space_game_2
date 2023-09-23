@@ -1,6 +1,7 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
@@ -29,8 +30,8 @@ public class Star extends Celestial {
     }
 
     // Constructor
-    public Star(PhysWorld world, float radius, float x, float y){
-        super(world, radius, x, y);
+    public Star(PhysicsSystem phys, PhysWorld world, float radius, float x, float y){
+        super(phys, world, radius, x, y);
         generateSprite();
 
         addComponent(new CustomSpriteComponent() {

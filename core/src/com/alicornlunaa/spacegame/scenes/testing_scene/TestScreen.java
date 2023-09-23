@@ -42,7 +42,7 @@ public class TestScreen implements Screen {
         registry.registerSystem(new CameraSystem(App.instance));
         simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(App.instance));
-        registry.registerSystem(new SpaceRenderSystem());
+        registry.registerSystem(new SpaceRenderSystem(universe));
         registry.registerSystem(new ScriptSystem());
 
         universe = new Universe(registry);
@@ -68,7 +68,7 @@ public class TestScreen implements Screen {
         // registry.addEntity(testPlanet);
         // universe.addCelestial(testPlanet);
         
-        Planet test = new Planet(world, -1000, 0, 500, 560, 1);
+        Planet test = new Planet(simulation, world, -1000, 0, 500, 560, 1);
         registry.addEntity(test);
 
         Ship ship = new Ship(App.instance, world, -64, 0, 0);

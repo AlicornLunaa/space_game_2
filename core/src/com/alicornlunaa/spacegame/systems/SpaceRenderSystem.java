@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -17,7 +18,7 @@ public class SpaceRenderSystem implements ISystem {
 	private SpriteBatch batch;
 
 	// Constructor
-	public SpaceRenderSystem(){
+	public SpaceRenderSystem(Universe universe){
 		batch = new SpriteBatch();
 	}
 	
@@ -61,6 +62,7 @@ public class SpaceRenderSystem implements ISystem {
 
 		// Get global position
 		Matrix4 trans = new Matrix4();
+
 		trans.translate(transform.position.x, transform.position.y, 0.0f);
 		trans.rotateRad(0, 0, 1, transform.rotation);
 
@@ -78,7 +80,7 @@ public class SpaceRenderSystem implements ISystem {
 
 	@Override
 	public boolean shouldRunOnEntity(IEntity entity) {
-		return entity.hasComponent(CustomSpriteComponent.class) && active;
+		return entity.hasComponents(CustomSpriteComponent.class, TransformComponent.class) && active;
 	}
 	
 }

@@ -1,16 +1,15 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,7 +23,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
  * when they are in the sphere of influence, and removed when they leave
  */
 public class Celestial extends BaseEntity {
-    public Celestial(PhysWorld world, float radius, float x, float y){
+    public Celestial(PhysicsSystem phys, PhysWorld world, float radius, float x, float y){
         // Initialize self
         TransformComponent transform = getComponent(TransformComponent.class);
         transform.position.x = x;
@@ -42,7 +41,7 @@ public class Celestial extends BaseEntity {
         shape.dispose();
 
         // Initialize components
-        addComponent(new CelestialComponent(this, radius));
+        addComponent(new CelestialComponent(this, phys, radius));
         addComponent(new CustomSpriteComponent() {
             private CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
 
@@ -69,40 +68,11 @@ public class Celestial extends BaseEntity {
                 batch.begin();
             }
         });
-        addComponent(new ScriptComponent(this) {
-            private TransformComponent transform = getEntity().getComponent(TransformComponent.class);
-            private BodyComponent bodyComponent = getEntity().getComponent(BodyComponent.class);
-            private CelestialComponent celestialComponent = getEntity().getComponent(CelestialComponent.class);
-
-            @Override
-            public void start() {}
-
-            @Override
-            public void render() {}
-
-            @Override
-            public void update() {
-                if(celestialComponent.conic == null) return;
-
-                celestialComponent.elapsedTime += Gdx.graphics.getDeltaTime();
-                double anomaly = celestialComponent.conic.timeToMeanAnomaly(celestialComponent.elapsedTime);
-
-                if(!Double.isNaN(anomaly)){
-                    transform.position.set(celestialComponent.conic.getPosition(anomaly).scl(bodyComponent.world.getPhysScale()));
-                    transform.position.add(celestialComponent.conic.getParent().getComponent(TransformComponent.class).position);
-
-                    transform.velocity.set(celestialComponent.conic.getVelocity(anomaly));
-                    transform.velocity.add(celestialComponent.conic.getParent().getComponent(TransformComponent.class).velocity);
-                    
-                    bodyComponent.sync(transform);
-                }
-            }
-        });
     }
 
-    public Celestial(PhysWorld world, Celestial parent, float radius, float x, float y, float vx, float vy){
+    public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float x, float y, float vx, float vy){
         // Create celestial that orbits around another
-        this(world, radius, x, y);
+        this(phys, world, radius, x, y);
         
         TransformComponent transform = getComponent(TransformComponent.class);
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
@@ -114,9 +84,10 @@ public class Celestial extends BaseEntity {
         celestialComponent.conic = new EllipticalConic(parent, this);
     }
 
-    public Celestial(PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
+    public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
         // Create celestial that orbits around another
         this(
+            phys,
             world,
             radius,
             parent.getComponent(TransformComponent.class).position.x + semiMajorAxis,

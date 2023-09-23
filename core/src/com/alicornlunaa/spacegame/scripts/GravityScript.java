@@ -19,8 +19,8 @@ public class GravityScript extends ScriptComponent {
     private void applyGravity(Body a, Body b){
         float m1 = a.getMass();
         float m2 = b.getMass();
-        float r = b.getPosition().dst(a.getPosition());
-        Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
+        float r = a.getPosition().len();
+        Vector2 direction = a.getPosition().cpy().nor();
         a.applyForceToCenter(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)), true);
     }
 
