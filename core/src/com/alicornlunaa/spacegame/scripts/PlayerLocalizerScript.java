@@ -27,12 +27,10 @@ public class PlayerLocalizerScript extends ScriptComponent {
         TransformComponent transform = getEntity().getComponent(TransformComponent.class);
         Vector2 subFactor = transform.position.cpy();
 
-        if(transform.position.len() > 1000){
-            // Move every entity to make it zero
-            for(int i = 0; i < registry.getEntities().size; i++){
-                IEntity e = registry.getEntity(i);
-                e.getComponent(TransformComponent.class).position.sub(subFactor);
-            }
+        // Move every entity to make it zero
+        for(int i = 0; i < registry.getEntities().size; i++){
+            IEntity e = registry.getEntity(i);
+            e.getComponent(TransformComponent.class).position.sub(subFactor);
         }
     }
 

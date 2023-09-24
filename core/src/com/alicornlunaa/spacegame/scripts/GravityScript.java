@@ -20,7 +20,7 @@ public class GravityScript extends ScriptComponent {
         float m1 = a.getMass();
         float m2 = b.getMass();
         float r = a.getPosition().len();
-        Vector2 direction = a.getPosition().cpy().nor();
+        Vector2 direction = a.getPosition().cpy().nor().scl(-1);
         a.applyForceToCenter(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)), true);
     }
 

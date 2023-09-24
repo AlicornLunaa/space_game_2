@@ -73,8 +73,8 @@ public class OrbitPropagator {
 
         ConicType type = getConicType(
             parent.getComponent(BodyComponent.class).body.getMass(),
-            child.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(parent.getComponent(BodyComponent.class).body.getWorldCenter()),
-            child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(parent.getComponent(BodyComponent.class).body.getLinearVelocity())
+            child.getComponent(BodyComponent.class).body.getWorldCenter().cpy(),
+            child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy()
         );
 
         if(type == ConicType.HYPERBOLIC){

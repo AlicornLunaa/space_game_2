@@ -55,7 +55,7 @@ public class CelestialComponent extends ScriptComponent {
             return (float)((conic.getSemiMajorAxis() * bodyComponent.world.getPhysScale()) * Math.pow(bodyComponent.body.getMass() / conic.getParent().getComponent(BodyComponent.class).body.getMass(), 2.f/5.f));
         }
 
-        return radius * 4000;
+        return radius * 4;
     }
     
     @Override
@@ -64,6 +64,9 @@ public class CelestialComponent extends ScriptComponent {
 
     @Override
     public void update(){
+        // Update offset
+        influenceWorld.getOffset().set(transform.position);
+
         // Update rails
         if(conic != null){
             elapsedTime += Gdx.graphics.getDeltaTime();
@@ -72,11 +75,7 @@ public class CelestialComponent extends ScriptComponent {
             if(!Double.isNaN(anomaly)){
                 transform.position.set(conic.getPosition(anomaly).scl(bodyComponent.world.getPhysScale()));
                 transform.position.add(conic.getParent().getComponent(TransformComponent.class).position);
-
-                transform.velocity.set(conic.getVelocity(anomaly));
-                transform.velocity.add(conic.getParent().getComponent(TransformComponent.class).velocity);
-                
-                bodyComponent.sync(transform);
+                bodyComponent.body.setLinearVelocity(conic.getVelocity(anomaly));
             }
         }
     }

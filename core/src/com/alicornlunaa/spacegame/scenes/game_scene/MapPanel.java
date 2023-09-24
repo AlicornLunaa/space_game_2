@@ -56,7 +56,7 @@ public class MapPanel extends Stage {
         game.vfxManager.add(new CameraZoomTransition(mapCamera, game.camera.zoom, mapCamera.zoom, 0.4f));
         game.gameScene.orbitSystem.visible = true;
 
-        orbit = new Orbit(game.gameScene.universe, game.gameScene.ship);
+        orbit = new Orbit(game.gameScene.universe, game.gameScene.player);
 
         // Load textures
         shipIcon = game.atlas.findRegion("ui/ship_icon");
@@ -188,7 +188,7 @@ public class MapPanel extends Stage {
         App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
         App.instance.shapeRenderer.begin(ShapeType.Filled);
-        orbit.draw(App.instance.shapeRenderer, 5000);
+        // orbit.draw(App.instance.shapeRenderer, 5000);
         orbit.recalculate();
         App.instance.shapeRenderer.end();
         

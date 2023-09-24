@@ -29,7 +29,6 @@ public class CelestialSystem implements ISystem {
 
         if(parents.get(entity) != entityParent){
             // Transfer to new parent
-            TransformComponent entityTransformComponent = entity.getComponent(TransformComponent.class);
             BodyComponent entityBodyComponent = entity.getComponent(BodyComponent.class);
 
             parents.put(entity, entityParent);
@@ -38,26 +37,21 @@ public class CelestialSystem implements ISystem {
             if(oldEntityParent != null){
                 // Old parent exists, remove from it
                 CelestialComponent oldParentCelestialComponent = oldEntityParent.getComponent(CelestialComponent.class);
-                TransformComponent oldParentTransformComponent = oldEntityParent.getComponent(TransformComponent.class);
                 BodyComponent oldParentBodyComponent = oldEntityParent.getComponent(BodyComponent.class);
                 
-                entityBodyComponent.setWorld(oldParentCelestialComponent.influenceWorld);
                 entityBodyComponent.body.setLinearVelocity(entityBodyComponent.body.getLinearVelocity().cpy().add(oldParentBodyComponent.body.getLinearVelocity()));
-                entityTransformComponent.position.add(oldParentTransformComponent.position);
-                entityBodyComponent.sync(entityTransformComponent);
+                entityBodyComponent.body.setTransform(entityBodyComponent.body.getPosition().cpy().add(oldParentBodyComponent.body.getPosition()), entityBodyComponent.body.getAngle());
                 oldParentCelestialComponent.children.removeValue(entity, true);
             }
 
             if(entityParent != null){
                 // New parent exists, remove from it
                 CelestialComponent newParentCelestialComponent = entityParent.getComponent(CelestialComponent.class);
-                TransformComponent newParentTransformComponent = entityParent.getComponent(TransformComponent.class);
                 BodyComponent newParentBodyComponent = entityParent.getComponent(BodyComponent.class);
                 
-                entityBodyComponent.setWorld(newParentCelestialComponent.influenceWorld);
                 entityBodyComponent.body.setLinearVelocity(entityBodyComponent.body.getLinearVelocity().cpy().sub(newParentBodyComponent.body.getLinearVelocity()));
-                entityTransformComponent.position.sub(newParentTransformComponent.position);
-                entityBodyComponent.sync(entityTransformComponent);
+                entityBodyComponent.body.setTransform(entityBodyComponent.body.getPosition().cpy().sub(newParentBodyComponent.body.getPosition()), entityBodyComponent.body.getAngle());
+                entityBodyComponent.setWorld(newParentCelestialComponent.influenceWorld);
                 newParentCelestialComponent.children.add(entity);
             } else {
                 // No new parent, add to the universal world

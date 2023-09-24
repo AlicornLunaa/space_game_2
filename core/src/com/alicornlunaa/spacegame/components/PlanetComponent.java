@@ -46,18 +46,6 @@ public class PlanetComponent extends ScriptComponent {
     // Constructor
     public PlanetComponent(Planet entity) {
         super(entity);
-
-        generator = new TerrainGenerator(
-            chunkWidth * Constants.CHUNK_SIZE / 20,
-            chunkHeight * Constants.CHUNK_SIZE / 20,
-            terrainSeed
-        );
-
-        atmosComposition.add(Color.CYAN);
-        atmosPercentages.add(1.f);
-        
-        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld(entity, Constants.PLANET_PPM));
-        worldBody = new WorldBody(App.instance, physWorld, chunkWidth, (int)(atmosphereRadius / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     // Functions
@@ -204,6 +192,17 @@ public class PlanetComponent extends ScriptComponent {
     // Script functions
     @Override
     public void start() {
+        generator = new TerrainGenerator(
+            chunkWidth * Constants.CHUNK_SIZE / 20,
+            chunkHeight * Constants.CHUNK_SIZE / 20,
+            terrainSeed
+        );
+
+        atmosComposition.add(Color.CYAN);
+        atmosPercentages.add(1.f);
+        
+        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PLANET_PPM));
+        worldBody = new WorldBody(App.instance, physWorld, chunkWidth, (int)(atmosphereRadius / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     @Override

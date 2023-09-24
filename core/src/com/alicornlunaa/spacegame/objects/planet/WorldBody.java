@@ -336,8 +336,6 @@ public class WorldBody extends Group {
     public void update(){
         // Update based on the player's positioning and time active
         Vector2 plyPos = game.gameScene.player.getCenter();
-
-        if(chunks.length <= 0){ return; }
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;

@@ -31,6 +31,7 @@ public class Planet extends Celestial {
         planetComponent.chunkWidth = (int)(2.0 * Math.PI * planetComponent.chunkHeight);
         planetComponent.atmosphereRadius = atmosRadius;
         planetComponent.atmosphereDensity = atmosDensity;
+        planetComponent.start();
 
         addComponent(new CustomSpriteComponent() {
             private TransformComponent transform = getComponent(TransformComponent.class);
