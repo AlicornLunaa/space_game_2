@@ -23,6 +23,7 @@ import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.systems.CelestialSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
 import com.alicornlunaa.spacegame.systems.PlanetRenderSystem;
+import com.alicornlunaa.spacegame.systems.SimulatedPathSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -66,14 +67,14 @@ public class GameplayScene extends BaseScene {
 	private void initializeUniverse(){
 		universe = new Universe(registry);
         simulation.addWorld(universe.getUniversalWorld());
-        registry.registerSystem(new CelestialSystem(universe));
+        // registry.registerSystem(new CelestialSystem(universe));
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem(universe));
 
         // Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 800000, 1000000, 0));
-        Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 80000, 400000, 0));
+        Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 80000, 300000, 0));
         newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 8000, -400000, 0));
-        Celestial s = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 10000, 1000, 0.001f, 0.0f, 0.0f, 0.0f)); 
-        s.getComponent(BodyComponent.class).body.setLinearVelocity(10000, 0);
+        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 100000, 10000, 0.001f, 0.0f, 0.0f, 0.0f)); 
+        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 10000, 1000, 0.001f, 0.0f, 0.0f, 0.0f)); 
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 11000, 17500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 21500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 31500, 0.001f, 0.0f, 0.0f, 0.0f));
@@ -90,14 +91,14 @@ public class GameplayScene extends BaseScene {
         player.getComponent(CameraComponent.class).active = true;
         game.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
-        // OrbitUtils.createOrbit(universe, player);
+        OrbitUtils.createOrbit(universe, player);
 
         ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
         ship.addComponent(new GravityScript(universe, ship));
         ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);
         OrbitUtils.createOrbit(universe, ship);
-        ship.drive(player);
+        // ship.drive(player);
 	}
 
     private void initializeSpaceScene(){

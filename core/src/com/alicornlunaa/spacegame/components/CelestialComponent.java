@@ -10,7 +10,6 @@ import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -69,7 +68,7 @@ public class CelestialComponent extends ScriptComponent {
 
         // Update rails
         if(conic != null){
-            elapsedTime += Gdx.graphics.getDeltaTime();
+            elapsedTime += Constants.TIME_STEP;
             double anomaly = conic.timeToMeanAnomaly(elapsedTime);
 
             if(!Double.isNaN(anomaly)){

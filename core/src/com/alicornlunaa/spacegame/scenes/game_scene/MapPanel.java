@@ -188,7 +188,7 @@ public class MapPanel extends Stage {
         App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
         App.instance.shapeRenderer.begin(ShapeType.Filled);
-        // orbit.draw(App.instance.shapeRenderer, 5000);
+        orbit.draw(App.instance.shapeRenderer, 5000);
         orbit.recalculate();
         App.instance.shapeRenderer.end();
         

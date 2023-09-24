@@ -8,6 +8,8 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.Universe;
+import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -21,11 +23,13 @@ public class SimulatedPathSystem implements ISystem {
     public static final int MAX_STEPS = 20000;
 
     private App game;
+    private Universe universe;
     private ShapeRenderer shapeRenderer;
     private HashMap<IEntity, Array<Vector2>> paths = new HashMap<>();
 
-    public SimulatedPathSystem(App game){
+    public SimulatedPathSystem(App game, Universe universe){
         this.game = game;
+        this.universe = universe;
         this.shapeRenderer = new ShapeRenderer();
     }
 
@@ -36,24 +40,20 @@ public class SimulatedPathSystem implements ISystem {
         BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
 
         Vector2 pos = transform.position.cpy();
-        Vector2 vel = transform.velocity.cpy();
+        Vector2 vel = bodyComponent.body.getLinearVelocity().cpy();
+
+        Celestial parent = universe.getParentCelestial(entity);
+        if(parent == null) return;
+
+        Body a = bodyComponent.body;
+        Body b = parent.getComponent(BodyComponent.class).body;
 
         for(int i = 0; i < MAX_STEPS; i++){
-            for(Celestial other : game.gameScene.universe.getCelestials()){
-                if(other == entity) continue;
-
-                Body a = bodyComponent.body;
-                Body b = other.getComponent(BodyComponent.class).body;
-                Vector2 aPos = pos.cpy().scl(1 / Constants.PPM);
-                Vector2 bPos = other.getComponent(TransformComponent.class).position.cpy().scl(1 / Constants.PPM);
-
-                float m1 = a.getMass();
-                float m2 = b.getMass();
-                float r = bPos.dst(aPos);
-                Vector2 direction = bPos.cpy().sub(aPos).cpy().nor();
-
-                vel.add(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)));
-            }
+            float m1 = a.getMass();
+            float m2 = b.getMass();
+            float r = b.getPosition().dst(a.getPosition());
+            Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
+            vel.add(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)).scl(1.f / m1));
             
             arr.add(pos.cpy());
             arr.add(pos.cpy().add(vel));
@@ -97,7 +97,7 @@ public class SimulatedPathSystem implements ISystem {
 
     @Override
     public boolean shouldRunOnEntity(IEntity entity) {
-        return false;
+        return entity.hasComponent(GravityScript.class);
     }
     
 }

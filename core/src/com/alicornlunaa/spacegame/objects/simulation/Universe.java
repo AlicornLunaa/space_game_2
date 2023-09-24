@@ -170,12 +170,11 @@ public class Universe extends Actor {
                     }
     
                     // Celestial2 parent = path.getParent(currentFuture);
-                    Vector2 curPos = path.getPosition(currentFuture).scl(universalWorld.getPhysScale()).add(parent.getComponent(TransformComponent.class).position);;
+                    Vector2 curPos = path.getPosition(currentFuture).scl(universalWorld.getPhysScale()).add(parent.getComponent(TransformComponent.class).position);
                     Vector2 curVel = path.getVelocity(currentFuture);
 
                     transform.position.set(curPos);
-                    transform.velocity.set(curVel);
-                    bodyComponent.sync(transform);
+                    bodyComponent.body.setLinearVelocity(curVel);
                 }
             }
 

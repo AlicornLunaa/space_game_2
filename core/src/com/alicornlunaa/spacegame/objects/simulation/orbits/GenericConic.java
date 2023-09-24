@@ -86,8 +86,8 @@ public abstract class GenericConic {
     public GenericConic(IEntity parent, IEntity child) {
         this(
             parent.getComponent(BodyComponent.class).body.getMass(),
-            child.getComponent(BodyComponent.class).body.getWorldCenter().cpy(),
-            child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy()
+            child.getComponent(BodyComponent.class).body.getWorldCenter().cpy().sub(parent.getComponent(BodyComponent.class).body.getWorldCenter()),
+            child.getComponent(BodyComponent.class).body.getLinearVelocity().cpy().sub(parent.getComponent(BodyComponent.class).body.getLinearVelocity())
         );
         this.parent = parent;
         this.child = child;
