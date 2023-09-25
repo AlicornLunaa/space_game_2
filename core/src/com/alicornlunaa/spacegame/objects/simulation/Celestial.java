@@ -35,7 +35,7 @@ public class Celestial extends BaseEntity {
 
         BodyComponent bodyComponent = addComponent(new BodyComponent(world, new BodyDef()));
         bodyComponent.body.setType(BodyType.DynamicBody);
-        bodyComponent.body.createFixture(shape, 100.0f);
+        bodyComponent.body.createFixture(shape, 10.0f);
         bodyComponent.sync(transform);
 
         shape.dispose();

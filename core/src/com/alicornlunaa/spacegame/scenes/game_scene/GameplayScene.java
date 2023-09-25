@@ -20,10 +20,8 @@ import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetPanel;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetUIPanel;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
-import com.alicornlunaa.spacegame.systems.CelestialSystem;
 import com.alicornlunaa.spacegame.systems.OrbitSystem;
 import com.alicornlunaa.spacegame.systems.PlanetRenderSystem;
-import com.alicornlunaa.spacegame.systems.SimulatedPathSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -67,21 +65,17 @@ public class GameplayScene extends BaseScene {
 	private void initializeUniverse(){
 		universe = new Universe(registry);
         simulation.addWorld(universe.getUniversalWorld());
-        // registry.registerSystem(new CelestialSystem(universe));
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem(universe));
 
-        // Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 800000, 1000000, 0));
-        Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 80000, 300000, 0));
-        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 8000, -400000, 0));
-        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 100000, 10000, 0.001f, 0.0f, 0.0f, 0.0f)); 
-        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 10000, 1000, 0.001f, 0.0f, 0.0f, 0.0f)); 
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 11000, 17500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 21500, 0.001f, 0.0f, 0.0f, 0.0f));
+        Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 261600, 400000, 0));
+        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 11000, 17500, 0.5001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 31500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 41500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 51500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 61500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 480000, 71500, 0.001f, 0.0f, 0.0f, 0.0f));
+        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 71500, 0.001f, 0.0f, 0.0f, 0.0f));
+        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 81500, 0.001f, 0.0f, 0.0f, 0.0f));
+        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 101500, 0.001f, 0.0f, 0.0f, 0.0f));
+        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 480000, 221500, 0.001f, 0.0f, 0.0f, 0.0f));
+        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 45000, 19646, 0.2f, 0.0f, 0.0f, 0.0f)); // Moho
         
         // testPlanet = new Planet(simulation, universe.getUniversalWorld(), -1000, 0, 500, 560, 1);
         // registry.addEntity(testPlanet);

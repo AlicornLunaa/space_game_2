@@ -7,6 +7,7 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.scripts.GravityScript;
@@ -20,7 +21,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class SimulatedPathSystem implements ISystem {
 
-    public static final int MAX_STEPS = 20000;
+    public static final int MAX_STEPS = 300;
 
     private App game;
     private Universe universe;
@@ -33,13 +34,35 @@ public class SimulatedPathSystem implements ISystem {
         this.shapeRenderer = new ShapeRenderer();
     }
 
+    private Celestial parentCelestialByPos(BodyComponent bodyComponent, Vector2 pos){
+        // Find closest
+        Celestial parent = null;
+        float minDistance = Float.MAX_VALUE;
+        float minSOISize = Float.MAX_VALUE;
+
+        for(Celestial c : universe.getCelestials()){
+            CelestialComponent celestialComponent = c.getComponent(CelestialComponent.class);
+            float curDistance = c.getComponent(TransformComponent.class).position.dst(pos);
+            float curSOI = celestialComponent.getSphereOfInfluence();
+            
+            if(curDistance >= minDistance || curDistance >= celestialComponent.getSphereOfInfluence()) continue;
+            if(curSOI >= minSOISize) continue;
+            if(bodyComponent.body.getMass() >= c.getComponent(BodyComponent.class).body.getMass()) continue;
+
+            parent = c;
+            minDistance = curDistance;
+            minSOISize = curSOI;
+        }
+
+        return parent;
+    }
+
     public void simulate(IEntity entity){
         Array<Vector2> arr = new Array<>();
         
-        TransformComponent transform = entity.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
 
-        Vector2 pos = transform.position.cpy();
+        Vector2 pos = bodyComponent.body.getPosition().cpy();
         Vector2 vel = bodyComponent.body.getLinearVelocity().cpy();
 
         Celestial parent = universe.getParentCelestial(entity);
@@ -49,10 +72,12 @@ public class SimulatedPathSystem implements ISystem {
         Body b = parent.getComponent(BodyComponent.class).body;
 
         for(int i = 0; i < MAX_STEPS; i++){
+            parent = parentCelestialByPos(bodyComponent, pos.cpy().scl(128));
+
             float m1 = a.getMass();
             float m2 = b.getMass();
-            float r = b.getPosition().dst(a.getPosition());
-            Vector2 direction = b.getPosition().cpy().sub(a.getPosition()).cpy().nor();
+            float r = b.getPosition().dst(pos);
+            Vector2 direction = b.getPosition().cpy().sub(pos).cpy().nor();
             vel.add(direction.scl(Constants.GRAVITY_CONSTANT * (m1 * m2) / (r * r)).scl(1.f / m1));
             
             arr.add(pos.cpy());
@@ -91,7 +116,7 @@ public class SimulatedPathSystem implements ISystem {
 
         for(int i = 0; i < path.size; i += 2){
             shapeRenderer.setColor(Color.CYAN);
-            shapeRenderer.rectLine(path.get(i), path.get(i + 1), 2000);
+            shapeRenderer.rectLine(path.get(i).cpy().scl(128), path.get(i + 1).cpy().scl(128), 2000);
         }
     }
 

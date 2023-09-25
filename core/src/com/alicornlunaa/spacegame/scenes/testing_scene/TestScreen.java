@@ -1,105 +1,116 @@
 package com.alicornlunaa.spacegame.scenes.testing_scene;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
+import com.alicornlunaa.selene_engine.components.SpriteComponent;
+import com.alicornlunaa.selene_engine.components.TextureComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
+import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.systems.CameraSystem;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
+import com.alicornlunaa.selene_engine.systems.ShapeRenderSystem;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
-import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
-import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
-import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class TestScreen implements Screen {
+    // Static classes
+    private static class TestEntity extends BaseEntity {
+        public TestEntity(float x, float y){
+            addComponent(new TextureComponent(App.instance.manager, "textures/dev_texture.png"));
+            addComponent(new SpriteComponent(32, 32));
+            getComponent(TransformComponent.class).position.set(x, y);
+        }
+    };
+
     // Variables
     private Registry registry;
     private PhysicsSystem simulation;
     private PhysWorld world;
 
     private Universe universe;
-    private Orbit orbit;
     private InputMultiplexer inputs = new InputMultiplexer();
+    private float totalEnergy = 0.0f;
+
+    // Private functions
+    private float orbitVelocity(IEntity parent, IEntity entity){
+        TransformComponent trans1 = parent.getComponent(TransformComponent.class);
+        TransformComponent trans2 = entity.getComponent(TransformComponent.class);
+        GravityComponent grav1 = parent.getComponent(GravityComponent.class);
+
+        float radius = trans1.position.dst(trans2.position);
+        return (float)Math.sqrt(GravityComponent.GRAV_C * grav1.mass / radius);
+    }
     
+    private float energy(IEntity entity){
+        GravityComponent gravityComponent = entity.getComponent(GravityComponent.class);
+        BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
+        return (1.f / 2.f) * (bodyComponent.body.getMass() * gravityComponent.velocity.len2());
+    }
+
     // Constructor
     public TestScreen(){
         registry = new Registry();
         registry.registerSystem(new CameraSystem(App.instance));
         simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(App.instance));
+        registry.registerSystem(new ShapeRenderSystem());
         registry.registerSystem(new SpaceRenderSystem(universe));
         registry.registerSystem(new ScriptSystem());
 
         universe = new Universe(registry);
-        world = new CelestialPhysWorld(null, 128.0f);
+        world = new PhysWorld(128);
         simulation.addWorld(world);
 
-        float scale = 0.1f;
-        float au = 9.296e4f / 2;
-        // Star star = new Star(world, 432690 * scale, 432690 * scale, 0);
-        // registry.addEntity(star);
-        // universe.addCelestial(star);
-        // Celestial2 mercury = new Celestial2(world, star, 1516 * scale, 0.3871f * au * scale, 0.20564f, 77, 0, 0);
-        // registry.addEntity(mercury);
-        // universe.addCelestial(mercury);
-        // Celestial2 venus = new Celestial2(world, star, 3760 * scale, 0.7233f * au * scale, 0.00676f, 131, 0, 0);
-        // registry.addEntity(venus);
-        // universe.addCelestial(venus);
-        // Celestial2 earth = new Celestial2(world, star, 3958 * scale, 1.0f * au * scale, 0.01673f, 102, 0, 0);
-        // registry.addEntity(earth);
-        // universe.addCelestial(earth);
+        BodyDef def = new BodyDef();
+        def.type = BodyType.DynamicBody;
 
-        // Celestial2 testPlanet = new Celestial2(world, star, 50000 * scale, 600, 0.001f, 0, 0, 0);
-        // registry.addEntity(testPlanet);
-        // universe.addCelestial(testPlanet);
-        
-        Planet test = new Planet(simulation, world, -1000, 0, 500, 560, 1);
-        registry.addEntity(test);
+        BaseEntity cameraEntity = new BaseEntity();
+        cameraEntity.addComponent(new CameraComponent(1280, 720));
+        registry.addEntity(cameraEntity);
 
-        Ship ship = new Ship(App.instance, world, -64, 0, 0);
-        ship.load("./saves/ships/test.ship");
-        ship.addComponent(new GravityScript(universe, ship));
-        registry.addEntity(ship);
+        final TestEntity ent1 = new TestEntity(0, 0);
+        ent1.addComponent(new BodyComponent(world, def));
+        ent1.addComponent(new GravityComponent(ent1, registry, 0, 0, 100000));
+        registry.addEntity(ent1);
 
-        Player p = new Player(App.instance, world, -100, 0);
-        p.getComponent(CameraComponent.class).active = true;
-        registry.addEntity(p);
-        ship.drive(p);
-        orbit = new Orbit(universe, ship);
-        p.addComponent(new GravityScript(universe, p));
-        // p.addComponent(new PlayerLocalizerScript(registry, p));
-        p.addComponent(new CustomSpriteComponent() {
-            @Override
-            public void render(Batch batch) {
-                batch.end();
-                App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-                App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-                App.instance.shapeRenderer.begin(ShapeType.Filled);
+        TestEntity ent2 = new TestEntity(2000, 0);
+        ent2.addComponent(new BodyComponent(world, def));
+        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2), 1000));
+        // ent2.addComponent(new KeplerComponent(ent2, ent1));
+        // ent2.addComponent(new ShapeDrawableComponent(ent2) {
+        //     private TransformComponent parentTrans = ent1.getComponent(TransformComponent.class);
+        //     private KeplerComponent keplerComponent = getEntity().getComponent(KeplerComponent.class);
 
-                Constants.DEBUG = false;
-                orbit.recalculate();
-                orbit.draw(App.instance.shapeRenderer, 1000);
-                Constants.DEBUG = true;
+        //     @Override
+        //     public void draw(ShapeRenderer renderer) {
+        //         Matrix4 trans = new Matrix4();
+        //         trans.translate(parentTrans.position.x, parentTrans.position.y, 0);
+        //         renderer.setTransformMatrix(trans);
 
-                App.instance.shapeRenderer.end();
-                batch.begin();
-            }
-        });
+        //         Constants.DEBUG = false;
+        //         keplerComponent.conic.draw(renderer, 4);
+        //         Constants.DEBUG = true;
+        //     }
+        // });
+        registry.addEntity(ent2);
+
+        TestEntity ent3 = new TestEntity(2200, 0);
+        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent2, ent3) + orbitVelocity(ent1, ent3), 1));
+        registry.addEntity(ent3);
 
         inputs.addProcessor(new InputAdapter(){
             @Override
@@ -114,6 +125,13 @@ public class TestScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.02f, 0.02f, 0.02f, 1);
+
+        totalEnergy = 0;
+        for(IEntity entity : registry.getEntities()){
+            if(!entity.hasComponents(GravityComponent.class, BodyComponent.class)) continue;
+            totalEnergy += energy(entity);
+        }
+        System.out.println(totalEnergy);
 
         registry.update(delta);
         registry.render();

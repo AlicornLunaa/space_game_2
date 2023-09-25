@@ -54,7 +54,7 @@ public class CelestialComponent extends ScriptComponent {
             return (float)((conic.getSemiMajorAxis() * bodyComponent.world.getPhysScale()) * Math.pow(bodyComponent.body.getMass() / conic.getParent().getComponent(BodyComponent.class).body.getMass(), 2.f/5.f));
         }
 
-        return radius * 4;
+        return radius * 4000;
     }
     
     @Override

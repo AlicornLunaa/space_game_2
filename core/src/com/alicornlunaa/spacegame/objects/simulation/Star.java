@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.spacegame.App;
