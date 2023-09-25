@@ -79,7 +79,7 @@ public class TestScreen implements Screen {
         def.type = BodyType.DynamicBody;
 
         BaseEntity cameraEntity = new BaseEntity();
-        cameraEntity.addComponent(new CameraComponent(1280, 720));
+        // cameraEntity.addComponent(new CameraComponent(1280, 720));
         registry.addEntity(cameraEntity);
 
         final TestEntity ent1 = new TestEntity(0, 0);
@@ -89,7 +89,9 @@ public class TestScreen implements Screen {
 
         TestEntity ent2 = new TestEntity(2000, 0);
         ent2.addComponent(new BodyComponent(world, def));
-        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2), 1000));
+        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2) - 0.025f, 1000));
+        ent2.addComponent(new PathComponent(ent2, ent1, registry));
+        ent2.addComponent(new CameraComponent(1280, 720));
         // ent2.addComponent(new KeplerComponent(ent2, ent1));
         // ent2.addComponent(new ShapeDrawableComponent(ent2) {
         //     private TransformComponent parentTrans = ent1.getComponent(TransformComponent.class);
@@ -108,9 +110,10 @@ public class TestScreen implements Screen {
         // });
         registry.addEntity(ent2);
 
-        TestEntity ent3 = new TestEntity(2200, 0);
-        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent2, ent3) + orbitVelocity(ent1, ent3), 1));
-        registry.addEntity(ent3);
+        // TestEntity ent3 = new TestEntity(2200, 0);
+        // ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent2, ent3) + orbitVelocity(ent1, ent3), 1));
+        // ent3.addComponent(new PathComponent(ent3, ent1, registry));
+        // registry.addEntity(ent3);
 
         inputs.addProcessor(new InputAdapter(){
             @Override
@@ -131,7 +134,7 @@ public class TestScreen implements Screen {
             if(!entity.hasComponents(GravityComponent.class, BodyComponent.class)) continue;
             totalEnergy += energy(entity);
         }
-        System.out.println(totalEnergy);
+        // System.out.println(totalEnergy);
 
         registry.update(delta);
         registry.render();
