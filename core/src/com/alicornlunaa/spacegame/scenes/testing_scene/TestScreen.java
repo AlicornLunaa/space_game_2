@@ -73,8 +73,8 @@ public class TestScreen implements Screen {
         registry.registerSystem(new RenderSystem(App.instance));
         registry.registerSystem(new ShapeRenderSystem());
         registry.registerSystem(new SpaceRenderSystem(universe));
-        registry.registerSystem(new TrackingSystem(registry));
-        registry.registerSystem(new TrailSystem());
+        TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
+        TrailSystem trailSystem = registry.registerSystem(new TrailSystem());
         registry.registerSystem(new ScriptSystem());
 
         universe = new Universe(registry);
@@ -92,6 +92,8 @@ public class TestScreen implements Screen {
         ent1.addComponent(new BodyComponent(world, def));
         ent1.addComponent(new GravityComponent(ent1, registry, 0, 0, 100000));
         registry.addEntity(ent1);
+        trackingSystem.setReferenceEntity(ent1);
+        trailSystem.setReferenceEntity(ent1);
 
         TestEntity ent2 = new TestEntity(2000, 0);
         ent2.addComponent(new BodyComponent(world, def));

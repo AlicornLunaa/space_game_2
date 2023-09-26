@@ -37,6 +37,7 @@ public class TrackingSystem implements ISystem {
     private ShapeRenderer renderer = App.instance.shapeRenderer;
     private Registry registry;
 
+    private @Null IEntity referenceEntity;
     private Array<VirtualBody> virtualBodies = new Array<>();
     private HashMap<IEntity, Array<Vector2>> paths = new HashMap<>();
 
@@ -46,6 +47,10 @@ public class TrackingSystem implements ISystem {
     }
 
     // Functions
+    public void setReferenceEntity(@Null IEntity ref){
+        referenceEntity = ref;
+    }
+
     public Vector2 calculateGravity(Vector2 position, Array<VirtualBody> virtualBodies, @Null VirtualBody ignore){
         Vector2 a = new Vector2();
 
