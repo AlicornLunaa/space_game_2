@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.testing_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
+import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
 import com.alicornlunaa.selene_engine.components.TextureComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
@@ -22,6 +23,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -69,6 +73,8 @@ public class TestScreen implements Screen {
         registry.registerSystem(new RenderSystem(App.instance));
         registry.registerSystem(new ShapeRenderSystem());
         registry.registerSystem(new SpaceRenderSystem(universe));
+        registry.registerSystem(new TrackingSystem(registry));
+        registry.registerSystem(new TrailSystem());
         registry.registerSystem(new ScriptSystem());
 
         universe = new Universe(registry);
@@ -82,38 +88,77 @@ public class TestScreen implements Screen {
         // cameraEntity.addComponent(new CameraComponent(1280, 720));
         registry.addEntity(cameraEntity);
 
-        final TestEntity ent1 = new TestEntity(0, 0);
+        TestEntity ent1 = new TestEntity(0, 0);
         ent1.addComponent(new BodyComponent(world, def));
         ent1.addComponent(new GravityComponent(ent1, registry, 0, 0, 100000));
         registry.addEntity(ent1);
 
         TestEntity ent2 = new TestEntity(2000, 0);
         ent2.addComponent(new BodyComponent(world, def));
-        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2) - 0.025f, 1000));
-        ent2.addComponent(new PathComponent(ent2, ent1, registry));
-        ent2.addComponent(new CameraComponent(1280, 720));
-        // ent2.addComponent(new KeplerComponent(ent2, ent1));
-        // ent2.addComponent(new ShapeDrawableComponent(ent2) {
-        //     private TransformComponent parentTrans = ent1.getComponent(TransformComponent.class);
-        //     private KeplerComponent keplerComponent = getEntity().getComponent(KeplerComponent.class);
-
-        //     @Override
-        //     public void draw(ShapeRenderer renderer) {
-        //         Matrix4 trans = new Matrix4();
-        //         trans.translate(parentTrans.position.x, parentTrans.position.y, 0);
-        //         renderer.setTransformMatrix(trans);
-
-        //         Constants.DEBUG = false;
-        //         keplerComponent.conic.draw(renderer, 4);
-        //         Constants.DEBUG = true;
-        //     }
-        // });
+        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2), 1000));
+        ent2.addComponent(new TrailComponent(Color.PINK));
+        // ent2.addComponent(new CameraComponent(1280, 720));
         registry.addEntity(ent2);
 
-        // TestEntity ent3 = new TestEntity(2200, 0);
-        // ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent2, ent3) + orbitVelocity(ent1, ent3), 1));
-        // ent3.addComponent(new PathComponent(ent3, ent1, registry));
-        // registry.addEntity(ent3);
+        TestEntity ent3 = new TestEntity(2200, 0);
+        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent1, ent3), 1));
+        ent3.addComponent(new TrailComponent(Color.CYAN));
+        registry.addEntity(ent3);
+
+        TestEntity ent4 = new TestEntity(400, 0);
+        ent4.addComponent(new GravityComponent(ent4, registry, 0, orbitVelocity(ent1, ent4), 1000));
+        ent4.addComponent(new TrailComponent(Color.LIME));
+        // ent4.addComponent(new TrackedEntityComponent(Color.LIME));
+        registry.addEntity(ent4);
+
+        TestEntity ent5 = new TestEntity(750, 0);
+        ent5.addComponent(new GravityComponent(ent5, registry, 0, orbitVelocity(ent1, ent5), 1000));
+        ent5.addComponent(new TrailComponent(Color.YELLOW));
+        registry.addEntity(ent5);
+
+        TestEntity player = new TestEntity(1000, 0);
+        player.addComponent(new BodyComponent(world, def));
+        player.addComponent(new GravityComponent(player, registry, 0, orbitVelocity(ent1, player), 0.01f));
+        player.addComponent(new TrackedEntityComponent(Color.CORAL));
+        player.addComponent(new CameraComponent(1280, 720));
+        player.addComponent(new ScriptComponent(player) {
+            private TransformComponent trans = getEntity().getComponent(TransformComponent.class);
+            private GravityComponent gc = getEntity().getComponent(GravityComponent.class);
+
+            @Override
+            public void start() {}
+
+            @Override
+            public void update() {
+                if(Gdx.input.isKeyPressed(Keys.W)){
+                    gc.acceleration.y += 0.005f;
+                }
+                if(Gdx.input.isKeyPressed(Keys.S)){
+                    gc.acceleration.y -= 0.005f;
+                }
+                if(Gdx.input.isKeyPressed(Keys.A)){
+                    gc.acceleration.x -= 0.005f;
+                }
+                if(Gdx.input.isKeyPressed(Keys.D)){
+                    gc.acceleration.x += 0.005f;
+                }
+
+                Vector2 offset = trans.position.cpy();
+                if(trans.position.len() > 1500){
+                    for(int i = 0; i < registry.getEntities().size; i++){
+                        IEntity otherEntity = registry.getEntity(i);
+                        TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
+                        otherTrans.position.sub(offset);
+                    }
+                }
+            }
+
+            @Override
+            public void render() {
+                System.out.println(trans.position);
+            }
+        });
+        registry.addEntity(player);
 
         inputs.addProcessor(new InputAdapter(){
             @Override

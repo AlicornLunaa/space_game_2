@@ -68,7 +68,7 @@ public class OrbitPropagator {
         return new EllipticalConic(parent, child, position, velocity);
     }
 
-    public static GenericConic getConic(Celestial parent, IEntity child){
+    public static GenericConic getConic(IEntity parent, IEntity child){
         if(parent == null) return null;
 
         ConicType type = getConicType(

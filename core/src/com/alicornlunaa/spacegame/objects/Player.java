@@ -60,8 +60,8 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 5.5f;//1.f;
-    private static final float JUMP_FORCE = 5.5f;//1.25f;
+    private static final float MOVEMENT_SPEED = 0.1f;//1.f;
+    private static final float JUMP_FORCE = 0.1f;//1.25f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
