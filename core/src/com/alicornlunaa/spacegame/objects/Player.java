@@ -249,7 +249,7 @@ public class Player extends BaseEntity {
     }
 
     public Vector2 getVelocity(){
-        if(isDriving()) return vehicle.getComponent(TransformComponent.class).velocity.cpy();
-        return transform.velocity.cpy();
+        if(isDriving()) return vehicle.getComponent(BodyComponent.class).body.getLinearVelocity().cpy();
+        return bodyComponent.body.getLinearVelocity().cpy();
     }
 }

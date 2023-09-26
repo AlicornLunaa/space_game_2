@@ -164,8 +164,9 @@ public class Universe extends Actor {
                         // Skip player if player is inside a vehicle after parenting to vehicle
                         DriveableEntity vehicle = ((Player)entity).getVehicle();
                         TransformComponent vehicleTrans = vehicle.getComponent(TransformComponent.class);
+                        BodyComponent vehicleBody = vehicle.getComponent(BodyComponent.class);
                         transform.position.set(vehicleTrans.position);
-                        transform.velocity.set(vehicleTrans.velocity);
+                        bodyComponent.body.setLinearVelocity(vehicleBody.body.getLinearVelocity());
                         continue;
                     }
     

@@ -51,6 +51,7 @@ public class OrbitUtils {
         TransformComponent celestialTransform = parent.getComponent(TransformComponent.class);
         TransformComponent entityTransform = e.getComponent(TransformComponent.class);
         BodyComponent celestialBodyComponent = parent.getComponent(BodyComponent.class);
+        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
 
         if(celestialTransform == null || entityTransform == null || celestialBodyComponent == null) return; // Cant create an orbit for something that doesnt have a position
 
@@ -58,7 +59,7 @@ public class OrbitUtils {
         float orbitalRadius = entityTransform.position.dst(celestialTransform.position) / celestialBodyComponent.world.getPhysScale();
         float speed = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * celestialBodyComponent.body.getMass()) / orbitalRadius);
 
-        entityTransform.velocity.set(tangentDirection.scl(speed));
+        entityBodyComponent.body.setLinearVelocity(tangentDirection.scl(speed));
     }
 
     /**

@@ -99,11 +99,11 @@ public class TrackingSystem implements ISystem {
 
             if(gravityComponent != null){
                 virtualBodies.add(new VirtualBody(
-                    entity,
+                    entity.hasComponent(TrackedEntityComponent.class) ? entity : null,
                     transform.position.cpy(),
                     gravityComponent.velocity.cpy(),
                     gravityComponent.acceleration.cpy(),
-                    gravityComponent.mass
+                    gravityComponent.getMass()
                 ));
             }
         }
@@ -121,7 +121,7 @@ public class TrackingSystem implements ISystem {
                 paths.put(vb.ref, points);
             }
 
-            for(int k = 0; k < 5; k++){
+            for(int k = 0; k < 20; k++){
                 for(VirtualBody vb : virtualBodies){
                     integrate(virtualBodies, vb.position, vb.velocity, vb.acceleration, vb);
                 }

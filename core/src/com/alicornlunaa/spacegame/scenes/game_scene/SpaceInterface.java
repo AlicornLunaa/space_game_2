@@ -102,7 +102,7 @@ public class SpaceInterface extends Stage {
                         TransformComponent shipTransform = ship.getComponent(TransformComponent.class);
                         BodyComponent shipBodyComponent = ship.getComponent(BodyComponent.class);
                         game.gameScene.player.bodyComponent.setWorld(shipBodyComponent.world);
-                        game.gameScene.player.transform.velocity.set(shipTransform.velocity);
+                        game.gameScene.player.bodyComponent.body.setLinearVelocity(shipBodyComponent.body.getLinearVelocity());
                     }
                 } else {
                     DriveableEntity ship = game.gameScene.ship;

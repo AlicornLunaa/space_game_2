@@ -69,6 +69,7 @@ public class PlanetComponent extends ScriptComponent {
     public Vector2 getSpaceVelocity(IEntity e){
         // Convert the planetary coords to space coords
         TransformComponent entityTransform = e.getComponent(TransformComponent.class);
+        BodyComponent entityBody = e.getComponent(BodyComponent.class);
         Vector2 velocity = new Vector2();
 
         // Convet to space velocity
@@ -77,7 +78,7 @@ public class PlanetComponent extends ScriptComponent {
 
             Vector2 tangentDirection = new Vector2(0, 1).rotateRad((float)theta);
             Vector2 radialDirection = entityTransform.position.cpy().nor();
-            Vector2 currentVelocity = entityTransform.velocity.cpy();
+            Vector2 currentVelocity = entityBody.body.getLinearVelocity().cpy();
 
             velocity.set(tangentDirection.scl(currentVelocity.x).add(radialDirection.scl(currentVelocity.y)));
         }

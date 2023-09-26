@@ -56,7 +56,7 @@ public class TestScreen implements Screen {
         GravityComponent grav1 = parent.getComponent(GravityComponent.class);
 
         float radius = trans1.position.dst(trans2.position);
-        return (float)Math.sqrt(GravityComponent.GRAV_C * grav1.mass / radius);
+        return (float)Math.sqrt(GravityComponent.GRAV_C * grav1.getMass() / radius);
     }
     
     private float energy(IEntity entity){
@@ -101,7 +101,7 @@ public class TestScreen implements Screen {
         registry.addEntity(ent2);
 
         TestEntity ent3 = new TestEntity(2200, 0);
-        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent1, ent3), 1));
+        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3), 1));
         ent3.addComponent(new TrailComponent(Color.CYAN));
         registry.addEntity(ent3);
 
@@ -144,7 +144,7 @@ public class TestScreen implements Screen {
                 }
 
                 Vector2 offset = trans.position.cpy();
-                if(trans.position.len() > 1500){
+                if(trans.position.len() > 15000){
                     for(int i = 0; i < registry.getEntities().size; i++){
                         IEntity otherEntity = registry.getEntity(i);
                         TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
@@ -155,7 +155,6 @@ public class TestScreen implements Screen {
 
             @Override
             public void render() {
-                System.out.println(trans.position);
             }
         });
         registry.addEntity(player);

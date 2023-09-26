@@ -28,14 +28,13 @@ public abstract class DriveableEntity extends BaseEntity {
         this.driver = driver;
         driver.setVehicle(this);
 
-        TransformComponent driverTransform = driver.getComponent(TransformComponent.class);
         BodyComponent bodyComponent = driver.getComponent(BodyComponent.class);
         CameraComponent driverCamera = driver.getComponent(CameraComponent.class);
         CameraComponent shipCamera = this.getComponent(CameraComponent.class);
 
         if(bodyComponent != null){
             bodyComponent.body.setActive(false);
-            driverTransform.velocity.set(0, 0);
+            bodyComponent.body.setLinearVelocity(0, 0);
         }
 
         if(driverCamera != null && shipCamera != null){
@@ -54,7 +53,7 @@ public abstract class DriveableEntity extends BaseEntity {
 
         if(bodyComponent != null){
             bodyComponent.body.setActive(true);
-            driverTransform.velocity.set(getComponent(TransformComponent.class).velocity);
+            bodyComponent.body.setLinearVelocity(getComponent(BodyComponent.class).body.getLinearVelocity());
             driverTransform.position.add(64, 0);
         }
 

@@ -29,6 +29,7 @@ public class TrailSystem implements ISystem {
         // Start render
         renderer.setProjectionMatrix(App.instance.camera.combined);
         renderer.setTransformMatrix(new Matrix4());
+        renderer.setAutoShapeType(true);
         renderer.begin(ShapeType.Filled);
     }
 
@@ -41,8 +42,15 @@ public class TrailSystem implements ISystem {
     public void render(IEntity entity) {
         TransformComponent transform = entity.getComponent(TransformComponent.class);
         TrailComponent trailComponent = entity.getComponent(TrailComponent.class);
+        GravityComponent gravityComponent = entity.getComponent(GravityComponent.class);
 
         renderer.setColor(trailComponent.color);
+
+        if(gravityComponent != null){
+            renderer.set(ShapeType.Line);
+            renderer.circle(transform.position.x, transform.position.y, gravityComponent.getSphereOfInfluence());
+            renderer.set(ShapeType.Filled);
+        }
 
         for(int i = 0; i < trailComponent.points.size - 1; i++){
             renderer.rectLine(trailComponent.points.get(i), trailComponent.points.get(i + 1), 5 * ((float)i / trailComponent.points.size));

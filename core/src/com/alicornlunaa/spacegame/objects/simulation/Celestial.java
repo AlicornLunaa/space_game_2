@@ -76,7 +76,7 @@ public class Celestial extends BaseEntity {
         
         TransformComponent transform = getComponent(TransformComponent.class);
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        transform.velocity.set(vx, vy);
+        bodyComponent.body.setLinearVelocity(vx, vy);
         bodyComponent.sync(transform);
 
         // Initialize rails
