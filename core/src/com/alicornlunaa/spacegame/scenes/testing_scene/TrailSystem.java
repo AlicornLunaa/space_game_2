@@ -70,7 +70,7 @@ public class TrailSystem implements ISystem {
         // TODO: Move this to gravity system
         if(gravityComponent != null){
             renderer.set(ShapeType.Line);
-            renderer.circle(transform.position.x, transform.position.y, gravityComponent.getSphereOfInfluence());
+            renderer.circle(transform.position.x - referencePoint.x, transform.position.y - referencePoint.y, gravityComponent.getSphereOfInfluence());
             renderer.set(ShapeType.Filled);
         }
 

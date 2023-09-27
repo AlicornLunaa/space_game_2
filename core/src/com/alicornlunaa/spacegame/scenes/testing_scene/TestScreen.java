@@ -56,7 +56,7 @@ public class TestScreen implements Screen {
         GravityComponent grav1 = parent.getComponent(GravityComponent.class);
 
         float radius = trans1.position.dst(trans2.position);
-        return (float)Math.sqrt(GravityComponent.GRAV_C * grav1.getMass() / radius);
+        return (float)Math.sqrt(Constants.GRAVITY_CONSTANT * grav1.getMass() / radius);
     }
     
     private float energy(IEntity entity){
@@ -91,26 +91,24 @@ public class TestScreen implements Screen {
         TestEntity ent1 = new TestEntity(0, 0);
         ent1.addComponent(new BodyComponent(world, def));
         ent1.addComponent(new GravityComponent(ent1, registry, 0, 0, 100000));
+        ent1.addComponent(new TrailComponent(Color.RED));
         registry.addEntity(ent1);
-        trackingSystem.setReferenceEntity(ent1);
-        trailSystem.setReferenceEntity(ent1);
 
         TestEntity ent2 = new TestEntity(2000, 0);
         ent2.addComponent(new BodyComponent(world, def));
-        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2), 1000));
+        ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2), 15000));
         ent2.addComponent(new TrailComponent(Color.PINK));
         // ent2.addComponent(new CameraComponent(1280, 720));
         registry.addEntity(ent2);
 
         TestEntity ent3 = new TestEntity(2200, 0);
-        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3), 1));
+        ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3), 10));
         ent3.addComponent(new TrailComponent(Color.CYAN));
         registry.addEntity(ent3);
 
         TestEntity ent4 = new TestEntity(400, 0);
         ent4.addComponent(new GravityComponent(ent4, registry, 0, orbitVelocity(ent1, ent4), 1000));
         ent4.addComponent(new TrailComponent(Color.LIME));
-        // ent4.addComponent(new TrackedEntityComponent(Color.LIME));
         registry.addEntity(ent4);
 
         TestEntity ent5 = new TestEntity(750, 0);
@@ -118,11 +116,15 @@ public class TestScreen implements Screen {
         ent5.addComponent(new TrailComponent(Color.YELLOW));
         registry.addEntity(ent5);
 
+        trackingSystem.setReferenceEntity(ent2);
+        trailSystem.setReferenceEntity(ent2);
+        ent2.addComponent(new CameraComponent(1280, 720));
+
         TestEntity player = new TestEntity(1000, 0);
         player.addComponent(new BodyComponent(world, def));
         player.addComponent(new GravityComponent(player, registry, 0, orbitVelocity(ent1, player), 0.01f));
         player.addComponent(new TrackedEntityComponent(Color.CORAL));
-        player.addComponent(new CameraComponent(1280, 720));
+        // player.addComponent(new CameraComponent(1280, 720));
         player.addComponent(new ScriptComponent(player) {
             private TransformComponent trans = getEntity().getComponent(TransformComponent.class);
             private GravityComponent gc = getEntity().getComponent(GravityComponent.class);
@@ -207,5 +209,4 @@ public class TestScreen implements Screen {
 
     @Override
     public void dispose() {}
-    
 }

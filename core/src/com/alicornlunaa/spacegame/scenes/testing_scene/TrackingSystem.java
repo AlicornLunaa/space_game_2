@@ -38,6 +38,8 @@ public class TrackingSystem implements ISystem {
     private Registry registry;
 
     private @Null IEntity referenceEntity;
+    private @Null TransformComponent referenceTransform = null;
+
     private Array<VirtualBody> virtualBodies = new Array<>();
     private HashMap<IEntity, Array<Vector2>> paths = new HashMap<>();
 
@@ -49,6 +51,7 @@ public class TrackingSystem implements ISystem {
     // Functions
     public void setReferenceEntity(@Null IEntity ref){
         referenceEntity = ref;
+        referenceTransform = (ref == null) ? null : ref.getComponent(TransformComponent.class);
     }
 
     public Vector2 calculateGravity(Vector2 position, Array<VirtualBody> virtualBodies, @Null VirtualBody ignore){
@@ -94,6 +97,7 @@ public class TrackingSystem implements ISystem {
     @Override
     public void beforeRender() {
         // Initialize all virtual bodies
+        @Null VirtualBody referenceVirtualBody = null;
         virtualBodies.clear();
 
         for(int i = 0; i < registry.getEntities().size; i++){
@@ -110,23 +114,31 @@ public class TrackingSystem implements ISystem {
                     gravityComponent.acceleration.cpy(),
                     gravityComponent.getMass()
                 ));
+
+                if(entity == referenceEntity){
+                    referenceVirtualBody = virtualBodies.peek();
+                }
             }
         }
 
         for(int i = 0; i < 1000; i++){
+            Vector2 referencePoint = (referenceVirtualBody == null) ? Vector2.Zero.cpy() : referenceVirtualBody.position.cpy();
+
             for(VirtualBody vb : virtualBodies){
+                if(vb.ref == null) continue;
+                
                 Array<Vector2> points = paths.getOrDefault(vb.ref, new Array<Vector2>());
 
                 if((points.size - 1) < i){
-                    points.add(vb.position.cpy());
+                    points.add(vb.position.cpy().sub(referencePoint));
                 } else {
-                    points.get(i).set(vb.position);
+                    points.get(i).set(vb.position).sub(referencePoint);
                 }
 
                 paths.put(vb.ref, points);
             }
 
-            for(int k = 0; k < 20; k++){
+            for(int k = 0; k < 25; k++){
                 for(VirtualBody vb : virtualBodies){
                     integrate(virtualBodies, vb.position, vb.velocity, vb.acceleration, vb);
                 }
@@ -134,8 +146,9 @@ public class TrackingSystem implements ISystem {
         }
 
         // Start render
+        Vector2 referencePoint = (referenceEntity == null) ? Vector2.Zero.cpy() : referenceTransform.position.cpy();
         renderer.setProjectionMatrix(App.instance.camera.combined);
-        renderer.setTransformMatrix(new Matrix4());
+        renderer.setTransformMatrix(new Matrix4().translate(referencePoint.x, referencePoint.y, 0.0f));
         renderer.begin(ShapeType.Filled);
     }
 
