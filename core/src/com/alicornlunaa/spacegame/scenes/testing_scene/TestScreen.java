@@ -3,6 +3,7 @@ package com.alicornlunaa.spacegame.scenes.testing_scene;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.BoxColliderComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
+import com.alicornlunaa.selene_engine.components.CircleColliderComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
 import com.alicornlunaa.selene_engine.components.TextureComponent;
@@ -18,7 +19,6 @@ import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.selene_engine.systems.ShapeRenderSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
-import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -32,10 +32,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class TestScreen implements Screen {
     // Static classes
-    private static class TestEntity extends BaseEntity {
+    static private class TestEntity extends BaseEntity {
         public TestEntity(float x, float y){
             addComponent(new TextureComponent(App.instance.manager, "textures/dev_texture.png"));
-            addComponent(new SpriteComponent(2, 2));
             getComponent(TransformComponent.class).position.set(x, y);
         }
     };
@@ -87,16 +86,18 @@ public class TestScreen implements Screen {
         registry.addEntity(cameraEntity);
 
         final TestEntity ent1 = new TestEntity(0, 0);
+        ent1.addComponent(new SpriteComponent(20, 20));
         ent1.addComponent(new BodyComponent(world, def));
-        ent1.addComponent(new BoxColliderComponent(ent1.getComponent(BodyComponent.class), 1, 1, 100));
+        ent1.addComponent(new CircleColliderComponent(ent1.getComponent(BodyComponent.class), 10, 10));
         ent1.addComponent(new GravityComponent(ent1, registry));
         ent1.addComponent(new TrailComponent(Color.RED));
         registry.addEntity(ent1);
 
         //testicle
         TestEntity player = new TestEntity(100, 0);
+        player.addComponent(new SpriteComponent(2, 2));
         player.addComponent(new BodyComponent(world, def));
-        player.addComponent(new BoxColliderComponent(player.getComponent(BodyComponent.class), 1, 1, 0.01f));
+        player.addComponent(new CircleColliderComponent(player.getComponent(BodyComponent.class), 1, 0.01f));
         player.addComponent(new GravityComponent(player, registry));
         player.addComponent(new TrailComponent(Color.CORAL));
         player.addComponent(new ScriptComponent(player) {
