@@ -76,7 +76,7 @@ public class TrailSystem implements ISystem {
 
         // Draw the trail so far
         for(int i = 0; i < trailComponent.points.size - 1; i++){
-            renderer.rectLine(trailComponent.points.get(i), trailComponent.points.get(i + 1), 5 * ((float)i / trailComponent.points.size));
+            renderer.rectLine(trailComponent.points.get(i), trailComponent.points.get(i + 1), 0.4f * ((float)i / trailComponent.points.size));
         }
 
         // Create new trail points as it moves

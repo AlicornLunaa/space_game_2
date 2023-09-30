@@ -2,6 +2,7 @@ package com.alicornlunaa.spacegame.scenes.testing_scene;
 
 import java.util.HashMap;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
@@ -71,7 +72,7 @@ public class TrackingSystem implements ISystem {
     }
 
     public void integrate(Array<VirtualBody> virtualBodies, Vector2 position, Vector2 velocity, Vector2 acceleration, @Null VirtualBody ignore){
-        int substeps = 10;
+        int substeps = 8;
         float dt = 1.0f;
         float sub_dt = dt / substeps;
 
@@ -104,15 +105,16 @@ public class TrackingSystem implements ISystem {
             IEntity entity = registry.getEntity(i);
 
             TransformComponent transform = entity.getComponent(TransformComponent.class);
+            BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
             GravityComponent gravityComponent = entity.getComponent(GravityComponent.class);
 
             if(gravityComponent != null){
                 virtualBodies.add(new VirtualBody(
                     entity.hasComponent(TrackedEntityComponent.class) ? entity : null,
                     transform.position.cpy(),
-                    gravityComponent.velocity.cpy(),
-                    gravityComponent.acceleration.cpy(),
-                    gravityComponent.getMass()
+                    bodyComponent.body.getLinearVelocity().cpy(),
+                    Vector2.Zero.cpy(),
+                    bodyComponent.body.getMass()
                 ));
 
                 if(entity == referenceEntity){

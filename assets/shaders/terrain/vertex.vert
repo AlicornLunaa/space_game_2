@@ -21,5 +21,5 @@ void main(){
     //     normalPos.w 
     // );
     gl_Position = normalPos;
-    gl_Position.y = min(abs(u_invCamTrans.y), 50);
+    // gl_Position.y = min(abs(u_invCamTrans.y), 50);
 }   
