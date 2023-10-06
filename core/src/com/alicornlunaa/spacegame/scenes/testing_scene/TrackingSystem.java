@@ -32,10 +32,6 @@ public class TrackingSystem implements ISystem {
             this.mass = mass;
         }
 
-        private VirtualBody cpy(){
-            return new VirtualBody(ref, position.cpy(), velocity.cpy(), mass);
-        }
-
         private Vector2 calculateGravity(Array<VirtualBody> virtualBodies, Vector2 position){
             Vector2 a = new Vector2();
     
@@ -124,11 +120,12 @@ public class TrackingSystem implements ISystem {
             }
         }
 
-        for(int i = 0; i < 10000; i++){
+        for(int i = 0; i < 1000; i++){
             Vector2 referencePoint = (referenceVirtualBody == null) ? Vector2.Zero.cpy() : referenceVirtualBody.position.cpy();
 
             for(VirtualBody vb : virtualBodies){
                 if(vb.ref == null) continue;
+                if(!vb.ref.hasComponent(TrackedEntityComponent.class)) continue;
                 
                 Array<Vector2> points = paths.getOrDefault(vb.ref, new Array<Vector2>());
 
@@ -141,8 +138,8 @@ public class TrackingSystem implements ISystem {
                 paths.put(vb.ref, points);
             }
 
-            int substeps = 16;
-            float dt = 0.005f;
+            int substeps = 8;
+            float dt = 0.01f;
             float sub_dt = dt / substeps;
 
             for(int steps = 0; steps < substeps; steps++){

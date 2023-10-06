@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.scenes.testing_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.BoxColliderComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.CircleColliderComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
@@ -70,8 +69,8 @@ public class TestScreen implements Screen {
         simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(App.instance));
         registry.registerSystem(new ShapeRenderSystem());
-        TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
-        TrailSystem trailSystem = registry.registerSystem(new TrailSystem());
+        final TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
+        final TrailSystem trailSystem = registry.registerSystem(new TrailSystem());
         registry.registerSystem(new ScriptSystem());
 
         universe = new Universe(registry);
@@ -82,7 +81,6 @@ public class TestScreen implements Screen {
         def.type = BodyType.DynamicBody;
 
         BaseEntity cameraEntity = new BaseEntity();
-        cameraEntity.addComponent(new CameraComponent(1280, 720));
         registry.addEntity(cameraEntity);
 
         final TestEntity ent1 = new TestEntity(0, 0);
@@ -91,6 +89,7 @@ public class TestScreen implements Screen {
         ent1.addComponent(new CircleColliderComponent(ent1.getComponent(BodyComponent.class), 10, 10));
         ent1.addComponent(new GravityComponent(ent1, registry));
         ent1.addComponent(new TrailComponent(Color.RED));
+        ent1.addComponent(new CameraComponent(1280, 720)).active = true;
         registry.addEntity(ent1);
 
         //testicle
@@ -138,35 +137,79 @@ public class TestScreen implements Screen {
             }
         });
         player.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, player));
+        player.addComponent(new CameraComponent(1280, 720)).active = false;
         registry.addEntity(player);
 
-        // TestEntity ent2 = new TestEntity(2000, 0);
-        // ent2.addComponent(new BodyComponent(world, def));
-        // ent2.addComponent(new GravityComponent(ent2, registry, 0, orbitVelocity(ent1, ent2), 1500));
-        // ent2.addComponent(new TrailComponent(Color.PINK));
-        // // ent2.addComponent(new CameraComponent(1280, 720));
-        // registry.addEntity(ent2);
+        TestEntity ent2 = new TestEntity(700, 0);
+        ent2.addComponent(new SpriteComponent(8, 8));
+        ent2.addComponent(new BodyComponent(world, def));
+        ent2.addComponent(new CircleColliderComponent(ent2.getComponent(BodyComponent.class), 4, 1));
+        ent2.addComponent(new GravityComponent(ent2, registry));
+        ent2.addComponent(new TrailComponent(Color.PINK));
+        ent2.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent2));
+        ent2.addComponent(new CameraComponent(1280, 720)).active = false;
+        registry.addEntity(ent2);
 
-        // TestEntity ent3 = new TestEntity(2200, 0);
-        // ent3.addComponent(new GravityComponent(ent3, registry, 0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3), 1));
-        // ent3.addComponent(new TrailComponent(Color.CYAN));
-        // registry.addEntity(ent3);
+        TestEntity ent3 = new TestEntity(820, 0);
+        ent3.addComponent(new SpriteComponent(2, 2));
+        ent3.addComponent(new BodyComponent(world, def));
+        ent3.addComponent(new CircleColliderComponent(ent3.getComponent(BodyComponent.class), 1, 1));
+        ent3.addComponent(new GravityComponent(ent3, registry));
+        ent3.addComponent(new TrailComponent(Color.CYAN));
+        ent3.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3));
+        ent3.addComponent(new CameraComponent(1280, 720)).active = false;
+        registry.addEntity(ent3);
 
-        // TestEntity ent4 = new TestEntity(400, 0);
-        // ent4.addComponent(new GravityComponent(ent4, registry, 0, orbitVelocity(ent1, ent4), 1000));
-        // ent4.addComponent(new TrailComponent(Color.LIME));
-        // registry.addEntity(ent4);
+        TestEntity ent4 = new TestEntity(275, 0);
+        ent4.addComponent(new SpriteComponent(2, 2));
+        ent4.addComponent(new BodyComponent(world, def));
+        ent4.addComponent(new CircleColliderComponent(ent4.getComponent(BodyComponent.class), 1, 1));
+        ent4.addComponent(new GravityComponent(ent4, registry));
+        ent4.addComponent(new TrailComponent(Color.LIME));
+        ent4.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent4));
+        ent4.addComponent(new CameraComponent(1280, 720)).active = false;
+        registry.addEntity(ent4);
 
-        // TestEntity ent5 = new TestEntity(750, 0);
-        // ent5.addComponent(new GravityComponent(ent5, registry, 0, orbitVelocity(ent1, ent5), 1000));
-        // ent5.addComponent(new TrailComponent(Color.YELLOW));
-        // registry.addEntity(ent5);
+        TestEntity ent5 = new TestEntity(400, 0);
+        ent5.addComponent(new SpriteComponent(2, 2));
+        ent5.addComponent(new BodyComponent(world, def));
+        ent5.addComponent(new CircleColliderComponent(ent5.getComponent(BodyComponent.class), 1, 1));
+        ent5.addComponent(new GravityComponent(ent5, registry));
+        ent5.addComponent(new TrailComponent(Color.YELLOW));
+        ent5.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent5));
+        ent5.addComponent(new CameraComponent(1280, 720)).active = false;
+        registry.addEntity(ent5);
 
-        // trackingSystem.setReferenceEntity(ent1);
-        // trailSystem.setReferenceEntity(ent1);
-        // ent1.addComponent(new CameraComponent(1280, 720));
+        trackingSystem.setReferenceEntity(cameraEntity);
+        trailSystem.setReferenceEntity(cameraEntity);
+        cameraEntity.addComponent(new CameraComponent(1280, 720));
+        
+        final IEntity[] focusableEntities = { ent1, player, ent2, ent3, ent4, ent5 };
 
         inputs.addProcessor(new InputAdapter(){
+            int index = 0;
+
+            @Override
+            public boolean keyTyped(char character) {
+                if(character == 'r'){
+                    focusableEntities[index].getComponent(CameraComponent.class).active = false;
+                    index = Math.floorMod(index + 1, focusableEntities.length);
+                    focusableEntities[index].getComponent(CameraComponent.class).active = true;
+                    trackingSystem.setReferenceEntity(focusableEntities[index]);
+                    trailSystem.setReferenceEntity(focusableEntities[index]);
+                    return true;
+                } else if(character == 'e'){
+                    focusableEntities[index].getComponent(CameraComponent.class).active = false;
+                    index = Math.floorMod(index - 1, focusableEntities.length);
+                    focusableEntities[index].getComponent(CameraComponent.class).active = true;
+                    trackingSystem.setReferenceEntity(focusableEntities[index]);
+                    trailSystem.setReferenceEntity(focusableEntities[index]);
+                    return true;
+                }
+
+                return false;
+            }
+
             @Override
             public boolean scrolled(float amountX, float amountY){
                 float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * App.instance.camera.zoom * amountY;
