@@ -120,7 +120,7 @@ public class TrackingSystem implements ISystem {
             }
         }
 
-        for(int i = 0; i < 1000; i++){
+        for(int i = 0; i < 3000; i++){
             Vector2 referencePoint = (referenceVirtualBody == null) ? Vector2.Zero.cpy() : referenceVirtualBody.position.cpy();
 
             for(VirtualBody vb : virtualBodies){
@@ -138,8 +138,8 @@ public class TrackingSystem implements ISystem {
                 paths.put(vb.ref, points);
             }
 
-            int substeps = 8;
-            float dt = 0.01f;
+            int substeps = 12;
+            float dt = 0.05f;
             float sub_dt = dt / substeps;
 
             for(int steps = 0; steps < substeps; steps++){
