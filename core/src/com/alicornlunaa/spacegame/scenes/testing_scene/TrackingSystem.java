@@ -25,12 +25,45 @@ public class TrackingSystem implements ISystem {
         private Vector2 acceleration = new Vector2();
         private float mass = 0.f;
 
-        private VirtualBody(IEntity ref, Vector2 position, Vector2 velocity, Vector2 acceleration, float mass){
+        private VirtualBody(IEntity ref, Vector2 position, Vector2 velocity, float mass){
             this.ref = ref;
             this.position = position;
             this.velocity = velocity;
-            this.acceleration = acceleration;
             this.mass = mass;
+        }
+
+        private VirtualBody cpy(){
+            return new VirtualBody(ref, position.cpy(), velocity.cpy(), mass);
+        }
+
+        private Vector2 calculateGravity(Array<VirtualBody> virtualBodies, Vector2 position){
+            Vector2 a = new Vector2();
+    
+            for(int i = 0; i < virtualBodies.size; i++){
+                VirtualBody vb = virtualBodies.get(i);
+                GravityComponent vbGravity = vb.ref.getComponent(GravityComponent.class);
+    
+                if(vb == this) continue; // Prevent infinite forces
+    
+                float radiusSqr = position.dst2(vb.position);
+                float soi = vbGravity.getSphereOfInfluence();
+    
+                // Prevent insignificant forces
+                if(radiusSqr > soi * soi)
+                    continue;
+    
+                // Calculate forces
+                Vector2 direction = vb.position.cpy().sub(position).nor();
+                a.add(direction.scl(Constants.GRAVITY_CONSTANT * vb.mass / radiusSqr));
+            }
+    
+            return a;
+        }
+
+        private void integrate(Array<VirtualBody> virtualBodies, float dt){
+            Vector2 newAcc = calculateGravity(virtualBodies, position.add(velocity.cpy().scl(dt)).add(acceleration.cpy().scl(dt * dt * 0.5f)));
+            velocity.add(acceleration.cpy().add(newAcc).scl(dt * 0.5f));
+            acceleration.set(newAcc);
         }
     };
     
@@ -53,37 +86,6 @@ public class TrackingSystem implements ISystem {
     public void setReferenceEntity(@Null IEntity ref){
         referenceEntity = ref;
         referenceTransform = (ref == null) ? null : ref.getComponent(TransformComponent.class);
-    }
-
-    public Vector2 calculateGravity(Vector2 position, Array<VirtualBody> virtualBodies, @Null VirtualBody ignore){
-        Vector2 a = new Vector2();
-
-        for(int i = 0; i < virtualBodies.size; i++){
-            VirtualBody vb = virtualBodies.get(i);
-
-            if(vb == ignore) continue;
-
-            float radiusSqr = position.dst2(vb.position);
-            Vector2 direction = vb.position.cpy().sub(position).nor();
-            a.add(direction.scl(Constants.GRAVITY_CONSTANT * vb.mass / radiusSqr));
-        }
-
-        return a;
-    }
-
-    public void integrate(Array<VirtualBody> virtualBodies, Vector2 position, Vector2 velocity, Vector2 acceleration, @Null VirtualBody ignore){
-        int substeps = 8;
-        float dt = 1.0f;
-        float sub_dt = dt / substeps;
-
-        for(int i = 0; i < substeps; i++){
-            Vector2 newPosition = position.cpy().add(velocity.cpy().scl(sub_dt)).add(acceleration.cpy().scl(sub_dt).scl(sub_dt).scl(0.5f));
-            Vector2 newAccel = calculateGravity(position, virtualBodies, ignore);
-            Vector2 newVelocity = velocity.cpy().add(acceleration.cpy().add(newAccel).scl(sub_dt).scl(0.5f));
-            position.set(newPosition);
-            velocity.set(newVelocity);
-            acceleration.set(newAccel);
-        }
     }
 
     @Override
@@ -110,10 +112,9 @@ public class TrackingSystem implements ISystem {
 
             if(gravityComponent != null){
                 virtualBodies.add(new VirtualBody(
-                    entity.hasComponent(TrackedEntityComponent.class) ? entity : null,
+                    entity,
                     transform.position.cpy(),
                     bodyComponent.body.getLinearVelocity().cpy(),
-                    Vector2.Zero.cpy(),
                     bodyComponent.body.getMass()
                 ));
 
@@ -123,7 +124,7 @@ public class TrackingSystem implements ISystem {
             }
         }
 
-        for(int i = 0; i < 1000; i++){
+        for(int i = 0; i < 10000; i++){
             Vector2 referencePoint = (referenceVirtualBody == null) ? Vector2.Zero.cpy() : referenceVirtualBody.position.cpy();
 
             for(VirtualBody vb : virtualBodies){
@@ -140,9 +141,13 @@ public class TrackingSystem implements ISystem {
                 paths.put(vb.ref, points);
             }
 
-            for(int k = 0; k < 25; k++){
+            int substeps = 16;
+            float dt = 0.005f;
+            float sub_dt = dt / substeps;
+
+            for(int steps = 0; steps < substeps; steps++){
                 for(VirtualBody vb : virtualBodies){
-                    integrate(virtualBodies, vb.position, vb.velocity, vb.acceleration, vb);
+                    vb.integrate(virtualBodies, sub_dt);
                 }
             }
         }

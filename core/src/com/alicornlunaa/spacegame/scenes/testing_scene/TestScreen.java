@@ -70,7 +70,7 @@ public class TestScreen implements Screen {
         simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(App.instance));
         registry.registerSystem(new ShapeRenderSystem());
-        // TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
+        TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
         TrailSystem trailSystem = registry.registerSystem(new TrailSystem());
         registry.registerSystem(new ScriptSystem());
 
@@ -100,6 +100,7 @@ public class TestScreen implements Screen {
         player.addComponent(new CircleColliderComponent(player.getComponent(BodyComponent.class), 1, 0.01f));
         player.addComponent(new GravityComponent(player, registry));
         player.addComponent(new TrailComponent(Color.CORAL));
+        player.addComponent(new TrackedEntityComponent(Color.LIME));
         player.addComponent(new ScriptComponent(player) {
             private TransformComponent trans = getEntity().getComponent(TransformComponent.class);
             private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
@@ -121,9 +122,6 @@ public class TestScreen implements Screen {
                 if(Gdx.input.isKeyPressed(Keys.D)){
                     bc.body.applyLinearImpulse(0.00155f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
                 }
-                if(Gdx.input.isKeyPressed(Keys.F)){
-                    bc.body.setLinearVelocity(0, orbitVelocity(ent1, getEntity()));
-                }
 
                 // Vector2 offset = trans.position.cpy();
                 // if(trans.position.len() > 15000){
@@ -139,6 +137,7 @@ public class TestScreen implements Screen {
             public void render() {
             }
         });
+        player.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, player));
         registry.addEntity(player);
 
         // TestEntity ent2 = new TestEntity(2000, 0);
