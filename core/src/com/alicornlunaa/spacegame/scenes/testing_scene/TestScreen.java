@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.components.CircleColliderComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
+import com.alicornlunaa.selene_engine.components.TextureComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -178,9 +179,9 @@ public class TestScreen implements Screen {
         registry.addEntity(ent5);
         
         TestEntity player = new TestEntity(400, 0);
-        player.addComponent(new SpriteComponent(2, 2));
+        player.addComponent(new SpriteComponent(1, 1));
         player.addComponent(new BodyComponent(world, def));
-        player.addComponent(new CircleColliderComponent(player.getComponent(BodyComponent.class), 1, 0.01f));
+        player.addComponent(new CircleColliderComponent(player.getComponent(BodyComponent.class), 0.5f, 0.01f));
         player.addComponent(new GravityComponent(player, registry));
         player.addComponent(new TrailComponent(Color.CORAL));
         player.addComponent(new TrackedEntityComponent(Color.LIME));

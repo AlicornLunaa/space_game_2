@@ -67,7 +67,7 @@ public class PlanetSprite extends CustomSpriteComponent {
         atmosShader.program.setUniformf("u_planetWorldPos", transform.position);
         atmosShader.program.setUniformf("u_planetRadius", planetRadius);
         atmosShader.program.setUniformf("u_atmosRadius", atmosRadius);
-        atmosShader.program.setUniformf("u_atmosColor", Color.CYAN);
+        atmosShader.program.setUniformf("u_atmosColor", color);
         batch.draw(texture.texture, 0, 0, 1280, 720);
 
         batch.setShader(null);
