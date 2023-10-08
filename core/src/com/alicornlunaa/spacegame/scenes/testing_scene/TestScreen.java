@@ -4,8 +4,8 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.CircleColliderComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
+import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
-import com.alicornlunaa.selene_engine.components.TextureComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -18,6 +18,7 @@ import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.selene_engine.systems.ShapeRenderSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
+import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -33,8 +34,24 @@ public class TestScreen implements Screen {
     // Static classes
     static private class TestEntity extends BaseEntity {
         public TestEntity(float x, float y){
-            addComponent(new TextureComponent(App.instance.manager, "textures/dev_texture.png"));
             getComponent(TransformComponent.class).position.set(x, y);
+        }
+    };
+
+    static private class PlanetEntity extends BaseEntity {
+        public PlanetEntity(Registry registry, PhysWorld world, float x, float y, float density, float planetRadius, float atmosRadius, Color color){
+            BodyDef def = new BodyDef();
+            def.type = BodyType.DynamicBody;
+
+            getComponent(TransformComponent.class).position.set(x, y);
+            addComponent(new BodyComponent(world, def));
+            addComponent(new CircleColliderComponent(this.getComponent(BodyComponent.class), planetRadius, density));
+            addComponent(new GravityComponent(this, registry));
+            addComponent(new TrailComponent(color));
+            addComponent(new CameraComponent(1280, 720)).active = false;
+            addComponent(new ShaderComponent(App.instance.manager, "shaders/atmosphere"));
+            addComponent(new ShaderComponent(App.instance.manager, "shaders/planet"));
+            addComponent(new PlanetSprite(this, planetRadius, atmosRadius, color));
         }
     };
 
@@ -98,6 +115,7 @@ public class TestScreen implements Screen {
         registry.registerSystem(new CameraSystem(App.instance));
         simulation = registry.registerSystem(new PhysicsSystem());
         registry.registerSystem(new RenderSystem(App.instance));
+        registry.registerSystem(new SpaceRenderSystem());
         registry.registerSystem(new ShapeRenderSystem());
         final TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
         final TrailSystem trailSystem = registry.registerSystem(new TrailSystem());
@@ -113,16 +131,52 @@ public class TestScreen implements Screen {
         BaseEntity cameraEntity = new BaseEntity();
         registry.addEntity(cameraEntity);
 
-        final TestEntity ent1 = new TestEntity(0, 0);
-        ent1.addComponent(new SpriteComponent(400, 400));
-        ent1.addComponent(new BodyComponent(world, def));
-        ent1.addComponent(new CircleColliderComponent(ent1.getComponent(BodyComponent.class), 200, 10));
-        ent1.addComponent(new GravityComponent(ent1, registry));
-        ent1.addComponent(new TrailComponent(Color.RED));
-        ent1.addComponent(new CameraComponent(1280, 720)).active = true;
+        final PlanetEntity ent1 = new PlanetEntity(registry, world, 0, 0, 10, 400, 0, Color.RED);
         registry.addEntity(ent1);
 
-        //testicle
+        PlanetEntity ent2 = new PlanetEntity(registry, world, 1900, 0, 12, 40, 50, Color.PINK);
+        ent2.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent2));
+        registry.addEntity(ent2);
+
+        PlanetEntity ent3 = new PlanetEntity(registry, world, 2400, 0, 10, 10, 30, Color.CYAN);
+        ent3.addComponent(new TrackedEntityComponent(Color.LIME));
+        ent3.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3));
+        ent3.addComponent(new ScriptComponent(ent3) {
+            private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
+
+            @Override
+            public void start() {}
+
+            @Override
+            public void update() {
+                if(Gdx.input.isKeyPressed(Keys.I)){
+                    bc.body.applyLinearImpulse(0, 4.955f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
+                }
+                if(Gdx.input.isKeyPressed(Keys.K)){
+                    bc.body.applyLinearImpulse(0, -4.955f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
+                }
+                if(Gdx.input.isKeyPressed(Keys.J)){
+                    bc.body.applyLinearImpulse(-4.955f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
+                }
+                if(Gdx.input.isKeyPressed(Keys.L)){
+                    bc.body.applyLinearImpulse(4.955f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
+                }
+            }
+
+            @Override
+            public void render() {
+            }
+        });
+        registry.addEntity(ent3);
+
+        PlanetEntity ent4 = new PlanetEntity(registry, world, 750, 0, 4, 10, 14, Color.LIME);
+        ent4.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent4));
+        registry.addEntity(ent4);
+
+        PlanetEntity ent5 = new PlanetEntity(registry, world, 3300, 0, 90, 10, 50, Color.YELLOW);
+        ent5.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent5));
+        registry.addEntity(ent5);
+        
         TestEntity player = new TestEntity(400, 0);
         player.addComponent(new SpriteComponent(2, 2));
         player.addComponent(new BodyComponent(world, def));
@@ -169,73 +223,6 @@ public class TestScreen implements Screen {
         player.addComponent(new CameraComponent(1280, 720)).active = false;
         registry.addEntity(player);
 
-        TestEntity ent2 = new TestEntity(1900, 0);
-        ent2.addComponent(new SpriteComponent(80, 80));
-        ent2.addComponent(new BodyComponent(world, def));
-        ent2.addComponent(new CircleColliderComponent(ent2.getComponent(BodyComponent.class), 40, 12));
-        ent2.addComponent(new GravityComponent(ent2, registry));
-        ent2.addComponent(new TrailComponent(Color.PINK));
-        ent2.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent2));
-        ent2.addComponent(new CameraComponent(1280, 720)).active = false;
-        registry.addEntity(ent2);
-
-        TestEntity ent3 = new TestEntity(2400, 0);
-        ent3.addComponent(new SpriteComponent(20, 20));
-        ent3.addComponent(new BodyComponent(world, def));
-        ent3.addComponent(new CircleColliderComponent(ent3.getComponent(BodyComponent.class), 10, 10));
-        ent3.addComponent(new GravityComponent(ent3, registry));
-        ent3.addComponent(new TrailComponent(Color.CYAN));
-        ent3.addComponent(new TrackedEntityComponent(Color.LIME));
-        ent3.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3));
-        ent3.addComponent(new CameraComponent(1280, 720)).active = false;
-        ent3.addComponent(new ScriptComponent(ent3) {
-            private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
-
-            @Override
-            public void start() {}
-
-            @Override
-            public void update() {
-                if(Gdx.input.isKeyPressed(Keys.I)){
-                    bc.body.applyLinearImpulse(0, 4.955f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.K)){
-                    bc.body.applyLinearImpulse(0, -4.955f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.J)){
-                    bc.body.applyLinearImpulse(-4.955f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.L)){
-                    bc.body.applyLinearImpulse(4.955f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-            }
-
-            @Override
-            public void render() {
-            }
-        });
-        registry.addEntity(ent3);
-
-        TestEntity ent4 = new TestEntity(750, 0);
-        ent4.addComponent(new SpriteComponent(20, 20));
-        ent4.addComponent(new BodyComponent(world, def));
-        ent4.addComponent(new CircleColliderComponent(ent4.getComponent(BodyComponent.class), 10, 4));
-        ent4.addComponent(new GravityComponent(ent4, registry));
-        ent4.addComponent(new TrailComponent(Color.LIME));
-        ent4.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent4));
-        ent4.addComponent(new CameraComponent(1280, 720)).active = false;
-        registry.addEntity(ent4);
-
-        TestEntity ent5 = new TestEntity(3300, 0);
-        ent5.addComponent(new SpriteComponent(20, 20));
-        ent5.addComponent(new BodyComponent(world, def));
-        ent5.addComponent(new CircleColliderComponent(ent5.getComponent(BodyComponent.class), 10, 90));
-        ent5.addComponent(new GravityComponent(ent5, registry));
-        ent5.addComponent(new TrailComponent(Color.YELLOW));
-        ent5.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent5));
-        ent5.addComponent(new CameraComponent(1280, 720)).active = false;
-        registry.addEntity(ent5);
-
         trackingSystem.setReferenceEntity(cameraEntity);
         trailSystem.setReferenceEntity(cameraEntity);
         cameraEntity.addComponent(new CameraComponent(1280, 720));
@@ -260,6 +247,9 @@ public class TestScreen implements Screen {
                     focusableEntities[index].getComponent(CameraComponent.class).active = true;
                     trackingSystem.setReferenceEntity(focusableEntities[index]);
                     trailSystem.setReferenceEntity(focusableEntities[index]);
+                    return true;
+                } else if(character == 'v'){
+                    App.instance.manager.reload();
                     return true;
                 }
 

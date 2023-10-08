@@ -65,7 +65,7 @@ public class GameplayScene extends BaseScene {
 	private void initializeUniverse(){
 		universe = new Universe(registry);
         simulation.addWorld(universe.getUniversalWorld());
-        spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem(universe));
+        spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
 
         Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 261600, 400000, 0));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 11000, 17500, 0.5001f, 0.0f, 0.0f, 0.0f));

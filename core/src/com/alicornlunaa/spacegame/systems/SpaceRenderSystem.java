@@ -6,7 +6,6 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
-import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -18,7 +17,7 @@ public class SpaceRenderSystem implements ISystem {
 	private SpriteBatch batch;
 
 	// Constructor
-	public SpaceRenderSystem(Universe universe){
+	public SpaceRenderSystem(){
 		batch = new SpriteBatch();
 	}
 	

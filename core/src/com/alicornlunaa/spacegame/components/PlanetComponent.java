@@ -212,12 +212,12 @@ public class PlanetComponent extends ScriptComponent {
         starDirection.set(1, 0, 0);
 
         // Remove entities in the world still
-        while(entitiesLeavingPlanet.size() > 0){
-            delEntityWorld(entitiesLeavingPlanet.pop());
-        }
+        // while(entitiesLeavingPlanet.size() > 0){
+        //     delEntityWorld(entitiesLeavingPlanet.pop());
+        // }
 
-        worldBody.act(Gdx.graphics.getDeltaTime());
-        worldBody.update();
+        // worldBody.act(Gdx.graphics.getDeltaTime());
+        // worldBody.update();
     }
 
     @Override

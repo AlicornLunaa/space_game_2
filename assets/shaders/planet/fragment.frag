@@ -14,6 +14,7 @@ varying vec2 v_worldcoord;
 
 uniform sampler2D u_texture;
 
+uniform vec4 u_planetColor;
 uniform vec3 u_starDirection;
 uniform vec2 u_planetWorldPos;
 uniform float u_planetRadius;
@@ -59,5 +60,5 @@ void main() {
         color *= vec4(vec3(1.0 - (lightingRay.y / (u_planetRadius * 2.0))), 1.0);
     }
 
-    gl_FragColor = color;
+    gl_FragColor = color * u_planetColor;
 }
