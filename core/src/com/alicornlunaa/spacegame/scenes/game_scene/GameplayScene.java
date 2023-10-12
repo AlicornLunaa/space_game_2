@@ -8,7 +8,9 @@ import com.alicornlunaa.selene_engine.systems.CameraSystem;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
+import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -19,6 +21,8 @@ import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetPanel;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetUIPanel;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
+import com.alicornlunaa.spacegame.systems.TrackingSystem;
+import com.alicornlunaa.spacegame.systems.GravitySystem;
 import com.alicornlunaa.spacegame.systems.PlanetRenderSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -38,7 +42,7 @@ public class GameplayScene extends BaseScene {
     public SpaceRenderSystem spaceRenderSystem;
     public PlanetRenderSystem planetRenderSystem;
 	public PhysicsSystem simulation;
-	// public OrbitSystem orbitSystem;
+    public TrackingSystem trackingSystem;
 
     public SpacePanel spacePanel;
     public SpaceInterface spaceInterface;
@@ -65,7 +69,7 @@ public class GameplayScene extends BaseScene {
         simulation.addWorld(universe.getUniversalWorld());
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
 
-        Celestial star = newCelestial(new Star(simulation, universe.getUniversalWorld(), 261600, 400000, 0));
+        newCelestial(new Star(simulation, universe.getUniversalWorld(), 3000, 4000, 0));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 11000, 17500, 0.5001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 31500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 51500, 0.001f, 0.0f, 0.0f, 0.0f));
@@ -73,12 +77,11 @@ public class GameplayScene extends BaseScene {
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 81500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 101500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 480000, 221500, 0.001f, 0.0f, 0.0f, 0.0f));
-        newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 45000, 19646, 0.2f, 0.0f, 0.0f, 0.0f)); // Moho
+        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 45000, 19646, 0.2f, 0.0f, 0.0f, 0.0f)); // Moho
         
-        // testPlanet = new Planet(simulation, universe.getUniversalWorld(), -1000, 0, 500, 560, 1);
-        // registry.addEntity(testPlanet);
-
 		player = new Player(game, universe.getUniversalWorld(), -50, 0);
+        player.addComponent(new GravityComponent(player));
+        player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
         player.getComponent(CameraComponent.class).active = true;
         game.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
@@ -112,7 +115,8 @@ public class GameplayScene extends BaseScene {
         registry.registerSystem(new CameraSystem(game));
         simulation = registry.registerSystem(new PhysicsSystem());
         planetRenderSystem = registry.registerSystem(new PlanetRenderSystem());
-        // orbitSystem = registry.registerSystem(new OrbitSystem(game));
+        trackingSystem = registry.registerSystem(new TrackingSystem(registry));
+        registry.registerSystem(new GravitySystem(registry));
         registry.registerSystem(new ScriptSystem());
     }
     

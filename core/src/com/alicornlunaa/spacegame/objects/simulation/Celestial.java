@@ -1,20 +1,21 @@
 package com.alicornlunaa.spacegame.objects.simulation;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.CircleColliderComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.components.GravityComponent;
+import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.components.CelestialComponent;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 /**
@@ -26,22 +27,17 @@ public class Celestial extends BaseEntity {
     public Celestial(PhysicsSystem phys, PhysWorld world, float radius, float x, float y){
         // Initialize self
         TransformComponent transform = getComponent(TransformComponent.class);
-        transform.position.x = x;
-        transform.position.y = y;
+        transform.position.set(x, y);
         
-        // Initialize body
-        CircleShape shape = new CircleShape();
-        shape.setRadius(radius / world.getPhysScale());
-
+        // Initialize body component
         BodyComponent bodyComponent = addComponent(new BodyComponent(world, new BodyDef()));
         bodyComponent.body.setType(BodyType.DynamicBody);
-        bodyComponent.body.createFixture(shape, 10.0f);
-        bodyComponent.sync(transform);
-
-        shape.dispose();
+        addComponent(new CircleColliderComponent(bodyComponent, radius, 0, 0, 10.f));
 
         // Initialize components
-        addComponent(new CelestialComponent(this, phys, radius));
+        addComponent(new CelestialComponent(radius));
+        addComponent(new GravityComponent(this));
+        addComponent(new TrackedEntityComponent(Color.SKY));
         addComponent(new CustomSpriteComponent() {
             private CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
 
@@ -53,16 +49,10 @@ public class Celestial extends BaseEntity {
                 App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
                 App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
 
-                App.instance.shapeRenderer.setColor(Color.RED);
-                App.instance.shapeRenderer.circle(0, 0, celestialComponent.getSphereOfInfluence(), 500);
+                // App.instance.shapeRenderer.setColor(Color.RED);
+                // App.instance.shapeRenderer.circle(0, 0, celestialComponent.getSphereOfInfluence(), 500);
                 App.instance.shapeRenderer.setColor(Color.YELLOW);
                 App.instance.shapeRenderer.circle(0, 0, celestialComponent.getRadius(), 500);
-
-                if(celestialComponent.conic != null){
-                    Constants.DEBUG = false;
-                    celestialComponent.conic.draw(App.instance.shapeRenderer, 1);
-                    Constants.DEBUG = true;
-                }
                 
                 App.instance.shapeRenderer.end();
                 batch.begin();
@@ -78,13 +68,9 @@ public class Celestial extends BaseEntity {
         BodyComponent bodyComponent = getComponent(BodyComponent.class);
         bodyComponent.body.setLinearVelocity(vx, vy);
         bodyComponent.sync(transform);
-
-        // Initialize rails
-        CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
-        celestialComponent.conic = new EllipticalConic(parent, this);
     }
 
-    public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
+    /* public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
         // Create celestial that orbits around another
         this(
             phys,
@@ -97,5 +83,5 @@ public class Celestial extends BaseEntity {
         // Initialize rails
         CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
         celestialComponent.conic = new EllipticalConic(parent, this, semiMajorAxis, eccentricity, periapsis, trueAnomaly, inclination);
-    }
+    } */
 }

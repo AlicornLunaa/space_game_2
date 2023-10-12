@@ -246,6 +246,7 @@ public class Ship extends DriveableEntity {
     
     public void setRootPart(Part p){ this.rootPart = p; }
     public Part getRootPart(){ return rootPart; }
+    
     public void assemble(){
         if(rootPart != null)
             rootPart.setParent(this, new Matrix4());

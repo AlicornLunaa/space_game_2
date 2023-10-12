@@ -156,8 +156,8 @@ public class Part implements Disposable,Comparable<Part> {
 
         BodyComponent bc = ship.getBody();
         parent = ship;
-        collider.setScale((flipX ? -1 : 1) / bc.world.getPhysScale(), (flipY ? -1 : 1) / bc.world.getPhysScale());
-        collider.setPosition(pos.cpy().scl(1 / bc.world.getPhysScale()));
+        collider.setScale(flipX ? -1 : 1, flipY ? -1 : 1);
+        collider.setPosition(pos.cpy());
         collider.setRotation(rotation * ((getFlipX() ^ getFlipY()) ? -1 : 1));
         collider.attachCollider(bc.body);
 

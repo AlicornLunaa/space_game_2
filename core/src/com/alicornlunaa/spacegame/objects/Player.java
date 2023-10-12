@@ -58,8 +58,8 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 8.0f;
     private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 0.1f;//1.f;
-    private static final float JUMP_FORCE = 0.1f;//1.25f;
+    private static final float MOVEMENT_SPEED = 100000.f;
+    private static final float JUMP_FORCE = 100000.f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
@@ -85,9 +85,8 @@ public class Player extends BaseEntity {
         // addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
 
-        float ppm = bodyComponent.world.getPhysScale();
         bodyComponent.body.setFixedRotation(true);
-        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle());
+        bodyComponent.body.setTransform(x, y, bodyComponent.body.getAngle());
         transform.position.set(x, y);
         transform.dp.set(x, y);
 
@@ -97,10 +96,10 @@ public class Player extends BaseEntity {
         fixtureDef.density = 1.4f;
 
         PolygonShape shape = new PolygonShape();
-        float rad = PLAYER_WIDTH / 2.f / ppm;
+        float rad = PLAYER_WIDTH / 2.f;
         shape.setAsBox(
-            PLAYER_WIDTH / 2 / ppm,
-            PLAYER_HEIGHT / 2 / ppm - rad,
+            PLAYER_WIDTH / 2,
+            PLAYER_HEIGHT / 2 - rad,
             new Vector2(
                 0,
                 0
@@ -113,10 +112,10 @@ public class Player extends BaseEntity {
 
         CircleShape cShape = new CircleShape();
         cShape.setRadius(rad);
-        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 / ppm - rad));
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 - rad));
         fixtureDef.shape = cShape;
         bodyComponent.body.createFixture(fixtureDef);
-        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 / ppm + rad));
+        cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 + rad));
         bodyComponent.body.createFixture(fixtureDef);
         cShape.dispose();
 
@@ -165,7 +164,7 @@ public class Player extends BaseEntity {
 
                 // Movement
                 if(vertical != 0 || horizontal != 0){
-                    bodyComponent.body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP).scl(128.f / bodyComponent.world.getPhysScale() * 1.f), bodyComponent.body.getWorldCenter(), true);
+                    bodyComponent.body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP), bodyComponent.body.getWorldCenter(), true);
                 }
 
                 // Controls
@@ -219,8 +218,6 @@ public class Player extends BaseEntity {
             }
         });
         addComponent(new CameraComponent(1280, 720));
-        
-        // orbitComponent = addComponent(new OrbitComponent(game.gameScene.universe, this));
     }
 
     // Functions

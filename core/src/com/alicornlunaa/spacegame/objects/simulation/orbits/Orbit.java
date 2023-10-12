@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
  * Solves an entire orbit with the patched conics algorithm, using different conic sections
  * It will take an entity and a universe, allowing it to simulate every body in the system
  */
+@SuppressWarnings("unused")
 public class Orbit {
     // Variables
     private final Universe universe;
@@ -87,7 +88,7 @@ public class Orbit {
         Celestial parent = (Celestial)childConic.getParent();
 
         // Error check
-        if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getComponent(CelestialComponent.class).getSphereOfInfluence() / 2 / Constants.PPM) || parent.getComponent(CelestialComponent.class).conic.getParent() == null) return null;
+        if((childConic.getEccentricity() < 1.f && Math.abs(childConic.getApoapsis()) < parent.getComponent(CelestialComponent.class).getSphereOfInfluence() / 2 / Constants.PPM) /* || parent.getComponent(CelestialComponent.class).conic.getParent() == null */) return null;
         
         // Find first intersection by the changing value
         double startIntersectionGuess = -1.f;
@@ -137,7 +138,7 @@ public class Orbit {
         if(parent == null) return;
         if(depth > Constants.PATCHED_CONIC_LIMIT) return;
 
-        GenericConic parentConic = parent.getComponent(CelestialComponent.class).conic;
+        GenericConic parentConic = /* parent.getComponent(CelestialComponent.class).conic */ null;
         // Double exitAnomaly = getExitAnomaly(section, parentConic, currentTime);
 
         // if(exitAnomaly != null){
@@ -187,7 +188,7 @@ public class Orbit {
         for(Celestial celestial : universe.getCelestials()){
             if(celestial == parent) continue;
 
-            double enterAnomaly = getPatchAnomaly(section, celestial.getComponent(CelestialComponent.class).conic, currentTime);
+            double enterAnomaly = getPatchAnomaly(section, /* celestial.getComponent(CelestialComponent.class).conic */ null, currentTime);
             System.out.println(enterAnomaly);
         }
     }

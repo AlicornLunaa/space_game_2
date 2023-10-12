@@ -34,6 +34,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+@SuppressWarnings("unused")
 public class TestScreen implements Screen {
     // Static classes
     static private class TestEntity extends BaseEntity {

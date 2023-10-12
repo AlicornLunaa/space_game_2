@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.scenes.game_scene;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.scenes.transitions.PauseScene;
@@ -99,7 +98,7 @@ public class SpaceInterface extends Stage {
                     ship.stopDriving();
 
                     if(ship.hasComponent(BodyComponent.class)){
-                        TransformComponent shipTransform = ship.getComponent(TransformComponent.class);
+                        // TransformComponent shipTransform = ship.getComponent(TransformComponent.class);
                         BodyComponent shipBodyComponent = ship.getComponent(BodyComponent.class);
                         game.gameScene.player.bodyComponent.setWorld(shipBodyComponent.world);
                         game.gameScene.player.bodyComponent.body.setLinearVelocity(shipBodyComponent.body.getLinearVelocity());

@@ -67,7 +67,7 @@ public class SpacePanel extends Stage {
         super.draw();
 
         if(Constants.DEBUG){
-            game.debug.render(game.gameScene.universe.getUniversalWorld().getBox2DWorld(), game.camera.combined.cpy().scl(Constants.PPM));
+            game.debug.render(game.gameScene.universe.getUniversalWorld().getBox2DWorld(), game.camera.combined);
         }
     }
     

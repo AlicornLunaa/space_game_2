@@ -96,15 +96,15 @@ public class Universe extends Actor {
         // Starting the timewarp for first time
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
-            for(IEntity e : registry.getEntities()){
-                // if(e.hasComponent(GravityScript.class)){
-                //     Celestial parent = getParentCelestial(e);
+            // for(IEntity e : registry.getEntities()){
+            //     // if(e.hasComponent(GravityScript.class)){
+            //     //     Celestial parent = getParentCelestial(e);
 
-                //     if(parent != null){
-                //         entityPaths.add(new Orbit(this, e));
-                //     }
-                // }
-            }
+            //     //     if(parent != null){
+            //     //         entityPaths.add(new Orbit(this, e));
+            //     //     }
+            //     // }
+            // }
         }
 
         timewarp = warp;
