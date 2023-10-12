@@ -85,12 +85,14 @@ public class GameplayScene extends BaseScene {
         player.getComponent(CameraComponent.class).active = true;
         game.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
-        OrbitUtils.createOrbit(universe, player);
+        OrbitUtils.createOrbit(registry, player);
 
-        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
+        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0); //! Ship does not render correctly
+        ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
+        ship.addComponent(new GravityComponent(ship));
         ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);
-        OrbitUtils.createOrbit(universe, ship);
+        OrbitUtils.createOrbit(registry, ship);
         // ship.drive(player);
 	}
 

@@ -4,7 +4,9 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
+import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.spacegame.components.CelestialComponent;
+import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
@@ -40,26 +42,42 @@ public class OrbitUtils {
     }
  
     /**
-     * Creates a stable orbit for the given object using math equations
-     * @param u Universe to affect
-     * @param e The entity to stablize into a near-circular orbit
+     * Forces stable orbit
+     * @param registry
+     * @param entity
      */
-    public static void createOrbit(Universe u, IEntity e){
-        Celestial parent = u.getParentCelestial(e);
-        if(parent == null) return; // Cant create an orbit for no parent
+    public static void createOrbit(Registry registry, IEntity entity){
+        TransformComponent entityTrans = entity.getComponent(TransformComponent.class);
+        BodyComponent entityBodyComponent = entity.getComponent(BodyComponent.class);
+        Vector2 force = new Vector2();
+        
+        for(int i = 0; i < registry.getEntities().size; i++){
+            IEntity otherEntity = registry.getEntity(i);
 
-        TransformComponent celestialTransform = parent.getComponent(TransformComponent.class);
-        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
-        BodyComponent celestialBodyComponent = parent.getComponent(BodyComponent.class);
-        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
+            if(otherEntity == entity) continue;
 
-        if(celestialTransform == null || entityTransform == null || celestialBodyComponent == null) return; // Cant create an orbit for something that doesnt have a position
+            TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
+            BodyComponent otherBodyComponent = otherEntity.getComponent(BodyComponent.class);
+            GravityComponent otherGravity = otherEntity.getComponent(GravityComponent.class);
 
-        Vector2 tangentDirection = entityTransform.position.cpy().sub(celestialTransform.position).nor().rotateDeg(90);
-        float orbitalRadius = entityTransform.position.dst(celestialTransform.position) / celestialBodyComponent.world.getPhysScale();
-        float speed = (float)Math.sqrt((Constants.GRAVITY_CONSTANT * celestialBodyComponent.body.getMass()) / orbitalRadius);
+            if(otherGravity != null){
+                // Get variables
+                float radius = entityTrans.position.dst(otherTrans.position);
+                float soi = otherGravity.getSphereOfInfluence();
+                
+                // Prevent insignificant forces
+                if(radius > soi)
+                    continue;
 
-        entityBodyComponent.body.setLinearVelocity(tangentDirection.scl(speed));
+                // Calculate gravitational force
+                Vector2 tangent = entityTrans.position.cpy().sub(otherTrans.position).nor().rotate90(1);
+                float magnitude = (float)Math.sqrt(Constants.GRAVITY_CONSTANT * otherBodyComponent.body.getMass() / radius);
+    
+                force.add(tangent.scl(magnitude));
+            }
+        }
+
+        entityBodyComponent.body.setLinearVelocity(force);
     }
 
     /**

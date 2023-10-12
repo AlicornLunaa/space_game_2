@@ -66,7 +66,7 @@ public class SpaceRenderSystem implements ISystem {
 		trans.rotateRad(0, 0, 1, transform.rotation);
 
 		if(bodyComponent != null){
-			Vector2 localCenter = bodyComponent.body.getLocalCenter().cpy().scl(bodyComponent.world.getPhysScale());
+			Vector2 localCenter = bodyComponent.body.getLocalCenter();
 			trans.translate(-localCenter.x, -localCenter.y, 0);
 		}
 		
