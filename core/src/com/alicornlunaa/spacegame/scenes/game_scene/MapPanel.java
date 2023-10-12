@@ -54,7 +54,7 @@ public class MapPanel extends Stage {
         game.camera = mapCamera;
 
         game.vfxManager.add(new CameraZoomTransition(mapCamera, game.camera.zoom, mapCamera.zoom, 0.4f));
-        game.gameScene.orbitSystem.visible = true;
+        // game.gameScene.orbitSystem.visible = true;
 
         orbit = new Orbit(game.gameScene.universe, game.gameScene.player);
 
@@ -75,7 +75,7 @@ public class MapPanel extends Stage {
                 if(keycode == ControlSchema.OPEN_ORBITAL_MAP){
                     game.gameScene.closeMap();
                     game.camera = oldCamera;
-                    game.gameScene.orbitSystem.visible = false;
+                    // game.gameScene.orbitSystem.visible = false;
                     return true;
                 }
 

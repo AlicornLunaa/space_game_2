@@ -17,8 +17,12 @@ import com.alicornlunaa.selene_engine.systems.RenderSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.selene_engine.systems.ShapeRenderSystem;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.GravityComponent;
+import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
+import com.alicornlunaa.spacegame.systems.GravitySystem;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
+import com.alicornlunaa.spacegame.systems.TrackingSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -26,7 +30,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -47,8 +50,8 @@ public class TestScreen implements Screen {
             getComponent(TransformComponent.class).position.set(x, y);
             addComponent(new BodyComponent(world, def));
             addComponent(new CircleColliderComponent(this.getComponent(BodyComponent.class), planetRadius, density));
-            addComponent(new GravityComponent(this, registry));
-            addComponent(new TrailComponent(color));
+            addComponent(new GravityComponent(this));
+            addComponent(new TrackedEntityComponent(color));
             addComponent(new CameraComponent(1280, 720)).active = false;
             addComponent(new ShaderComponent(App.instance.manager, "shaders/atmosphere"));
             addComponent(new ShaderComponent(App.instance.manager, "shaders/planet"));
@@ -119,7 +122,7 @@ public class TestScreen implements Screen {
         registry.registerSystem(new SpaceRenderSystem());
         registry.registerSystem(new ShapeRenderSystem());
         final TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
-        final TrailSystem trailSystem = registry.registerSystem(new TrailSystem());
+        registry.registerSystem(new GravitySystem(registry));
         registry.registerSystem(new ScriptSystem());
 
         universe = new Universe(registry);
@@ -140,7 +143,7 @@ public class TestScreen implements Screen {
         registry.addEntity(ent2);
 
         PlanetEntity ent3 = new PlanetEntity(registry, world, 2100, 0, 10, 10, 30, Color.CYAN);
-        ent3.addComponent(new TrackedEntityComponent(Color.LIME));
+        ent3.getComponent(TrackedEntityComponent.class).predictFuture = true;
         ent3.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3));
         ent3.addComponent(new ScriptComponent(ent3) {
             private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
@@ -182,9 +185,8 @@ public class TestScreen implements Screen {
         player.addComponent(new SpriteComponent(1, 1));
         player.addComponent(new BodyComponent(world, def));
         player.addComponent(new CircleColliderComponent(player.getComponent(BodyComponent.class), 0.5f, 0.01f));
-        player.addComponent(new GravityComponent(player, registry));
-        player.addComponent(new TrailComponent(Color.CORAL));
-        player.addComponent(new TrackedEntityComponent(Color.LIME));
+        player.addComponent(new GravityComponent(player));
+        player.addComponent(new TrackedEntityComponent(Color.LIME)).predictFuture = true;
         player.addComponent(new ScriptComponent(player) {
             private TransformComponent trans = getEntity().getComponent(TransformComponent.class);
             private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
@@ -207,14 +209,14 @@ public class TestScreen implements Screen {
                     bc.body.applyLinearImpulse(0.00155f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
                 }
 
-                Vector2 offset = trans.position.cpy();
-                if(trans.position.len() > 1500){
-                    for(int i = 0; i < registry.getEntities().size; i++){
-                        IEntity otherEntity = registry.getEntity(i);
-                        TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
-                        otherTrans.position.sub(offset);
-                    }
-                }
+                // Vector2 offset = trans.position.cpy();
+                // if(trans.position.len() > 1500){
+                //     for(int i = 0; i < registry.getEntities().size; i++){
+                //         IEntity otherEntity = registry.getEntity(i);
+                //         TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
+                //         otherTrans.position.sub(offset);
+                //     }
+                // }
             }
 
             @Override
@@ -226,7 +228,6 @@ public class TestScreen implements Screen {
         registry.addEntity(player);
 
         trackingSystem.setReferenceEntity(cameraEntity);
-        trailSystem.setReferenceEntity(cameraEntity);
         cameraEntity.addComponent(new CameraComponent(1280, 720));
         
         final IEntity[] focusableEntities = { cameraEntity, ent1, player, ent2, ent3, ent4, ent5 };
@@ -241,14 +242,12 @@ public class TestScreen implements Screen {
                     index = Math.floorMod(index + 1, focusableEntities.length);
                     focusableEntities[index].getComponent(CameraComponent.class).active = true;
                     trackingSystem.setReferenceEntity(focusableEntities[index]);
-                    trailSystem.setReferenceEntity(focusableEntities[index]);
                     return true;
                 } else if(character == 'e'){
                     focusableEntities[index].getComponent(CameraComponent.class).active = false;
                     index = Math.floorMod(index - 1, focusableEntities.length);
                     focusableEntities[index].getComponent(CameraComponent.class).active = true;
                     trackingSystem.setReferenceEntity(focusableEntities[index]);
-                    trailSystem.setReferenceEntity(focusableEntities[index]);
                     return true;
                 } else if(character == 'v'){
                     App.instance.manager.reload();

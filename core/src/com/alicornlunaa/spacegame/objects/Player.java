@@ -11,7 +11,6 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
-import com.alicornlunaa.spacegame.components.OrbitComponent;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -44,7 +43,6 @@ public class Player extends BaseEntity {
     private final App game;
     public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
-    public OrbitComponent orbitComponent;
 
     private float vertical = 0.0f;
     private float horizontal = 0.0f;

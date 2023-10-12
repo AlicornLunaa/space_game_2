@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class CustomSpriteComponent implements IComponent {
-
     // Enums
     public static enum AnchorPoint { CENTER, BOTTOM_LEFT };
 
@@ -15,5 +14,4 @@ public abstract class CustomSpriteComponent implements IComponent {
 
     // Functions
     public abstract void render(Batch batch);
-    
 }

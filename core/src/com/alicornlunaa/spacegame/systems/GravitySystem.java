@@ -1,31 +1,36 @@
-package com.alicornlunaa.spacegame.scenes.testing_scene;
+package com.alicornlunaa.spacegame.systems;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
-import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
-import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
+import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.selene_engine.ecs.Registry;
+import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Vector2;
 
-public class GravityComponent extends ScriptComponent {
+public class GravitySystem implements ISystem {
     // Variables
-    public static final float MIN_FORCE = 0.1f;
-
-    private TransformComponent transform = getEntity().getComponent(TransformComponent.class);
-    private BodyComponent bodyComponent = getEntity().getComponent(BodyComponent.class);
+    public static final float MIN_FORCE = 0.05f;
     private Registry registry;
 
+    // Constructor
+    public GravitySystem(Registry registry){
+        this.registry = registry;
+    }
+
     // Private functions
-    private Vector2 calculateGravity(){
+    private Vector2 calculateGravity(IEntity entity, GravityComponent gravityComponent){
+        TransformComponent transform = gravityComponent.getTransform();
+        BodyComponent bodyComponent = gravityComponent.getBodyComponent();
+
         Vector2 a = new Vector2();
 
         for(int i = 0; i < registry.getEntities().size; i++){
             // Calculate gravity for every n-body
             IEntity otherEntity = registry.getEntity(i);
 
-            if(otherEntity == getEntity()) continue; // Prevent infinite forces
+            if(otherEntity == entity) continue; // Prevent infinite forces
 
             TransformComponent otherTransform = otherEntity.getComponent(TransformComponent.class);
             BodyComponent otherBodyComponent = otherEntity.getComponent(BodyComponent.class);
@@ -50,26 +55,31 @@ public class GravityComponent extends ScriptComponent {
         return a;
     }
 
-    // Constructor
-    public GravityComponent(BaseEntity entity, Registry registry) {
-        super(entity);
-        this.registry = registry;
-    }
-
     // Functions
-    public float getSphereOfInfluence(){
-        return (float)Math.sqrt((Constants.GRAVITY_CONSTANT * bodyComponent.body.getMass()) / MIN_FORCE);
+    @Override
+    public void beforeUpdate() {}
+
+    @Override
+    public void afterUpdate() {}
+
+    @Override
+    public void update(IEntity entity) {
+        // Update gravity for entity
+        GravityComponent gravityComponent = entity.getComponent(GravityComponent.class);
+        gravityComponent.getBodyComponent().body.applyForceToCenter(calculateGravity(entity, gravityComponent), true);
     }
 
     @Override
-    public void start() {}
+    public void beforeRender() {}
 
     @Override
-    public void update() {
-        // Update gravity
-        bodyComponent.body.applyForceToCenter(calculateGravity(), true);
+    public void afterRender() {}
+
+    @Override
+    public void render(IEntity entity) {}
+
+    @Override
+    public boolean shouldRunOnEntity(IEntity entity) {
+        return entity.hasComponent(GravityComponent.class);
     }
-
-    @Override
-    public void render() {}
 }

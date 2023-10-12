@@ -10,7 +10,6 @@ import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
 import com.alicornlunaa.spacegame.phys.CelestialPhysWorld;
-import com.alicornlunaa.spacegame.scripts.GravityScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -98,13 +97,13 @@ public class Universe extends Actor {
         if(warp != 1 && timewarp == 1){
             // Get conic sections for projected positions using keplerian transforms
             for(IEntity e : registry.getEntities()){
-                if(e.hasComponent(GravityScript.class)){
-                    Celestial parent = getParentCelestial(e);
+                // if(e.hasComponent(GravityScript.class)){
+                //     Celestial parent = getParentCelestial(e);
 
-                    if(parent != null){
-                        entityPaths.add(new Orbit(this, e));
-                    }
-                }
+                //     if(parent != null){
+                //         entityPaths.add(new Orbit(this, e));
+                //     }
+                // }
             }
         }
 
