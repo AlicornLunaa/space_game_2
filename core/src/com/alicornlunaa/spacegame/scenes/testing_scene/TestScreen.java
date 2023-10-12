@@ -6,7 +6,6 @@ import com.alicornlunaa.selene_engine.components.CircleColliderComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
-import com.alicornlunaa.selene_engine.components.TextureComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -27,6 +26,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -135,11 +135,11 @@ public class TestScreen implements Screen {
         final PlanetEntity ent1 = new PlanetEntity(registry, world, 0, 0, 10, 400, 0, Color.RED);
         registry.addEntity(ent1);
 
-        PlanetEntity ent2 = new PlanetEntity(registry, world, 1900, 0, 12, 40, 50, Color.PINK);
+        PlanetEntity ent2 = new PlanetEntity(registry, world, 1900, 0, 12, 80, 50, Color.PINK);
         ent2.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent2));
         registry.addEntity(ent2);
 
-        PlanetEntity ent3 = new PlanetEntity(registry, world, 2400, 0, 10, 10, 30, Color.CYAN);
+        PlanetEntity ent3 = new PlanetEntity(registry, world, 2100, 0, 10, 10, 30, Color.CYAN);
         ent3.addComponent(new TrackedEntityComponent(Color.LIME));
         ent3.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3));
         ent3.addComponent(new ScriptComponent(ent3) {
@@ -186,6 +186,7 @@ public class TestScreen implements Screen {
         player.addComponent(new TrailComponent(Color.CORAL));
         player.addComponent(new TrackedEntityComponent(Color.LIME));
         player.addComponent(new ScriptComponent(player) {
+            private TransformComponent trans = getEntity().getComponent(TransformComponent.class);
             private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
 
             @Override
@@ -206,14 +207,14 @@ public class TestScreen implements Screen {
                     bc.body.applyLinearImpulse(0.00155f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
                 }
 
-                // Vector2 offset = trans.position.cpy();
-                // if(trans.position.len() > 15000){
-                //     for(int i = 0; i < registry.getEntities().size; i++){
-                //         IEntity otherEntity = registry.getEntity(i);
-                //         TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
-                //         otherTrans.position.sub(offset);
-                //     }
-                // }
+                Vector2 offset = trans.position.cpy();
+                if(trans.position.len() > 1500){
+                    for(int i = 0; i < registry.getEntities().size; i++){
+                        IEntity otherEntity = registry.getEntity(i);
+                        TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
+                        otherTrans.position.sub(offset);
+                    }
+                }
             }
 
             @Override

@@ -84,6 +84,10 @@ public class TrackingSystem implements ISystem {
         referenceTransform = (ref == null) ? null : ref.getComponent(TransformComponent.class);
     }
 
+    public void translate(Vector2 v){
+        // Translates everything by vector
+    }
+
     @Override
     public void beforeUpdate() {}
 
