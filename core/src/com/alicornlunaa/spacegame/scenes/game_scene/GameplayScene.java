@@ -69,8 +69,8 @@ public class GameplayScene extends BaseScene {
         simulation.addWorld(universe.getUniversalWorld());
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
 
-        newCelestial(new Star(simulation, universe.getUniversalWorld(), 3000, 4000, 0));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 11000, 17500, 0.5001f, 0.0f, 0.0f, 0.0f));
+        Celestial c1 = newCelestial(new Star(simulation, universe.getUniversalWorld(), 3000, 4000, 0));
+        Celestial c2 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 300, 15000, 0.f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 31500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 51500, 0.001f, 0.0f, 0.0f, 0.0f));
         // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 71500, 0.001f, 0.0f, 0.0f, 0.0f));
@@ -85,15 +85,17 @@ public class GameplayScene extends BaseScene {
         player.getComponent(CameraComponent.class).active = true;
         game.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
-        OrbitUtils.createOrbit(registry, player);
 
-        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0); //! Ship does not render correctly
+        ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
         ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
         ship.addComponent(new GravityComponent(ship));
         ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);
-        OrbitUtils.createOrbit(registry, ship);
         // ship.drive(player);
+        
+        OrbitUtils.createOrbit(registry, c2);
+        OrbitUtils.createOrbit(registry, ship);
+        OrbitUtils.createOrbit(registry, player);
 	}
 
     private void initializeSpaceScene(){
@@ -129,7 +131,7 @@ public class GameplayScene extends BaseScene {
     }
 
     public void openMap(){
-        mapPanel = new MapPanel(game, spacePanel);
+        mapPanel = new MapPanel(game, spacePanel, trackingSystem);
         inputs.addProcessor(0, mapPanel);
         state = GameplayState.MAP;
         player.getComponent(CameraComponent.class).active = false;

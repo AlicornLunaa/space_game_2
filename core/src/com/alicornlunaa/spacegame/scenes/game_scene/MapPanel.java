@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.vfx.transitions.CameraZoomTransition;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.Orbit;
+import com.alicornlunaa.spacegame.systems.TrackingSystem;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -40,7 +41,7 @@ public class MapPanel extends Stage {
     private Group markers = new Group();
 
     // Constructor
-    public MapPanel(final App game, final Stage oldStage){
+    public MapPanel(final App game, final Stage oldStage, final TrackingSystem trackingSystem){
         super(new ScreenViewport());
         this.game = game;
         targetEntity = game.gameScene.player.isDriving() ? game.gameScene.player.getVehicle() : game.gameScene.player;
@@ -86,6 +87,7 @@ public class MapPanel extends Stage {
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * mapCamera.zoom * amountY;
                 mapCamera.zoom = Math.min(Math.max(mapCamera.zoom + speed, Constants.MAP_VIEW_MIN_ZOOM), Constants.MAP_VIEW_MAX_ZOOM);
+                trackingSystem.setLineWidth(10.f * mapCamera.zoom, 1.f * mapCamera.zoom);
                 return true;
             }
         });

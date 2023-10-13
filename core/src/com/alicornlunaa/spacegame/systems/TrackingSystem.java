@@ -11,6 +11,7 @@ import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -72,6 +73,8 @@ public class TrackingSystem implements ISystem {
     private @Null IEntity referenceEntity;
     private @Null TransformComponent referenceTransform = null;
     private boolean refreshTrails = false;
+    private float startWidth = 20.f;
+    private float endWidth = 1.0f;
 
     private Array<VirtualBody> virtualBodies = new Array<>();
 
@@ -170,6 +173,11 @@ public class TrackingSystem implements ISystem {
         refreshTrails = true;
     }
 
+    public void setLineWidth(float start, float end){
+        startWidth = start;
+        endWidth = end;
+    }
+
     @Override
     public void beforeUpdate() {}
 
@@ -202,31 +210,35 @@ public class TrackingSystem implements ISystem {
     @Override
     public void render(IEntity entity) {
         TrackedEntityComponent trackedEntityComponent = entity.getComponent(TrackedEntityComponent.class);
-        TransformComponent transform = entity.getComponent(TransformComponent.class);
-        GravityComponent gravityComponent = entity.getComponent(GravityComponent.class);
+        
         savePreviousPath(entity, trackedEntityComponent);
         renderer.setColor(trackedEntityComponent.color);
 
-        Vector2 referencePoint = (referenceEntity == null) ? Vector2.Zero.cpy() : referenceTransform.position.cpy();
         Array<Vector2> futurePoints = trackedEntityComponent.futurePoints;
         Array<Vector2> pastPoints = trackedEntityComponent.pastPoints;
 
-        // Render gravity well
-        // TODO: Move this to gravity system
-        if(gravityComponent != null){
-            renderer.set(ShapeType.Line);
-            renderer.circle(transform.position.x - referencePoint.x, transform.position.y - referencePoint.y, gravityComponent.getSphereOfInfluence());
-            renderer.set(ShapeType.Filled);
-        }
-
         // Draw past path
         for(int i = 0; i < pastPoints.size - 1; i++){
-            renderer.rectLine(pastPoints.get(i), pastPoints.get(i + 1), 0.4f * ((float)i / pastPoints.size));
+            Vector2 point1 = pastPoints.get(i);
+            Vector2 point2 = pastPoints.get(i + 1);
+            float lineScale = (1.0f - (float)i / pastPoints.size);
+            renderer.rectLine(point1, point2, Interpolation.linear.apply(startWidth, endWidth, lineScale));
         }
 
         // Draw future path
+        int count = 0;
+        int direction = 1;
+        int spacing = 20;
+
         for(int i = 0; i < futurePoints.size - 1; i++){
-            renderer.rectLine(futurePoints.get(i), futurePoints.get(i + 1), 4 * (1.f - ((float)i / futurePoints.size)));
+            count += direction;
+            if(count <= 0 || count >= spacing) direction *= -1;
+            if(count < spacing / 2) continue;
+
+            Vector2 point1 = futurePoints.get(i);
+            Vector2 point2 = futurePoints.get(i + 1);
+            float lineScale = ((float)i / futurePoints.size);
+            renderer.rectLine(point1, point2, Interpolation.linear.apply(startWidth, endWidth, lineScale));
         }
     }
 

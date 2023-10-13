@@ -37,9 +37,10 @@ public class Celestial extends BaseEntity {
         // Initialize components
         addComponent(new CelestialComponent(radius));
         addComponent(new GravityComponent(this));
-        addComponent(new TrackedEntityComponent(Color.SKY));
+        addComponent(new TrackedEntityComponent(Color.SKY)).predictFuture = true;
         addComponent(new CustomSpriteComponent() {
             private CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
+            private GravityComponent gravityComponent = getComponent(GravityComponent.class);
 
             @Override
             public void render(Batch batch) {
@@ -49,8 +50,8 @@ public class Celestial extends BaseEntity {
                 App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
                 App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
 
-                // App.instance.shapeRenderer.setColor(Color.RED);
-                // App.instance.shapeRenderer.circle(0, 0, celestialComponent.getSphereOfInfluence(), 500);
+                App.instance.shapeRenderer.setColor(Color.RED);
+                App.instance.shapeRenderer.circle(0, 0, gravityComponent.getSphereOfInfluence(), 500);
                 App.instance.shapeRenderer.setColor(Color.YELLOW);
                 App.instance.shapeRenderer.circle(0, 0, celestialComponent.getRadius(), 500);
                 
@@ -58,16 +59,6 @@ public class Celestial extends BaseEntity {
                 batch.begin();
             }
         });
-    }
-
-    public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float x, float y, float vx, float vy){
-        // Create celestial that orbits around another
-        this(phys, world, radius, x, y);
-        
-        TransformComponent transform = getComponent(TransformComponent.class);
-        BodyComponent bodyComponent = getComponent(BodyComponent.class);
-        bodyComponent.body.setLinearVelocity(vx, vy);
-        bodyComponent.sync(transform);
     }
 
     /* public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
