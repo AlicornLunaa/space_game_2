@@ -70,14 +70,11 @@ public class GameplayScene extends BaseScene {
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
 
         Celestial c1 = newCelestial(new Star(simulation, universe.getUniversalWorld(), 3000, 4000, 0));
-        Celestial c2 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 300, 15000, 0.f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 31500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 51500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 71500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 81500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 18000, 101500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 480000, 221500, 0.001f, 0.0f, 0.0f, 0.0f));
-        // newCelestial(new Celestial(simulation, universe.getUniversalWorld(), star, 45000, 19646, 0.2f, 0.0f, 0.0f, 0.0f)); // Moho
+        Celestial c2 = newCelestial(new Planet(simulation, universe.getUniversalWorld(), 15000, 0.f, 300, 400, 1.f));
+        Celestial c3 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 50, 15575, 0.f));
+        Celestial c4 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 100, 21000, 0.f));
+        Celestial c5 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 200, 24000, 0.f));
+        Celestial c6 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 400, 30000, 0.f));
         
 		player = new Player(game, universe.getUniversalWorld(), -50, 0);
         player.addComponent(new GravityComponent(player));
@@ -93,7 +90,12 @@ public class GameplayScene extends BaseScene {
         registry.addEntity(ship);
         // ship.drive(player);
         
+        OrbitUtils.createOrbit(registry, c1);
         OrbitUtils.createOrbit(registry, c2);
+        OrbitUtils.createOrbit(registry, c3);
+        OrbitUtils.createOrbit(registry, c4);
+        OrbitUtils.createOrbit(registry, c5);
+        OrbitUtils.createOrbit(registry, c6);
         OrbitUtils.createOrbit(registry, ship);
         OrbitUtils.createOrbit(registry, player);
 	}

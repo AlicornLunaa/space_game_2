@@ -18,6 +18,7 @@ import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.selene_engine.systems.ShapeRenderSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.GravityComponent;
+import com.alicornlunaa.spacegame.components.PlanetSprite;
 import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.systems.GravitySystem;

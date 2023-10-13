@@ -108,8 +108,7 @@ public class TrackingSystem implements ISystem {
     }
 
     private void generateFuturePoints(@Null VirtualBody referenceVirtualBody){
-        // Generate 3000 points
-        for(int i = 0; i < 3000; i++){
+        for(int i = 0; i < 600; i++){
             Vector2 referencePoint = (referenceVirtualBody == null) ? Vector2.Zero.cpy() : referenceVirtualBody.position.cpy();
 
             // Generate the points for every tracked entity
@@ -129,8 +128,8 @@ public class TrackingSystem implements ISystem {
             }
 
             // Predict future path of entities
-            int substeps = 12;
-            float dt = 0.05f;
+            int substeps = 8;
+            float dt = 0.5f;
             float sub_dt = dt / substeps;
 
             for(int steps = 0; steps < substeps; steps++){
@@ -228,9 +227,9 @@ public class TrackingSystem implements ISystem {
         // Draw future path
         int count = 0;
         int direction = 1;
-        int spacing = 20;
+        int spacing = 10;
 
-        for(int i = 0; i < futurePoints.size - 1; i++){
+        for(int i = 0; i < futurePoints.size - 1 && trackedEntityComponent.predictFuture; i++){
             count += direction;
             if(count <= 0 || count >= spacing) direction *= -1;
             if(count < spacing / 2) continue;

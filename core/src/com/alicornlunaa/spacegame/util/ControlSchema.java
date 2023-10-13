@@ -33,6 +33,8 @@ public class ControlSchema {
     public static int PLAYER_DOWN = Keys.S;
     public static int PLAYER_LEFT = Keys.A;
     public static int PLAYER_RIGHT = Keys.D;
+    public static int PLAYER_SPRINT = Keys.SHIFT_LEFT;
+    public static int PLAYER_NOCLIP = Keys.V;
 
     public static int OPEN_ORBITAL_MAP = Keys.M;
 

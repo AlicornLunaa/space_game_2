@@ -47,6 +47,7 @@ public class Player extends BaseEntity {
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
     private boolean grounded = false;
+    private boolean noclip = false;
 
     private @Null DriveableEntity vehicle = null;
     // private Vector3 cameraAngle = new Vector3(0, 1, 0);
@@ -158,6 +159,8 @@ public class Player extends BaseEntity {
             
             @Override
             public void update() {
+                if(noclip) return;
+
                 // Groundchecking
                 grounded = true;
                 bodyComponent.world.getBox2DWorld().rayCast(jumpCallback, bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / bodyComponent.world.getPhysScale())).cpy(), bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / bodyComponent.world.getPhysScale())));
@@ -193,7 +196,33 @@ public class Player extends BaseEntity {
             }
 
             @Override
-            public void render() {}
+            public void render() {
+                // Noclip
+                if(Gdx.input.isKeyJustPressed(ControlSchema.PLAYER_NOCLIP)){
+                    noclip = !noclip;
+                    bodyComponent.body.setType(noclip ? BodyType.KinematicBody : BodyType.DynamicBody);
+                    bodyComponent.body.setActive(!noclip);
+                    Gdx.app.log("Noclip", noclip ? "Enabled" : "Disabled");
+                }
+
+                if(noclip){
+                    bodyComponent.body.setLinearVelocity(0, 0);
+
+                    if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)){
+                        transform.position.y += (Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 10000 : 1000) * Gdx.graphics.getDeltaTime();
+                    } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)){
+                        transform.position.y -= (Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 10000 : 1000) * Gdx.graphics.getDeltaTime();
+                    }
+                    
+                    if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)){
+                        transform.position.x += (Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 10000 : 1000) * Gdx.graphics.getDeltaTime();
+                    } else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)){
+                        transform.position.x -= (Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 10000 : 1000) * Gdx.graphics.getDeltaTime();
+                    }
+
+                    return;
+                }
+            }
         });
         addComponent(new CustomSpriteComponent() {
             @Override

@@ -36,8 +36,8 @@ public class Celestial extends BaseEntity {
 
         // Initialize components
         addComponent(new CelestialComponent(radius));
-        addComponent(new GravityComponent(this));
-        addComponent(new TrackedEntityComponent(Color.SKY)).predictFuture = true;
+        // addComponent(new GravityComponent(this));
+        addComponent(new TrackedEntityComponent(Color.SKY)).predictFuture = false;
         addComponent(new CustomSpriteComponent() {
             private CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
             private GravityComponent gravityComponent = getComponent(GravityComponent.class);
@@ -50,8 +50,11 @@ public class Celestial extends BaseEntity {
                 App.instance.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
                 App.instance.shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
 
-                App.instance.shapeRenderer.setColor(Color.RED);
-                App.instance.shapeRenderer.circle(0, 0, gravityComponent.getSphereOfInfluence(), 500);
+                if(gravityComponent != null){
+                    App.instance.shapeRenderer.setColor(Color.RED);
+                    App.instance.shapeRenderer.circle(0, 0, gravityComponent.getSphereOfInfluence(), 500);
+                }
+
                 App.instance.shapeRenderer.setColor(Color.YELLOW);
                 App.instance.shapeRenderer.circle(0, 0, celestialComponent.getRadius(), 500);
                 

@@ -1,10 +1,9 @@
-package com.alicornlunaa.spacegame.scenes.testing_scene;
+package com.alicornlunaa.spacegame.components;
 
 import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.SingleColorTextureComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
