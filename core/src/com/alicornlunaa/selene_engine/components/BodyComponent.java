@@ -109,7 +109,7 @@ public class BodyComponent implements IComponent {
     public void afterWorldChange(PhysWorld world){}
 
     public void sync(TransformComponent transform){
-        body.setTransform(transform.position.cpy().scl(1.0f / world.getPhysScale()), transform.rotation);
+        body.setTransform(transform.position, transform.rotation);
         transform.dp.set(transform.position);
         transform.dr = transform.rotation;
     }

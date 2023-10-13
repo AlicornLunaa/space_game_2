@@ -88,49 +88,53 @@ public class PlanetComponent extends ScriptComponent {
 
     public void addEntityWorld(IEntity e){
         // Formula: x = theta, y = radius
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
+        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
+        if(entityBodyComponent == null || entityTransform == null) return;
+
         // Convert orbital position to world
-        Vector2 localPos = transform.position.cpy();
-        float ppm = bodyComponent.world.getPhysScale();
-        float x = (float)((localPos.angleRad() / Math.PI / 2.0) * (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
+        Vector2 localPos = entityTransform.position.cpy().sub(transform.position);
+        float x = (float)((localPos.angleRad() / Math.PI / -2.0) * (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
         float y = localPos.len();
-        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle() - localPos.angleRad() + (float)Math.PI / 2);
+        entityTransform.position.set(x, y);
+        entityTransform.rotation -= (localPos.angleRad() + (float)Math.PI / 2);
+        entityBodyComponent.sync(entityTransform);
 
         // Convert orbital velocity to world
-        Vector2 vel = bodyComponent.body.getLinearVelocity().cpy();
+        Vector2 vel = entityBodyComponent.body.getLinearVelocity().cpy();
         Vector2 tangent = localPos.cpy().nor().rotateDeg(90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
-        bodyComponent.body.setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
+        entityBodyComponent.body.setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
 
         // Add body
-        bodyComponent.setWorld(physWorld);
-        transform.sync(bodyComponent);
+        entityBodyComponent.setWorld(physWorld);
         entitiesOnPlanet.add(e);
     }
 
     public void delEntityWorld(IEntity e){
         // Formula: theta = x, radius = y
-        TransformComponent transform = e.getComponent(TransformComponent.class);
-        BodyComponent bodyComponent = e.getComponent(BodyComponent.class);
-        if(bodyComponent == null || transform == null) return;
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
+        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
+        if(entityBodyComponent == null || entityTransform == null) return;
 
         // Convert to space angles, spaceAngle = worldAngle + theta
-        float ppm = bodyComponent.world.getPhysScale();
-        float theta = ((transform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * (float)Math.PI * 2);
-        float radius = transform.position.y;
-        float x = (float)(Math.cos(theta) * radius);
-        float y = (float)(Math.sin(theta) * radius);
-        bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle() + theta - (float)Math.PI / 2);
+        float theta = (float)((entityTransform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * -2);
+        float radius = entityTransform.position.y;
+        float x = (float)(Math.cos(theta) * radius) + transform.position.x;
+        float y = (float)(Math.sin(theta) * radius) + transform.position.y;
+        entityTransform.position.set(x, y);
+        entityTransform.rotation += (theta - (float)Math.PI / 2);
+        entityBodyComponent.sync(entityTransform);
 
         // Convert to space velocity, tangent = x, planetToEntity = y
-        Vector2 tangent = new Vector2(0, 1).rotateRad((float)theta);
-        Vector2 planetToEnt = transform.position.cpy().nor();
-        Vector2 curVelocity = bodyComponent.body.getLinearVelocity().cpy().scl(ppm).scl(1 / Constants.PPM);
+        Vector2 tangent = new Vector2(0, 1).rotateRad(theta);
+        Vector2 planetToEnt = entityTransform.position.cpy().nor();
+        Vector2 curVelocity = bodyComponent.body.getLinearVelocity().cpy();
         bodyComponent.body.setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
         bodyComponent.setWorld(bodyComponent.world);
-        transform.sync(bodyComponent);
         entitiesOnPlanet.removeValue(e, true);
     }
 

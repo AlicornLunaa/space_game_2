@@ -182,11 +182,6 @@ public class GameplayScene extends BaseScene {
     }
 
     public void openPlanetView(Planet planet){
-        player.bodyComponent.setWorld(planet.getComponent(PlanetComponent.class).physWorld);
-        player.transform.position.set(0, 800);
-        player.transform.rotation = 0;
-        player.getComponent(BodyComponent.class).body.setLinearVelocity(0, 0);
-
         state = GameplayState.PLANET;
 
         planet.getComponent(PlanetComponent.class).addEntityWorld(player);
@@ -203,7 +198,7 @@ public class GameplayScene extends BaseScene {
     }
 
     public void closePlanetView(){
-        player.bodyComponent.setWorld(universe.getUniversalWorld());
+        planetViewPanel.getPlanet().getComponent(PlanetComponent.class).delEntityWorld(player);
 
         state = GameplayState.SPACE;
         planetViewPanel.dispose();

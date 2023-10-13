@@ -21,7 +21,7 @@ public class TransformComponent implements IComponent{
     }
 
     public void sync(BodyComponent bodyComponent){
-        position.set(bodyComponent.body.getWorldCenter().cpy().scl(bodyComponent.world.getPhysScale()));
+        position.set(bodyComponent.body.getWorldCenter());
         rotation = bodyComponent.body.getAngle();
 
         dp.set(position);
