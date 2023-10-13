@@ -75,7 +75,7 @@ public class GameplayScene extends BaseScene {
         testPlanet = new Planet(simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
         
-		player = new Player(game, universe.getUniversalWorld(), 500, 0);
+		player = new Player(universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));
         // player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
         App.instance.camera = player.getComponent(CameraComponent.class).camera;

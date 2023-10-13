@@ -193,7 +193,7 @@ public class Ship extends DriveableEntity {
                 }
             }
         });
-        // addComponent(new CameraComponent(1280, 720)).active = false;
+        addComponent(new CameraComponent(1280, 720)).active = false;
         interior = new InteriorComponent(game, this);
     
         transform.position.set(x, y);

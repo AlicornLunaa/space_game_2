@@ -60,7 +60,7 @@ public class Part implements Disposable,Comparable<Part> {
     private String id;
     private String name;
     private String description;
-    private float partScale = 1;
+    private float partScale = 0.5f;
     private int interiorSize;
     private boolean freeform = false;
     private boolean flipX = false;
@@ -156,24 +156,28 @@ public class Part implements Disposable,Comparable<Part> {
 
         BodyComponent bc = ship.getBody();
         parent = ship;
-        collider.setScale(flipX ? -1 : 1, flipY ? -1 : 1);
+        collider.setScale((flipX ? -1 : 1) * partScale, (flipY ? -1 : 1) * partScale);
         collider.setPosition(pos.cpy());
         collider.setRotation(rotation * ((getFlipX() ^ getFlipY()) ? -1 : 1));
         collider.attachCollider(bc.body);
 
         for(Node node : attachments){
             if(node.next != null){
+                trans.scale(partScale, partScale, 1);
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                trans.scale(1.f / partScale, 1.f / partScale, 1);
                 node.next.part.setParent(ship, trans);
+                trans.scale(partScale, partScale, 1);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
                 trans.rotate(0, 0, 1, node.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
+                trans.scale(1.f / partScale, 1.f / partScale, 1);
             }
         }
     }
@@ -190,14 +194,14 @@ public class Part implements Disposable,Comparable<Part> {
     }
 
     public Vector2 getNodePosition(Node node){
-        return this.getPosition().cpy().add(node.point.cpy().rotateDeg(getRotation()).scl(node.part.getFlipX() ? -1 : 1, node.part.getFlipY() ? -1 : 1));
+        return this.getPosition().cpy().add(node.point.cpy().rotateDeg(getRotation()).scl((node.part.getFlipX() ? -1 : 1) * partScale, (node.part.getFlipY() ? -1 : 1) * partScale));
     }
 
     public boolean contains(Vector2 position){
         Matrix3 trans = new Matrix3();
         trans.translate(pos.x, pos.y);
         trans.rotate(getRotation());
-        trans.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+        trans.scale((flipX ? -1 : 1) * partScale, (flipY ? -1 : 1) * partScale);
 
         if(this.collider.contains(position.cpy().mul(trans.inv()))){
             return true;
@@ -260,24 +264,28 @@ public class Part implements Disposable,Comparable<Part> {
             texture.getRegionWidth() / -2, texture.getRegionHeight() / -2,
             texture.getRegionWidth() / 2, texture.getRegionHeight() / 2,
             texture.getRegionWidth(), texture.getRegionHeight(),
-            1, 1,
+            partScale, partScale,
             0
         );
         drawEffectsAbove(batch);
 
         for(Node node : attachments){
             if(node.next != null){
+                trans.scale(partScale, partScale, 1);
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                trans.scale(1.f / partScale, 1.f / partScale, 1);
                 node.next.part.draw(batch, trans);
+                trans.scale(partScale, partScale, 1);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
                 trans.rotate(0, 0, 1, node.part.getRotation());
                 trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
+                trans.scale(1.f / partScale, 1.f / partScale, 1);
             }
         }
     }
@@ -293,16 +301,16 @@ public class Part implements Disposable,Comparable<Part> {
             renderer.setTransformMatrix(trans);
             renderer.circle(node.point.x, node.point.y, 1);
 
-            if(node.next != null){
+            if(node.next != null){ //! Fix the scaling here
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
-                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.scale((node.next.part.flipX ? -1 : 1) * partScale, (node.next.part.flipY ? -1 : 1) * partScale, 1);
                 trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 node.next.part.drawAttachmentPoints(renderer, trans);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
                 trans.rotate(0, 0, 1, node.part.getRotation());
-                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
+                trans.scale((node.next.part.flipX ? -1 : 1) / partScale, (node.next.part.flipY ? -1 : 1) / partScale, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
             }

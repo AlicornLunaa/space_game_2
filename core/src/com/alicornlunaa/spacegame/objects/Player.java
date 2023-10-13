@@ -40,7 +40,6 @@ public class Player extends BaseEntity {
     public enum State { IDLE, MOVE_LEFT, MOVE_RIGHT, JUMP };
 
     // Variables
-    private final App game;
     public TransformComponent transform = getComponent(TransformComponent.class);
     public BodyComponent bodyComponent;
 
@@ -57,15 +56,15 @@ public class Player extends BaseEntity {
     private State animationState = State.IDLE;
     private HashMap<State, Animation<TextureRegion>> animations = new HashMap<>();
 
-    private static final float PLAYER_WIDTH = 8.0f;
-    private static final float PLAYER_HEIGHT = 16.0f;
-    private static final float MOVEMENT_SPEED = 100000.f;
-    private static final float JUMP_FORCE = 100000.f;
+    private static final float PLAYER_WIDTH = 0.2f;
+    private static final float PLAYER_HEIGHT = 0.4f;
+    private static final float MOVEMENT_SPEED = 60.f;
+    private static final float JUMP_FORCE = 60.f;
 
     // Private functions
     private Array<TextureRegion> getTextureRegions(String path){
         Array<TextureRegion> out = new Array<>();
-        Array<AtlasRegion> arr = game.atlas.findRegions(path);
+        Array<AtlasRegion> arr = App.instance.atlas.findRegions(path);
 
         for(AtlasRegion a : arr){
             out.add(new TextureRegion(a));
@@ -78,12 +77,11 @@ public class Player extends BaseEntity {
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
         bodyComponent = addComponent(new BodyComponent(world, def));
-        addComponent(new PlanetPhysScript(this));
-
         bodyComponent.body.setFixedRotation(true);
-        bodyComponent.body.setTransform(x, y, bodyComponent.body.getAngle());
+
         transform.position.set(x, y);
         transform.dp.set(x, y);
+        bodyComponent.sync(transform);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.1f;
@@ -140,9 +138,8 @@ public class Player extends BaseEntity {
     }
 
     // Constructor
-    public Player(final App game, PhysWorld world, float x, float y){
+    public Player(PhysWorld world, float x, float y){
         super();
-        this.game = game;
 
         initializePhys(world, x, y);
         initializeAnims();
@@ -242,6 +239,7 @@ public class Player extends BaseEntity {
             }
         });
         addComponent(new CameraComponent(1280, 720));
+        addComponent(new PlanetPhysScript(this));
     }
 
     // Functions
