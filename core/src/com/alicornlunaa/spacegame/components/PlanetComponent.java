@@ -15,7 +15,6 @@ import com.alicornlunaa.spacegame.objects.planet.TerrainGenerator;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -49,43 +48,6 @@ public class PlanetComponent extends ScriptComponent {
     }
 
     // Functions
-    public Vector2 getSpacePosition(IEntity e){
-        // Convert the planetary coords to space coords
-        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
-        float x = 0;
-        float y = 0;
-
-        if(entityTransform != null){
-            // Convet to space position
-            double theta = ((entityTransform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-            float radius = entityTransform.position.y;
-            x = (float)(Math.cos(theta) * radius);
-            y = (float)(Math.sin(theta) * radius);
-        }
-
-        return new Vector2(x, y);
-    }
-
-    public Vector2 getSpaceVelocity(IEntity e){
-        // Convert the planetary coords to space coords
-        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
-        BodyComponent entityBody = e.getComponent(BodyComponent.class);
-        Vector2 velocity = new Vector2();
-
-        // Convet to space velocity
-        if(entityTransform != null){
-            double theta = ((transform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * 2);
-
-            Vector2 tangentDirection = new Vector2(0, 1).rotateRad((float)theta);
-            Vector2 radialDirection = entityTransform.position.cpy().nor();
-            Vector2 currentVelocity = entityBody.body.getLinearVelocity().cpy();
-
-            velocity.set(tangentDirection.scl(currentVelocity.x).add(radialDirection.scl(currentVelocity.y)));
-        }
-
-        return velocity;
-    }
-
     public void addEntityWorld(IEntity e){
         // Formula: x = theta, y = radius
         TransformComponent entityTransform = e.getComponent(TransformComponent.class);
@@ -130,11 +92,11 @@ public class PlanetComponent extends ScriptComponent {
         // Convert to space velocity, tangent = x, planetToEntity = y
         Vector2 tangent = new Vector2(0, 1).rotateRad(theta);
         Vector2 planetToEnt = entityTransform.position.cpy().nor();
-        Vector2 curVelocity = bodyComponent.body.getLinearVelocity().cpy();
-        bodyComponent.body.setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
+        Vector2 curVelocity = entityBodyComponent.body.getLinearVelocity().cpy();
+        entityBodyComponent.body.setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 
         // Remove body
-        bodyComponent.setWorld(bodyComponent.world);
+        entityBodyComponent.setWorld(bodyComponent.world);
         entitiesOnPlanet.removeValue(e, true);
     }
 
@@ -220,8 +182,8 @@ public class PlanetComponent extends ScriptComponent {
         //     delEntityWorld(entitiesLeavingPlanet.pop());
         // }
 
-        worldBody.act(Gdx.graphics.getDeltaTime());
-        worldBody.update();
+        // worldBody.act(Gdx.graphics.getDeltaTime());
+        // worldBody.update();
     }
 
     @Override

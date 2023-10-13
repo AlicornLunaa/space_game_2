@@ -47,7 +47,7 @@ public class Player extends BaseEntity {
     private float vertical = 0.0f;
     private float horizontal = 0.0f;
     private boolean grounded = false;
-    private boolean noclip = false;
+    private boolean noclip = true;
 
     private @Null DriveableEntity vehicle = null;
     // private Vector3 cameraAngle = new Vector3(0, 1, 0);

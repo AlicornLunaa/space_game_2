@@ -16,7 +16,6 @@ import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetPanel;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetUIPanel;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
@@ -77,9 +76,9 @@ public class GameplayScene extends BaseScene {
         testPlanet = new Planet(simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
         
-		player = new Player(game, universe.getUniversalWorld(), -50, 0);
+		player = new Player(game, universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));
-        player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
+        // player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
         player.getComponent(CameraComponent.class).active = true;
         game.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
@@ -97,8 +96,10 @@ public class GameplayScene extends BaseScene {
         // OrbitUtils.createOrbit(registry, c4);
         // OrbitUtils.createOrbit(registry, c5);
         // OrbitUtils.createOrbit(registry, c6);
-        OrbitUtils.createOrbit(registry, ship);
-        OrbitUtils.createOrbit(registry, player);
+        // OrbitUtils.createOrbit(registry, ship);
+        // OrbitUtils.createOrbit(registry, player);
+
+        openPlanetView(testPlanet);
 	}
 
     private void initializeSpaceScene(){
