@@ -65,7 +65,6 @@ public class GameplayScene extends BaseScene {
 	private void initializeUniverse(){
 		universe = new Universe(registry);
         simulation.addWorld(universe.getUniversalWorld());
-        spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
 
         // Celestial c1 = newCelestial(new Star(simulation, universe.getUniversalWorld(), 3000, 4000, 0));
         // Celestial c2 = newCelestial(new Planet(simulation, universe.getUniversalWorld(), 15000, 0.f, 300, 400, 1.f));
@@ -79,8 +78,7 @@ public class GameplayScene extends BaseScene {
 		player = new Player(game, universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));
         // player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
-        player.getComponent(CameraComponent.class).active = true;
-        game.camera = player.getComponent(CameraComponent.class).camera;
+        App.instance.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
 
         ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
@@ -99,7 +97,7 @@ public class GameplayScene extends BaseScene {
         // OrbitUtils.createOrbit(registry, ship);
         // OrbitUtils.createOrbit(registry, player);
 
-        openPlanetView(testPlanet);
+        // openPlanetView(testPlanet);
 	}
 
     private void initializeSpaceScene(){
@@ -122,6 +120,7 @@ public class GameplayScene extends BaseScene {
         registry = new Registry();
         registry.registerSystem(new CameraSystem(game));
         simulation = registry.registerSystem(new PhysicsSystem());
+        spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
         planetRenderSystem = registry.registerSystem(new PlanetRenderSystem());
         trackingSystem = registry.registerSystem(new TrackingSystem(registry));
         registry.registerSystem(new GravitySystem(registry));

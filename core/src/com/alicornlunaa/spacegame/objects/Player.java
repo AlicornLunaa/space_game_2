@@ -77,12 +77,7 @@ public class Player extends BaseEntity {
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
         def.type = BodyType.DynamicBody;
-        bodyComponent = addComponent(new BodyComponent(world, def){
-            @Override
-            public void afterWorldChange(PhysWorld world){
-                
-            }
-        });
+        bodyComponent = addComponent(new BodyComponent(world, def));
         addComponent(new PlanetPhysScript(this));
 
         bodyComponent.body.setFixedRotation(true);

@@ -5,7 +5,6 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Input.Keys;
@@ -117,12 +116,12 @@ public class PlanetPanel extends Stage {
         App.instance.gameScene.registry.render();
 
         // World rendering
-        ChunkManager worldBody = planetComponent.chunkManager;
+        // ChunkManager worldBody = planetComponent.chunkManager;
         batch.setProjectionMatrix(game.camera.combined);
-        batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
-        batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
-        worldBody.draw(batch, batch.getColor().a);
+        // batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
+        // worldBody.draw(batch, batch.getColor().a);
+        // batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
+        // worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4());
 
         batch.end();

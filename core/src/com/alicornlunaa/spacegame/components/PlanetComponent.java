@@ -66,10 +66,10 @@ public class PlanetComponent extends ScriptComponent {
 
         // Convert orbital velocity to world
         Vector2 vel = entityBodyComponent.body.getLinearVelocity().cpy();
-        Vector2 tangent = localPos.cpy().nor().rotateDeg(90);
+        Vector2 tangent = localPos.cpy().nor().rotateDeg(-90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
-        entityBodyComponent.body.setLinearVelocity(tangentVel, -1 * Math.abs(velToPlanet));
+        entityBodyComponent.body.setLinearVelocity(tangentVel, velToPlanet);
 
         // Add body
         entityBodyComponent.setWorld(physWorld);
@@ -92,8 +92,8 @@ public class PlanetComponent extends ScriptComponent {
         entityBodyComponent.sync(entityTransform);
 
         // Convert to space velocity, tangent = x, planetToEntity = y
-        Vector2 tangent = new Vector2(0, 1).rotateRad(theta);
-        Vector2 planetToEnt = entityTransform.position.cpy().nor();
+        Vector2 tangent = new Vector2(0, -1).rotateRad(theta);
+        Vector2 planetToEnt = entityTransform.position.cpy().sub(transform.position).nor();
         Vector2 curVelocity = entityBodyComponent.body.getLinearVelocity().cpy();
         entityBodyComponent.body.setLinearVelocity(tangent.scl(curVelocity.x).add(planetToEnt.scl(curVelocity.y)));
 

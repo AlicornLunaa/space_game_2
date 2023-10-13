@@ -4,8 +4,6 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -339,12 +337,5 @@ public class ChunkManager extends Group {
 
             generateChunkHull();
         }
-    }
-
-    @Override
-    public void draw(Batch batch, float a){
-        Matrix4 trans = batch.getTransformMatrix().cpy();
-        super.draw(batch, a);
-        batch.setTransformMatrix(trans);
     }
 }

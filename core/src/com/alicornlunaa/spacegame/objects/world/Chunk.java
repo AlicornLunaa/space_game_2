@@ -6,6 +6,7 @@ import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -24,7 +25,7 @@ public class Chunk extends Group {
     // Private functions
     private void tempTileData(){
         // TODO: Remove
-        if(chunkY < 14){
+        if(chunkY < 2){
             for(int y = 0; y < Constants.CHUNK_SIZE; y++){
                 for(int x = 0; x < Constants.CHUNK_SIZE; x++){
                     final Tile tile = new Tile(App.instance, x, y, "stone");
@@ -88,8 +89,9 @@ public class Chunk extends Group {
     
     @Override
     public void draw(Batch batch, float a){
-        batch.setTransformMatrix(batch.getTransformMatrix().cpy().translate(chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE, chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE, 0));
+        Matrix4 trans = batch.getTransformMatrix().cpy();
+        batch.setTransformMatrix(trans.cpy().translate(chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE, chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE, 0));
         super.draw(batch, a);
-        batch.setTransformMatrix(batch.getTransformMatrix().cpy().translate(-chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE, -chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE, 0));
+        batch.setTransformMatrix(trans);
     }
 }

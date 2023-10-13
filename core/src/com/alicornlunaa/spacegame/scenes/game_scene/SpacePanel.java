@@ -3,7 +3,6 @@ package com.alicornlunaa.spacegame.scenes.game_scene;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.Starfield;
 import com.alicornlunaa.spacegame.util.Constants;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,17 +20,14 @@ public class SpacePanel extends Stage {
     public SpacePanel(final App game){
         super(new FillViewport(1280, 720));
         this.game = game;
-
-        getViewport().setCamera(game.camera);
         addActor(game.gameScene.universe);
-
         backgroundTexture = new Starfield(game, (int)getWidth(), (int)getHeight());
 
         // Controls
         this.addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                game.camera.zoom = Math.min(Math.max(game.camera.zoom + (amountY / 30), 0.05f), 3.0f);
+                App.instance.camera.zoom = Math.min(Math.max(App.instance.camera.zoom + amountY * 2.f, 1.f), 200.0f);
                 return true;
             }
         });
@@ -49,12 +45,11 @@ public class SpacePanel extends Stage {
         Batch batch = getBatch();
         Matrix4 oldProj = batch.getProjectionMatrix().cpy();
         Matrix4 oldTrans = batch.getTransformMatrix().cpy();
-        OrthographicCamera cam = (OrthographicCamera)getCamera();
 
         batch.begin();
         batch.setProjectionMatrix(new Matrix4());
         batch.setTransformMatrix(new Matrix4());
-        backgroundTexture.setOffset(cam.position.x / 10000000, cam.position.y / 10000000);
+        backgroundTexture.setOffset(App.instance.camera.position.x / 10000000, App.instance.camera.position.y / 10000000);
         backgroundTexture.draw(batch, -1, -1, 2, 2);
         batch.setProjectionMatrix(oldProj);
         batch.setTransformMatrix(oldTrans);

@@ -223,6 +223,7 @@ public class TestScreen implements Screen {
 
             @Override
             public void render() {
+                System.out.println(bc.body.getLinearVelocity());
             }
         });
         player.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, player));
