@@ -4,7 +4,6 @@ import org.json.JSONArray;
 
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -113,8 +112,8 @@ public class InteriorCell {
             collider = new Collider();
         }
     
-        collider.setScale(1 / Constants.SHIP_PPM);
-        collider.setPosition(new Vector2(x * texture.getRegionWidth(), y * texture.getRegionHeight()).scl(1 / Constants.SHIP_PPM));
+        collider.setScale(1);
+        collider.setPosition(new Vector2(x * texture.getRegionWidth(), y * texture.getRegionHeight()));
         collider.attachCollider(body);
     }
     

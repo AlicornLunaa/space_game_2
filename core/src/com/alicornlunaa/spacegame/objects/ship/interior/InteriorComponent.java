@@ -26,7 +26,7 @@ public class InteriorComponent extends ScriptComponent {
         super(ship);
         this.game = game;
         this.ship = ship;
-        world = new PhysWorld(Constants.SHIP_PPM);
+        world = new PhysWorld(Constants.PPM);
 
         BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;

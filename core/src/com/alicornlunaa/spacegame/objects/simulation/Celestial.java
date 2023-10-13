@@ -63,19 +63,4 @@ public class Celestial extends BaseEntity {
             }
         });
     }
-
-    /* public Celestial(PhysicsSystem phys, PhysWorld world, Celestial parent, float radius, float semiMajorAxis, float eccentricity, float periapsis, float trueAnomaly, float inclination){
-        // Create celestial that orbits around another
-        this(
-            phys,
-            world,
-            radius,
-            parent.getComponent(TransformComponent.class).position.x + semiMajorAxis,
-            parent.getComponent(TransformComponent.class).position.y
-        );
-        
-        // Initialize rails
-        CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
-        celestialComponent.conic = new EllipticalConic(parent, this, semiMajorAxis, eccentricity, periapsis, trueAnomaly, inclination);
-    } */
 }

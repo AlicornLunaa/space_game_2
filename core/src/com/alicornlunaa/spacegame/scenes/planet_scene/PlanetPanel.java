@@ -125,7 +125,7 @@ public class PlanetPanel extends Stage {
 
         // Debug rendering
         if(Constants.DEBUG){
-            game.debug.render(planetComponent.physWorld.getBox2DWorld(), game.camera.combined.cpy().scl(Constants.PLANET_PPM));
+            game.debug.render(planetComponent.physWorld.getBox2DWorld(), game.camera.combined);
         }
     }
 

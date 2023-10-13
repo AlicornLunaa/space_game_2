@@ -145,7 +145,7 @@ public class WorldBody extends Group {
         // Keep track of the start of an edge and create the edge when it ends.
         // Repeat until finished. Run again but for Y.
         EdgeShape hullShape = new EdgeShape();
-        float physTileSize = Tile.TILE_SIZE / Constants.PLANET_PPM;
+        float physTileSize = Tile.TILE_SIZE;
         int startTop = -1;
         int startBottom = -1;
         int startLeft = -1;

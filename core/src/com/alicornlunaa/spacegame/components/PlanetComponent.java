@@ -15,6 +15,7 @@ import com.alicornlunaa.spacegame.objects.planet.TerrainGenerator;
 import com.alicornlunaa.spacegame.objects.planet.WorldBody;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -95,7 +96,7 @@ public class PlanetComponent extends ScriptComponent {
         bodyComponent.body.setTransform(x / ppm, y / ppm, bodyComponent.body.getAngle() - localPos.angleRad() + (float)Math.PI / 2);
 
         // Convert orbital velocity to world
-        Vector2 vel = bodyComponent.body.getLinearVelocity().cpy().scl(ppm).scl(1 / Constants.PLANET_PPM);
+        Vector2 vel = bodyComponent.body.getLinearVelocity().cpy();
         Vector2 tangent = localPos.cpy().nor().rotateDeg(90);
         float velToPlanet = vel.dot(localPos.cpy().nor());
         float tangentVel = vel.dot(tangent);
@@ -201,7 +202,7 @@ public class PlanetComponent extends ScriptComponent {
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
         
-        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PLANET_PPM));
+        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PPM));
         worldBody = new WorldBody(App.instance, physWorld, chunkWidth, (int)(atmosphereRadius / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
@@ -215,8 +216,8 @@ public class PlanetComponent extends ScriptComponent {
         //     delEntityWorld(entitiesLeavingPlanet.pop());
         // }
 
-        // worldBody.act(Gdx.graphics.getDeltaTime());
-        // worldBody.update();
+        worldBody.act(Gdx.graphics.getDeltaTime());
+        worldBody.update();
     }
 
     @Override

@@ -83,7 +83,6 @@ public class Player extends BaseEntity {
                 
             }
         });
-        // addComponent(new GravityScript(game, this));
         addComponent(new PlanetPhysScript(this));
 
         bodyComponent.body.setFixedRotation(true);

@@ -10,8 +10,6 @@ public class Constants {
     
     // Scaling constants
     public static final float PPM = 128.0f;
-    public static final float PLANET_PPM = 128.0f;
-    public static final float SHIP_PPM = 16.0f;
 
     // Math constants
     public static final float GRAVITY_CONSTANT = 1.f;
