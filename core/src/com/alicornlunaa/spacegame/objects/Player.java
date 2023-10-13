@@ -219,6 +219,7 @@ public class Player extends BaseEntity {
                         transform.position.x -= (Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 10000 : 1000) * Gdx.graphics.getDeltaTime();
                     }
 
+                    bodyComponent.sync(transform);
                     return;
                 }
             }

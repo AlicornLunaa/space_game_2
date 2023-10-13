@@ -1,19 +1,20 @@
 package com.alicornlunaa.spacegame.scenes.planet_scene;
 
+import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.objects.planet.WorldBody;
+import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,7 +28,7 @@ public class PlanetPanel extends Stage {
     private Planet planet;
     private PlanetComponent planetComponent;
     private Texture texture;
-    private ShaderProgram cartesianAtmosShader;
+    private ShaderComponent cartesianAtmosShader;
 
     // Functions
     private void generateTexture(){
@@ -45,15 +46,19 @@ public class PlanetPanel extends Stage {
         this.planet = planet;
         planetComponent = planet.getComponent(PlanetComponent.class);
 
-        cartesianAtmosShader = game.manager.get("shaders/cartesian_atmosphere", ShaderProgram.class);
+        cartesianAtmosShader = planetComponent.getCartesianShaderComponent();
         generateTexture();
         getViewport().setCamera(game.camera);
-        addActor(planetComponent.worldBody);
+        addActor(planetComponent.chunkManager);
 
         // Controls
         this.addListener(new InputListener(){
             @Override
             public boolean keyDown(InputEvent event, int keycode){
+                if(keycode == Keys.F5){
+                    App.instance.manager.reload();
+                }
+
                 return false;
             }
 
@@ -97,22 +102,22 @@ public class PlanetPanel extends Stage {
         game.gameScene.spacePanel.getStarfield().setOffset(globalPos.x / 10000000, globalPos.y / 10000000);
         game.gameScene.spacePanel.getStarfield().draw(batch, -1, -1, 2, 2);
 
-        batch.setShader(cartesianAtmosShader);
+        batch.setShader(cartesianAtmosShader.program);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, 1280, 720));
         batch.setTransformMatrix(new Matrix4());
-        cartesianAtmosShader.setUniformMatrix("u_invCamTrans", invProj);
-        cartesianAtmosShader.setUniformf("u_starDirection", planetComponent.starDirection);
-        cartesianAtmosShader.setUniformf("u_planetRadius", planetComponent.chunkHeight * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
-        cartesianAtmosShader.setUniformf("u_planetCircumference", planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
-        cartesianAtmosShader.setUniformf("u_atmosRadius", planetComponent.atmosphereRadius);
-        cartesianAtmosShader.setUniformf("u_atmosColor", planetComponent.getAtmosphereColor());
+        cartesianAtmosShader.program.setUniformMatrix("u_invCamTrans", invProj);
+        cartesianAtmosShader.program.setUniformf("u_starDirection", planetComponent.starDirection);
+        cartesianAtmosShader.program.setUniformf("u_planetRadius", planetComponent.chunkHeight * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.program.setUniformf("u_planetCircumference", planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.program.setUniformf("u_atmosRadius", planetComponent.atmosphereRadius);
+        cartesianAtmosShader.program.setUniformf("u_atmosColor", planetComponent.getAtmosphereColor());
         batch.draw(texture, 0, 0, 1280, 720);
         batch.setShader(null);
         
         App.instance.gameScene.registry.render();
 
         // World rendering
-        WorldBody worldBody = planetComponent.worldBody;
+        ChunkManager worldBody = planetComponent.chunkManager;
         batch.setProjectionMatrix(game.camera.combined);
         batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * -1.00f, 0, 0));
         worldBody.draw(batch, batch.getColor().a);

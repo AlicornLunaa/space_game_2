@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class Tile extends Actor {
-
     // Static vars
     public static final float TILE_SIZE = 8;
     public static HashMap<String, TextureRegion> tileTextures = new HashMap<>();
@@ -55,5 +54,4 @@ public class Tile extends Actor {
             0
         );
     }
-
 }

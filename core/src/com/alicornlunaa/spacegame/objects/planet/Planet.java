@@ -17,6 +17,10 @@ public class Planet extends Celestial {
     public Planet(PhysicsSystem phys, PhysWorld world, float x, float y, float terraRadius, float atmosRadius, float atmosDensity) {
         super(phys, world, terraRadius, x, y);
 
+        addComponent(new ShaderComponent(App.instance.manager, "shaders/atmosphere"));
+        addComponent(new ShaderComponent(App.instance.manager, "shaders/planet"));
+        addComponent(new ShaderComponent(App.instance.manager, "shaders/cartesian_atmosphere"));
+
         CelestialComponent celestialComponent = getComponent(CelestialComponent.class);
         PlanetComponent planetComponent = addComponent(new PlanetComponent(this));
         planetComponent.chunkHeight = (int)Math.floor(celestialComponent.radius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
@@ -25,8 +29,6 @@ public class Planet extends Celestial {
         planetComponent.atmosphereDensity = atmosDensity;
         planetComponent.start();
 
-        addComponent(new ShaderComponent(App.instance.manager, "shaders/atmosphere"));
-        addComponent(new ShaderComponent(App.instance.manager, "shaders/planet"));
         addComponent(new PlanetSprite(this, terraRadius, atmosRadius, Color.WHITE));
     }
 }

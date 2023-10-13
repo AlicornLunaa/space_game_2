@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
+import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
@@ -12,7 +13,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.planet.TerrainGenerator;
-import com.alicornlunaa.spacegame.objects.planet.WorldBody;
+import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -25,6 +26,7 @@ public class PlanetComponent extends ScriptComponent {
     private TransformComponent transform = getEntity().getComponent(TransformComponent.class);
     private BodyComponent bodyComponent = getEntity().getComponent(BodyComponent.class);
     private CelestialComponent celestialComponent = getEntity().getComponent(CelestialComponent.class);
+    private ShaderComponent cartesianAtmosShader = getEntity().getComponents(ShaderComponent.class)[2];
 
     public int chunkWidth;
     public int chunkHeight;
@@ -33,7 +35,7 @@ public class PlanetComponent extends ScriptComponent {
     public long terrainSeed = 123;
     public Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
     public PhysWorld physWorld;
-    public WorldBody worldBody;
+    public ChunkManager chunkManager;
     
     private TerrainGenerator generator;
     private Array<Color> atmosComposition = new Array<>();
@@ -156,6 +158,10 @@ public class PlanetComponent extends ScriptComponent {
         return new Color(r, g, b, a);
     }
 
+    public ShaderComponent getCartesianShaderComponent(){
+        return cartesianAtmosShader;
+    }
+
     // Script functions
     @Override
     public void start() {
@@ -169,7 +175,7 @@ public class PlanetComponent extends ScriptComponent {
         atmosPercentages.add(1.f);
         
         physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PPM));
-        worldBody = new WorldBody(App.instance, physWorld, chunkWidth, (int)(atmosphereRadius / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
+        chunkManager = new ChunkManager(App.instance, physWorld, chunkWidth, (int)(atmosphereRadius / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
     }
 
     @Override
@@ -182,8 +188,8 @@ public class PlanetComponent extends ScriptComponent {
         //     delEntityWorld(entitiesLeavingPlanet.pop());
         // }
 
-        // worldBody.act(Gdx.graphics.getDeltaTime());
-        // worldBody.update();
+        // chunkManager.act(Gdx.graphics.getDeltaTime());
+        chunkManager.update();
     }
 
     @Override
