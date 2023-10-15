@@ -4,7 +4,7 @@ import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Input.Keys;
@@ -64,7 +64,7 @@ public class PlanetPanel extends Stage {
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 OrthographicCamera cam = (OrthographicCamera)getCamera();
-                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 50), 0.05f), 10.5f);
+                cam.zoom = Math.min(Math.max(cam.zoom + (amountY / 5), 0.05f), 10.5f);
                 return true;
             }
         });

@@ -7,7 +7,7 @@ import com.alicornlunaa.selene_engine.ecs.ISystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;

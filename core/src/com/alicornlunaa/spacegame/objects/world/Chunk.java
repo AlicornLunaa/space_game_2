@@ -1,7 +1,6 @@
 package com.alicornlunaa.spacegame.objects.world;
 
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
@@ -23,22 +22,21 @@ public class Chunk extends Group {
     public boolean chunkUpdate = false;
 
     // Private functions
-    private void tempTileData(){
-        // TODO: Remove
-        if(chunkY < 2){
-            for(int y = 0; y < Constants.CHUNK_SIZE; y++){
-                for(int x = 0; x < Constants.CHUNK_SIZE; x++){
-                    final Tile tile = new Tile(App.instance, x, y, "stone");
-                    tiles[x][y] = tile;
+    private void generateTiles(TerrainGenerator generator){
+        for(int y = 0; y < Constants.CHUNK_SIZE; y++){
+            for(int x = 0; x < Constants.CHUNK_SIZE; x++){
+                final @Null Tile tile = generator.getTile(chunkX, chunkY, x, y);
 
+                if(tile != null){
                     tile.setBounds(
                         x * Tile.TILE_SIZE + chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE,
                         y * Tile.TILE_SIZE + chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE,
                         Tile.TILE_SIZE,
                         Tile.TILE_SIZE
                     );
-                    this.addActor(tile);
-
+                    tiles[x][y] = tile;
+                    
+                    addActor(tile);
                     tile.addListener(new ClickListener(){
                         @Override
                         public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
@@ -54,14 +52,12 @@ public class Chunk extends Group {
     }
 
     // Constructor
-    public Chunk(PhysWorld world, int chunkX, int chunkY){
+    public Chunk(TerrainGenerator generator, PhysWorld world, int chunkX, int chunkY){
         // Slight performance save
         this.setTransform(false);
         this.chunkX = chunkX;
         this.chunkY = chunkY;
-
-        // TODO: Temp
-        tempTileData();
+        generateTiles(generator);
     }
 
     // Functions

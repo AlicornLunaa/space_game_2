@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class Tile extends Actor {
     // Static vars
-    public static final float TILE_SIZE = 8;
+    public static final float TILE_SIZE = 0.2f;
     public static HashMap<String, TextureRegion> tileTextures = new HashMap<>();
     
     private static TextureRegion getTexture(TextureAtlas atlas, String id){
@@ -29,12 +29,12 @@ public class Tile extends Actor {
     private TextureRegion region;
 
     // Constructor
-    public Tile(final App game, int x, int y, String id){
+    public Tile(int x, int y, String id){
         super();
         this.x = x;
         this.y = y;
         this.id = id;
-        region = getTexture(game.atlas, id);
+        region = getTexture(App.instance.atlas, id);
         setBounds(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 

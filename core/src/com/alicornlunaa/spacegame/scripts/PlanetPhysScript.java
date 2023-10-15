@@ -8,7 +8,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 
@@ -50,7 +50,7 @@ public class PlanetPhysScript extends ScriptComponent {
         // entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / entityBody.world.getPhysScale() * 1.f)) + dragForce.y, true);
         float height = Math.max(entityBody.body.getPosition().y, celestialComponent.radius / planet.getComponent(BodyComponent.class).world.getPhysScale());
         float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / (height * height));
-        entityBody.body.applyForceToCenter(0.0f, -force, true);
+        entityBody.body.applyForceToCenter(0.0f, -force * 0.1f, true);
     }
 
     @Override

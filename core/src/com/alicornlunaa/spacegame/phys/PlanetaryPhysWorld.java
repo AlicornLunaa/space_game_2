@@ -1,7 +1,7 @@
 package com.alicornlunaa.spacegame.phys;
 
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.Planet;
 
 public class PlanetaryPhysWorld extends PhysWorld {
 

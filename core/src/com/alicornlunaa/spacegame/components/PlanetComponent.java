@@ -11,9 +11,9 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
-import com.alicornlunaa.spacegame.objects.planet.TerrainGenerator;
+import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.objects.world.ChunkManager;
+import com.alicornlunaa.spacegame.objects.world.TerrainGenerator;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.Color;
@@ -30,6 +30,7 @@ public class PlanetComponent extends ScriptComponent {
 
     public int chunkWidth;
     public int chunkHeight;
+    public float terrainRadius;
     public float atmosphereRadius;
     public float atmosphereDensity = 1.0f;
     public long terrainSeed = 123;
@@ -59,7 +60,7 @@ public class PlanetComponent extends ScriptComponent {
         // Convert orbital position to world
         Vector2 localPos = entityTransform.position.cpy().sub(transform.position);
         float x = (float)((localPos.angleRad() / Math.PI / -2.0) * (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
-        float y = localPos.len();
+        float y = (localPos.len() / atmosphereRadius) * (chunkHeight * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
         entityTransform.position.set(x, y);
         entityTransform.rotation -= (localPos.angleRad() + (float)Math.PI / 2);
         entityBodyComponent.sync(entityTransform);
@@ -84,7 +85,7 @@ public class PlanetComponent extends ScriptComponent {
 
         // Convert to space angles, spaceAngle = worldAngle + theta
         float theta = (float)((entityTransform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * -2);
-        float radius = entityTransform.position.y;
+        float radius = (entityTransform.position.y / chunkHeight / Constants.CHUNK_SIZE / Tile.TILE_SIZE) * atmosphereRadius;
         float x = (float)(Math.cos(theta) * radius) + transform.position.x;
         float y = (float)(Math.sin(theta) * radius) + transform.position.y;
         entityTransform.position.set(x, y);
@@ -165,17 +166,13 @@ public class PlanetComponent extends ScriptComponent {
     // Script functions
     @Override
     public void start() {
-        generator = new TerrainGenerator(
-            chunkWidth * Constants.CHUNK_SIZE / 20,
-            chunkHeight * Constants.CHUNK_SIZE / 20,
-            terrainSeed
-        );
+        generator = new TerrainGenerator(this);
 
         atmosComposition.add(Color.CYAN);
         atmosPercentages.add(1.f);
         
         physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PPM));
-        chunkManager = new ChunkManager(App.instance, physWorld, chunkWidth, (int)(atmosphereRadius / Constants.CHUNK_SIZE / Tile.TILE_SIZE) + 1);
+        chunkManager = new ChunkManager(generator, physWorld, chunkWidth, chunkHeight);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class Part implements Disposable,Comparable<Part> {
     private String id;
     private String name;
     private String description;
-    private float partScale = 0.5f;
+    private float partScale = 1.f / 32.f;
     private int interiorSize;
     private boolean freeform = false;
     private boolean flipX = false;
@@ -299,20 +299,24 @@ public class Part implements Disposable,Comparable<Part> {
             }
 
             renderer.setTransformMatrix(trans);
-            renderer.circle(node.point.x, node.point.y, 1);
+            renderer.circle(node.point.x * partScale, node.point.y * partScale, 1);
 
-            if(node.next != null){ //! Fix the scaling here
+            if(node.next != null){
+                trans.scale(partScale, partScale, 1);
                 trans.translate(node.point.x, node.point.y, 0);
                 trans.rotate(0, 0, 1, node.next.part.getRotation());
-                trans.scale((node.next.part.flipX ? -1 : 1) * partScale, (node.next.part.flipY ? -1 : 1) * partScale, 1);
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
+                trans.scale(1.f / partScale, 1.f / partScale, 1);
                 node.next.part.drawAttachmentPoints(renderer, trans);
+                trans.scale(partScale, partScale, 1);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
                 trans.rotate(0, 0, 1, node.part.getRotation());
-                trans.scale((node.next.part.flipX ? -1 : 1) / partScale, (node.next.part.flipY ? -1 : 1) / partScale, 1);
+                trans.scale(node.next.part.flipX ? -1 : 1, node.next.part.flipY ? -1 : 1, 1);
                 trans.rotate(0, 0, 1, -node.next.part.getRotation());
                 trans.translate(-node.point.x, -node.point.y, 0);
+                trans.scale(1.f / partScale, 1.f / partScale, 1);
             }
         }
     }

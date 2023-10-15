@@ -105,16 +105,6 @@ public class Ship extends DriveableEntity {
 
                 Matrix4 trans = batch.getTransformMatrix().cpy().rotate(0, 0, 1, rootPart.getRotation());
                 rootPart.draw(batch, trans.cpy());
-                
-                batch.end();
-
-                game.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-                game.shapeRenderer.setTransformMatrix(trans);
-                game.shapeRenderer.begin(ShapeType.Filled);
-                rootPart.drawAttachmentPoints(game.shapeRenderer, trans.cpy());
-                game.shapeRenderer.end();
-                
-                batch.begin();
             }
         });
         addComponent(new ScriptComponent(this) {

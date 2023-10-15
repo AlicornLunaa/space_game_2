@@ -12,42 +12,31 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 
 /**
  * Holds world chunks and manages which is loaded or not
  */
 public class ChunkManager extends Group {
     // Variables
-    private final App game;
+    private TerrainGenerator generator;
     private PhysWorld world;
     private Chunk[][] chunks;
+
     private Array<Chunk> loadedChunks = new Array<>();
     private Array<Chunk> visibleChunks = new Array<>();
     private Array<Fixture> activeFixtures = new Array<>();
+
     private Body worldBody;
+
     private boolean tileUpdate = false;
     private int lastPlayerX = -1;
     private int lastPlayerY = -1;
 
     // Private functions
-    private Tile getTileFromGlobal(int x, int y){
-        if(chunks.length <= 0) return null;
-        if(y < 0) return null;
-        if(y >= chunks[0].length * Constants.CHUNK_SIZE) return null;
-
-        int chunkX = Math.floorMod(Math.floorDiv(x, Constants.CHUNK_SIZE), chunks.length);
-        int chunkY = Math.floorMod((int)(y / Constants.CHUNK_SIZE), chunks[0].length);
-        int tileX = Math.floorMod(x, Constants.CHUNK_SIZE);
-        int tileY = Math.floorMod(y, Constants.CHUNK_SIZE);
-        Chunk chunk = chunks[chunkX][chunkY];
-
-        if(chunk == null) return null;
-        return chunk.getTile(tileX, tileY);
-    }
-
     private void generateChunkHull(){
         // Update based on the player's positioning and time active
-        Vector2 plyPos = game.gameScene.player.getCenter();
+        Vector2 plyPos = App.instance.gameScene.player.getCenter();
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
@@ -193,10 +182,10 @@ public class ChunkManager extends Group {
     }
 
     // Constructor
-    public ChunkManager(final App game, PhysWorld world, int width, int height){
+    public ChunkManager(TerrainGenerator generator, PhysWorld world, int width, int height){
         this.setTransform(false);
-        this.game = game;
         this.world = world;
+        this.generator = generator;
         chunks = new Chunk[width][height];
 
         BodyDef def = new BodyDef();
@@ -206,10 +195,25 @@ public class ChunkManager extends Group {
     }
 
     // Functions
+    public @Null Tile getTileFromGlobal(int x, int y){
+        if(chunks.length <= 0) return null;
+        if(y < 0) return null;
+        if(y >= chunks[0].length * Constants.CHUNK_SIZE) return null;
+
+        int chunkX = Math.floorMod(Math.floorDiv(x, Constants.CHUNK_SIZE), chunks.length);
+        int chunkY = Math.floorMod((int)(y / Constants.CHUNK_SIZE), chunks[0].length);
+        int tileX = Math.floorMod(x, Constants.CHUNK_SIZE);
+        int tileY = Math.floorMod(y, Constants.CHUNK_SIZE);
+        Chunk chunk = chunks[chunkX][chunkY];
+
+        if(chunk == null) return null;
+        return chunk.getTile(tileX, tileY);
+    }
+
     public void loadChunk(int x, int y){
         if(chunks[x][y] == null){
             // Generate new chunk because it didnt exist before
-            chunks[x][y] = new Chunk(world, x, y);
+            chunks[x][y] = new Chunk(generator, world, x, y);
         }
 
         if(!chunks[x][y].isLoaded()){
@@ -253,11 +257,11 @@ public class ChunkManager extends Group {
 
     public void update(){
         // Update based on the player's positioning and time active
-        Vector2 plyPos = game.gameScene.player.getCenter();
+        Vector2 plyPos = App.instance.gameScene.player.getCenter();
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        int viewDist = (int)(game.camera.viewportWidth / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
+        int viewDist = (int)(App.instance.camera.viewportWidth * App.instance.camera.zoom / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1); // TODO: Fix size
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
@@ -316,7 +320,7 @@ public class ChunkManager extends Group {
 
                 if(chunks[wrappedX][wrappedY] == null){
                     // Generate new chunk because it didnt exist before
-                    chunks[wrappedX][wrappedY] = new Chunk(world, wrappedX, wrappedY);
+                    chunks[wrappedX][wrappedY] = new Chunk(generator, world, wrappedX, wrappedY);
                 }
 
                 // Only add if not visible already

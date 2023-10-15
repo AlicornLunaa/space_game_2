@@ -1,10 +1,9 @@
-package com.alicornlunaa.spacegame.objects.planet;
+package com.alicornlunaa.spacegame.objects.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
 public class Biome {
-
     private static Array<Biome> biomes = new Array<>();
 
     private String name;
@@ -80,5 +79,4 @@ public class Biome {
 
         return closestMatch;
     }
-
 }

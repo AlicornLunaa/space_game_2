@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
-import com.alicornlunaa.spacegame.objects.planet.Biome;
+import com.alicornlunaa.spacegame.objects.world.Biome;
 import com.alicornlunaa.spacegame.scenes.game_scene.GameplayScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.ControlSchema;

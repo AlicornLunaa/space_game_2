@@ -12,9 +12,9 @@ import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.Player;
-import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
+import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetPanel;
 import com.alicornlunaa.spacegame.scenes.planet_scene.PlanetUIPanel;
@@ -80,6 +80,7 @@ public class GameplayScene extends BaseScene {
         // player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
         App.instance.camera = player.getComponent(CameraComponent.class).camera;
 		registry.addEntity(player);
+        player.toggleNoclip();
 
         ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
         ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
@@ -97,7 +98,7 @@ public class GameplayScene extends BaseScene {
         // OrbitUtils.createOrbit(registry, ship);
         // OrbitUtils.createOrbit(registry, player);
 
-        // openPlanetView(testPlanet);
+        openPlanetView(testPlanet);
 	}
 
     private void initializeSpaceScene(){
