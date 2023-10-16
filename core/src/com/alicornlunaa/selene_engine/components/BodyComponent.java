@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
 public class BodyComponent implements IComponent {
@@ -20,6 +21,14 @@ public class BodyComponent implements IComponent {
     // Constructor
     public BodyComponent(PhysWorld world, BodyDef def){
         this.world = world;
+        body = world.getBox2DWorld().createBody(def);
+    }
+
+    public BodyComponent(PhysWorld world){
+        this.world = world;
+        
+        BodyDef def = new BodyDef();
+        def.type = BodyType.DynamicBody;
         body = world.getBox2DWorld().createBody(def);
     }
 

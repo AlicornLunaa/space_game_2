@@ -3,7 +3,6 @@ package com.alicornlunaa.spacegame.scenes.planet_scene;
 import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -106,8 +105,8 @@ public class PlanetPanel extends Stage {
         batch.setTransformMatrix(new Matrix4());
         cartesianAtmosShader.program.setUniformMatrix("u_invCamTrans", invProj);
         cartesianAtmosShader.program.setUniformf("u_starDirection", planetComponent.starDirection);
-        cartesianAtmosShader.program.setUniformf("u_planetRadius", planetComponent.chunkHeight * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
-        cartesianAtmosShader.program.setUniformf("u_planetCircumference", planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        cartesianAtmosShader.program.setUniformf("u_planetRadius", planetComponent.chunkHeight * Constants.CHUNK_SIZE * Constants.TILE_SIZE);
+        cartesianAtmosShader.program.setUniformf("u_planetCircumference", planetComponent.chunkWidth * Constants.CHUNK_SIZE * Constants.TILE_SIZE);
         cartesianAtmosShader.program.setUniformf("u_atmosRadius", planetComponent.atmosphereRadius);
         cartesianAtmosShader.program.setUniformf("u_atmosColor", planetComponent.getAtmosphereColor());
         batch.draw(texture, 0, 0, 1280, 720);

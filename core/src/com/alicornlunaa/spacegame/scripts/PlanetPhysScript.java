@@ -6,7 +6,6 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -32,7 +31,7 @@ public class PlanetPhysScript extends ScriptComponent {
 
         Planet planet = ((PlanetaryPhysWorld)entityBody.world).getPlanet();
         PlanetComponent planetComponent = planet.getComponent(PlanetComponent.class);
-        float worldWidthPixels = planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
+        float worldWidthPixels = planetComponent.chunkWidth * Constants.CHUNK_SIZE * Constants.TILE_SIZE;
 
         BaseEntity e = getEntity();
         if(transform.position.x > worldWidthPixels){
@@ -44,7 +43,7 @@ public class PlanetPhysScript extends ScriptComponent {
         planetComponent.checkLeavePlanet(e);
         
         // Taken from Celestial.java to correctly apply the right force
-        float heightNormalized = Math.max(entityBody.body.getPosition().y / planetComponent.chunkHeight / Constants.CHUNK_SIZE / Tile.TILE_SIZE, 1);
+        float heightNormalized = Math.max(entityBody.body.getPosition().y / planetComponent.chunkHeight / Constants.CHUNK_SIZE / Constants.TILE_SIZE, 1);
         float heightScaled = (float)Math.pow(heightNormalized * planetComponent.terrainRadius, 2);
         float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / heightScaled);
         entityBody.body.applyForceToCenter(0.0f, -force, true);

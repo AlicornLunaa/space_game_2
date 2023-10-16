@@ -29,10 +29,10 @@ public class Chunk extends Group {
 
                 if(tile != null){
                     tile.setBounds(
-                        x * Tile.TILE_SIZE + chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE,
-                        y * Tile.TILE_SIZE + chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE,
-                        Tile.TILE_SIZE,
-                        Tile.TILE_SIZE
+                        x * Constants.TILE_SIZE + chunkX * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
+                        y * Constants.TILE_SIZE + chunkY * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
+                        Constants.TILE_SIZE,
+                        Constants.TILE_SIZE
                     );
                     tiles[x][y] = tile;
                     
@@ -86,7 +86,7 @@ public class Chunk extends Group {
     @Override
     public void draw(Batch batch, float a){
         Matrix4 trans = batch.getTransformMatrix().cpy();
-        batch.setTransformMatrix(trans.cpy().translate(chunkX * Constants.CHUNK_SIZE * Tile.TILE_SIZE, chunkY * Constants.CHUNK_SIZE * Tile.TILE_SIZE, 0));
+        batch.setTransformMatrix(trans.cpy().translate(chunkX * Constants.CHUNK_SIZE * Constants.TILE_SIZE, chunkY * Constants.CHUNK_SIZE * Constants.TILE_SIZE, 0));
         super.draw(batch, a);
         batch.setTransformMatrix(trans);
     }

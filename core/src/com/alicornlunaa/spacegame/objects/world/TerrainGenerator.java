@@ -94,6 +94,11 @@ public class TerrainGenerator {
         if((estimationHeight * planetComponent.atmosphereRadius) > terrainColumnHeight){
             type = "dirt";
         }
+        
+        estimationHeight = (float)(globalY + 1) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
+        if((estimationHeight * planetComponent.atmosphereRadius) > terrainColumnHeight){
+            type = "grass";
+        }
 
         float caveFrequency = 0.11f;
         float fuckFrequency = 0.7f;

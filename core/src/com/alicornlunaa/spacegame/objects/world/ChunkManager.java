@@ -40,8 +40,8 @@ public class ChunkManager extends Group {
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        int plyTileX = (int)(plyPos.x / Tile.TILE_SIZE);
-        int plyTileY = (int)(plyPos.y / Tile.TILE_SIZE);
+        int plyTileX = (int)(plyPos.x / Constants.TILE_SIZE);
+        int plyTileY = (int)(plyPos.y / Constants.TILE_SIZE);
         
         // Destroy all current fixtures
         while(activeFixtures.size > 0){
@@ -52,7 +52,7 @@ public class ChunkManager extends Group {
         // Keep track of the start of an edge and create the edge when it ends.
         // Repeat until finished. Run again but for Y.
         EdgeShape hullShape = new EdgeShape();
-        float physTileSize = Tile.TILE_SIZE;
+        float physTileSize = Constants.TILE_SIZE;
         int startTop = -1;
         int startBottom = -1;
         int startLeft = -1;
@@ -261,9 +261,9 @@ public class ChunkManager extends Group {
         
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        int viewDist = (int)(App.instance.camera.viewportWidth * App.instance.camera.zoom / Tile.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1); // TODO: Fix size
-        int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
-        int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
+        int viewDist = (int)(App.instance.camera.viewportWidth * App.instance.camera.zoom / Constants.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1); // TODO: Fix size
+        int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Constants.TILE_SIZE);
+        int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Constants.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
         int containedY = Math.min(Math.max(plyChunkY, 0), chunks[0].length - loadDist);
 

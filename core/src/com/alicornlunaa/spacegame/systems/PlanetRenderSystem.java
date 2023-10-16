@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Null;
 
 public class PlanetRenderSystem implements ISystem {
-
 	// Variables
 	private @Null Planet planet;
 	private SpriteBatch batch;
@@ -81,5 +80,4 @@ public class PlanetRenderSystem implements ISystem {
 		if(!planet.getComponent(PlanetComponent.class).isOnPlanet(entity)) return false;
 		return entity.hasComponent(CustomSpriteComponent.class);
 	}
-	
 }

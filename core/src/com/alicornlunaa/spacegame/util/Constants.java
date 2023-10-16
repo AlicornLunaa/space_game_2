@@ -14,7 +14,6 @@ public class Constants {
     // Math constants
     public static final float GRAVITY_CONSTANT = 1.f;
     public static final float DRAG_COEFFICIENT = 0.004f;
-    public static final float CONVERSION_FACTOR = (1.f / 3.125f) * 0.2f;
     public static final float FPI = (float)Math.PI;
     
     // Map constants
@@ -29,6 +28,7 @@ public class Constants {
 
     // Terrain constants
     public static final int CHUNK_SIZE = 16;
+    public static final float TILE_SIZE = 0.2f;
 
     // Debug constants
     public static boolean DEBUG = true;

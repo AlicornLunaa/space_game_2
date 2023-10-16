@@ -10,7 +10,6 @@ import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.objects.world.TerrainGenerator;
@@ -59,8 +58,8 @@ public class PlanetComponent extends ScriptComponent {
 
         // Convert orbital position to world
         Vector2 localPos = entityTransform.position.cpy().sub(transform.position);
-        float x = (float)((localPos.angleRad() / Math.PI / -2.0) * (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE));
-        float y = (localPos.len() / atmosphereRadius) * (chunkHeight * Constants.CHUNK_SIZE * Tile.TILE_SIZE);
+        float x = (float)((localPos.angleRad() / Math.PI / -2.0) * (chunkWidth * Constants.CHUNK_SIZE * Constants.TILE_SIZE));
+        float y = (localPos.len() / atmosphereRadius) * (chunkHeight * Constants.CHUNK_SIZE * Constants.TILE_SIZE);
         entityTransform.position.set(x, y);
         entityTransform.rotation -= (localPos.angleRad() + (float)Math.PI / 2);
         entityBodyComponent.sync(entityTransform);
@@ -84,8 +83,8 @@ public class PlanetComponent extends ScriptComponent {
         if(entityBodyComponent == null || entityTransform == null) return;
 
         // Convert to space angles, spaceAngle = worldAngle + theta
-        float theta = (float)((entityTransform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE)) * Math.PI * -2);
-        float radius = (entityTransform.position.y / chunkHeight / Constants.CHUNK_SIZE / Tile.TILE_SIZE) * atmosphereRadius;
+        float theta = (float)((entityTransform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Constants.TILE_SIZE)) * Math.PI * -2);
+        float radius = (entityTransform.position.y / chunkHeight / Constants.CHUNK_SIZE / Constants.TILE_SIZE) * atmosphereRadius;
         float x = (float)(Math.cos(theta) * radius) + transform.position.x;
         float y = (float)(Math.sin(theta) * radius) + transform.position.y;
         entityTransform.position.set(x, y);
