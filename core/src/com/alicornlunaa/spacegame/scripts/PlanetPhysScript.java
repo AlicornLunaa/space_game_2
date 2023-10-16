@@ -5,7 +5,6 @@ import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
-import com.alicornlunaa.spacegame.components.CelestialComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.Tile;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
@@ -32,7 +31,6 @@ public class PlanetPhysScript extends ScriptComponent {
         if(!(entityBody.world instanceof PlanetaryPhysWorld)) return;
 
         Planet planet = ((PlanetaryPhysWorld)entityBody.world).getPlanet();
-        CelestialComponent celestialComponent = planet.getComponent(CelestialComponent.class);
         PlanetComponent planetComponent = planet.getComponent(PlanetComponent.class);
         float worldWidthPixels = planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE;
 
@@ -46,11 +44,10 @@ public class PlanetPhysScript extends ScriptComponent {
         planetComponent.checkLeavePlanet(e);
         
         // Taken from Celestial.java to correctly apply the right force
-        // Vector2 dragForce = planet.applyDrag(entityBody);
-        // entityBody.body.applyForceToCenter(dragForce.x, (-force * 0.5f * (128.f / entityBody.world.getPhysScale() * 1.f)) + dragForce.y, true);
-        float height = Math.max(entityBody.body.getPosition().y, celestialComponent.radius / planet.getComponent(BodyComponent.class).world.getPhysScale());
-        float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / (height * height));
-        entityBody.body.applyForceToCenter(0.0f, -force * 0.1f, true);
+        float heightNormalized = Math.max(entityBody.body.getPosition().y / planetComponent.chunkHeight / Constants.CHUNK_SIZE / Tile.TILE_SIZE, 1);
+        float heightScaled = (float)Math.pow(heightNormalized * planetComponent.terrainRadius, 2);
+        float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / heightScaled);
+        entityBody.body.applyForceToCenter(0.0f, -force, true);
     }
 
     @Override

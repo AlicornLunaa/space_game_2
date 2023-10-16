@@ -281,6 +281,7 @@ public class ChunkManager extends Group {
             }
 
             if(chunk.chunkUpdate){
+                chunk.chunkUpdate = false;
                 tileUpdate = true;
             }
         }
@@ -338,7 +339,6 @@ public class ChunkManager extends Group {
             lastPlayerX = plyChunkX;
             lastPlayerY = plyChunkY;
             tileUpdate = false;
-
             generateChunkHull();
         }
     }
