@@ -1,7 +1,9 @@
 package com.alicornlunaa.spacegame.objects.world;
 
+import com.alicornlunaa.selene_engine.components.ActorComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
+import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
+import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,7 +16,7 @@ import com.badlogic.gdx.utils.Null;
 
 public class Chunk extends Group {
     // Variables
-    private Tile[][] tiles = new Tile[Constants.CHUNK_SIZE][Constants.CHUNK_SIZE];
+    private BaseTile[][] tiles = new BaseTile[Constants.CHUNK_SIZE][Constants.CHUNK_SIZE];
     private boolean active = false;
     private int chunkX;
     private int chunkY;
@@ -25,24 +27,26 @@ public class Chunk extends Group {
     private void generateTiles(TerrainGenerator generator){
         for(int y = 0; y < Constants.CHUNK_SIZE; y++){
             for(int x = 0; x < Constants.CHUNK_SIZE; x++){
-                final @Null Tile tile = generator.getTile(chunkX, chunkY, x, y);
+                final @Null BaseTile tile = generator.getTile(chunkX, chunkY, x, y);
 
                 if(tile != null){
-                    tile.setBounds(
+                    final StaticTileComponent staticTileComponent = tile.getComponent(StaticTileComponent.class);
+                    final ActorComponent actorComponent = tile.getComponent(ActorComponent.class);
+                    actorComponent.actor.setBounds(
                         x * Constants.TILE_SIZE + chunkX * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
                         y * Constants.TILE_SIZE + chunkY * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
                         Constants.TILE_SIZE,
                         Constants.TILE_SIZE
                     );
                     tiles[x][y] = tile;
-                    
-                    addActor(tile);
-                    tile.addListener(new ClickListener(){
+                    addActor(actorComponent.actor);
+
+                    actorComponent.actor.addListener(new ClickListener(){
                         @Override
                         public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
                             if(!Gdx.input.isTouched(0)) return;
-                            removeActor(tile);
-                            tiles[tile.getTileX()][tile.getTileY()] = null;
+                            removeActor(actorComponent.actor);
+                            tiles[staticTileComponent.x][staticTileComponent.y] = null;
                             chunkUpdate = true;
                         }
                     });
@@ -77,7 +81,7 @@ public class Chunk extends Group {
         return chunkY;
     }
 
-    public Tile getTile(int x, int y){
+    public BaseTile getTile(int x, int y){
         if(x < 0 || x >= tiles.length) return null;
         if(y < 0 || y >= tiles[x].length) return null;
         return tiles[x][y];

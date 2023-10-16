@@ -1,6 +1,8 @@
 package com.alicornlunaa.spacegame.systems;
 
 import com.alicornlunaa.selene_engine.components.BodyComponent;
+import com.alicornlunaa.selene_engine.components.SpriteComponent;
+import com.alicornlunaa.selene_engine.components.TextureComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.ISystem;
@@ -52,7 +54,9 @@ public class PlanetRenderSystem implements ISystem {
 		// Get components
 		TransformComponent transform = entity.getComponent(TransformComponent.class);
 		BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
-		CustomSpriteComponent[] sprites = entity.getComponents(CustomSpriteComponent.class);
+		TextureComponent textureComponent = entity.getComponent(TextureComponent.class);
+		SpriteComponent[] sprites = entity.getComponents(SpriteComponent.class);
+		CustomSpriteComponent[] customSprites = entity.getComponents(CustomSpriteComponent.class);
 		
 		batch.setProjectionMatrix(App.instance.camera.combined);
 		batch.setTransformMatrix(new Matrix4());
@@ -63,14 +67,35 @@ public class PlanetRenderSystem implements ISystem {
 		trans.rotateRad(0, 0, 1, transform.rotation);
 
 		if(bodyComponent != null){
-			Vector2 localCenter = bodyComponent.body.getLocalCenter().cpy().scl(bodyComponent.world.getPhysScale());
+			Vector2 localCenter = bodyComponent.body.getLocalCenter();
 			trans.translate(-localCenter.x, -localCenter.y, 0);
 		}
 		
 		batch.setTransformMatrix(trans);
 
 		// Render every sprite
-		for(CustomSpriteComponent sprite : sprites)
+		for(SpriteComponent sprite : sprites){
+			Vector2 offset = new Vector2(0, 0);
+	
+			switch(sprite.anchor){
+				case CENTER:
+					offset.set(sprite.size.cpy().scl(1.f / 2.f));
+					break;
+				default:
+					break;
+			}
+
+			batch.draw(
+				textureComponent.texture,
+				offset.x * -1, offset.y * -1,
+				offset.x, offset.y,
+				sprite.size.x, sprite.size.y,
+				1.f, 1.f,
+				0
+			);
+		}
+
+		for(CustomSpriteComponent sprite : customSprites)
 			sprite.render(batch);
 	}
 
@@ -78,6 +103,6 @@ public class PlanetRenderSystem implements ISystem {
 	public boolean shouldRunOnEntity(IEntity entity) {
 		if(planet == null) return false;
 		if(!planet.getComponent(PlanetComponent.class).isOnPlanet(entity)) return false;
-		return entity.hasComponent(CustomSpriteComponent.class);
+		return entity.hasComponent(CustomSpriteComponent.class) || entity.hasComponent(SpriteComponent.class);
 	}
 }

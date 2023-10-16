@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 
 public class RenderSystem implements ISystem, Disposable {
-
 	// Variables
 	private final App game;
 	private SpriteBatch batch;
@@ -83,5 +82,4 @@ public class RenderSystem implements ISystem, Disposable {
 	public void dispose() {
 		batch.dispose();
 	}
-
 }

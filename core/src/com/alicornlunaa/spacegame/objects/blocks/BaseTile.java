@@ -3,22 +3,23 @@ package com.alicornlunaa.spacegame.objects.blocks;
 import java.util.HashMap;
 
 import com.alicornlunaa.selene_engine.components.ActorComponent;
+import com.alicornlunaa.selene_engine.components.AtlasTextureComponent;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.BoxColliderComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.SpriteComponent;
 import com.alicornlunaa.selene_engine.components.TextureComponent;
+import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.tiles.DynamicTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.TileComponent;
+import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Align;
 
@@ -36,6 +37,7 @@ public class BaseTile extends BaseEntity {
     }
     
     // Variables
+    protected TransformComponent transform = getComponent(TransformComponent.class);
     protected TextureComponent textureComponent;
     protected SpriteComponent spriteComponent;
     protected TileComponent tileComponent;
@@ -44,7 +46,7 @@ public class BaseTile extends BaseEntity {
     // Constructor
     public BaseTile(String tileID, int x, int y){
         // Static Tile Constructor
-        textureComponent = addComponent(new TextureComponent(App.instance.manager, "tiles/" + tileID));
+        textureComponent = addComponent(new AtlasTextureComponent("tiles/" + tileID));
         spriteComponent = addComponent(new SpriteComponent(Constants.TILE_SIZE, Constants.TILE_SIZE));
         tileComponent = addComponent(new StaticTileComponent(textureComponent, tileID, x, y));
         actorComponent = addComponent(new ActorComponent(new Actor(){
@@ -71,16 +73,20 @@ public class BaseTile extends BaseEntity {
 
     public BaseTile(PhysWorld world, String tileID, float x, float y, float rotation){
         // Dynamic Tile Constructor
+        transform.position.set(x, y);
+        transform.rotation = rotation;
+
         BodyComponent bodyComponent = addComponent(new BodyComponent(world));
-        textureComponent = addComponent(new TextureComponent(App.instance.manager, "tiles/" + tileID));
+        textureComponent = addComponent(new AtlasTextureComponent("tiles/" + tileID));
         spriteComponent = addComponent(new SpriteComponent(Constants.TILE_SIZE, Constants.TILE_SIZE));
         actorComponent = addComponent(new ActorComponent());
         tileComponent = addComponent(new DynamicTileComponent(textureComponent, bodyComponent, tileID));
 
-        addComponent(new BoxColliderComponent(bodyComponent, Constants.TILE_SIZE, Constants.TILE_SIZE, 1.f));
+        addComponent(new BoxColliderComponent(bodyComponent, Constants.TILE_SIZE / 2, Constants.TILE_SIZE / 2, 1.f));
+        addComponent(new PlanetPhysScript(this));
         addComponent(new ScriptComponent(this) {
             // Variables
-            private BodyComponent bodyComponent = getEntity().getComponent(BodyComponent.class);
+            private TransformComponent transform = getEntity().getComponent(TransformComponent.class);
 
             // Functions
             @Override
@@ -92,10 +98,8 @@ public class BaseTile extends BaseEntity {
             @Override
             public void update() {
                 // Update the actor to fit
-                Vector2 position = bodyComponent.body.getWorldCenter();
-                float rotation = bodyComponent.body.getAngle();
-                actorComponent.actor.setPosition(position.x, position.y, Align.center);
-                actorComponent.actor.setRotation((float)Math.toDegrees(rotation));
+                actorComponent.actor.setPosition(transform.position.x, transform.position.y, Align.center);
+                actorComponent.actor.setRotation((float)Math.toDegrees(transform.rotation));
             }
         });
 

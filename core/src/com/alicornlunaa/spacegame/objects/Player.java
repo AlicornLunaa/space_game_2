@@ -89,9 +89,9 @@ public class Player extends BaseEntity {
         fixtureDef.density = 1.4f;
 
         PolygonShape shape = new PolygonShape();
-        float rad = PLAYER_WIDTH / 2.f;
+        float rad = PLAYER_WIDTH / 2.f - Constants.HITBOX_LINEUP_FACTOR;
         shape.setAsBox(
-            PLAYER_WIDTH / 2,
+            PLAYER_WIDTH / 2 - Constants.HITBOX_LINEUP_FACTOR,
             PLAYER_HEIGHT / 2 - rad,
             new Vector2(
                 0,

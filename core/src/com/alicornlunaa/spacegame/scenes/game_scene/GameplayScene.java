@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.scenes.game_scene;
 
+import com.alicornlunaa.selene_engine.components.ActorComponent;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.ecs.Registry;
@@ -12,6 +13,7 @@ import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.Player;
+import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
 import com.alicornlunaa.spacegame.objects.simulation.Celestial;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
@@ -25,6 +27,10 @@ import com.alicornlunaa.spacegame.systems.PlanetRenderSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 /**
@@ -74,6 +80,19 @@ public class GameplayScene extends BaseScene {
         // Celestial c6 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 400, 30000, 0.f));
         testPlanet = new Planet(simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
+
+        PlanetComponent pc = testPlanet.getComponent(PlanetComponent.class);
+        BaseTile testDynamicTile = new BaseTile(pc.physWorld, "stone", 96, 26, 0);
+        testDynamicTile.getComponent(ActorComponent.class).actor.addListener(new ClickListener(){
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
+                if(!Gdx.input.isTouched(0)) return;
+                Gdx.app.log("Tile Checker", "Clicked!");
+            }
+        });
+        registry.addEntity(testDynamicTile);
+        pc.addToPlanetEntities(testDynamicTile);
+        pc.chunkManager.addActor(testDynamicTile.getComponent(ActorComponent.class).actor);
         
 		player = new Player(universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));

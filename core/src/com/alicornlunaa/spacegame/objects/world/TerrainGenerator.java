@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.world;
 import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.components.PlanetComponent;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
+import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
@@ -78,7 +78,7 @@ public class TerrainGenerator {
     // Public functions
     public Pixmap getBiomeMap(){ return biomeMap; }
 
-    public @Null Tile getTile(int chunkX, int chunkY, int x, int y){
+    public @Null BaseTile getTile(int chunkX, int chunkY, int x, int y){
         int globalX = x + chunkX * Constants.CHUNK_SIZE;
         int globalY = y + chunkY * Constants.CHUNK_SIZE;
         String type = "stone";
@@ -106,7 +106,7 @@ public class TerrainGenerator {
             return null;
         }
 
-        Tile tile = new Tile(x, y, type);
+        BaseTile tile = new BaseTile(type, x, y);
         return tile;
     }
 }

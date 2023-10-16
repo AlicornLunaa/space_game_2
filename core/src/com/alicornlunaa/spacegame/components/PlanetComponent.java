@@ -134,6 +134,14 @@ public class PlanetComponent extends ScriptComponent {
         return entitiesOnPlanet.contains(e, true);
     }
 
+    public void addToPlanetEntities(IEntity e){
+        entitiesOnPlanet.add(e);
+    }
+
+    public void delToPlanetEntities(IEntity e){
+        entitiesOnPlanet.removeValue(e, true);
+    }
+
     public Color getAtmosphereColor(){
         float r = 0.f;
         float g = 0.f;

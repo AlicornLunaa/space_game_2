@@ -10,6 +10,7 @@ public class Constants {
     
     // Scaling constants
     public static final float PPM = 128.0f;
+    public static final float HITBOX_LINEUP_FACTOR = 0.02f;
 
     // Math constants
     public static final float GRAVITY_CONSTANT = 1.f;

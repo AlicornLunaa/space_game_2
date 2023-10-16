@@ -2,7 +2,7 @@ package com.alicornlunaa.spacegame.objects.world;
 
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
-import com.alicornlunaa.spacegame.objects.blocks.Tile;
+import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -61,9 +61,9 @@ public class ChunkManager extends Group {
         for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
             for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
                 // Get the chunk coordinates and tile coordinates from the global x and y
-                Tile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
-                Tile tileAbove = getTileFromGlobal(x + plyTileX, y + plyTileY + 1);
-                Tile tileBelow = getTileFromGlobal(x + plyTileX, y + plyTileY - 1);
+                BaseTile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
+                BaseTile tileAbove = getTileFromGlobal(x + plyTileX, y + plyTileY + 1);
+                BaseTile tileBelow = getTileFromGlobal(x + plyTileX, y + plyTileY - 1);
 
                 if(tile != null && tileAbove == null && startTop == -1){
                     // Create a new shape on the edge of this tile on the top
@@ -121,9 +121,9 @@ public class ChunkManager extends Group {
         for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
             for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
                 // Get the chunk coordinates and tile coordinates from the global x and y
-                Tile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
-                Tile tileLeft = getTileFromGlobal(x - 1 + plyTileX, y + plyTileY);
-                Tile tileRight = getTileFromGlobal(x + 1 + plyTileX, y + plyTileY);
+                BaseTile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
+                BaseTile tileLeft = getTileFromGlobal(x - 1 + plyTileX, y + plyTileY);
+                BaseTile tileRight = getTileFromGlobal(x + 1 + plyTileX, y + plyTileY);
 
                 if(tile != null && tileLeft == null && startLeft == -1){
                     // Create a new shape on the edge of this tile on the top
@@ -195,7 +195,7 @@ public class ChunkManager extends Group {
     }
 
     // Functions
-    public @Null Tile getTileFromGlobal(int x, int y){
+    public @Null BaseTile getTileFromGlobal(int x, int y){
         if(chunks.length <= 0) return null;
         if(y < 0) return null;
         if(y >= chunks[0].length * Constants.CHUNK_SIZE) return null;
