@@ -85,7 +85,7 @@ public class TerrainGenerator {
 
         // Heightmapping
         float heightNormalized = (float)globalY / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
-        float terrainColumnHeight = (float)(planetComponent.terrainRadius + 150 * noise.eval(globalX * 0.005f, 0));
+        float terrainColumnHeight = (float)(planetComponent.terrainRadius + 10 * noise.eval(globalX * 0.005f, 0));
         if((heightNormalized * planetComponent.atmosphereRadius) > terrainColumnHeight){
             return null;
         }

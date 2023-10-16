@@ -58,7 +58,7 @@ public class Player extends BaseEntity {
 
     private static final float PLAYER_WIDTH = 0.2f;
     private static final float PLAYER_HEIGHT = 0.4f;
-    private static final float MOVEMENT_SPEED = 60.f;
+    private static final float MOVEMENT_SPEED = 6.f;
     private static final float JUMP_FORCE = 60.f;
 
     // Private functions
@@ -153,8 +153,12 @@ public class Player extends BaseEntity {
                 if(noclip) return;
 
                 // Groundchecking
-                grounded = true;
-                bodyComponent.world.getBox2DWorld().rayCast(jumpCallback, bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 + 1.f).scl(1 / bodyComponent.world.getPhysScale())).cpy(), bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 1.5f).scl(1 / bodyComponent.world.getPhysScale())));
+                grounded = false;
+                bodyComponent.world.getBox2DWorld().rayCast(
+                    jumpCallback,
+                    bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2)).cpy(),
+                    bodyComponent.body.getWorldPoint(new Vector2(0, PLAYER_HEIGHT / -2 - 0.1f)).cpy()
+                );
 
                 // Movement
                 if(vertical != 0 || horizontal != 0){
