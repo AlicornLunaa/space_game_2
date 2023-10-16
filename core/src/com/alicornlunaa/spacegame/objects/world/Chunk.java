@@ -2,10 +2,13 @@ package com.alicornlunaa.spacegame.objects.world;
 
 import com.alicornlunaa.selene_engine.components.ActorComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -44,10 +47,14 @@ public class Chunk extends Group {
                     actorComponent.addListener(new ClickListener(){
                         @Override
                         public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
-                            if(!Gdx.input.isTouched(0)) return;
-                            removeActor(actorComponent);
-                            tiles[staticTileComponent.x][staticTileComponent.y] = null;
-                            chunkUpdate = true;
+                            if(Gdx.input.isButtonPressed(Buttons.LEFT)){
+                                removeActor(actorComponent);
+                                tiles[staticTileComponent.x][staticTileComponent.y] = null;
+                                chunkUpdate = true;
+                            } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
+                                BaseTile.convertToDynamic(App.instance.gameScene.registry, Chunk.this, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile); //! TODO: Garbage code, fix it later
+                                chunkUpdate = true;
+                            }
                         }
                     });
                 }
@@ -85,6 +92,13 @@ public class Chunk extends Group {
         if(x < 0 || x >= tiles.length) return null;
         if(y < 0 || y >= tiles[x].length) return null;
         return tiles[x][y];
+    }
+
+    public boolean setTile(@Null BaseTile tile, int x, int y){
+        if(x < 0 || x >= tiles.length) return false;
+        if(y < 0 || y >= tiles[x].length) return false;
+        tiles[x][y] = tile;
+        return true;
     }
     
     @Override

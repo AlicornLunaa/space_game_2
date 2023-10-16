@@ -210,6 +210,25 @@ public class ChunkManager extends Group {
         return chunk.getTile(tileX, tileY);
     }
 
+    public boolean setTileFromGlobal(@Null BaseTile tile, int x, int y){
+        if(chunks.length <= 0) return false;
+        if(y < 0) return false;
+        if(y >= chunks[0].length * Constants.CHUNK_SIZE) return false;
+
+        int chunkX = Math.floorMod(Math.floorDiv(x, Constants.CHUNK_SIZE), chunks.length);
+        int chunkY = Math.floorMod((int)(y / Constants.CHUNK_SIZE), chunks[0].length);
+        int tileX = Math.floorMod(x, Constants.CHUNK_SIZE);
+        int tileY = Math.floorMod(y, Constants.CHUNK_SIZE);
+        Chunk chunk = chunks[chunkX][chunkY];
+
+        if(chunk != null){
+            chunk.setTile(tile, tileX, tileY);
+            return true;
+        }
+
+        return false;
+    }
+
     public void loadChunk(int x, int y){
         if(chunks[x][y] == null){
             // Generate new chunk because it didnt exist before
