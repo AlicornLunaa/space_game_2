@@ -20,7 +20,6 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Align;
 
 public class BaseTile extends BaseEntity {
@@ -49,7 +48,7 @@ public class BaseTile extends BaseEntity {
         textureComponent = addComponent(new AtlasTextureComponent("tiles/" + tileID));
         spriteComponent = addComponent(new SpriteComponent(Constants.TILE_SIZE, Constants.TILE_SIZE));
         tileComponent = addComponent(new StaticTileComponent(textureComponent, tileID, x, y));
-        actorComponent = addComponent(new ActorComponent(new Actor(){
+        actorComponent = addComponent(new ActorComponent(){
             @Override
             public void draw(Batch batch, float alpha){
                 batch.draw(
@@ -61,9 +60,9 @@ public class BaseTile extends BaseEntity {
                     0
                 );
             }
-        }));
+        });
 
-        actorComponent.actor.setBounds(
+        actorComponent.setBounds(
             x * Constants.TILE_SIZE,
             y * Constants.TILE_SIZE,
             Constants.TILE_SIZE,
@@ -98,21 +97,16 @@ public class BaseTile extends BaseEntity {
             @Override
             public void update() {
                 // Update the actor to fit
-                actorComponent.actor.setPosition(transform.position.x, transform.position.y, Align.center);
-                actorComponent.actor.setRotation((float)Math.toDegrees(transform.rotation));
+                actorComponent.setPosition(transform.position.x, transform.position.y, Align.center);
+                actorComponent.setRotation((float)Math.toDegrees(transform.rotation));
             }
         });
 
-        actorComponent.actor.setBounds(
+        actorComponent.setBounds(
             x * Constants.TILE_SIZE,
             y * Constants.TILE_SIZE,
             Constants.TILE_SIZE,
             Constants.TILE_SIZE
         );
-    }
-
-    // Functions
-    public Actor getActor(){
-        return actorComponent.actor;
     }
 }

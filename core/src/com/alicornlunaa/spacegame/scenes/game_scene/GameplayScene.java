@@ -83,7 +83,7 @@ public class GameplayScene extends BaseScene {
 
         PlanetComponent pc = testPlanet.getComponent(PlanetComponent.class);
         BaseTile testDynamicTile = new BaseTile(pc.physWorld, "stone", 96, 26, 0);
-        testDynamicTile.getComponent(ActorComponent.class).actor.addListener(new ClickListener(){
+        testDynamicTile.getComponent(ActorComponent.class).addListener(new ClickListener(){
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
                 if(!Gdx.input.isTouched(0)) return;
@@ -92,7 +92,7 @@ public class GameplayScene extends BaseScene {
         });
         registry.addEntity(testDynamicTile);
         pc.addToPlanetEntities(testDynamicTile);
-        pc.chunkManager.addActor(testDynamicTile.getComponent(ActorComponent.class).actor);
+        pc.chunkManager.addActor(testDynamicTile.getComponent(ActorComponent.class));
         
 		player = new Player(universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));

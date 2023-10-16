@@ -32,20 +32,20 @@ public class Chunk extends Group {
                 if(tile != null){
                     final StaticTileComponent staticTileComponent = tile.getComponent(StaticTileComponent.class);
                     final ActorComponent actorComponent = tile.getComponent(ActorComponent.class);
-                    actorComponent.actor.setBounds(
+                    actorComponent.setBounds(
                         x * Constants.TILE_SIZE + chunkX * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
                         y * Constants.TILE_SIZE + chunkY * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
                         Constants.TILE_SIZE,
                         Constants.TILE_SIZE
                     );
                     tiles[x][y] = tile;
-                    addActor(actorComponent.actor);
+                    addActor(actorComponent);
 
-                    actorComponent.actor.addListener(new ClickListener(){
+                    actorComponent.addListener(new ClickListener(){
                         @Override
                         public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
                             if(!Gdx.input.isTouched(0)) return;
-                            removeActor(actorComponent.actor);
+                            removeActor(actorComponent);
                             tiles[staticTileComponent.x][staticTileComponent.y] = null;
                             chunkUpdate = true;
                         }
