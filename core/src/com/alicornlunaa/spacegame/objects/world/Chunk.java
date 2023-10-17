@@ -55,7 +55,6 @@ public class Chunk extends Group {
 
                                 PlanetComponent pc = App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class);
                                 App.instance.gameScene.registry.removeEntity(tile);
-                                pc.delToPlanetEntities(tile);
 
                                 ItemEntity newItem = new ItemEntity(
                                     pc.physWorld,
@@ -65,7 +64,6 @@ public class Chunk extends Group {
                                     1,
                                     64
                                 );
-                                pc.addToPlanetEntities(newItem);
                                 App.instance.gameScene.registry.addEntity(newItem);
                             } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
                                 BaseTile.convertToDynamic(App.instance.gameScene.registry, Chunk.this, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile); //! TODO: Garbage code, fix it later

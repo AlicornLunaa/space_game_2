@@ -126,13 +126,11 @@ public class BaseTile extends BaseEntity {
         ActorComponent actorComponent = tile.getComponent(ActorComponent.class);
         
         Group parent = actorComponent.getParent();
-        planetComponent.delToPlanetEntities(tile);
         actorComponent.remove();
         registry.removeEntity(tile);
 
         BaseTile newTile = new BaseTile(dynamicTileComponent.tileID, (int)transform.position.x, (int)transform.position.y);
         planetComponent.chunkManager.setTileFromGlobal(newTile, (int)transform.position.x, (int)transform.position.y);
-        planetComponent.addToPlanetEntities(newTile);
         parent.addActor(newTile.getComponent(ActorComponent.class));
         registry.addEntity(newTile);
 
@@ -146,7 +144,6 @@ public class BaseTile extends BaseEntity {
 
         Group parent = actorComponent.getParent();
         chunk.setTile(null, staticTileComponent.x, staticTileComponent.y);
-        planetComponent.delToPlanetEntities(tile);
         actorComponent.remove();
         registry.removeEntity(tile);
 
@@ -157,7 +154,6 @@ public class BaseTile extends BaseEntity {
             staticTileComponent.y * Constants.TILE_SIZE + chunk.getChunkY() * Constants.CHUNK_SIZE * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
             0
         );
-        planetComponent.addToPlanetEntities(newTile);
         parent.addActor(newTile.getComponent(ActorComponent.class));
         registry.addEntity(newTile);
 

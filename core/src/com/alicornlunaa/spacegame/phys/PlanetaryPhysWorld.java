@@ -4,7 +4,6 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
 
 public class PlanetaryPhysWorld extends PhysWorld {
-
     // Variables
     private Planet planet;
 
@@ -18,5 +17,4 @@ public class PlanetaryPhysWorld extends PhysWorld {
     public Planet getPlanet(){
         return planet;
     }
-
 }

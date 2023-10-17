@@ -6,7 +6,6 @@ import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
-import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -40,8 +39,6 @@ public class PlanetComponent extends ScriptComponent {
     private TerrainGenerator generator;
     private Array<Color> atmosComposition = new Array<>();
     private Array<Float> atmosPercentages = new Array<>();
-    
-    private Array<IEntity> entitiesOnPlanet = new Array<>();
     private Stack<IEntity> entitiesLeavingPlanet = new Stack<>();
 
     // Constructor
@@ -73,7 +70,6 @@ public class PlanetComponent extends ScriptComponent {
 
         // Add body
         entityBodyComponent.setWorld(physWorld);
-        entitiesOnPlanet.add(e);
     }
 
     public void delEntityWorld(IEntity e){
@@ -99,7 +95,6 @@ public class PlanetComponent extends ScriptComponent {
 
         // Remove body
         entityBodyComponent.setWorld(bodyComponent.world);
-        entitiesOnPlanet.removeValue(e, true);
     }
 
     public boolean checkEnterPlanet(IEntity e){
@@ -116,7 +111,7 @@ public class PlanetComponent extends ScriptComponent {
         return false;
     }
 
-    public boolean checkLeavePlanet(BaseEntity e){
+    public boolean checkLeavePlanet(IEntity e){
         // This function checks if the entity supplied
         TransformComponent transform = e.getComponent(TransformComponent.class);
 
@@ -130,16 +125,13 @@ public class PlanetComponent extends ScriptComponent {
         return false;
     }
 
-    public boolean isOnPlanet(IEntity e){
-        return entitiesOnPlanet.contains(e, true);
-    }
+    public boolean isOnPlanet(IEntity entity){
+        BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
 
-    public void addToPlanetEntities(IEntity e){
-        entitiesOnPlanet.add(e);
-    }
+        if(bodyComponent != null)
+            return (bodyComponent.world == physWorld);
 
-    public void delToPlanetEntities(IEntity e){
-        entitiesOnPlanet.removeValue(e, true);
+        return false;
     }
 
     public Color getAtmosphereColor(){
@@ -186,14 +178,12 @@ public class PlanetComponent extends ScriptComponent {
     public void update() {
         // starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
         starDirection.set(1, 0, 0);
+        chunkManager.update();
 
         // Remove entities in the world still
         // while(entitiesLeavingPlanet.size() > 0){
         //     delEntityWorld(entitiesLeavingPlanet.pop());
         // }
-
-        // chunkManager.act(Gdx.graphics.getDeltaTime());
-        chunkManager.update();
     }
 
     @Override

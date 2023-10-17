@@ -105,10 +105,13 @@ public class Player extends BaseEntity {
 
         CircleShape cShape = new CircleShape();
         cShape.setRadius(rad);
+
         cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / 2 - rad));
         fixtureDef.shape = cShape;
         bodyComponent.body.createFixture(fixtureDef);
+        
         cShape.setPosition(new Vector2(0, PLAYER_HEIGHT / -2 + rad));
+        fixtureDef.friction = 1;
         bodyComponent.body.createFixture(fixtureDef);
         cShape.dispose();
 
@@ -161,7 +164,7 @@ public class Player extends BaseEntity {
                 );
 
                 // Movement
-                if(vertical != 0 || horizontal != 0){
+                if(vertical != 0 || horizontal != 0 && bodyComponent.body.getLinearVelocity().len() < 5){
                     bodyComponent.body.applyLinearImpulse(new Vector2(horizontal, grounded ? vertical : 0).scl(MOVEMENT_SPEED, JUMP_FORCE).scl(Constants.TIME_STEP), bodyComponent.body.getWorldCenter(), true);
                 }
 

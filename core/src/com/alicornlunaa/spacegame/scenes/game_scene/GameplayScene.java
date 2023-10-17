@@ -99,12 +99,10 @@ public class GameplayScene extends BaseScene {
             }
         });
         registry.addEntity(testDynamicTile);
-        pc.addToPlanetEntities(testDynamicTile);
         pc.chunkManager.addActor(testDynamicTile.getComponent(ActorComponent.class));
 
         ItemEntity testItemEntity = new ItemEntity(pc.physWorld, 94, 26, "stone_square", 1, 64);
         registry.addEntity(testItemEntity);
-        pc.addToPlanetEntities(testItemEntity);
 
         ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
         ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
