@@ -7,6 +7,7 @@ import com.alicornlunaa.selene_engine.components.ScriptComponent;
 import com.alicornlunaa.selene_engine.components.ShaderComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.IEntity;
+import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
@@ -42,8 +43,23 @@ public class PlanetComponent extends ScriptComponent {
     private Stack<IEntity> entitiesLeavingPlanet = new Stack<>();
 
     // Constructor
-    public PlanetComponent(Planet entity) {
+    public PlanetComponent(Registry registry, Planet entity, float terraRadius, float atmosRadius, float atmosDensity, int internalChunkHeight) {
         super(entity);
+        
+        // chunkHeight = (int)Math.floor(terraRadius / Tile.TILE_SIZE / Constants.CHUNK_SIZE);
+        chunkHeight = 10;
+        chunkWidth = (int)(2.0 * Math.PI * chunkHeight);
+        terrainRadius = terraRadius;
+        atmosphereRadius = atmosRadius;
+        atmosphereDensity = atmosDensity;
+        
+        generator = new TerrainGenerator(this);
+
+        atmosComposition.add(Color.CYAN);
+        atmosPercentages.add(1.f);
+        
+        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PPM));
+        chunkManager = new ChunkManager(registry, physWorld, chunkWidth, chunkHeight, generator);
     }
 
     // Functions
@@ -165,13 +181,6 @@ public class PlanetComponent extends ScriptComponent {
     // Script functions
     @Override
     public void start() {
-        generator = new TerrainGenerator(this);
-
-        atmosComposition.add(Color.CYAN);
-        atmosPercentages.add(1.f);
-        
-        physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PPM));
-        chunkManager = new ChunkManager(generator, physWorld, chunkWidth, chunkHeight);
     }
 
     @Override

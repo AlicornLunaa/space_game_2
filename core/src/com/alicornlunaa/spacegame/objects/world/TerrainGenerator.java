@@ -78,31 +78,30 @@ public class TerrainGenerator {
     // Public functions
     public Pixmap getBiomeMap(){ return biomeMap; }
 
-    public @Null BaseTile getTile(int chunkX, int chunkY, int x, int y){
-        int globalX = x + chunkX * Constants.CHUNK_SIZE;
-        int globalY = y + chunkY * Constants.CHUNK_SIZE;
+    public @Null BaseTile getTile(int x, int y){
+        // Starting values
         String type = "stone";
 
         // Heightmapping
-        float heightNormalized = (float)globalY / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
-        float terrainColumnHeight = (float)(planetComponent.terrainRadius + 10 * noise.eval(globalX * 0.005f, 0));
+        float heightNormalized = (float)y / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
+        float terrainColumnHeight = (float)(planetComponent.terrainRadius + 10 * noise.eval(x * 0.005f, 0));
         if((heightNormalized * planetComponent.atmosphereRadius) > terrainColumnHeight){
             return null;
         }
         
-        float estimationHeight = (float)(globalY + 8) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
+        float estimationHeight = (float)(y + 8) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
         if((estimationHeight * planetComponent.atmosphereRadius) > terrainColumnHeight){
             type = "dirt";
         }
         
-        estimationHeight = (float)(globalY + 1) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
+        estimationHeight = (float)(y + 1) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
         if((estimationHeight * planetComponent.atmosphereRadius) > terrainColumnHeight){
             type = "grass";
         }
 
         float caveFrequency = 0.11f;
         float fuckFrequency = 0.7f;
-        if(((noise.eval(globalX * caveFrequency, globalY * caveFrequency) + 1) / 2.0) < 0.4 && ((noise.eval(globalX * fuckFrequency, globalY * fuckFrequency) + 1) / 2.0) < 0.95){
+        if(((noise.eval(x * caveFrequency, y * caveFrequency) + 1) / 2.0) < 0.4 && ((noise.eval(x * fuckFrequency, y * fuckFrequency) + 1) / 2.0) < 0.95){
             return null;
         }
 

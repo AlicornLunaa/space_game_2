@@ -79,7 +79,7 @@ public class GameplayScene extends BaseScene {
         // Celestial c4 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 100, 21000, 0.f));
         // Celestial c5 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 200, 24000, 0.f));
         // Celestial c6 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 400, 30000, 0.f));
-        testPlanet = new Planet(simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
+        testPlanet = new Planet(registry, simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
         
 		player = new Player(universe.getUniversalWorld(), 500, 0);

@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.world;
 
+import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
@@ -15,21 +16,22 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
 /**
- * Holds world chunks and manages which is loaded or not
+ * Abstracts chunks away from managing the world data
+ * This allows for quicker and simpler world block changes
  */
 public class ChunkManager extends Group {
     // Variables
-    private TerrainGenerator generator;
-    private PhysWorld world;
-    private Chunk[][] chunks;
+    private Registry registry;
+    private Chunk[][] chunks; // World data stored in static arrays
+    private TerrainGenerator generator; // Terrain generator
 
-    private Array<Chunk> loadedChunks = new Array<>();
-    private Array<Chunk> visibleChunks = new Array<>();
-    private Array<Fixture> activeFixtures = new Array<>();
+    private Array<Chunk> loadedChunks = new Array<>(); // Chunks which are currently physically active
+    private Array<Chunk> visibleChunks = new Array<>(); // Chunks which are visually active
+    private Array<Fixture> activeFixtures = new Array<>(); // Physics fixtures for the world hull
 
-    private Body worldBody;
+    private Body worldBody; // Physics body to hold static tiles
+    private boolean tileUpdate = false; // If tile update is true, update the hull
 
-    private boolean tileUpdate = false;
     private int lastPlayerX = -1;
     private int lastPlayerY = -1;
 
@@ -61,9 +63,9 @@ public class ChunkManager extends Group {
         for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
             for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
                 // Get the chunk coordinates and tile coordinates from the global x and y
-                BaseTile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
-                BaseTile tileAbove = getTileFromGlobal(x + plyTileX, y + plyTileY + 1);
-                BaseTile tileBelow = getTileFromGlobal(x + plyTileX, y + plyTileY - 1);
+                BaseTile tile = getTile(x + plyTileX, y + plyTileY);
+                BaseTile tileAbove = getTile(x + plyTileX, y + plyTileY + 1);
+                BaseTile tileBelow = getTile(x + plyTileX, y + plyTileY - 1);
 
                 if(tile != null && tileAbove == null && startTop == -1){
                     // Create a new shape on the edge of this tile on the top
@@ -121,9 +123,9 @@ public class ChunkManager extends Group {
         for(int x = loadDist * -1 * Constants.CHUNK_SIZE; x < loadDist * Constants.CHUNK_SIZE; x++){
             for(int y = loadDist * -1 * Constants.CHUNK_SIZE; y < loadDist * Constants.CHUNK_SIZE; y++){
                 // Get the chunk coordinates and tile coordinates from the global x and y
-                BaseTile tile = getTileFromGlobal(x + plyTileX, y + plyTileY);
-                BaseTile tileLeft = getTileFromGlobal(x - 1 + plyTileX, y + plyTileY);
-                BaseTile tileRight = getTileFromGlobal(x + 1 + plyTileX, y + plyTileY);
+                BaseTile tile = getTile(x + plyTileX, y + plyTileY);
+                BaseTile tileLeft = getTile(x - 1 + plyTileX, y + plyTileY);
+                BaseTile tileRight = getTile(x + 1 + plyTileX, y + plyTileY);
 
                 if(tile != null && tileLeft == null && startLeft == -1){
                     // Create a new shape on the edge of this tile on the top
@@ -182,20 +184,19 @@ public class ChunkManager extends Group {
     }
 
     // Constructor
-    public ChunkManager(TerrainGenerator generator, PhysWorld world, int width, int height){
+    public ChunkManager(Registry registry, PhysWorld world, int width, int height, TerrainGenerator generator){
         this.setTransform(false);
-        this.world = world;
+        this.registry = registry;
         this.generator = generator;
         chunks = new Chunk[width][height];
 
         BodyDef def = new BodyDef();
         def.type = BodyType.StaticBody;
-        def.position.set(0, 0);
         worldBody = world.getBox2DWorld().createBody(def);
     }
 
     // Functions
-    public @Null BaseTile getTileFromGlobal(int x, int y){
+    public @Null BaseTile getTile(int x, int y){
         if(chunks.length <= 0) return null;
         if(y < 0) return null;
         if(y >= chunks[0].length * Constants.CHUNK_SIZE) return null;
@@ -210,7 +211,7 @@ public class ChunkManager extends Group {
         return chunk.getTile(tileX, tileY);
     }
 
-    public boolean setTileFromGlobal(@Null BaseTile tile, int x, int y){
+    public boolean setTile(@Null BaseTile tile, int x, int y){
         if(chunks.length <= 0) return false;
         if(y < 0) return false;
         if(y >= chunks[0].length * Constants.CHUNK_SIZE) return false;
@@ -221,10 +222,8 @@ public class ChunkManager extends Group {
         int tileY = Math.floorMod(y, Constants.CHUNK_SIZE);
         Chunk chunk = chunks[chunkX][chunkY];
 
-        if(chunk != null){
-            chunk.setTile(tile, tileX, tileY);
-            return true;
-        }
+        if(chunk != null)
+            return chunk.setTile(tile, tileX, tileY);
 
         return false;
     }
@@ -232,55 +231,29 @@ public class ChunkManager extends Group {
     public void loadChunk(int x, int y){
         if(chunks[x][y] == null){
             // Generate new chunk because it didnt exist before
-            chunks[x][y] = new Chunk(generator, world, x, y);
+            chunks[x][y] = new Chunk(registry, generator, x, y);
         }
 
-        if(!chunks[x][y].isLoaded()){
+        if(!chunks[x][y].chunkLoaded){
             // Load if not loaded
             loadedChunks.add(chunks[x][y]);
-            chunks[x][y].setLoaded(true);
+            chunks[x][y].chunkLoaded = true;
         }
-
-        // Load every active entity within the chunk
-        // for(BaseEntity e : world.getEntities()){
-        //     if(e.getBody().isActive() || e instanceof Player) continue;
-
-        //     Vector2 entPos = e.getPosition();
-        //     int entChunkX = (int)(entPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
-        //     int entChunkY = (int)(entPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
-
-        //     if(entChunkX == x && entChunkY == y){
-        //         e.getBody().setActive(true);
-        //     }
-        // }
     }
 
     public void unloadChunk(int x, int y){
         if(chunks[x][y] == null) return;
         loadedChunks.removeValue(chunks[x][y], true);
-        chunks[x][y].setLoaded(false);
-
-        // Unload every active entity within the chunk
-        // for(BaseEntity e : world.getEntities()){
-        //     if(!e.getBody().isActive() || e instanceof Player) continue;
-
-        //     Vector2 entPos = e.getCenter();
-        //     int entChunkX = (int)(entPos.x / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
-        //     int entChunkY = (int)(entPos.y / Constants.CHUNK_SIZE / Tile.TILE_SIZE);
-
-        //     if(entChunkX == x && entChunkY == y){
-        //         e.getBody().setActive(false);
-        //     }
-        // }
+        chunks[x][y].chunkLoaded = false;
     }
 
     public void update(){
         // Update based on the player's positioning and time active
         Vector2 plyPos = App.instance.gameScene.player.getCenter();
-        
+
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
-        int viewDist = (int)(App.instance.camera.viewportWidth * App.instance.camera.zoom / Constants.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1); // TODO: Fix size
+        int viewDist = (int)(App.instance.camera.viewportWidth * App.instance.camera.zoom / Constants.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Constants.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Constants.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
@@ -340,7 +313,7 @@ public class ChunkManager extends Group {
 
                 if(chunks[wrappedX][wrappedY] == null){
                     // Generate new chunk because it didnt exist before
-                    chunks[wrappedX][wrappedY] = new Chunk(generator, world, wrappedX, wrappedY);
+                    chunks[wrappedX][wrappedY] = new Chunk(registry, generator, wrappedX, wrappedY);
                 }
 
                 // Only add if not visible already

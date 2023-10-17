@@ -17,7 +17,6 @@ import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.tiles.DynamicTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.TileComponent;
-import com.alicornlunaa.spacegame.objects.world.Chunk;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -130,28 +129,26 @@ public class BaseTile extends BaseEntity {
         registry.removeEntity(tile);
 
         BaseTile newTile = new BaseTile(dynamicTileComponent.tileID, (int)transform.position.x, (int)transform.position.y);
-        planetComponent.chunkManager.setTileFromGlobal(newTile, (int)transform.position.x, (int)transform.position.y);
+        planetComponent.chunkManager.setTile(newTile, (int)transform.position.x, (int)transform.position.y);
         parent.addActor(newTile.getComponent(ActorComponent.class));
         registry.addEntity(newTile);
 
         return newTile;
     }
 
-    public static BaseTile convertToDynamic(Registry registry, Chunk chunk, PlanetComponent planetComponent, BaseTile tile){
+    public static BaseTile convertToDynamic(Registry registry, PlanetComponent planetComponent, BaseTile tile){
         // Static->Dynamic function
         StaticTileComponent staticTileComponent = tile.getComponent(StaticTileComponent.class);
         ActorComponent actorComponent = tile.getComponent(ActorComponent.class);
 
-        Group parent = actorComponent.getParent();
-        chunk.setTile(null, staticTileComponent.x, staticTileComponent.y);
-        actorComponent.remove();
-        registry.removeEntity(tile);
+        Group parent = actorComponent.getParent().getParent();
+        planetComponent.chunkManager.setTile(null, staticTileComponent.x, staticTileComponent.y);
 
         BaseTile newTile = new BaseTile(
             planetComponent.physWorld,
             staticTileComponent.tileID,
-            staticTileComponent.x * Constants.TILE_SIZE + chunk.getChunkX() * Constants.CHUNK_SIZE * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
-            staticTileComponent.y * Constants.TILE_SIZE + chunk.getChunkY() * Constants.CHUNK_SIZE * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
+            staticTileComponent.x * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
+            staticTileComponent.y * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
             0
         );
         parent.addActor(newTile.getComponent(ActorComponent.class));
