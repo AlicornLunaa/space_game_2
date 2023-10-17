@@ -22,8 +22,10 @@ import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Null;
 
 public class BaseTile extends BaseEntity {
     // Statics
@@ -44,6 +46,7 @@ public class BaseTile extends BaseEntity {
     protected SpriteComponent spriteComponent;
     protected TileComponent tileComponent;
     protected ActorComponent actorComponent;
+    protected @Null EventListener eventListener = null;
 
     // Constructor
     public BaseTile(String tileID){
@@ -56,7 +59,7 @@ public class BaseTile extends BaseEntity {
         // Static Tile Constructor
         this(tileID);
         tileComponent = addComponent(new StaticTileComponent(textureComponent, tileID, x, y));
-        actorComponent = addComponent(new ActorComponent(){
+        actorComponent = addComponent(new ActorComponent(this){
             @Override
             public void draw(Batch batch, float alpha){
                 batch.draw(
@@ -85,7 +88,7 @@ public class BaseTile extends BaseEntity {
         transform.rotation = rotation;
 
         BodyComponent bodyComponent = addComponent(new BodyComponent(world));
-        actorComponent = addComponent(new ActorComponent());
+        actorComponent = addComponent(new ActorComponent(this));
         tileComponent = addComponent(new DynamicTileComponent(textureComponent, bodyComponent, tileID));
 
         addComponent(new BoxColliderComponent(bodyComponent, Constants.TILE_SIZE / 2, Constants.TILE_SIZE / 2, 1.f));
@@ -115,6 +118,18 @@ public class BaseTile extends BaseEntity {
             Constants.TILE_SIZE,
             Constants.TILE_SIZE
         );
+    }
+
+    // Functions
+    public void setEventListener(@Null EventListener newEventListener){
+        if(eventListener != null){
+            // Remove old event listener
+            actorComponent.removeListener(eventListener);
+        }
+
+        if(newEventListener != null){
+            actorComponent.addListener(newEventListener);
+        }
     }
 
     // Static constructors

@@ -25,42 +25,45 @@ public class Chunk extends Group {
     public boolean chunkLoaded = false; // Whether or not the chunk is loaded
     public boolean chunkUpdate = false; // Whether or not to update the chunk
 
+    private ClickListener defaultListener = new ClickListener(){
+        @Override
+        public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
+            // Get variables
+            BaseTile tile = ((BaseTile)((ActorComponent)event.getListenerActor()).getEntity());
+            StaticTileComponent staticTileComponent = tile.getComponent(StaticTileComponent.class);
+
+            // Inputs
+            if(Gdx.input.isButtonPressed(Buttons.LEFT)){
+                PlanetComponent pc = App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class);
+                pc.chunkManager.setTile(null, staticTileComponent.x, staticTileComponent.y);
+
+                ItemEntity newItem = new ItemEntity(
+                    pc.physWorld,
+                    staticTileComponent.x * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
+                    staticTileComponent.y * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
+                    "stone_square",
+                    1,
+                    64
+                );
+                registry.addEntity(newItem);
+                
+                chunkUpdate = true;
+            } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
+                BaseTile.convertToDynamic(registry, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile);
+                chunkUpdate = true;
+            }
+        }
+    };
+
     // Private functions
     private void generateTiles(TerrainGenerator generator){
         for(int y = 0; y < Constants.CHUNK_SIZE; y++){
             for(int x = 0; x < Constants.CHUNK_SIZE; x++){
-                final @Null BaseTile tile = generator.getTile(x + chunkX * Constants.CHUNK_SIZE, y + chunkY * Constants.CHUNK_SIZE);
+                @Null BaseTile tile = generator.getTile(x + chunkX * Constants.CHUNK_SIZE, y + chunkY * Constants.CHUNK_SIZE);
+                setTile(tile, x, y);
 
-                if(tile != null){
-                    final StaticTileComponent staticTileComponent = tile.getComponent(StaticTileComponent.class);
-                    final ActorComponent actorComponent = tile.getComponent(ActorComponent.class);
-                    setTile(tile, x, y);
-
-                    actorComponent.addListener(new ClickListener(){
-                        @Override
-                        public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
-                            if(Gdx.input.isButtonPressed(Buttons.LEFT)){
-                                PlanetComponent pc = App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class);
-                                pc.chunkManager.setTile(null, staticTileComponent.x, staticTileComponent.y);
-
-                                ItemEntity newItem = new ItemEntity(
-                                    pc.physWorld,
-                                    staticTileComponent.x * Constants.TILE_SIZE,
-                                    staticTileComponent.y * Constants.TILE_SIZE,
-                                    "stone_square",
-                                    1,
-                                    64
-                                );
-                                App.instance.gameScene.registry.addEntity(newItem);
-                                
-                                chunkUpdate = true;
-                            } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
-                                BaseTile.convertToDynamic(registry, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile); //! TODO: Garbage code, fix it later
-                                chunkUpdate = true;
-                            }
-                        }
-                    });
-                }
+                if(tile != null)
+                    tile.setEventListener(defaultListener);
             }
         }
     }

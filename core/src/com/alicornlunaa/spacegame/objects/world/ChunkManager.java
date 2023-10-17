@@ -1,5 +1,6 @@
 package com.alicornlunaa.spacegame.objects.world;
 
+import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
@@ -29,6 +30,7 @@ public class ChunkManager extends Group {
     private Array<Chunk> visibleChunks = new Array<>(); // Chunks which are visually active
     private Array<Fixture> activeFixtures = new Array<>(); // Physics fixtures for the world hull
 
+    private PhysWorld world;
     private Body worldBody; // Physics body to hold static tiles
     private boolean tileUpdate = false; // If tile update is true, update the hull
 
@@ -187,6 +189,7 @@ public class ChunkManager extends Group {
     public ChunkManager(Registry registry, PhysWorld world, int width, int height, TerrainGenerator generator){
         this.setTransform(false);
         this.registry = registry;
+        this.world = world;
         this.generator = generator;
         chunks = new Chunk[width][height];
 
@@ -254,6 +257,11 @@ public class ChunkManager extends Group {
         // Get chunk coordinates for the player
         int loadDist = Constants.CHUNK_LOAD_DISTANCE;
         int viewDist = (int)(App.instance.camera.viewportWidth * App.instance.camera.zoom / Constants.TILE_SIZE / Constants.CHUNK_SIZE / 2 + 1);
+
+        // Skip if player isnt on the planet
+        if(App.instance.gameScene.player.getComponent(BodyComponent.class).world != world)
+            return;
+
         int plyChunkX = (int)(plyPos.x / Constants.CHUNK_SIZE / Constants.TILE_SIZE);
         int plyChunkY = (int)(plyPos.y / Constants.CHUNK_SIZE / Constants.TILE_SIZE);
         int containedX = Math.min(Math.max(plyChunkX, 0), chunks.length);
