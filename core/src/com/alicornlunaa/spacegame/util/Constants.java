@@ -31,6 +31,9 @@ public class Constants {
     public static final int CHUNK_SIZE = 16;
     public static final float TILE_SIZE = 0.2f;
 
+    // Item constants
+    public static final float ITEM_PICKUP_RANGE = 0.34f;
+
     // Debug constants
     public static boolean DEBUG = true;
 }

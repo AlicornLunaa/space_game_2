@@ -12,6 +12,7 @@ import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
+import com.alicornlunaa.spacegame.objects.ItemEntity;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.objects.ship.Ship;
@@ -80,6 +81,13 @@ public class GameplayScene extends BaseScene {
         // Celestial c6 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 400, 30000, 0.f));
         testPlanet = new Planet(simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
+        
+		player = new Player(universe.getUniversalWorld(), 500, 0);
+        player.addComponent(new GravityComponent(player));
+        // player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
+        App.instance.camera = player.getComponent(CameraComponent.class).camera;
+		registry.addEntity(player);
+        player.toggleNoclip();
 
         PlanetComponent pc = testPlanet.getComponent(PlanetComponent.class);
         BaseTile testDynamicTile = new BaseTile(pc.physWorld, "stone", 96, 26, 0);
@@ -93,13 +101,10 @@ public class GameplayScene extends BaseScene {
         registry.addEntity(testDynamicTile);
         pc.addToPlanetEntities(testDynamicTile);
         pc.chunkManager.addActor(testDynamicTile.getComponent(ActorComponent.class));
-        
-		player = new Player(universe.getUniversalWorld(), 500, 0);
-        player.addComponent(new GravityComponent(player));
-        // player.addComponent(new TrackedEntityComponent(Color.CYAN)).predictFuture = true;
-        App.instance.camera = player.getComponent(CameraComponent.class).camera;
-		registry.addEntity(player);
-        player.toggleNoclip();
+
+        ItemEntity testItemEntity = new ItemEntity(pc.physWorld, 94, 26, "stone_square", 1, 64);
+        registry.addEntity(testItemEntity);
+        pc.addToPlanetEntities(testItemEntity);
 
         ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
         ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
