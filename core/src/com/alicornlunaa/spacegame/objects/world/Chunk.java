@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
+import com.alicornlunaa.spacegame.objects.ItemEntity;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.Gdx;
@@ -51,6 +52,21 @@ public class Chunk extends Group {
                                 removeActor(actorComponent);
                                 tiles[staticTileComponent.x][staticTileComponent.y] = null;
                                 chunkUpdate = true;
+
+                                PlanetComponent pc = App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class);
+                                App.instance.gameScene.registry.removeEntity(tile);
+                                pc.delToPlanetEntities(tile);
+
+                                ItemEntity newItem = new ItemEntity(
+                                    pc.physWorld,
+                                    staticTileComponent.x * Constants.TILE_SIZE + getChunkX() * Constants.CHUNK_SIZE * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
+                                    staticTileComponent.y * Constants.TILE_SIZE + getChunkY() * Constants.CHUNK_SIZE * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
+                                    "stone_square",
+                                    1,
+                                    64
+                                );
+                                pc.addToPlanetEntities(newItem);
+                                App.instance.gameScene.registry.addEntity(newItem);
                             } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
                                 BaseTile.convertToDynamic(App.instance.gameScene.registry, Chunk.this, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile); //! TODO: Garbage code, fix it later
                                 chunkUpdate = true;
