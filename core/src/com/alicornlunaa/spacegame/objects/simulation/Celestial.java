@@ -36,7 +36,7 @@ public class Celestial extends BaseEntity {
 
         // Initialize components
         addComponent(new CelestialComponent(radius));
-        // addComponent(new GravityComponent(this));
+        addComponent(new GravityComponent(this));
         addComponent(new TrackedEntityComponent(Color.SKY)).predictFuture = false;
         addComponent(new CustomSpriteComponent() {
             private CelestialComponent celestialComponent = getComponent(CelestialComponent.class);

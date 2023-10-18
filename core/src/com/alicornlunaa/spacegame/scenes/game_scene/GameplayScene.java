@@ -11,7 +11,6 @@ import com.alicornlunaa.selene_engine.systems.ScriptSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
-import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.ItemEntity;
 import com.alicornlunaa.spacegame.objects.Player;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
@@ -81,6 +80,7 @@ public class GameplayScene extends BaseScene {
         // Celestial c6 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 400, 30000, 0.f));
         testPlanet = new Planet(registry, simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
+        newCelestial(new Planet(registry, simulation, universe.getUniversalWorld(), 2000, 0, 300, 400, 1.f));
         
 		player = new Player(universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));
@@ -105,7 +105,7 @@ public class GameplayScene extends BaseScene {
         registry.addEntity(testItemEntity);
 
         ship = new Ship(game, game.gameScene.universe.getUniversalWorld(), 100, 0, 0);
-        ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
+        // ship.addComponent(new TrackedEntityComponent(Color.CORAL)).predictFuture = true;
         ship.addComponent(new GravityComponent(ship));
         ship.load("./saves/ships/test.ship");
         registry.addEntity(ship);

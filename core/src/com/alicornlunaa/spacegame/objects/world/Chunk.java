@@ -49,7 +49,22 @@ public class Chunk extends Group {
                 
                 chunkUpdate = true;
             } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
-                BaseTile.convertToDynamic(registry, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile);
+                BaseTile newTile = BaseTile.convertToDynamic(registry, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), tile);
+                
+                newTile.setEventListener(new ClickListener(){
+                    @Override
+                    public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor){
+                        // Get variables
+                        BaseTile newBaseTile = ((BaseTile)((ActorComponent)event.getListenerActor()).getEntity());
+            
+                        // Inputs
+                        if(Gdx.input.isButtonPressed(Buttons.LEFT)){
+                            BaseTile.convertToStatic(registry, App.instance.gameScene.planetViewPanel.getPlanet().getComponent(PlanetComponent.class), newBaseTile);
+                            chunkUpdate = true;
+                        }
+                    }
+                });
+
                 chunkUpdate = true;
             }
         }

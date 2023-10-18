@@ -63,6 +63,33 @@ public class PlanetComponent extends ScriptComponent {
     }
 
     // Functions
+    public TransformComponent convertToGlobalTransform(IEntity e){
+        // Formula: x = theta, y = radius
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
+        BodyComponent entityBodyComponent = e.getComponent(BodyComponent.class);
+        TransformComponent convertedTransform = new TransformComponent();
+
+        if(entityBodyComponent == null || entityTransform == null) return convertedTransform;
+
+        // Convert orbital position to world
+        float theta = (float)((entityTransform.position.x / (chunkWidth * Constants.CHUNK_SIZE * Constants.TILE_SIZE)) * Math.PI * -2);
+        float radius = (entityTransform.position.y / chunkHeight / Constants.CHUNK_SIZE / Constants.TILE_SIZE) * atmosphereRadius;
+        float x = (float)(Math.cos(theta) * radius) + transform.position.x;
+        float y = (float)(Math.sin(theta) * radius) + transform.position.y;
+        convertedTransform.position.set(x, y);
+        convertedTransform.rotation = entityTransform.rotation + (theta - (float)Math.PI / 2);
+
+        return convertedTransform;
+    }
+
+    public Vector2 convertToLocalForce(Vector2 position, Vector2 force){
+        // Convert orbital velocity to world
+        Vector2 tangent = position.cpy().nor().rotateDeg(-90);
+        float velToPlanet = force.dot(position.cpy().nor());
+        float tangentVel = force.dot(tangent);
+        return new Vector2(tangentVel, -velToPlanet);
+    }
+
     public void addEntityWorld(IEntity e){
         // Formula: x = theta, y = radius
         TransformComponent entityTransform = e.getComponent(TransformComponent.class);

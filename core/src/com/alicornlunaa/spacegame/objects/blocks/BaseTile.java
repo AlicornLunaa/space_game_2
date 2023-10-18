@@ -136,17 +136,19 @@ public class BaseTile extends BaseEntity {
     public static BaseTile convertToStatic(Registry registry, PlanetComponent planetComponent, BaseTile tile){
         // Dynamic->Static function
         TransformComponent transform = tile.getComponent(TransformComponent.class);
+        BodyComponent bodyComponent = tile.getComponent(BodyComponent.class);
         DynamicTileComponent dynamicTileComponent = tile.getComponent(DynamicTileComponent.class);
         ActorComponent actorComponent = tile.getComponent(ActorComponent.class);
+
+        int tileX = (int)(transform.position.x / Constants.TILE_SIZE);
+        int tileY = (int)(transform.position.y / Constants.TILE_SIZE);
         
-        Group parent = actorComponent.getParent();
+        planetComponent.physWorld.getBox2DWorld().destroyBody(bodyComponent.body);
         actorComponent.remove();
         registry.removeEntity(tile);
 
-        BaseTile newTile = new BaseTile(dynamicTileComponent.tileID, (int)transform.position.x, (int)transform.position.y);
-        planetComponent.chunkManager.setTile(newTile, (int)transform.position.x, (int)transform.position.y);
-        parent.addActor(newTile.getComponent(ActorComponent.class));
-        registry.addEntity(newTile);
+        BaseTile newTile = new BaseTile(dynamicTileComponent.tileID, tileX, tileY);
+        planetComponent.chunkManager.setTile(newTile, tileX, tileY);
 
         return newTile;
     }
@@ -169,6 +171,7 @@ public class BaseTile extends BaseEntity {
         parent.addActor(newTile.getComponent(ActorComponent.class));
         registry.addEntity(newTile);
 
+        tile.dispose();
         return newTile;
     }
 }

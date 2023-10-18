@@ -46,7 +46,7 @@ public class PlanetPhysScript extends ScriptComponent {
         float heightNormalized = Math.max(entityBody.body.getPosition().y / planetComponent.chunkHeight / Constants.CHUNK_SIZE / Constants.TILE_SIZE, 1);
         float heightScaled = (float)Math.pow(heightNormalized * planetComponent.terrainRadius, 2);
         float force = Constants.GRAVITY_CONSTANT * ((planet.getComponent(BodyComponent.class).body.getMass() * entityBody.body.getMass()) / heightScaled);
-        entityBody.body.applyForceToCenter(0.0f, -force, true);
+        // entityBody.body.applyForceToCenter(0.0f, -force, true);
     }
 
     @Override
