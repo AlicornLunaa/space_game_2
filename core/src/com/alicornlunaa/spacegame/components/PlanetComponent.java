@@ -84,10 +84,11 @@ public class PlanetComponent extends ScriptComponent {
 
     public Vector2 convertToLocalForce(Vector2 position, Vector2 force){
         // Convert orbital velocity to world
-        Vector2 tangent = position.cpy().nor().rotateDeg(-90);
-        float velToPlanet = force.dot(position.cpy().nor());
-        float tangentVel = force.dot(tangent);
-        return new Vector2(tangentVel, -velToPlanet);
+        Vector2 toPlanetDirection = transform.position.cpy().sub(position).nor();
+        Vector2 tangentPlanetDirection = toPlanetDirection.cpy().rotateDeg(-90);
+        float velToPlanet = force.dot(toPlanetDirection);
+        float tangentVel = force.dot(tangentPlanetDirection);
+        return new Vector2(-tangentVel, -velToPlanet);
     }
 
     public void addEntityWorld(IEntity e){

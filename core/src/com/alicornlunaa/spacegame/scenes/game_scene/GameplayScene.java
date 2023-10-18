@@ -80,7 +80,7 @@ public class GameplayScene extends BaseScene {
         // Celestial c6 = newCelestial(new Celestial(simulation, universe.getUniversalWorld(), 400, 30000, 0.f));
         testPlanet = new Planet(registry, simulation, universe.getUniversalWorld(), 800, 0, 300, 400, 1.f);
         newCelestial(testPlanet);
-        newCelestial(new Planet(registry, simulation, universe.getUniversalWorld(), 2000, 0, 300, 400, 1.f));
+        newCelestial(new Planet(registry, simulation, universe.getUniversalWorld(), -1000, 0, 300, 400, 1.f));
         
 		player = new Player(universe.getUniversalWorld(), 500, 0);
         player.addComponent(new GravityComponent(player));
@@ -111,7 +111,6 @@ public class GameplayScene extends BaseScene {
         registry.addEntity(ship);
         // ship.drive(player);
         
-        // OrbitUtils.createOrbit(registry, c1);
         // OrbitUtils.createOrbit(registry, c2);
         // OrbitUtils.createOrbit(registry, c3);
         // OrbitUtils.createOrbit(registry, c4);

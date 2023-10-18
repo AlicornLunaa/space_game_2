@@ -64,11 +64,11 @@ public class GravitySystem implements ISystem {
                 // Calculate gravitational force
                 Vector2 direction = otherTransform.position.cpy().sub(spacePosition).nor();
                 Vector2 force = direction.scl(Constants.GRAVITY_CONSTANT * otherBodyComponent.body.getMass() * bodyComponent.body.getMass() / radiusSqr);
-                acceleration.add(normalizedDirection ? planetComponent.convertToLocalForce(spacePosition, force) : force);
+                acceleration.add(force);
             }
         }
 
-        return acceleration;
+        return normalizedDirection ? planetComponent.convertToLocalForce(spacePosition.cpy(), acceleration) : acceleration;
     }
 
     // Functions
