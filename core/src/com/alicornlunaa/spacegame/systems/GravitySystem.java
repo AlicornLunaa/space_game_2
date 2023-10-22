@@ -37,6 +37,7 @@ public class GravitySystem implements ISystem {
             planetComponent = ((PlanetaryPhysWorld)bodyComponent.world).getPlanet().getComponent(PlanetComponent.class);
             spacePosition.set(planetComponent.convertToGlobalTransform(entity).position);
             normalizedDirection = true;
+            return acceleration;
         }
 
         // Calculate gravity for everything
@@ -53,6 +54,9 @@ public class GravitySystem implements ISystem {
 
             // Only apply if they also have a gravity component
             if(otherGravity != null){
+                // More error guarding
+                if(!otherGravity.affectsOthers) continue;
+
                 // Get variables
                 float radiusSqr = spacePosition.dst2(otherTransform.position);
                 float soi = otherGravity.getSphereOfInfluence();
@@ -82,7 +86,7 @@ public class GravitySystem implements ISystem {
     public void update(IEntity entity) {
         // Update gravity for entity
         GravityComponent gravityComponent = entity.getComponent(GravityComponent.class);
-        gravityComponent.getBodyComponent().body.applyForceToCenter(calculateGravity(entity, gravityComponent), true);
+        gravityComponent.getBodyComponent().body.applyForceToCenter(calculateGravity(entity, gravityComponent), false);
     }
 
     @Override

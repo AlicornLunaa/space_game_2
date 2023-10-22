@@ -11,11 +11,19 @@ public class GravityComponent implements IComponent {
     // Variables
     private TransformComponent transform;
     private BodyComponent bodyComponent;
+    
+    public boolean affectsOthers = true;
 
     // Constructor
     public GravityComponent(IEntity entity) {
         transform = entity.getComponent(TransformComponent.class);
         bodyComponent = entity.getComponent(BodyComponent.class);
+    }
+
+    public GravityComponent(IEntity entity, boolean affectsOthers) {
+        transform = entity.getComponent(TransformComponent.class);
+        bodyComponent = entity.getComponent(BodyComponent.class);
+        this.affectsOthers = affectsOthers;
     }
 
     // Functions

@@ -15,6 +15,8 @@ import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.objects.world.TerrainGenerator;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
 import com.alicornlunaa.spacegame.util.Constants;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -24,7 +26,6 @@ public class PlanetComponent extends ScriptComponent {
     // Variables
     private TransformComponent transform = getEntity().getComponent(TransformComponent.class);
     private BodyComponent bodyComponent = getEntity().getComponent(BodyComponent.class);
-    private CelestialComponent celestialComponent = getEntity().getComponent(CelestialComponent.class);
     private ShaderComponent cartesianAtmosShader = getEntity().getComponents(ShaderComponent.class)[2];
 
     public int chunkWidth;
@@ -144,9 +145,9 @@ public class PlanetComponent extends ScriptComponent {
     public boolean checkEnterPlanet(IEntity e){
         // This function checks if the entity supplied
         // is within range to change its physics system to the planet's
-        TransformComponent transform = e.getComponent(TransformComponent.class);
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
 
-        if(transform.position.len() < celestialComponent.radius * 1.2f){
+        if(((entityTransform.position.cpy().sub(transform.position).len() / atmosphereRadius) * (chunkHeight * Constants.CHUNK_SIZE * Constants.TILE_SIZE)) < atmosphereRadius * 1.2f){
             // Move it into this world
             addEntityWorld(e);
             return true;
@@ -156,11 +157,11 @@ public class PlanetComponent extends ScriptComponent {
     }
 
     public boolean checkLeavePlanet(IEntity e){
-        // This function checks if the entity supplied
-        TransformComponent transform = e.getComponent(TransformComponent.class);
+        // This function checks if the entity supplied if its outside of the leaving radius
+        TransformComponent entityTransform = e.getComponent(TransformComponent.class);
 
         // is far enough to leave the planet's physics world
-        if(transform.position.y > celestialComponent.radius * 1.3f){
+        if((entityTransform.position.y / chunkHeight / Constants.CHUNK_SIZE / Constants.TILE_SIZE) * atmosphereRadius > atmosphereRadius * 1.3f){
             // Move it into this world
             entitiesLeavingPlanet.push(e);
             return true;
@@ -217,10 +218,16 @@ public class PlanetComponent extends ScriptComponent {
         starDirection.set(1, 0, 0);
         chunkManager.update();
 
+        //! TODO: DEBUG REMOVE THIS
+        if(Gdx.input.isKeyJustPressed(Keys.F9)){
+            chunkManager.reset();
+            chunkManager.update();
+        }
+
         // Remove entities in the world still
-        // while(entitiesLeavingPlanet.size() > 0){
-        //     delEntityWorld(entitiesLeavingPlanet.pop());
-        // }
+        while(entitiesLeavingPlanet.size() > 0){
+            delEntityWorld(entitiesLeavingPlanet.pop());
+        }
     }
 
     @Override

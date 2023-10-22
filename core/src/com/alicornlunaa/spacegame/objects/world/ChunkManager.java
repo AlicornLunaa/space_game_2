@@ -250,6 +250,30 @@ public class ChunkManager extends Group {
         chunks[x][y].chunkLoaded = false;
     }
 
+    public void reset(){
+        // Reset every chunk
+        while(loadedChunks.size > 0){
+            Chunk chunk = loadedChunks.pop();
+            int currentChunkX = chunk.getChunkX();
+            int currentChunkY = chunk.getChunkY();
+            unloadChunk(currentChunkX, currentChunkY);
+        }
+
+        while(visibleChunks.size > 0){
+            Chunk chunk = visibleChunks.pop();
+            chunk.setVisible(false);
+            removeActor(chunk);
+        }
+
+        while(activeFixtures.size > 0){
+            worldBody.destroyFixture(activeFixtures.pop());
+        }
+
+        // Remove all data from the world
+        chunks = new Chunk[chunks.length][chunks[0].length];
+        tileUpdate = true; // Minor tile change happened i guess
+    }
+
     public void update(){
         // Update based on the player's positioning and time active
         Vector2 plyPos = App.instance.gameScene.player.getCenter();

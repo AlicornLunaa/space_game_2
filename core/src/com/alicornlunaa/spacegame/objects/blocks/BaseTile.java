@@ -13,6 +13,7 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.tiles.DynamicTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
@@ -93,6 +94,7 @@ public class BaseTile extends BaseEntity {
 
         addComponent(new BoxColliderComponent(bodyComponent, Constants.TILE_SIZE / 2, Constants.TILE_SIZE / 2, 1.f));
         addComponent(new PlanetPhysScript(this));
+        // addComponent(new GravityComponent(this));
         addComponent(new ScriptComponent(this) {
             // Variables
             private TransformComponent transform = getEntity().getComponent(TransformComponent.class);

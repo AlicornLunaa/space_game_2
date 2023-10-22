@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
+import com.alicornlunaa.spacegame.components.tiles.TileComponent;
 import com.alicornlunaa.spacegame.objects.ItemEntity;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.util.Constants;
@@ -41,7 +42,7 @@ public class Chunk extends Group {
                     pc.physWorld,
                     staticTileComponent.x * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
                     staticTileComponent.y * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f,
-                    "stone_square",
+                    tile.getComponent(TileComponent.class).tileID + "_square",
                     1,
                     64
                 );
@@ -84,12 +85,16 @@ public class Chunk extends Group {
     }
 
     // Constructor
-    public Chunk(Registry registry, TerrainGenerator generator, int chunkX, int chunkY){
+    public Chunk(Registry registry, int chunkX, int chunkY){
         // Slight performance save
         this.setTransform(false);
         this.registry = registry;
         this.chunkX = chunkX;
         this.chunkY = chunkY;
+    }
+
+    public Chunk(Registry registry, TerrainGenerator generator, int chunkX, int chunkY){
+        this(registry, chunkX, chunkY);
         generateTiles(generator);
     }
 

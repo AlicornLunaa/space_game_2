@@ -22,13 +22,17 @@ public class TerrainGenerator {
     private PlanetComponent planetComponent;
     private OpenSimplexNoise noise;
 
-    private Pixmap biomeMap;
     private float tempFrequency = 40;
     private float tempAmplitude = 1;
     private float humidityFrequency = 80;
     private float humidityAmplitude = 1;
     private float heightFrequency = 120;
-    private float heightAmplitude = 1;
+    private float heightAmplitude = 0.3f;
+    private float caveFrequency1 = 0.018f;
+    private float caveFrequency2 = 0.08f;
+    private float caveFrequency3 = 0.021f;
+    
+    private Pixmap biomeMap;
 
     // Private functions
     private void generateBiomeMaps(){
@@ -66,6 +70,22 @@ public class TerrainGenerator {
         }
     }
 
+    private float getHeight(int x){
+        float guaranteeHeight = (planetComponent.chunkHeight * Constants.CHUNK_SIZE) * (1.f - heightAmplitude); // Used to push up height if not being used
+        return (float)(noise.eval(x / heightFrequency, 0.f) + 1) / 2.f * planetComponent.chunkHeight * Constants.CHUNK_SIZE * heightAmplitude + guaranteeHeight;
+    }
+
+    private boolean isCaveZone(int x, int y){
+        boolean caveZone = ((noise.eval(x * caveFrequency1, y * caveFrequency1) + 1) / 2.0) < 0.6;
+        boolean isCave = ((noise.eval(x * caveFrequency2, y * caveFrequency2) + 1) / 2.0) < 0.25;
+
+        float modulatedFrequency = (y > (int)getHeight(x)-9) ? caveFrequency3 / 4 : caveFrequency3;
+        float spindleVal = (float)noise.eval(x * modulatedFrequency, y * modulatedFrequency);
+        boolean spindleCave = (spindleVal < 0.1 && spindleVal > -0.1);
+
+        return (caveZone && isCave) || spindleCave;
+    }
+
     // Constructor
     public TerrainGenerator(PlanetComponent planetComponent){
         this.planetComponent = planetComponent;
@@ -81,30 +101,24 @@ public class TerrainGenerator {
     public @Null BaseTile getTile(int x, int y){
         // Starting values
         String type = "stone";
+        float height = getHeight(x);
 
         // Heightmapping
-        float heightNormalized = (float)y / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
-        float terrainColumnHeight = (float)(planetComponent.terrainRadius + 10 * noise.eval(x * 0.005f, 0));
-        if((heightNormalized * planetComponent.atmosphereRadius) > terrainColumnHeight){
+        if(y > height)
             return null;
-        }
-        
-        float estimationHeight = (float)(y + 8) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
-        if((estimationHeight * planetComponent.atmosphereRadius) > terrainColumnHeight){
+
+        // Surface generation
+        if(y > (int)(height - 7))
             type = "dirt";
-        }
-        
-        estimationHeight = (float)(y + 1) / planetComponent.chunkHeight / Constants.CHUNK_SIZE;
-        if((estimationHeight * planetComponent.atmosphereRadius) > terrainColumnHeight){
+
+        if(y == (int)height)
             type = "grass";
-        }
 
-        float caveFrequency = 0.11f;
-        float fuckFrequency = 0.7f;
-        if(((noise.eval(x * caveFrequency, y * caveFrequency) + 1) / 2.0) < 0.4 && ((noise.eval(x * fuckFrequency, y * fuckFrequency) + 1) / 2.0) < 0.95){
+        // Cave generation
+        if(isCaveZone(x, y))
             return null;
-        }
 
+        // Final output
         BaseTile tile = new BaseTile(type, x, y);
         return tile;
     }

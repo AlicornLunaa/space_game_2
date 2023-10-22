@@ -29,6 +29,7 @@ public class ItemEntity extends BaseEntity {
         addComponent(new AtlasTextureComponent("items/" + itemID));
         addComponent(new SpriteComponent(0.09f, 0.09f, AnchorPoint.CENTER));
         addComponent(new PlanetPhysScript(this));
+        // addComponent(new GravityComponent(this));
 
         // Pickup script, defined anonymously because nothing else will use it
         addComponent(new ScriptComponent(this) {

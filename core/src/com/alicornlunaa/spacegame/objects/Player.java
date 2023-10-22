@@ -11,6 +11,7 @@ import com.alicornlunaa.selene_engine.core.DriveableEntity;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.CustomSpriteComponent;
+import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.ControlSchema;
@@ -243,6 +244,7 @@ public class Player extends BaseEntity {
         });
         addComponent(new CameraComponent(1280, 720));
         addComponent(new PlanetPhysScript(this));
+        addComponent(new GravityComponent(this, false));
     }
 
     // Functions

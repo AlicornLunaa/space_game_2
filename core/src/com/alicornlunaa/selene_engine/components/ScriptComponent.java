@@ -1,19 +1,19 @@
 package com.alicornlunaa.selene_engine.components;
 
-import com.alicornlunaa.selene_engine.core.BaseEntity;
+import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.IComponent;
 
 public abstract class ScriptComponent implements IComponent {
     // Variables
-    private BaseEntity entity;
+    private IEntity entity;
 
     // Constructor
-    public ScriptComponent(BaseEntity entity){
+    public ScriptComponent(IEntity entity){
         this.entity = entity;
     }
 
     // Functions
-    protected BaseEntity getEntity(){ return entity; }
+    protected IEntity getEntity(){ return entity; }
 
     /** Only at the start */
     public abstract void start();
