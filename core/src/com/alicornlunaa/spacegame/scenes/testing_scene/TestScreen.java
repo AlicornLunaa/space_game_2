@@ -23,6 +23,8 @@ import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Sand;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Water;
 import com.alicornlunaa.spacegame.systems.GravitySystem;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.systems.TrackingSystem;
@@ -47,6 +49,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 @SuppressWarnings("unused")
 public class TestScreen implements Screen {
+    // Enums
+    enum BrushType { STONE, SAND, WATER };
+
     // Variables
     private InputMultiplexer inputs = new InputMultiplexer();
     private CellWorld world = new CellWorld(7, 7);
@@ -54,6 +59,7 @@ public class TestScreen implements Screen {
     private Batch batch = new SpriteBatch();
 
     private int brushSize = 1;
+    private BrushType brushType = BrushType.STONE;
 
     // Constructor
     public TestScreen(){
@@ -101,7 +107,7 @@ public class TestScreen implements Screen {
         
         Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
         mouse.set(App.instance.camera.unproject(mouse));
-        mouse.set((int)(mouse.x / Constants.TILE_SIZE) * Constants.TILE_SIZE, (int)(mouse.y / Constants.TILE_SIZE) * Constants.TILE_SIZE, 0.f);
+        mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
         
         batch.setProjectionMatrix(App.instance.camera.combined);
         batch.setTransformMatrix(new Matrix4());
@@ -115,17 +121,55 @@ public class TestScreen implements Screen {
 
         shapeRenderer.set(ShapeType.Line);
         shapeRenderer.setColor(Color.CYAN);
-        shapeRenderer.rect(mouse.x, mouse.y, Constants.TILE_SIZE * brushSize, Constants.TILE_SIZE * brushSize);
+        shapeRenderer.rect(mouse.x * Constants.TILE_SIZE, mouse.y * Constants.TILE_SIZE, Constants.TILE_SIZE * brushSize, Constants.TILE_SIZE * brushSize);
+
+        shapeRenderer.setColor(Color.RED);
+        for(int w = 0; w < world.width; w++){
+            for(int h = 0; h < world.height; h++){
+                shapeRenderer.rect(
+                    w * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
+                    h * Constants.CHUNK_SIZE * Constants.TILE_SIZE,
+                    Constants.CHUNK_SIZE * Constants.TILE_SIZE,
+                    Constants.CHUNK_SIZE * Constants.TILE_SIZE
+                );
+            }
+        }
 
         shapeRenderer.end();
 
         // Controls
-        if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
+        if(Gdx.input.isButtonPressed(Buttons.LEFT)){
             for(int i = (int)mouse.x; i < (int)(mouse.x + brushSize); i++){
                 for(int k = (int)mouse.y; k < (int)(mouse.y + brushSize); k++){
-                    world.setTile(i, k, new CellBase("stone"));
+                    CellBase cell;
+
+                    switch(brushType){
+                    case SAND:
+                        cell = new Sand(); break;
+
+                    case WATER:
+                        cell = new Water(); break;
+
+                    default:
+                        cell = new CellBase("stone"); break;
+                    }
+
+                    world.setTile(i, k, cell);
                 }
             }
+        }
+        
+        if(Gdx.input.isKeyPressed(Keys.SPACE)){
+            world.step();
+        }
+        if(Gdx.input.isKeyJustPressed(Keys.A)){
+            brushType = BrushType.STONE;
+        }
+        if(Gdx.input.isKeyJustPressed(Keys.S)){
+            brushType = BrushType.SAND;
+        }
+        if(Gdx.input.isKeyJustPressed(Keys.D)){
+            brushType = BrushType.WATER;
         }
     }
 
