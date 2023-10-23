@@ -27,6 +27,10 @@ public class CellWorld extends BaseEntity {
     }
 
     // Functions
+    public boolean inBounds(int x, int y){
+        return !(x < 0 || y < 0 || x >= Constants.CHUNK_SIZE * width || y >= Constants.CHUNK_SIZE * height);
+    }
+
     public void setTile(int x, int y, @Null CellBase tile){
         if(tile != null)
             tile.setPosition(x, y);
@@ -40,10 +44,15 @@ public class CellWorld extends BaseEntity {
     }
 
     public @Null CellBase getTile(int x, int y){
+        // Guard clauses
+        if(!inBounds(x, y)) return null;
+
+        // Get chunk the tile is in
         int chunkX = x / Constants.CHUNK_SIZE;
         int chunkY = y / Constants.CHUNK_SIZE;
         CellChunk chunk = chunks[chunkX][chunkY];
 
+        // Return tile
         if(chunk != null)
             return chunk.getTile(x, y);
 

@@ -15,9 +15,6 @@ public class CellBase {
     private Vector2 position = new Vector2(); // "Real" float position
     private Vector2 velocity = new Vector2(); // Velocity
 
-    // Private functions
-    
-
     // Constructor
     public CellBase(String textureName){
         texture = App.instance.atlas.findRegion("tiles/" + textureName);
@@ -39,8 +36,16 @@ public class CellBase {
         ix = (int)position.x; iy = (int)position.y;
     }
 
+    public Vector2 getPosition(){ return position; }
+
     public void setVelocity(float vx, float vy){
         velocity.set(vx, vy);
+    }
+
+    public Vector2 getVelocity(){ return velocity; }
+
+    public void applyForce(float vx, float vy){
+        velocity.add(vx, vy);
     }
 
     public void step(CellWorld world, Array<Action> changes){

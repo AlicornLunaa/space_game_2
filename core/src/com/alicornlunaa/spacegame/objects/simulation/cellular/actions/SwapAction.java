@@ -19,6 +19,9 @@ public class SwapAction extends Action {
     // Functions
     @Override
     public boolean commit(CellWorld world) {
+        if(!world.inBounds(toX, toY))
+            return false;
+            
         @Null CellBase otherCell = world.getTile(toX, toY);
         world.setTile(cell.getX(), cell.getY(), otherCell);
         world.setTile(toX, toY, cell);

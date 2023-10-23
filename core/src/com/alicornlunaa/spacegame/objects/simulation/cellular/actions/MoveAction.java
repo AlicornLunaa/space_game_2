@@ -18,6 +18,9 @@ public class MoveAction extends Action {
     // Functions
     @Override
     public boolean commit(CellWorld world) {
+        if(!world.inBounds(toX, toY))
+            return false;
+
         if(world.getTile(toX, toY) == null){
             world.setTile(cell.getX(), cell.getY(), null); // Remove old cell
             world.setTile(toX, toY, cell); // Read it to new position
