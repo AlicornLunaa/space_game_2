@@ -225,8 +225,10 @@ public class ChunkManager extends Group {
         int tileY = Math.floorMod(y, Constants.CHUNK_SIZE);
         Chunk chunk = chunks[chunkX][chunkY];
 
-        if(chunk != null)
+        if(chunk != null){
+            chunk.chunkUpdate = true;
             return chunk.setTile(tile, tileX, tileY);
+        }
 
         return false;
     }
@@ -304,6 +306,7 @@ public class ChunkManager extends Group {
                 i--;
             }
 
+            // Update chunks
             if(chunk.chunkUpdate){
                 chunk.chunkUpdate = false;
                 tileUpdate = true;

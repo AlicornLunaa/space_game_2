@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
+import com.alicornlunaa.spacegame.objects.blocks.WaterTile;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.OpenSimplexNoise;
 import com.badlogic.gdx.graphics.Color;
@@ -103,6 +104,10 @@ public class TerrainGenerator {
         String type = "stone";
         float height = getHeight(x);
 
+        // Temp debug
+        if(x == 495 && y == 124)
+            return new WaterTile("water", x, y);
+
         // Heightmapping
         if(y > height)
             return null;
@@ -118,8 +123,12 @@ public class TerrainGenerator {
         if(isCaveZone(x, y))
             return null;
 
-        // Final output
-        BaseTile tile = new BaseTile(type, x, y);
-        return tile;
+        // Typing system
+        switch(type){
+            case "water":
+                return new BaseTile(type, x, y);
+            default:
+                return new BaseTile(type, x, y);
+        }
     }
 }

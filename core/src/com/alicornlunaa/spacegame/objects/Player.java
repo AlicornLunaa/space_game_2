@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.alicornlunaa.selene_engine.components.BodyComponent;
 import com.alicornlunaa.selene_engine.components.CameraComponent;
 import com.alicornlunaa.selene_engine.components.ScriptComponent;
+import com.alicornlunaa.selene_engine.components.ShapeDrawableComponent;
 import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.core.DriveableEntity;
@@ -19,9 +20,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -240,6 +244,17 @@ public class Player extends BaseEntity {
                     1, 1,
                     0
                 );
+            }
+        });
+        addComponent(new ShapeDrawableComponent(this) {
+            @Override
+            public void draw(ShapeRenderer renderer) {
+                Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
+                mouse.set(App.instance.camera.unproject(mouse));
+                mouse.set((int)(mouse.x / Constants.TILE_SIZE) * Constants.TILE_SIZE, (int)(mouse.y / Constants.TILE_SIZE) * Constants.TILE_SIZE, 0.f);
+                
+                renderer.set(ShapeType.Line);
+                renderer.rect(mouse.x, mouse.y, Constants.TILE_SIZE, Constants.TILE_SIZE);
             }
         });
         addComponent(new CameraComponent(1280, 720));

@@ -8,6 +8,7 @@ import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.selene_engine.systems.CameraSystem;
 import com.alicornlunaa.selene_engine.systems.PhysicsSystem;
 import com.alicornlunaa.selene_engine.systems.ScriptSystem;
+import com.alicornlunaa.selene_engine.systems.ShapeRenderSystem;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
@@ -143,6 +144,7 @@ public class GameplayScene extends BaseScene {
         spaceRenderSystem = registry.registerSystem(new SpaceRenderSystem());
         planetRenderSystem = registry.registerSystem(new PlanetRenderSystem());
         trackingSystem = registry.registerSystem(new TrackingSystem(registry));
+        registry.registerSystem(new ShapeRenderSystem());
         registry.registerSystem(new GravitySystem(registry));
         registry.registerSystem(new ScriptSystem());
     }

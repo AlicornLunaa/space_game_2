@@ -13,11 +13,11 @@ import com.alicornlunaa.selene_engine.components.TransformComponent;
 import com.alicornlunaa.selene_engine.core.BaseEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
-import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetComponent;
 import com.alicornlunaa.spacegame.components.tiles.DynamicTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.StaticTileComponent;
 import com.alicornlunaa.spacegame.components.tiles.TileComponent;
+import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.scripts.PlanetPhysScript;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -133,6 +133,8 @@ public class BaseTile extends BaseEntity {
             actorComponent.addListener(newEventListener);
         }
     }
+
+    public void step(ChunkManager chunkManager){}
 
     // Static constructors
     public static BaseTile convertToStatic(Registry registry, PlanetComponent planetComponent, BaseTile tile){

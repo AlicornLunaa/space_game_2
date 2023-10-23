@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
  * This will of course simulate a spherical planet.
  */
 public class PlanetScene implements Screen {
-
     // Variables
     final App game;
 
@@ -87,5 +86,4 @@ public class PlanetScene implements Screen {
         uiPanel.dispose();
         uiShip.dispose();
     }
-    
 }

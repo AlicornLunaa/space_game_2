@@ -107,7 +107,7 @@ public class PlanetPanel extends Stage {
         cartesianAtmosShader.program.setUniformf("u_starDirection", planetComponent.starDirection);
         cartesianAtmosShader.program.setUniformf("u_planetRadius", planetComponent.chunkHeight * Constants.CHUNK_SIZE * Constants.TILE_SIZE);
         cartesianAtmosShader.program.setUniformf("u_planetCircumference", planetComponent.chunkWidth * Constants.CHUNK_SIZE * Constants.TILE_SIZE);
-        cartesianAtmosShader.program.setUniformf("u_atmosRadius", planetComponent.atmosphereRadius);
+        cartesianAtmosShader.program.setUniformf("u_atmosRadius", planetComponent.atmosphereRadius / (planetComponent.terrainRadius / planetComponent.chunkHeight / Constants.CHUNK_SIZE / Constants.TILE_SIZE));
         cartesianAtmosShader.program.setUniformf("u_atmosColor", planetComponent.getAtmosphereColor());
         batch.draw(texture, 0, 0, 1280, 720);
         batch.setShader(null);
