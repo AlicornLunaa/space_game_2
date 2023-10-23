@@ -21,6 +21,8 @@ import com.alicornlunaa.spacegame.components.GravityComponent;
 import com.alicornlunaa.spacegame.components.PlanetSprite;
 import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.systems.GravitySystem;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.systems.TrackingSystem;
@@ -29,242 +31,58 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 @SuppressWarnings("unused")
 public class TestScreen implements Screen {
-    // Static classes
-    static private class TestEntity extends BaseEntity {
-        public TestEntity(float x, float y){
-            getComponent(TransformComponent.class).position.set(x, y);
-        }
-    };
-
-    static private class PlanetEntity extends BaseEntity {
-        public PlanetEntity(Registry registry, PhysWorld world, float x, float y, float density, float planetRadius, float atmosRadius, Color color){
-            BodyDef def = new BodyDef();
-            def.type = BodyType.DynamicBody;
-
-            getComponent(TransformComponent.class).position.set(x, y);
-            addComponent(new BodyComponent(world, def));
-            addComponent(new CircleColliderComponent(this.getComponent(BodyComponent.class), planetRadius, density));
-            addComponent(new GravityComponent(this));
-            addComponent(new TrackedEntityComponent(color));
-            addComponent(new CameraComponent(1280, 720)).active = false;
-            addComponent(new ShaderComponent(App.instance.manager, "shaders/atmosphere"));
-            addComponent(new ShaderComponent(App.instance.manager, "shaders/planet"));
-            addComponent(new PlanetSprite(this, planetRadius, atmosRadius, color));
-        }
-    };
-
     // Variables
-    private Registry registry;
-    private PhysicsSystem simulation;
-    private PhysWorld world;
-
-    private Universe universe;
     private InputMultiplexer inputs = new InputMultiplexer();
-    private float totalEnergy = 0.0f;
+    private CellWorld world = new CellWorld(7, 7);
+    private ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private Batch batch = new SpriteBatch();
 
-    // Private functions
-    private float orbitVelocity(IEntity parent, IEntity entity){
-        TransformComponent trans1 = parent.getComponent(TransformComponent.class);
-        TransformComponent trans2 = entity.getComponent(TransformComponent.class);
-        BodyComponent bc = parent.getComponent(BodyComponent.class);
-
-        float radius = trans1.position.dst(trans2.position);
-        return (float)Math.sqrt(Constants.GRAVITY_CONSTANT * bc.body.getMass() / radius);
-    }
-    
-    private float energy(IEntity entity){
-        TransformComponent transform = entity.getComponent(TransformComponent.class);
-        BodyComponent bodyComponent = entity.getComponent(BodyComponent.class);
-
-        float kineticEnergy = (1.f / 2.f) * (bodyComponent.body.getMass() * bodyComponent.body.getLinearVelocity().len2());
-        float potentialEnergy = 0.f;
-
-        for(int i = 0; i < registry.getEntities().size; i++){
-            // Calculate gravity for every n-body
-            IEntity otherEntity = registry.getEntity(i);
-
-            if(otherEntity == entity) continue; // Prevent infinite forces
-
-            TransformComponent otherTransform = otherEntity.getComponent(TransformComponent.class);
-            BodyComponent otherBodyComponent = otherEntity.getComponent(BodyComponent.class);
-            GravityComponent otherGravity = otherEntity.getComponent(GravityComponent.class);
-
-            // Only apply if they also have a gravity component
-            if(otherGravity != null){
-                // Get variables
-                float radius = transform.position.dst(otherTransform.position);
-                float soi = otherGravity.getSphereOfInfluence();
-                
-                // Prevent insignificant forces
-                if(radius > soi)
-                    continue;
-
-                // Calculate gravitational force
-                potentialEnergy += (Constants.GRAVITY_CONSTANT * otherBodyComponent.body.getMass() * bodyComponent.body.getMass() * -1) / radius;
-            }
-        }
-
-        return kineticEnergy + potentialEnergy;
-    }
+    private int brushSize = 1;
 
     // Constructor
     public TestScreen(){
-        registry = new Registry();
-        registry.registerSystem(new CameraSystem(App.instance));
-        simulation = registry.registerSystem(new PhysicsSystem());
-        registry.registerSystem(new RenderSystem(App.instance));
-        registry.registerSystem(new SpaceRenderSystem());
-        registry.registerSystem(new ShapeRenderSystem());
-        final TrackingSystem trackingSystem = registry.registerSystem(new TrackingSystem(registry));
-        registry.registerSystem(new GravitySystem(registry));
-        registry.registerSystem(new ScriptSystem());
+        float width = 1280 / Constants.PPM;
+        float height = 720 / Constants.PPM;
+        App.instance.camera = new OrthographicCamera(width, height);
+        App.instance.camera.position.set(width / 2.f, height / 2.f, 0);
+        App.instance.camera.update();
 
-        universe = new Universe(registry);
-        world = new PhysWorld(128);
-        simulation.addWorld(world);
-
-        BodyDef def = new BodyDef();
-        def.type = BodyType.DynamicBody;
-
-        BaseEntity cameraEntity = new BaseEntity();
-        registry.addEntity(cameraEntity);
-
-        final PlanetEntity ent1 = new PlanetEntity(registry, world, 0, 0, 10, 400, 0, Color.RED);
-        registry.addEntity(ent1);
-
-        PlanetEntity ent2 = new PlanetEntity(registry, world, 1900, 0, 12, 80, 50, Color.PINK);
-        ent2.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent2));
-        registry.addEntity(ent2);
-
-        PlanetEntity ent3 = new PlanetEntity(registry, world, 2100, 0, 10, 10, 30, Color.CYAN);
-        ent3.getComponent(TrackedEntityComponent.class).predictFuture = true;
-        ent3.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent3) + orbitVelocity(ent2, ent3));
-        ent3.addComponent(new ScriptComponent(ent3) {
-            private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
-
-            @Override
-            public void start() {}
-
-            @Override
-            public void update() {
-                if(Gdx.input.isKeyPressed(Keys.I)){
-                    bc.body.applyLinearImpulse(0, 4.955f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.K)){
-                    bc.body.applyLinearImpulse(0, -4.955f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.J)){
-                    bc.body.applyLinearImpulse(-4.955f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.L)){
-                    bc.body.applyLinearImpulse(4.955f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-            }
-
-            @Override
-            public void render() {
-            }
-        });
-        registry.addEntity(ent3);
-
-        PlanetEntity ent4 = new PlanetEntity(registry, world, 750, 0, 4, 10, 14, Color.LIME);
-        ent4.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent4));
-        registry.addEntity(ent4);
-
-        PlanetEntity ent5 = new PlanetEntity(registry, world, 3300, 0, 90, 10, 50, Color.YELLOW);
-        ent5.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, ent5));
-        registry.addEntity(ent5);
-        
-        TestEntity player = new TestEntity(400, 0);
-        player.addComponent(new SpriteComponent(1, 1));
-        player.addComponent(new BodyComponent(world, def));
-        player.addComponent(new CircleColliderComponent(player.getComponent(BodyComponent.class), 0.5f, 0.01f));
-        player.addComponent(new GravityComponent(player));
-        player.addComponent(new TrackedEntityComponent(Color.LIME)).predictFuture = true;
-        player.addComponent(new ScriptComponent(player) {
-            private TransformComponent trans = getEntity().getComponent(TransformComponent.class);
-            private BodyComponent bc = getEntity().getComponent(BodyComponent.class);
-
-            @Override
-            public void start() {}
-
-            @Override
-            public void update() {
-                if(Gdx.input.isKeyPressed(Keys.W)){
-                    bc.body.applyLinearImpulse(0, 0.00155f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.S)){
-                    bc.body.applyLinearImpulse(0, -0.00155f, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.A)){
-                    bc.body.applyLinearImpulse(-0.00155f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-                if(Gdx.input.isKeyPressed(Keys.D)){
-                    bc.body.applyLinearImpulse(0.00155f, 0, bc.body.getWorldCenter().x, bc.body.getWorldCenter().y, true);
-                }
-
-                // Vector2 offset = trans.position.cpy();
-                // if(trans.position.len() > 1500){
-                //     for(int i = 0; i < registry.getEntities().size; i++){
-                //         IEntity otherEntity = registry.getEntity(i);
-                //         TransformComponent otherTrans = otherEntity.getComponent(TransformComponent.class);
-                //         otherTrans.position.sub(offset);
-                //     }
-                // }
-            }
-
-            @Override
-            public void render() {
-                System.out.println(bc.body.getLinearVelocity());
-            }
-        });
-        player.getComponent(BodyComponent.class).body.setLinearVelocity(0, orbitVelocity(ent1, player));
-        player.addComponent(new CameraComponent(1280, 720)).active = false;
-        registry.addEntity(player);
-
-        trackingSystem.setReferenceEntity(cameraEntity);
-        cameraEntity.addComponent(new CameraComponent(1280, 720));
-        
-        final IEntity[] focusableEntities = { cameraEntity, ent1, player, ent2, ent3, ent4, ent5 };
+        shapeRenderer.setAutoShapeType(true);
 
         inputs.addProcessor(new InputAdapter(){
-            int index = 0;
-
             @Override
             public boolean keyTyped(char character) {
-                if(character == 'r'){
-                    focusableEntities[index].getComponent(CameraComponent.class).active = false;
-                    index = Math.floorMod(index + 1, focusableEntities.length);
-                    focusableEntities[index].getComponent(CameraComponent.class).active = true;
-                    trackingSystem.setReferenceEntity(focusableEntities[index]);
-                    return true;
-                } else if(character == 'e'){
-                    focusableEntities[index].getComponent(CameraComponent.class).active = false;
-                    index = Math.floorMod(index - 1, focusableEntities.length);
-                    focusableEntities[index].getComponent(CameraComponent.class).active = true;
-                    trackingSystem.setReferenceEntity(focusableEntities[index]);
-                    return true;
-                } else if(character == 'v'){
-                    App.instance.manager.reload();
-                    return true;
-                }
+                if(character == 'r'){}
 
                 return false;
             }
 
             @Override
             public boolean scrolled(float amountX, float amountY){
-                if(App.instance.camera == null) return false;
-                float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * App.instance.camera.zoom * amountY;
-                App.instance.camera.zoom = Math.min(Math.max(App.instance.camera.zoom + speed, 0.01f), 300000.0f);
+                if(Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)){
+                    if(App.instance.camera == null) return false;
+                    float speed = Constants.MAP_VIEW_ZOOM_SENSITIVITY * App.instance.camera.zoom * amountY;
+                    App.instance.camera.zoom = Math.min(Math.max(App.instance.camera.zoom + speed, 0.01f), 300000.0f);
+                    return true;
+                }
+
+                brushSize = Math.min(Math.max(brushSize - (int)Math.signum(amountY), 1), 20);
                 return true;
             }
         });
@@ -273,18 +91,42 @@ public class TestScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.02f, 0.02f, 0.02f, 1);
+        
+        App.instance.camera.position.set(
+            world.width * Constants.CHUNK_SIZE * Constants.TILE_SIZE / 2.f,
+            world.height * Constants.CHUNK_SIZE * Constants.TILE_SIZE / 2.f,
+            0
+        );
+        App.instance.camera.update();
+        
+        Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
+        mouse.set(App.instance.camera.unproject(mouse));
+        mouse.set((int)(mouse.x / Constants.TILE_SIZE) * Constants.TILE_SIZE, (int)(mouse.y / Constants.TILE_SIZE) * Constants.TILE_SIZE, 0.f);
+        
+        batch.setProjectionMatrix(App.instance.camera.combined);
+        batch.setTransformMatrix(new Matrix4());
+        batch.begin();
+        world.draw(batch);
+        batch.end();
 
-        totalEnergy = 0;
-        for(IEntity entity : registry.getEntities()){
-            if(!entity.hasComponents(GravityComponent.class, BodyComponent.class)) continue;
-            totalEnergy += energy(entity);
+        shapeRenderer.setProjectionMatrix(App.instance.camera.combined);
+        shapeRenderer.setTransformMatrix(new Matrix4());
+        shapeRenderer.begin();
+
+        shapeRenderer.set(ShapeType.Line);
+        shapeRenderer.setColor(Color.CYAN);
+        shapeRenderer.rect(mouse.x, mouse.y, Constants.TILE_SIZE * brushSize, Constants.TILE_SIZE * brushSize);
+
+        shapeRenderer.end();
+
+        // Controls
+        if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
+            for(int i = (int)mouse.x; i < (int)(mouse.x + brushSize); i++){
+                for(int k = (int)mouse.y; k < (int)(mouse.y + brushSize); k++){
+                    world.setTile(i, k, new CellBase("stone"));
+                }
+            }
         }
-        // System.out.println(totalEnergy);
-
-        registry.update(delta);
-        registry.render();
-
-        App.instance.debug.render(world.getBox2DWorld(), App.instance.camera.combined);
     }
 
     @Override

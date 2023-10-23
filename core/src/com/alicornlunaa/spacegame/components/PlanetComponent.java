@@ -12,6 +12,7 @@ import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
 import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.objects.world.TerrainGenerator;
 import com.alicornlunaa.spacegame.phys.PlanetaryPhysWorld;
@@ -38,6 +39,7 @@ public class PlanetComponent extends ScriptComponent {
     public Vector3 starDirection = new Vector3(1.f, 0.f, 0.f);
     public PhysWorld physWorld;
     public ChunkManager chunkManager;
+    public CellWorld cellWorld;
     
     private TerrainGenerator generator;
     private Array<Color> atmosComposition = new Array<>();
@@ -62,6 +64,7 @@ public class PlanetComponent extends ScriptComponent {
         
         physWorld = App.instance.gameScene.simulation.addWorld(new PlanetaryPhysWorld((Planet)getEntity(), Constants.PPM));
         chunkManager = new ChunkManager(registry, physWorld, chunkWidth, chunkHeight, generator);
+        cellWorld = new CellWorld(7, 7);
     }
 
     // Functions
@@ -217,7 +220,7 @@ public class PlanetComponent extends ScriptComponent {
     public void update() {
         // starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
         starDirection.set(1, 0, 0);
-        chunkManager.update();
+        // chunkManager.update();
 
         //! TODO: DEBUG REMOVE THIS
         if(Gdx.input.isKeyJustPressed(Keys.F9)){
@@ -229,12 +232,12 @@ public class PlanetComponent extends ScriptComponent {
             Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
             mouse.set(App.instance.camera.unproject(mouse));
             mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
-            chunkManager.setTile(new BaseTile("dirt", (int)mouse.x, (int)mouse.y), (int)mouse.x, (int)mouse.y);
-        } else if(Gdx.input.isKeyPressed(Keys.F)){
+            // cellWorld.setTile((int)mouse.x, (int)mouse.y, new BaseTile("dirt", (int)mouse.x, (int)mouse.y));
+        } else if(Gdx.input.isKeyPressed(Keys.V)){
             Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
             mouse.set(App.instance.camera.unproject(mouse));
             mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
-            chunkManager.setTile(null, (int)mouse.x, (int)mouse.y);
+            // cellWorld.setTile((int)mouse.x, (int)mouse.y, null);
         }
 
         // Remove entities in the world still
