@@ -10,6 +10,7 @@ import com.alicornlunaa.selene_engine.core.IEntity;
 import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.spacegame.objects.blocks.BaseTile;
 import com.alicornlunaa.spacegame.objects.simulation.Planet;
 import com.alicornlunaa.spacegame.objects.world.ChunkManager;
 import com.alicornlunaa.spacegame.objects.world.TerrainGenerator;
@@ -222,6 +223,18 @@ public class PlanetComponent extends ScriptComponent {
         if(Gdx.input.isKeyJustPressed(Keys.F9)){
             chunkManager.reset();
             chunkManager.update();
+        }
+
+        if(Gdx.input.isKeyPressed(Keys.C)){
+            Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
+            mouse.set(App.instance.camera.unproject(mouse));
+            mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
+            chunkManager.setTile(new BaseTile("dirt", (int)mouse.x, (int)mouse.y), (int)mouse.x, (int)mouse.y);
+        } else if(Gdx.input.isKeyPressed(Keys.F)){
+            Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
+            mouse.set(App.instance.camera.unproject(mouse));
+            mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
+            chunkManager.setTile(null, (int)mouse.x, (int)mouse.y);
         }
 
         // Remove entities in the world still
