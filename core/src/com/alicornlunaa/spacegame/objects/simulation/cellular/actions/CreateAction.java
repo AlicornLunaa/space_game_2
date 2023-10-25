@@ -3,14 +3,14 @@ package com.alicornlunaa.spacegame.objects.simulation.cellular.actions;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 
-public class DupeAction<T extends CellBase> extends Action {
+public class CreateAction<T extends CellBase> extends Action {
     // Variables
     private T newCell;
     private int toX, toY;
 
     // Constructor
     @SuppressWarnings("unchecked")
-    public DupeAction(int toX, int toY, Class<? extends CellBase> type, Object... args){
+    public CreateAction(int toX, int toY, Class<? extends CellBase> type, Object... args){
         try {
             this.newCell = (T)type.getDeclaredConstructors()[0].newInstance(args);
         } catch(Exception e){

@@ -40,8 +40,6 @@ public class CellChunk {
             if(tiles[i] != null)
                 tiles[i].step(world, changes);
         }
-
-        commitActions(world);
     }
 
     public void commitActions(CellWorld world){

@@ -51,6 +51,7 @@ public class PhysicsCell extends CellBase {
         getPosition().set(projectedPosition);
 
         // Gravity
-        applyForce(0, -0.001f);
+        if(world.getTile(getX(), getY() - 1) == null)
+            applyForce(0, -0.001f);
     }
 }

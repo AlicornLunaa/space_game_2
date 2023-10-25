@@ -24,47 +24,55 @@ public class Sand extends CellBase {
         Array<Vector2i> positions;
         int randOrder = (Math.random() > 0.5) ? 1 : -1;
 
+        if(world.getTile(getX(), getY() - 1) == null){
+            changes.add(new MoveAction(this, getX(), getY() - 1));
+        } else if(world.getTile(getX() + randOrder, getY() - 1) == null){
+            changes.add(new MoveAction(this, getX() + randOrder, getY() - 1));
+        } else if(world.getTile(getX() - randOrder, getY() - 1) == null){
+            changes.add(new MoveAction(this, getX() - randOrder, getY() - 1));
+        }
+
         // Gravity movement
-        positions = getLine(getX(), getY(), getX(), getY() - DEPTH_RATE);
-        for(Vector2i possiblePosition : positions){
-            if(world.getTile(possiblePosition.x, possiblePosition.y) != null)
-                break;
+        // positions = getLine(getX(), getY(), getX(), getY() - DEPTH_RATE);
+        // for(Vector2i possiblePosition : positions){
+        //     if(world.getTile(possiblePosition.x, possiblePosition.y) != null)
+        //         break;
 
-            validTarget = possiblePosition;
-        }
-        if(validTarget != null){
-            // Swap positions to the last valid target position
-            changes.add(new MoveAction(this, validTarget.x, validTarget.y));
-            return;
-        }
+        //     validTarget = possiblePosition;
+        // }
+        // if(validTarget != null){
+        //     // Swap positions to the last valid target position
+        //     changes.add(new MoveAction(this, validTarget.x, validTarget.y));
+        //     return;
+        // }
 
-        // Sand movement
-        validTarget = null;
-        positions = getLine(getX() - randOrder, getY() - 1, getX() - randOrder, getY() - SPREAD_RATE);
-        for(Vector2i possiblePosition : positions){
-            if(world.getTile(possiblePosition.x, possiblePosition.y) != null)
-                break;
+        // // Sand movement
+        // validTarget = null;
+        // positions = getLine(getX() - randOrder, getY() - 1, getX() - randOrder, getY() - SPREAD_RATE);
+        // for(Vector2i possiblePosition : positions){
+        //     if(world.getTile(possiblePosition.x, possiblePosition.y) != null)
+        //         break;
 
-            validTarget = possiblePosition;
-        }
-        if(validTarget != null){
-            // Swap positions to the last valid target position
-            changes.add(new MoveAction(this, validTarget.x, validTarget.y));
-            return;
-        }
+        //     validTarget = possiblePosition;
+        // }
+        // if(validTarget != null){
+        //     // Swap positions to the last valid target position
+        //     changes.add(new MoveAction(this, validTarget.x, validTarget.y));
+        //     return;
+        // }
 
-        validTarget = null;
-        positions = getLine(getX() + randOrder, getY() - 1, getX() + randOrder, getY() - SPREAD_RATE);
-        for(Vector2i possiblePosition : positions){
-            if(world.getTile(possiblePosition.x, possiblePosition.y) != null)
-                break;
+        // validTarget = null;
+        // positions = getLine(getX() + randOrder, getY() - 1, getX() + randOrder, getY() - SPREAD_RATE);
+        // for(Vector2i possiblePosition : positions){
+        //     if(world.getTile(possiblePosition.x, possiblePosition.y) != null)
+        //         break;
 
-            validTarget = possiblePosition;
-        }
-        if(validTarget != null){
-            // Swap positions to the last valid target position
-            changes.add(new MoveAction(this, validTarget.x, validTarget.y));
-            return;
-        }
+        //     validTarget = possiblePosition;
+        // }
+        // if(validTarget != null){
+        //     // Swap positions to the last valid target position
+        //     changes.add(new MoveAction(this, validTarget.x, validTarget.y));
+        //     return;
+        // }
     }
 }

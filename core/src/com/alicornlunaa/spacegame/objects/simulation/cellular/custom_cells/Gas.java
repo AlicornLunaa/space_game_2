@@ -3,7 +3,7 @@ package com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.Action;
-import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.DupeAction;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.CreateAction;
 import com.alicornlunaa.spacegame.util.Vector2i;
 import com.badlogic.gdx.utils.Array;
 
@@ -37,7 +37,7 @@ public class Gas extends CellBase {
 
             if(cell == null){
                 // Create new gas
-                DupeAction<Gas> action = new DupeAction<>(getX() + v.x, getY() + v.y, Gas.class);
+                CreateAction<Gas> action = new CreateAction<>(getX() + v.x, getY() + v.y, Gas.class);
                 action.getCell().density = 0;
                 changes.add(action);
             } else if(cell instanceof Gas){

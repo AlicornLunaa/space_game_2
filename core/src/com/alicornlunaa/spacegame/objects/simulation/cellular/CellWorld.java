@@ -13,16 +13,22 @@ public class CellWorld extends BaseEntity {
     public final int width;
     public final int height;
     private CellChunk[][] chunks;
+    private boolean[][] updateMap;
 
     // Constructor
     public CellWorld(int width, int height){
         chunks = new CellChunk[width][height];
+        updateMap = new boolean[width * Constants.CHUNK_SIZE][height * Constants.CHUNK_SIZE];
 
         this.width = width;
         this.height = height;
 
         for(int y = 0; y < height; y++) for(int x = 0; x < width; x++){
             chunks[x][y] = new CellChunk(x, y);
+        }
+
+        for(int y = 0; y < height * Constants.CHUNK_SIZE; y++) for(int x = 0; x < width * Constants.CHUNK_SIZE; x++){
+            updateMap[x][y] = false;
         }
     }
 
@@ -59,11 +65,32 @@ public class CellWorld extends BaseEntity {
         return null;
     }
 
+    public void setVisited(int x, int y){
+        updateMap[x][y] = true;
+    }
+
+    public boolean getVisited(int x, int y){
+        return updateMap[x][y];
+    }
+
+    public void resetMap(){
+        for(int y = 0; y < height * Constants.CHUNK_SIZE; y++) for(int x = 0; x < width * Constants.CHUNK_SIZE; x++){
+            updateMap[x][y] = false;
+        }
+    }
+
     public void step(){
         for(CellChunk[] chunkColumn : chunks) for(CellChunk chunk : chunkColumn){
             if(chunk == null) continue;
             chunk.step(this);
         }
+
+        for(CellChunk[] chunkColumn : chunks) for(CellChunk chunk : chunkColumn){
+            if(chunk == null) continue;
+            chunk.commitActions(this);
+        }
+
+        resetMap();
     }
 
     public void draw(Batch batch){
