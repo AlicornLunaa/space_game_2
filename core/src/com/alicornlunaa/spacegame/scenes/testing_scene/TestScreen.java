@@ -23,6 +23,7 @@ import com.alicornlunaa.spacegame.components.TrackedEntityComponent;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Gas;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Sand;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Water;
 import com.alicornlunaa.spacegame.systems.GravitySystem;
@@ -50,11 +51,11 @@ import com.badlogic.gdx.utils.ScreenUtils;
 @SuppressWarnings("unused")
 public class TestScreen implements Screen {
     // Enums
-    enum BrushType { STONE, SAND, WATER };
+    enum BrushType { STONE, SAND, WATER, GAS };
 
     // Variables
     private InputMultiplexer inputs = new InputMultiplexer();
-    private CellWorld world = new CellWorld(7, 7);
+    private CellWorld world = new CellWorld(70, 70);
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
     private Batch batch = new SpriteBatch();
 
@@ -88,7 +89,7 @@ public class TestScreen implements Screen {
                     return true;
                 }
 
-                brushSize = Math.min(Math.max(brushSize - (int)Math.signum(amountY), 1), 20);
+                brushSize = Math.min(Math.max(brushSize - (int)Math.signum(amountY), 1), 200);
                 return true;
             }
         });
@@ -141,6 +142,8 @@ public class TestScreen implements Screen {
         if(Gdx.input.isButtonPressed(Buttons.LEFT)){
             for(int i = (int)mouse.x; i < (int)(mouse.x + brushSize); i++){
                 for(int k = (int)mouse.y; k < (int)(mouse.y + brushSize); k++){
+                    if(!world.inBounds(i, k)) continue;
+
                     CellBase cell;
 
                     switch(brushType){
@@ -150,6 +153,9 @@ public class TestScreen implements Screen {
                     case WATER:
                         cell = new Water(); break;
 
+                    case GAS:
+                        cell = new Gas(); break;
+
                     default:
                         cell = new CellBase("stone"); break;
                     }
@@ -157,9 +163,19 @@ public class TestScreen implements Screen {
                     world.setTile(i, k, cell);
                 }
             }
+        } else if(Gdx.input.isButtonPressed(Buttons.RIGHT)){
+            for(int i = (int)mouse.x; i < (int)(mouse.x + brushSize); i++){
+                for(int k = (int)mouse.y; k < (int)(mouse.y + brushSize); k++){
+                    if(!world.inBounds(i, k)) continue;
+                    world.setTile(i, k, null);
+                }
+            }
         }
         
         if(Gdx.input.isKeyPressed(Keys.SPACE)){
+            world.step();
+        }
+        if(Gdx.input.isKeyJustPressed(Keys.ALT_RIGHT)){
             world.step();
         }
         if(Gdx.input.isKeyJustPressed(Keys.A)){
@@ -170,6 +186,9 @@ public class TestScreen implements Screen {
         }
         if(Gdx.input.isKeyJustPressed(Keys.D)){
             brushType = BrushType.WATER;
+        }
+        if(Gdx.input.isKeyJustPressed(Keys.F)){
+            brushType = BrushType.GAS;
         }
     }
 

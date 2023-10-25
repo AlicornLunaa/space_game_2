@@ -52,20 +52,10 @@ public class CellChunk {
 
     public void draw(Batch batch){
         for(int i = 0; i < tiles.length; i++){
-            int x = i % Constants.CHUNK_SIZE;
-            int y = i / Constants.CHUNK_SIZE;
             CellBase tile = tiles[i];
 
-            if(tile == null) continue;
-
-            batch.draw(
-                tile.texture,
-                (x + chunkX * Constants.CHUNK_SIZE) * Constants.TILE_SIZE, (y + chunkY * Constants.CHUNK_SIZE) * Constants.TILE_SIZE,
-                0, 0,
-                Constants.TILE_SIZE, Constants.TILE_SIZE,
-                1, 1,
-                0
-            );
+            if(tile != null)
+                tile.draw(batch);
         }
     }
 }
