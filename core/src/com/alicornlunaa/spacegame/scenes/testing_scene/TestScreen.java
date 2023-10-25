@@ -25,7 +25,7 @@ import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Gas;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Sand;
-import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Water;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Liquid;
 import com.alicornlunaa.spacegame.systems.GravitySystem;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.systems.TrackingSystem;
@@ -151,7 +151,7 @@ public class TestScreen implements Screen {
                         cell = new Sand(); break;
 
                     case WATER:
-                        cell = new Water(); break;
+                        cell = new Liquid(); break;
 
                     case GAS:
                         cell = new Gas(); break;
