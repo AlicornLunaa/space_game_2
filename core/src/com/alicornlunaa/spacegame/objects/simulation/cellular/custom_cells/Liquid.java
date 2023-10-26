@@ -3,19 +3,21 @@ package com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.Action;
-import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.CreateAction;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.DeleteAction;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.EmplaceAction;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.SwapAction;
 import com.alicornlunaa.spacegame.util.Constants;
 import com.alicornlunaa.spacegame.util.Vector2i;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 
-public class Liquid extends CellBase {
+public abstract class Liquid extends CellBase {
     // Variables
-    private final int SPREAD_FACTOR = 5;
-    private final float VISCOSITY = 0.5f;
     private final double MIN_FLUID_LEVEL = 1e-5;
 
+    private int spreadFactor = 5;
+    private float viscosity = 0.5f;
+    private float density = 1.f;
     private float fluidLevel = 1.f;
     private boolean falling = false;
 
@@ -26,12 +28,10 @@ public class Liquid extends CellBase {
 
             if(possibleCell == null){
                 // No cell exists here, create it
-                CreateAction<Liquid> action = new CreateAction<>(v.x, v.y, Liquid.class);
-                changes.add(action);
-
-                Liquid cell = action.getCell();
+                Liquid cell = this.cpy();
                 cell.fluidLevel = 0.0f;
                 possibleCell = cell;
+                changes.add(new EmplaceAction(cell, v.x, v.y));
             } else if(!(possibleCell instanceof Liquid)) {
                 // Flow is blocked
                 break;
@@ -53,8 +53,8 @@ public class Liquid extends CellBase {
 
     private void balanceFluidLevel(CellWorld world, Array<Action> changes){
         // Get cells to transfer to
-        Array<Vector2i> leftCellPositions = getLine(getX(), getY(), getX() - SPREAD_FACTOR, getY());
-        Array<Vector2i> rightCellPositions = getLine(getX(), getY(), getX() + SPREAD_FACTOR, getY());
+        Array<Vector2i> leftCellPositions = getLine(getX(), getY(), getX() - spreadFactor, getY());
+        Array<Vector2i> rightCellPositions = getLine(getX(), getY(), getX() + spreadFactor, getY());
 
         // Get possible cells to transfer to
         Array<Liquid> flowingCells = new Array<>();
@@ -77,44 +77,66 @@ public class Liquid extends CellBase {
         fluidLevel = averageFluidLevel;
     }
 
+    private boolean flowDown(CellWorld world, Array<Action> changes){
+        // Flow down
+        CellBase possibleCell = world.getTile(getX(), getY() - 1);
+
+        if(possibleCell == null){
+            Liquid cell = this.cpy();
+            cell.falling = true;
+            cell.fluidLevel = 0.f;
+            possibleCell = cell;
+            changes.add(new EmplaceAction(cell, getX(), getY() - 1));
+        } else if(possibleCell instanceof Liquid){
+            // Some liquid, check if its less dense
+            Liquid liquidCell = (Liquid)possibleCell;
+
+            if(liquidCell.density < density){
+                // Swap them.
+                changes.add(new SwapAction(this, getX(), getY() - 1));
+                return true;
+            }
+        }
+
+        if(possibleCell instanceof Liquid){
+            Liquid cell = (Liquid)possibleCell;
+
+            if(cell.fluidLevel < 1){
+                // Move higher-pressure to lower-pressure
+                cell.fluidLevel += (viscosity * fluidLevel);
+                fluidLevel -= (viscosity * fluidLevel);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Constructor
-    public Liquid() {
-        super("water");
+    public Liquid(String textureName, int spreadFactor, float viscosity, float density, float fluidLevel) {
+        super(textureName);
+        this.spreadFactor = spreadFactor;
+        this.viscosity = viscosity;
+        this.density = density;
+        this.fluidLevel = fluidLevel;
     }
     
     // Functions
+    public abstract Liquid cpy();
+
     public void step(CellWorld world, Array<Action> changes){
         // Remove water with nothing in it
         falling = (world.getTile(getX(), getY() + 1) instanceof Liquid);
 
+        // Prevent stupidly small water cells
         if(fluidLevel <= MIN_FLUID_LEVEL){
             changes.add(new DeleteAction(this));
             return;
         }
         
-        // Flow down
-        CellBase below = world.getTile(getX(), getY() - 1);
-        if(below == null){
-            CreateAction<Liquid> action = new CreateAction<>(getX(), getY() - 1, Liquid.class);
-            changes.add(action);
-
-            below = action.getCell();
-            action.getCell().falling = true;
-            action.getCell().fluidLevel = 0.f;
-        }
-        if(below instanceof Liquid){
-            Liquid w = (Liquid)below;
-
-            if(w.fluidLevel < 1){
-                // Move higher-pressure to lower-pressure
-                w.fluidLevel += (VISCOSITY * fluidLevel);
-                fluidLevel -= (VISCOSITY * fluidLevel);
-                return;
-            }
-        }
-        
         // Simulate water pressure
-        balanceFluidLevel(world, changes);
+        if(!flowDown(world, changes))
+            balanceFluidLevel(world, changes);
     }
 
     public void draw(Batch batch){

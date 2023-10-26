@@ -25,7 +25,10 @@ import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Gas;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Sand;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Steam;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Water;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Liquid;
+import com.alicornlunaa.spacegame.objects.simulation.cellular.custom_cells.Oil;
 import com.alicornlunaa.spacegame.systems.GravitySystem;
 import com.alicornlunaa.spacegame.systems.SpaceRenderSystem;
 import com.alicornlunaa.spacegame.systems.TrackingSystem;
@@ -51,7 +54,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 @SuppressWarnings("unused")
 public class TestScreen implements Screen {
     // Enums
-    enum BrushType { STONE, SAND, WATER, GAS };
+    enum BrushType { STONE, SAND, WATER, GAS, OIL };
 
     // Variables
     private InputMultiplexer inputs = new InputMultiplexer();
@@ -151,10 +154,13 @@ public class TestScreen implements Screen {
                         cell = new Sand(); break;
 
                     case WATER:
-                        cell = new Liquid(); break;
+                        cell = new Water(); break;
 
                     case GAS:
-                        cell = new Gas(); break;
+                        cell = new Steam(); break;
+
+                    case OIL:
+                        cell = new Oil(); break;
 
                     default:
                         cell = new CellBase("stone"); break;
@@ -189,6 +195,9 @@ public class TestScreen implements Screen {
         }
         if(Gdx.input.isKeyJustPressed(Keys.F)){
             brushType = BrushType.GAS;
+        }
+        if(Gdx.input.isKeyJustPressed(Keys.G)){
+            brushType = BrushType.OIL;
         }
     }
 
