@@ -20,16 +20,18 @@ public class Liquid extends CellBase {
     private boolean falling = false;
 
     // Private functions
-    private void scanPossibleCells(CellWorld world, Array<Liquid> flowingCells, Array<Vector2i> positions){
+    private void scanPossibleCells(CellWorld world, Array<Action> changes, Array<Liquid> flowingCells, Array<Vector2i> positions){
         for(Vector2i v : positions){
             CellBase possibleCell = world.getTile(v.x, v.y);
 
             if(possibleCell == null){
                 // No cell exists here, create it
-                Liquid cell = new Liquid();
+                CreateAction<Liquid> action = new CreateAction<>(v.x, v.y, Liquid.class);
+                changes.add(action);
+
+                Liquid cell = action.getCell();
                 cell.fluidLevel = 0.0f;
                 possibleCell = cell;
-                world.setTile(v.x, v.y, cell);
             } else if(!(possibleCell instanceof Liquid)) {
                 // Flow is blocked
                 break;
@@ -41,6 +43,11 @@ public class Liquid extends CellBase {
             // Add this cell to the possible cells because its a liquid and valid for transfer
             if(possibleLiquidCell.fluidLevel < fluidLevel)
                 flowingCells.add(possibleLiquidCell);
+
+            // Aditional rule checking
+            CellBase additionalCellCheck = world.getTile(v.x, v.y - 1);
+            if(additionalCellCheck == null || (additionalCellCheck != null && additionalCellCheck instanceof Liquid && ((Liquid)additionalCellCheck).fluidLevel < 1))
+                break;
         }
     }
 
@@ -51,8 +58,8 @@ public class Liquid extends CellBase {
 
         // Get possible cells to transfer to
         Array<Liquid> flowingCells = new Array<>();
-        scanPossibleCells(world, flowingCells, leftCellPositions);
-        scanPossibleCells(world, flowingCells, rightCellPositions);
+        scanPossibleCells(world, changes, flowingCells, leftCellPositions);
+        scanPossibleCells(world, changes, flowingCells, rightCellPositions);
 
         // Calculate flow between all possible cells
         float averageFluidLevel = fluidLevel;
