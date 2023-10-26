@@ -178,6 +178,7 @@ public class TestScreen implements Screen {
             }
         }
         
+        // world.step();
         if(Gdx.input.isKeyPressed(Keys.SPACE)){
             world.step();
         }

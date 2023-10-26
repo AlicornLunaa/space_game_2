@@ -33,11 +33,11 @@ public abstract class Liquid extends CellBase {
                 possibleCell = cell;
                 changes.add(new EmplaceAction(cell, v.x, v.y));
                 world.setVisited(v.x, v.y);
-            } else if(!(possibleCell instanceof Liquid)) {
+            } else if(possibleCell != null && !(possibleCell.getClass().equals(this.getClass())) || world.getVisited(v.x, v.y)) {
                 // Flow is blocked
                 break;
             }
-            
+
             // Cast to liquid
             Liquid possibleLiquidCell = (Liquid)possibleCell;
 
@@ -52,9 +52,8 @@ public abstract class Liquid extends CellBase {
         }
     }
 
-    private void balanceFluidLevel(CellWorld world, Array<Action> changes){
+    private boolean balanceFluidLevel(CellWorld world, Array<Action> changes){
         // Get cells to transfer to
-        Array<Vector2i> upCellPositions = getLine(getX(), getY(), getX(), getY() + spreadFactor);
         Array<Vector2i> leftCellPositions = getLine(getX(), getY(), getX() - spreadFactor, getY());
         Array<Vector2i> rightCellPositions = getLine(getX(), getY(), getX() + spreadFactor, getY());
 
@@ -77,6 +76,8 @@ public abstract class Liquid extends CellBase {
             cell.fluidLevel = averageFluidLevel;
 
         fluidLevel = averageFluidLevel;
+
+        return flowingCells.size > 1;
     }
 
     private boolean flowDown(CellWorld world, Array<Action> changes){
@@ -91,18 +92,9 @@ public abstract class Liquid extends CellBase {
             possibleCell = cell;
             changes.add(new EmplaceAction(cell, getX(), getY() - 1));
             world.getVisited(getX(), getY() - 1);
-        } else if(possibleCell instanceof Liquid){
-            // Some liquid, check if its less dense
-            Liquid liquidCell = (Liquid)possibleCell;
-
-            if(liquidCell.density < density){
-                // Swap them.
-                changes.add(new SwapAction(this, getX(), getY() - 1));
-                return true;
-            }
         }
 
-        if(possibleCell instanceof Liquid){
+        if(possibleCell != null && possibleCell.getClass().equals(this.getClass())){
             Liquid cell = (Liquid)possibleCell;
 
             if(cell.fluidLevel < 1){
@@ -111,6 +103,26 @@ public abstract class Liquid extends CellBase {
                 fluidLevel -= (viscosity * fluidLevel);
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    private boolean densityRule(CellWorld world, Array<Action> changes){
+        CellBase cell = world.getTile(getX(), getY() + 1);
+
+        if(world.getVisited(getX(), getY())) return false;
+
+        if(cell instanceof Sand){
+            changes.add(new SwapAction(cell, getX(), getY()));
+            world.setVisited(getX(), getY());
+            world.setVisited(getX(), getY() + 1);
+            return true;
+        } else if(cell instanceof Liquid && ((Liquid)cell).density > density){
+            changes.add(new SwapAction(cell, getX(), getY()));
+            world.setVisited(getX(), getY());
+            world.setVisited(getX(), getY() + 1);
+            return true;
         }
 
         return false;
@@ -139,8 +151,9 @@ public abstract class Liquid extends CellBase {
         }
         
         // Simulate water pressure
-        if(!flowDown(world, changes))
-            balanceFluidLevel(world, changes);
+        if(densityRule(world, changes)) return;
+        if(flowDown(world, changes)) return;
+        if(balanceFluidLevel(world, changes)) return;
     }
 
     public void draw(Batch batch){
