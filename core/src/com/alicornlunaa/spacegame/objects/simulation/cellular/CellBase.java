@@ -86,10 +86,6 @@ public class CellBase {
 
         return false;
     }
-    
-    protected boolean isEmpty(CellWorld world, int toX, int toY){
-        return (world.getTile(getX() + toX, getY() + toY) == null);
-    }
 
     // Constructor
     public CellBase(String textureName){
@@ -119,10 +115,7 @@ public class CellBase {
     public Vector2 getVelocity(){ return velocity; }
 
     public void applyForce(float vx, float vy){ velocity.add(vx, vy); }
-
-    public void step(CellWorld world, Array<Action> changes){
-    }
-
+    
     public void draw(Batch batch){
         batch.setColor(1, 1, 1, 1);
         batch.draw(
@@ -133,5 +126,8 @@ public class CellBase {
             1, 1,
             0
         );
+    }
+
+    public void step(CellWorld world, Array<Action> changes){
     }
 }

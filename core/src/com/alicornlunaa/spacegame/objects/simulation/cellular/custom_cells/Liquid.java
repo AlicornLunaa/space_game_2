@@ -26,12 +26,13 @@ public abstract class Liquid extends CellBase {
         for(Vector2i v : positions){
             CellBase possibleCell = world.getTile(v.x, v.y);
 
-            if(possibleCell == null){
+            if(world.isEmpty(v.x, v.y)){
                 // No cell exists here, create it
                 Liquid cell = this.cpy();
                 cell.fluidLevel = 0.0f;
                 possibleCell = cell;
                 changes.add(new EmplaceAction(cell, v.x, v.y));
+                world.setVisited(v.x, v.y);
             } else if(!(possibleCell instanceof Liquid)) {
                 // Flow is blocked
                 break;
@@ -53,6 +54,7 @@ public abstract class Liquid extends CellBase {
 
     private void balanceFluidLevel(CellWorld world, Array<Action> changes){
         // Get cells to transfer to
+        Array<Vector2i> upCellPositions = getLine(getX(), getY(), getX(), getY() + spreadFactor);
         Array<Vector2i> leftCellPositions = getLine(getX(), getY(), getX() - spreadFactor, getY());
         Array<Vector2i> rightCellPositions = getLine(getX(), getY(), getX() + spreadFactor, getY());
 
@@ -81,12 +83,14 @@ public abstract class Liquid extends CellBase {
         // Flow down
         CellBase possibleCell = world.getTile(getX(), getY() - 1);
 
-        if(possibleCell == null){
+        if(world.isEmpty(getX(), getY() - 1)){
+            // No cell, create one
             Liquid cell = this.cpy();
             cell.falling = true;
             cell.fluidLevel = 0.f;
             possibleCell = cell;
             changes.add(new EmplaceAction(cell, getX(), getY() - 1));
+            world.getVisited(getX(), getY() - 1);
         } else if(possibleCell instanceof Liquid){
             // Some liquid, check if its less dense
             Liquid liquidCell = (Liquid)possibleCell;
