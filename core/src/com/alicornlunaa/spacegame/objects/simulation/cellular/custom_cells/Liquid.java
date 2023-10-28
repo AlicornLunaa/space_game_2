@@ -110,15 +110,13 @@ public abstract class Liquid extends CellBase {
 
     private boolean densityRule(CellWorld world, Array<Action> changes){
         CellBase cell = world.getTile(getX(), getY() + 1);
-
         if(world.getVisited(getX(), getY())) return false;
-
         if(cell instanceof Sand){
             changes.add(new SwapAction(cell, getX(), getY()));
             world.setVisited(getX(), getY());
             world.setVisited(getX(), getY() + 1);
             return true;
-        } else if(cell instanceof Liquid && ((Liquid)cell).density > density){
+        } else if(cell instanceof Liquid && !cell.getClass().equals(this.getClass()) && ((Liquid)cell).density > density){
             changes.add(new SwapAction(cell, getX(), getY()));
             world.setVisited(getX(), getY());
             world.setVisited(getX(), getY() + 1);

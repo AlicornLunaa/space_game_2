@@ -220,7 +220,7 @@ public class PlanetComponent extends ScriptComponent {
     public void update() {
         // starDirection.set(OrbitUtils.directionToNearestStar(game.gameScene.universe, Planet.this), 0);
         starDirection.set(1, 0, 0);
-        // chunkManager.update();
+        chunkManager.update();
 
         //! TODO: DEBUG REMOVE THIS
         if(Gdx.input.isKeyJustPressed(Keys.F9)){
