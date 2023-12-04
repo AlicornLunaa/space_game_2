@@ -232,12 +232,12 @@ public class PlanetComponent extends ScriptComponent {
             Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
             mouse.set(App.instance.camera.unproject(mouse));
             mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
-            // cellWorld.setTile((int)mouse.x, (int)mouse.y, new BaseTile("dirt", (int)mouse.x, (int)mouse.y));
+            chunkManager.setTile(new BaseTile("dirt", (int)mouse.x, (int)mouse.y), (int)mouse.x, (int)mouse.y);
         } else if(Gdx.input.isKeyPressed(Keys.V)){
             Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.f);
             mouse.set(App.instance.camera.unproject(mouse));
             mouse.set((int)(mouse.x / Constants.TILE_SIZE), (int)(mouse.y / Constants.TILE_SIZE), 0.f);
-            // cellWorld.setTile((int)mouse.x, (int)mouse.y, null);
+            chunkManager.setTile(null, (int)mouse.x, (int)mouse.y);
         }
 
         // Remove entities in the world still

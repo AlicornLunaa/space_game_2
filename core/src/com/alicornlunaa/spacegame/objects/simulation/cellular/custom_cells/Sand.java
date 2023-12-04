@@ -4,7 +4,6 @@ import com.alicornlunaa.spacegame.objects.simulation.cellular.CellBase;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.CellWorld;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.Action;
 import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.MoveAction;
-import com.alicornlunaa.spacegame.objects.simulation.cellular.actions.SwapAction;
 import com.badlogic.gdx.utils.Array;
 
 public class Sand extends CellBase {

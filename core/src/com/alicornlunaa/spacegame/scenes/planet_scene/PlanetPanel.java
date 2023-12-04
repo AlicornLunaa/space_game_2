@@ -122,7 +122,8 @@ public class PlanetPanel extends Stage {
         // batch.setTransformMatrix(new Matrix4().translate(planetComponent.chunkWidth * Constants.CHUNK_SIZE * Tile.TILE_SIZE * 1.00f, 0, 0));
         // worldBody.draw(batch, batch.getColor().a);
         batch.setTransformMatrix(new Matrix4());
-        planetComponent.cellWorld.draw(batch);
+        planetComponent.chunkManager.draw(batch, 1);
+        // planetComponent.cellWorld.draw(batch);
 
         batch.end();
         // super.draw();
