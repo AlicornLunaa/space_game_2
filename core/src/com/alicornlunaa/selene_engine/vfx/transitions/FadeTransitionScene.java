@@ -1,7 +1,7 @@
 package com.alicornlunaa.selene_engine.vfx.transitions;
 
 import com.alicornlunaa.selene_engine.vfx.IVfx;
-import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

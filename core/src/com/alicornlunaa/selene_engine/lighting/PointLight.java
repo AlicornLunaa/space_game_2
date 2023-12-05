@@ -1,6 +1,6 @@
 package com.alicornlunaa.selene_engine.lighting;
 
-import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;

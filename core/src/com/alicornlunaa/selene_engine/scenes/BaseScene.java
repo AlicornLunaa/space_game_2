@@ -1,6 +1,6 @@
 package com.alicornlunaa.selene_engine.scenes;
 
-import com.alicornlunaa.spacegame.App;
+import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
