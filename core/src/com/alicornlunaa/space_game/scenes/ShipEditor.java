@@ -1,14 +1,12 @@
-package com.alicornlunaa.spacegame.scenes.ship_editor_scene;
+package com.alicornlunaa.space_game.scenes;
 
-import com.alicornlunaa.selene_engine.ecs.Registry;
 import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.objects.ship.parts.Part;
-import com.alicornlunaa.spacegame.objects.ship.parts.Part.Node;
-import com.alicornlunaa.spacegame.systems.EditorRenderSystem;
+import com.alicornlunaa.space_game.objects.ship.Ship;
+import com.alicornlunaa.space_game.objects.ship.parts.Part;
+import com.alicornlunaa.space_game.objects.ship.parts.Part.Node;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
@@ -33,6 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.badlogic.ashley.core.Engine;
 
 public class ShipEditor extends BaseScene {
     // Interfaces
@@ -58,7 +57,7 @@ public class ShipEditor extends BaseScene {
     private @Null String selectedCategory = null;
     private @Null Part selectedPart = null;
 
-    private Registry registry;
+    private Engine engine = new Engine();
     private PhysWorld world;
     private Ship ship;
     
@@ -236,12 +235,11 @@ public class ShipEditor extends BaseScene {
 
         world = new PhysWorld(128);
         ship = new Ship(game, world, 0, 0, 0);
-        ship.getTransform().position.set(1280 / 2, 720 / 2);
+        // ship.getTransform().position.set(1280 / 2, 720 / 2);
 
-        registry = new Registry();
-        registry.registerSystem(new RenderSystem(game));
-        registry.registerSystem(new EditorRenderSystem(game));
-        registry.addEntity(ship);
+        engine.addSystem(new RenderSystem());
+        // registry.registerSystem(new EditorRenderSystem(game));
+        engine.addEntity(ship);
     }
 
     private void initializeControls(){
@@ -385,8 +383,7 @@ public class ShipEditor extends BaseScene {
         editorStage.act(delta);
         editorStage.draw();
 
-        registry.update(delta);
-        registry.render();
+        engine.update(delta);
         
         Vector2 editorCursorPos = editorStage.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         Vector2 editorCenterPos = new Vector2(1280 / 2.f, 720 / 2.f);

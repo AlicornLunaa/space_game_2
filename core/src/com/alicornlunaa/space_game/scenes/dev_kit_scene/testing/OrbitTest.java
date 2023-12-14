@@ -1,9 +1,6 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit_scene.testing;
+package com.alicornlunaa.space_game.scenes.dev_kit_scene.testing;
 
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.EllipticalConic;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.GenericConic;
-import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitPropagator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -44,7 +41,7 @@ public class OrbitTest implements Screen {
     private VisSlider vSlider;
     private VisCheckBox iCheckBox;
 
-    private GenericConic testConic;
+    // private GenericConic testConic;
 
     public OrbitTest(final App game) {
         this.game = game;
@@ -54,7 +51,7 @@ public class OrbitTest implements Screen {
         cam.position.set(0, 0, 0);
         cam.update();
 
-        testConic = new EllipticalConic(100, 80, 0.3, 0.1, 0, 0);
+        // testConic = new EllipticalConic(100, 80, 0.3, 0.1, 0, 0);
 
         ui = new VisTable();
         ui.setFillParent(true);
@@ -75,16 +72,16 @@ public class OrbitTest implements Screen {
         iCheckBox = new VisCheckBox("Retrograde"); ui.add(iCheckBox).colspan(2);
         uiStage.addActor(ui);
 
-        aSlider.setValue((float)testConic.getSemiMajorAxis());
-        eSlider.setValue((float)testConic.getEccentricity());
-        wSlider.setValue((float)testConic.getArgumentofPeriapsis());
-        iCheckBox.setChecked(testConic.getInclination() > Math.PI / 2);
+        // aSlider.setValue((float)testConic.getSemiMajorAxis());
+        // eSlider.setValue((float)testConic.getEccentricity());
+        // wSlider.setValue((float)testConic.getArgumentofPeriapsis());
+        // iCheckBox.setChecked(testConic.getInclination() > Math.PI / 2);
 
         ChangeListener l = new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor){
                 // testConic = new EllipticalConic(100, aSlider.getValue(), eSlider.getValue(), wSlider.getValue(), 0, iCheckBox.isChecked() ? Math.PI : 0);
-                testConic = OrbitPropagator.getConic(100, aSlider.getValue(), eSlider.getValue(), wSlider.getValue(), vSlider.getValue(), iCheckBox.isChecked() ? Math.PI : 0);
+                // testConic = OrbitPropagator.getConic(100, aSlider.getValue(), eSlider.getValue(), wSlider.getValue(), vSlider.getValue(), iCheckBox.isChecked() ? Math.PI : 0);
             }
         };
         aSlider.addListener(l);
@@ -152,7 +149,7 @@ public class OrbitTest implements Screen {
         renderer.setColor(Color.CORAL);
         renderer.circle(0, 0, 50);
 
-        testConic.draw(renderer, 1);
+        // testConic.draw(renderer, 1);
 
         renderer.end();
         renderer.setAutoShapeType(false);

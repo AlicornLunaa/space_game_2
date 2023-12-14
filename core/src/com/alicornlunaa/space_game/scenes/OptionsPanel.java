@@ -1,9 +1,9 @@
-package com.alicornlunaa.spacegame.scenes.misc;
+package com.alicornlunaa.space_game.scenes;
 
 import java.util.ArrayList;
 
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
-import com.alicornlunaa.spacegame.util.ControlSchema;
+import com.alicornlunaa.space_game.util.ControlSchema;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Actor;

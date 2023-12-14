@@ -48,7 +48,8 @@ public class Collider {
                 rawVertices[(i * 2) + 1] = v.y;
             }
 
-            polygon.setVertices(rawVertices);
+            if(rawVertices.length >= 6)
+                polygon.setVertices(rawVertices);
         }
 
         // Constructor

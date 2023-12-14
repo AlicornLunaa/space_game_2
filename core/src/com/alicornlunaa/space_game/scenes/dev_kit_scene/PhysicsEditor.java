@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit_scene;
+package com.alicornlunaa.space_game.scenes.dev_kit_scene;
 
 import org.json.JSONArray;
 
@@ -413,7 +413,7 @@ public class PhysicsEditor extends VisTable {
         editorCamera.zoom = 0.1f;
         editorCamera.update();
         
-        referenceTexture = new Texture("./assets/textures/dev_texture_32.png");
+        referenceTexture = new Texture("./assets/textures/dev_texture.png");
         referenceImage = new Image(referenceTexture);
         referenceImage.setPosition(referenceImage.getWidth() / -2, referenceImage.getHeight() / -2);
         editorStage.addActor(referenceImage);

@@ -6,16 +6,10 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
             "name": "Launch Project",
             "request": "launch",
-            "mainClass": "com.alicornlunaa.spacegame.DesktopLauncher",
-            "projectName": "SpaceGame2-desktop"
+            "mainClass": "com.alicornlunaa.space_game.DesktopLauncher",
+            "projectName": "Space Game-desktop"
         }
     ]
 }

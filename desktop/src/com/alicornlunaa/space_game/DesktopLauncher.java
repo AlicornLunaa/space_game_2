@@ -1,6 +1,5 @@
-package com.alicornlunaa.spacegame;
+package com.alicornlunaa.space_game;
 
-import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;

@@ -1,12 +1,12 @@
-package com.alicornlunaa.spacegame.objects.ship.parts;
+package com.alicornlunaa.space_game.objects.ship.parts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.alicornlunaa.selene_engine.components_old.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.space_game.objects.ship.Ship;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

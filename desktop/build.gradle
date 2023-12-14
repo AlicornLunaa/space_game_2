@@ -2,7 +2,7 @@ sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../assets"]
 
-project.ext.mainClassName = "com.alicornlunaa.spacegame.DesktopLauncher"
+project.ext.mainClassName = "com.alicornlunaa.space_game.DesktopLauncher"
 project.ext.assetsDir = new File("../")
 
 import org.gradle.internal.os.OperatingSystem

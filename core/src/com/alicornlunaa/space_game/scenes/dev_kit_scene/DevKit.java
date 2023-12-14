@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit_scene;
+package com.alicornlunaa.space_game.scenes.dev_kit_scene;
 
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
@@ -97,8 +97,8 @@ public class DevKit extends BaseScene {
     }
 
     // Constructor
-    public DevKit(App game) {
-        super(game);
+    public DevKit() {
+        super(App.instance);
         
         if(!VisUI.isLoaded())
             VisUI.load();

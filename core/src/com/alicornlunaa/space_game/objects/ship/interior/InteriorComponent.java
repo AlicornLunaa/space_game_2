@@ -1,11 +1,10 @@
-package com.alicornlunaa.spacegame.objects.ship.interior;
+package com.alicornlunaa.space_game.objects.ship.interior;
 
-import com.alicornlunaa.selene_engine.components_old.ScriptComponent;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
-import com.alicornlunaa.spacegame.objects.ship.parts.Part;
-import com.alicornlunaa.spacegame.util.Constants;
+import com.alicornlunaa.space_game.objects.ship.Ship;
+import com.alicornlunaa.space_game.objects.ship.parts.Part;
+import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
 // Component that allows for building a world within a ship
-public class InteriorComponent extends ScriptComponent {
+public class InteriorComponent {
     // Variables
     private final App game;
     private final Ship ship;
@@ -23,7 +22,7 @@ public class InteriorComponent extends ScriptComponent {
 
     // Constructor
     public InteriorComponent(final App game, final Ship ship){
-        super(ship);
+        // super(ship);
         this.game = game;
         this.ship = ship;
         world = new PhysWorld(Constants.PPM);
@@ -115,14 +114,14 @@ public class InteriorComponent extends ScriptComponent {
         }
     }
 
-    @Override
-    public void start(){}
+    // @Override
+    // public void start(){}
     
-	@Override
-	public void update() {
-        world.update();
-    }
+	// @Override
+	// public void update() {
+    //     world.update();
+    // }
 
-	@Override
-	public void render() {}
+	// @Override
+	// public void render() {}
 }

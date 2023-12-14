@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.scenes.dev_kit_scene.testing;
+package com.alicornlunaa.space_game.scenes.dev_kit_scene.testing;
 
 import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.Gdx;

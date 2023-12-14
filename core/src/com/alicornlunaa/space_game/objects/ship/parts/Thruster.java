@@ -1,9 +1,9 @@
-package com.alicornlunaa.spacegame.objects.ship.parts;
+package com.alicornlunaa.space_game.objects.ship.parts;
 
 import org.json.JSONObject;
 
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.spacegame.objects.ship.Ship;
+import com.alicornlunaa.space_game.objects.ship.Ship;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.math.Vector2;
@@ -52,9 +52,9 @@ public class Thruster extends Part {
         if(throttle == 0) return;
 
         float physScale = parent.getBody().world.getPhysScale();
-        Vector2 dir = new Vector2(
-            (float)Math.cos((currentAngle - 90) * (Math.PI / 180.f) + parent.getTransform().rotation),
-            (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getTransform().rotation)
+        Vector2 dir = new Vector2(0, 1
+            // (float)Math.cos((currentAngle - 90) * (Math.PI / 180.f) + parent.getTransform().rotation),
+            // (float)Math.sin((currentAngle - 90) * (Math.PI / 180.f) + parent.getTransform().rotation)
         );
 
         parent.getBody().body.applyForce(

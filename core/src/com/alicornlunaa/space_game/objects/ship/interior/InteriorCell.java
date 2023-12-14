@@ -1,4 +1,4 @@
-package com.alicornlunaa.spacegame.objects.ship.interior;
+package com.alicornlunaa.space_game.objects.ship.interior;
 
 import org.json.JSONArray;
 
