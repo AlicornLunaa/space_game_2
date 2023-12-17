@@ -4,9 +4,9 @@ import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.components.ship.parts.Part;
+import com.alicornlunaa.space_game.components.ship.parts.Part.Node;
 import com.alicornlunaa.space_game.objects.ship.Ship;
-import com.alicornlunaa.space_game.objects.ship.parts.Part;
-import com.alicornlunaa.space_game.objects.ship.parts.Part.Node;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
@@ -41,6 +41,7 @@ public class ShipEditor extends BaseScene {
     }
 
     // Variables
+    private App game = App.instance;
     private Screen previousScreen;
     private Stage root;
     private Stage editorStage;
@@ -356,7 +357,6 @@ public class ShipEditor extends BaseScene {
 
     // Constructor
     public ShipEditor(App game) {
-        super(game);
         initializeRoot();
         initializeEditor();
         initializeControls();

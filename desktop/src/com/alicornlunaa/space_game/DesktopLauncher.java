@@ -9,12 +9,12 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		// Development shit here
-		Settings settings = new Settings();
-		settings.maxWidth = 1024;
-		settings.maxHeight = 1024;
-		TexturePacker.process(settings, "./assets/textures/", "./assets/textures_packed", "textures");
-		TexturePacker.process(settings, "./assets/particles/", "./assets/particles_packed", "particles");
-		try { Thread.sleep(750); } catch(InterruptedException e){  }
+		// Settings settings = new Settings();
+		// settings.maxWidth = 1024;
+		// settings.maxHeight = 1024;
+		// TexturePacker.process(settings, "./assets/textures/", "./assets/textures_packed", "textures");
+		// TexturePacker.process(settings, "./assets/particles/", "./assets/particles_packed", "particles");
+		// try { Thread.sleep(750); } catch(InterruptedException e){  }
 
 		// Load game
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();

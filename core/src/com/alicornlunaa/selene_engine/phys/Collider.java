@@ -277,6 +277,8 @@ public class Collider {
 
             fixtures.clear();
         }
+
+        bodyRef = null;
     }
 
     public Body attachCollider(Body b){
@@ -362,13 +364,22 @@ public class Collider {
     }
 
     // Static functions
-    public static Collider box(Vector2 pos, Vector2 size, float rotation){
+    public static Collider box(float x, float y, float w, float h, float rotation){
         Collider c = new Collider();
+        c.position.set(x, y);
+        c.rotation = rotation;
+
         Shape s = c.addShape();
-        s.addVertex(new Vector2(-1, -1));
-        s.addVertex(new Vector2(1, -1));
-        s.addVertex(new Vector2(1, 1));
-        s.addVertex(new Vector2(-1, 1));
+        s.addVertex(new Vector2(w * -1.f, h * -1.f));
+        s.addVertex(new Vector2(w * 1.f, h * -1.f));
+        s.addVertex(new Vector2(w * 1.f, h * 1.f));
+        s.addVertex(new Vector2(w * -1.f, h * 1.f));
+        s.density = 1.f;
+        s.friction = 1.f;
+        s.restitution = 0.5f;
+        s.sensor = false;
+
+        c.simplifyShapes();
         return c;
     }
 }

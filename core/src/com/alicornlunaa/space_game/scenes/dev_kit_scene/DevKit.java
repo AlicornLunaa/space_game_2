@@ -98,8 +98,6 @@ public class DevKit extends BaseScene {
 
     // Constructor
     public DevKit() {
-        super(App.instance);
-        
         if(!VisUI.isLoaded())
             VisUI.load();
 

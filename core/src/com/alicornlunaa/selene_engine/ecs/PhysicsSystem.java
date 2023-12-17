@@ -1,39 +1,86 @@
 package com.alicornlunaa.selene_engine.ecs;
 
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
+import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.utils.Array;
 
 public class PhysicsSystem extends EntitySystem {
+    // Static classes
+    private static class PhysicsEntityListener implements EntityListener {
+        // Variables
+        private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
+        private ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
+
+        // Functions
+        @Override
+        public void entityAdded(Entity entity) {
+            TransformComponent transform = tm.get(entity);
+            BodyComponent bodyComp = bm.get(entity);
+
+            if(bodyComp.world != null){
+                bodyComp.bodyDef.position.set(transform.position);
+                bodyComp.bodyDef.angle = transform.rotation;
+                bodyComp.body = bodyComp.world.getBox2DWorld().createBody(bodyComp.bodyDef);
+
+                for(Collider collider : bodyComp.colliders){
+                    collider.attachCollider(bodyComp.body);
+                }
+            }
+        }
+
+        @Override
+        public void entityRemoved(Entity entity) {
+            // Remove the body from the world
+            BodyComponent bodyComp = bm.get(entity);
+
+            for(Collider collider : bodyComp.colliders){
+                collider.detachCollider();
+            }
+            
+            if(bodyComp.world != null){
+                bodyComp.world.getBox2DWorld().destroyBody(bodyComp.body);
+            }
+        }
+    }
+
     // Variables
     private ImmutableArray<Entity> entities;
     private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
     private ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
-    private Array<PhysWorld> physWorlds = new Array<>();
+
+    private PhysWorld world;
+    private float accumulator = 0.f;
 
     // Constructor
-    public PhysicsSystem(){}
+    public PhysicsSystem(float physScale){
+        world = new PhysWorld(physScale);
+    }
 
     // Functions
-    public PhysWorld addWorld(PhysWorld world){
-        physWorlds.add(world);
-        return physWorlds.peek();
+    public PhysWorld getWorld(){
+        return world;
     }
 
     @Override
     public void addedToEngine(Engine engine){
-        entities = engine.getEntitiesFor(Family.all(TransformComponent.class, BodyComponent.class).get());
+        Family entityFamily = Family.all(TransformComponent.class, BodyComponent.class).get();
+        entities = engine.getEntitiesFor(entityFamily);
+        engine.addEntityListener(entityFamily, new PhysicsEntityListener());
     }
 
     @Override
     public void update(float deltaTime){
-        // Update every physics world
-        for(PhysWorld world : physWorlds){
+        // Fixed timestep for world
+        accumulator += Math.min(deltaTime, 0.25f);
+        while(accumulator >= Constants.TIME_STEP){
+            accumulator -= Constants.TIME_STEP;
             world.update();
         }
 
@@ -44,6 +91,10 @@ public class PhysicsSystem extends EntitySystem {
             TransformComponent transform = tm.get(entity);
             BodyComponent rb = bm.get(entity);
 
+            // Error guards
+            if(rb.body == null) continue;
+            if(rb.world == null) continue;
+
             // Update entity
             transform.dp.set(transform.position.cpy().sub(transform.dp));
             transform.dr = transform.rotation - transform.dr;
@@ -52,7 +103,7 @@ public class PhysicsSystem extends EntitySystem {
                 rb.body.setTransform(rb.body.getPosition().cpy().add(transform.dp), rb.body.getAngle() + transform.dr);
             }
 
-            transform.position.set(rb.body.getWorldCenter()).add(rb.world.getOffset());
+            transform.position.set(rb.body.getWorldCenter());
             transform.rotation = rb.body.getAngle();
 
             transform.dp.set(transform.position);

@@ -8,20 +8,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public abstract class BaseScene implements IScene {
     // Variables
-    protected final App game;
     protected Color backgroundColor = new Color(0, 0, 0, 1);
     protected InputMultiplexer inputs = new InputMultiplexer();
-
-    // Constructor
-    public BaseScene(final App game){
-        this.game = game;
-    }
 
     // Functions
     @Override
     public void render(float delta) {
         ScreenUtils.clear(backgroundColor);
-        game.vfxManager.update(delta);
+        App.instance.vfxManager.update(delta);
     }
 
     @Override

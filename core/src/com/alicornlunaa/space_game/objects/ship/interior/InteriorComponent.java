@@ -2,8 +2,8 @@ package com.alicornlunaa.space_game.objects.ship.interior;
 
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.components.ship.parts.Part;
 import com.alicornlunaa.space_game.objects.ship.Ship;
-import com.alicornlunaa.space_game.objects.ship.parts.Part;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.Body;
