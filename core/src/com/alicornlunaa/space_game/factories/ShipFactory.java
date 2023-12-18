@@ -29,7 +29,7 @@ public class ShipFactory {
         transformComponent.position.set(x, y);
         transformComponent.rotation = rotation;
 
-        BodyComponent bodyComponent = new BodyComponent(world);
+        BodyComponent bodyComponent = new BodyComponent();
         attachBox(bodyComponent.body);
 
         Entity entity = new Entity();

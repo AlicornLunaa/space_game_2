@@ -6,7 +6,6 @@ import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.ecs.SpriteComponent;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
-import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.util.Constants;
@@ -18,12 +17,12 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class SpaceScene extends BaseScene {
     // Variables
     private Engine engine = new Engine();
-    private PhysWorld world = new PhysWorld(128.f);
+    private PhysicsSystem physics = new PhysicsSystem(Constants.PPM);
 
     // Constructor
     public SpaceScene() {
         // Initialize ashley
-        engine.addSystem(new PhysicsSystem(Constants.PPM));
+        engine.addSystem(physics);
         engine.addSystem(new RenderSystem());
         // engine.addSystem(new CameraSystem());
 
@@ -35,18 +34,17 @@ public class SpaceScene extends BaseScene {
         // Test entity
         Entity e = new Entity();
         e.add(new TransformComponent());
-        e.add(new BodyComponent(world, Collider.box(0, 0, 0.5f, 0.5f, 0)));
+        e.add(new BodyComponent(Collider.box(0, 0, 0.5f, 0.5f, 0)));
         e.add(new SpriteComponent(App.instance.atlas.findRegion("dev_texture"), 1, 1));
         engine.addEntity(e);
         
         // Ground entity
         TransformComponent transform = new TransformComponent();
         transform.position.set(0, -1.5f);
-        transform.rotation = 5;
+        transform.rotation = (float)Math.toRadians(5);
 
-        BodyComponent bodyComponent = new BodyComponent(world, Collider.box(0, 0, 4.f, 0.5f, 0));
-        // bodyComponent.bodyDef.type = BodyType.StaticBody;
-        bodyComponent.bodyDef.linearVelocity.set(0, 1000);
+        BodyComponent bodyComponent = new BodyComponent(Collider.box(0, 0, 4.f, 0.5f, 0));
+        bodyComponent.bodyDef.type = BodyType.StaticBody;
 
         e = new Entity();
         e.add(transform);
@@ -60,6 +58,6 @@ public class SpaceScene extends BaseScene {
     public void render(float delta) {
         super.render(delta);
         engine.update(delta);
-        App.instance.debug.render(world.getBox2DWorld(), App.instance.camera.combined);
+        App.instance.debug.render(physics.getWorld().getBox2DWorld(), App.instance.camera.combined);
     }
 }

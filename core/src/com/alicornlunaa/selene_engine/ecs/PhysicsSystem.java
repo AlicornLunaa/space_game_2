@@ -17,6 +17,12 @@ public class PhysicsSystem extends EntitySystem {
         // Variables
         private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
         private ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
+        private PhysicsSystem system;
+
+        // Constructor
+        public PhysicsEntityListener(PhysicsSystem system){
+            this.system = system;
+        }
 
         // Functions
         @Override
@@ -24,14 +30,16 @@ public class PhysicsSystem extends EntitySystem {
             TransformComponent transform = tm.get(entity);
             BodyComponent bodyComp = bm.get(entity);
 
-            if(bodyComp.world != null){
-                bodyComp.bodyDef.position.set(transform.position);
-                bodyComp.bodyDef.angle = transform.rotation;
-                bodyComp.body = bodyComp.world.getBox2DWorld().createBody(bodyComp.bodyDef);
+            bodyComp.bodyDef.position.set(transform.position);
+            bodyComp.bodyDef.angle = transform.rotation;
+            bodyComp.body = system.world.getBox2DWorld().createBody(bodyComp.bodyDef);
+            bodyComp.world = system.world;
 
-                for(Collider collider : bodyComp.colliders){
-                    collider.attachCollider(bodyComp.body);
-                }
+            transform.dp.set(transform.position);
+            transform.dr = transform.rotation;
+
+            for(Collider collider : bodyComp.colliders){
+                collider.attachCollider(bodyComp.body);
             }
         }
 
@@ -44,9 +52,9 @@ public class PhysicsSystem extends EntitySystem {
                 collider.detachCollider();
             }
             
-            if(bodyComp.world != null){
-                bodyComp.world.getBox2DWorld().destroyBody(bodyComp.body);
-            }
+            system.world.getBox2DWorld().destroyBody(bodyComp.body);
+            bodyComp.body = null;
+            bodyComp.world = null;
         }
     }
 
@@ -72,7 +80,7 @@ public class PhysicsSystem extends EntitySystem {
     public void addedToEngine(Engine engine){
         Family entityFamily = Family.all(TransformComponent.class, BodyComponent.class).get();
         entities = engine.getEntitiesFor(entityFamily);
-        engine.addEntityListener(entityFamily, new PhysicsEntityListener());
+        engine.addEntityListener(entityFamily, new PhysicsEntityListener(this));
     }
 
     @Override

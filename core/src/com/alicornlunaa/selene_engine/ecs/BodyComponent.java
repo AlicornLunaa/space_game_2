@@ -21,14 +21,9 @@ public class BodyComponent implements Component {
     public BodyComponent(){
         bodyDef.type = BodyType.DynamicBody;
     }
-
-    public BodyComponent(PhysWorld world){
-        this();
-        this.world = world;
-    }
     
-    public BodyComponent(PhysWorld world, Collider collider){
-        this(world);
+    public BodyComponent(Collider collider){
+        this();
         colliders.add(collider);
     }
 }

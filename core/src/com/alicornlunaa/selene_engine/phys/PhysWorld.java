@@ -20,7 +20,7 @@ public class PhysWorld {
 
     // Constructor
     public PhysWorld(float physScale){
-        box2DWorld = new World(new Vector2(0, -10000), false);
+        box2DWorld = new World(new Vector2(0, -1.5f), true);
         this.physScale = physScale;
     }
 

@@ -231,7 +231,7 @@ public class Ship extends Entity {
 
     public BodyComponent getBody(){
         // return bodyComponent;
-        return new BodyComponent(new PhysWorld(1));
+        return new BodyComponent();
     }
 
     public InteriorComponent getInterior(){
