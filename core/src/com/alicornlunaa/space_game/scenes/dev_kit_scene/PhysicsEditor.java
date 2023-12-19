@@ -3,6 +3,8 @@ package com.alicornlunaa.space_game.scenes.dev_kit_scene;
 import org.json.JSONArray;
 
 import com.alicornlunaa.selene_engine.phys.Collider;
+import com.alicornlunaa.selene_engine.phys.Collider.CircleShape;
+import com.alicornlunaa.selene_engine.phys.Collider.PolygonShape;
 import com.alicornlunaa.selene_engine.phys.Collider.Shape;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -82,18 +84,25 @@ public class PhysicsEditor extends VisTable {
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
             shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
             shapeRenderer.begin(ShapeType.Filled);
-            
             shapeRenderer.setColor(getColor());
-            for(int j = 0; j < shape.getIndexCount(); j++){
-                if(shape.getIndex(j) >= shape.getVertexCount() || shape.getIndex((j + 1) % shape.getIndexCount()) >= shape.getVertexCount()) continue;
-                Vector2 v1 = shape.getVertex(shape.getIndex(j));
-                Vector2 v2 = shape.getVertex(shape.getIndex((j + 1) % shape.getIndexCount()));
-                shapeRenderer.rectLine(v1.x, v1.y, v2.x, v2.y, 0.4f);
-            }
-    
-            for(int j = 0; j < shape.getVertexCount(); j++){
-                Vector2 v = shape.getVertex(j);
-                shapeRenderer.circle(v.x, v.y, 0.6f, 16);
+
+            if(shape instanceof PolygonShape){
+                PolygonShape polyShape = (PolygonShape)shape;
+
+                for(int j = 0; j < polyShape.getIndexCount(); j++){
+                    if(polyShape.getIndex(j) >= polyShape.getVertexCount() || polyShape.getIndex((j + 1) % polyShape.getIndexCount()) >= polyShape.getVertexCount()) continue;
+                    Vector2 v1 = polyShape.getVertex(polyShape.getIndex(j));
+                    Vector2 v2 = polyShape.getVertex(polyShape.getIndex((j + 1) % polyShape.getIndexCount()));
+                    shapeRenderer.rectLine(v1.x, v1.y, v2.x, v2.y, 0.4f);
+                }
+        
+                for(int j = 0; j < polyShape.getVertexCount(); j++){
+                    Vector2 v = polyShape.getVertex(j);
+                    shapeRenderer.circle(v.x, v.y, 0.6f, 16);
+                }
+            } else if(shape instanceof CircleShape){
+                CircleShape circShape = (CircleShape)shape;
+                shapeRenderer.circle(circShape.getPosition().x, circShape.getPosition().y, circShape.getRadius());
             }
 
             shapeRenderer.end();
@@ -165,14 +174,14 @@ public class PhysicsEditor extends VisTable {
             frictionField.setText("0.0");
             restitutionField.setText("0.0");
             densityField.setText("0.0");
-            convexCheck.setChecked(false);
+            convexCheck.setChecked(true);
             sensorCheck.setChecked(false);
         } else {
-            frictionField.setText(String.valueOf(shape.getFriction()));
-            restitutionField.setText(String.valueOf(shape.getRestitution()));
-            densityField.setText(String.valueOf(shape.getDensity()));
-            convexCheck.setChecked(shape.getConvex());
-            sensorCheck.setChecked(shape.getSensor());
+            frictionField.setText(String.valueOf(shape.friction));
+            restitutionField.setText(String.valueOf(shape.restitution));
+            densityField.setText(String.valueOf(shape.density));
+            convexCheck.setChecked(shape.convex);
+            sensorCheck.setChecked(shape.sensor);
         }
     }
 
@@ -308,7 +317,7 @@ public class PhysicsEditor extends VisTable {
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
                 try {
-                    shape.setFriction(Float.parseFloat(((VisTextField)a).getText()));
+                    shape.friction = Float.parseFloat(((VisTextField)a).getText());
                 } catch(NumberFormatException exception){}
             }
         });
@@ -321,7 +330,7 @@ public class PhysicsEditor extends VisTable {
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
                 try {
-                    shape.setRestitution(Float.parseFloat(((VisTextField)a).getText()));
+                    shape.restitution = Float.parseFloat(((VisTextField)a).getText());
                 } catch(NumberFormatException exception){}
             }
         });
@@ -334,7 +343,7 @@ public class PhysicsEditor extends VisTable {
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
                 try {
-                    shape.setDensity(Float.parseFloat(((VisTextField)a).getText()));
+                    shape.density = Float.parseFloat(((VisTextField)a).getText());
                 } catch(NumberFormatException exception){}
             }
         });
@@ -346,8 +355,7 @@ public class PhysicsEditor extends VisTable {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
-                shape.setConvex(convexCheck.isChecked());
-                shape.simplify();
+                shape.convex = convexCheck.isChecked();
                 loadShapeOutlines();
             }
         });
@@ -358,7 +366,7 @@ public class PhysicsEditor extends VisTable {
             @Override
             public void changed(ChangeEvent e, Actor a){
                 if(shape == null) return;
-                shape.setSensor(sensorCheck.isChecked());
+                shape.sensor = sensorCheck.isChecked();
             }
         });
         settings.add(sensorCheck).expandX().fillX().padRight(10).row();
@@ -371,7 +379,7 @@ public class PhysicsEditor extends VisTable {
         newShapeBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent e, Actor a){
-                shape = collider.addShape();
+                shape = collider.addPolygon();
                 selectShape(shape);
                 refreshShapes();
             }
@@ -434,14 +442,16 @@ public class PhysicsEditor extends VisTable {
                 }
 
                 if(shape == null) return false;
+                if(shape instanceof PolygonShape) return false;
+                PolygonShape polyShape = (PolygonShape)shape;
 
                 if(button == Buttons.LEFT){
-                    shape.addVertex(new Vector2(cursor.getX(), cursor.getY()));
-                    shape.simplify();
+                    polyShape.addVertex(new Vector2(cursor.getX(), cursor.getY()));
+                    polyShape.simplify();
                     loadShapeOutlines();
                 } else if(button == Buttons.RIGHT){
-                    shape.removeVertex(new Vector2(cursor.getX(), cursor.getY()));
-                    shape.simplify();
+                    polyShape.removeVertex(new Vector2(cursor.getX(), cursor.getY()));
+                    polyShape.simplify();
                     loadShapeOutlines();
                 }
 

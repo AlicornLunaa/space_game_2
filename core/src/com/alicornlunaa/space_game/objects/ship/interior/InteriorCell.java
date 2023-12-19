@@ -114,7 +114,7 @@ public class InteriorCell {
     
         collider.setScale(1);
         collider.setPosition(new Vector2(x * texture.getRegionWidth(), y * texture.getRegionHeight()));
-        collider.attachCollider(body);
+        collider.attach(body);
     }
     
     // Constructor
@@ -129,7 +129,7 @@ public class InteriorCell {
 
     // Functions
     public void updateConnections(boolean up, boolean down, boolean left, boolean right){
-        collider.detachCollider();
+        collider.detach();
         createShapes(up, down, left, right);
     }
 

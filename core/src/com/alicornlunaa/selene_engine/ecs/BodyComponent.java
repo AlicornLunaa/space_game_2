@@ -34,7 +34,7 @@ public class BodyComponent implements Component {
 
         if(body != null){
             // Attach immediately
-            collider.attachCollider(body);
+            collider.attach(body);
         }
     }
 }

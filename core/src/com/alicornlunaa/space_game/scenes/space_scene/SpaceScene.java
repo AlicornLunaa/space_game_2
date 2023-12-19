@@ -8,6 +8,7 @@ import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.factories.CharacterFactory;
 import com.alicornlunaa.space_game.factories.ShipFactory;
 import com.alicornlunaa.space_game.systems.ShipSystem;
 import com.alicornlunaa.space_game.util.Constants;
@@ -38,6 +39,8 @@ public class SpaceScene extends BaseScene {
         Entity shipEntity = ShipFactory.createShip(0, 1, 0);
         engine.addEntity(shipEntity);
         shipEntity.getComponent(BodyComponent.class).body.applyForceToCenter(0, -30, true);
+
+        engine.addEntity(CharacterFactory.createPlayer(4, 0, 0));
         
         // Ground entity
         TransformComponent transform = new TransformComponent();

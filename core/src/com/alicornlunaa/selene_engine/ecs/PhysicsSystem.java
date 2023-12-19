@@ -39,7 +39,7 @@ public class PhysicsSystem extends EntitySystem {
             transform.dr = transform.rotation;
 
             for(Collider collider : bodyComp.colliders){
-                collider.attachCollider(bodyComp.body);
+                collider.attach(bodyComp.body);
             }
         }
 
@@ -49,7 +49,7 @@ public class PhysicsSystem extends EntitySystem {
             BodyComponent bodyComp = bm.get(entity);
 
             for(Collider collider : bodyComp.colliders){
-                collider.detachCollider();
+                collider.detach();
             }
             
             system.world.getBox2DWorld().destroyBody(bodyComp.body);

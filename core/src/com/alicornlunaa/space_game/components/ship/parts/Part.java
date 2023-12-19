@@ -41,7 +41,7 @@ public class Part implements Disposable,Comparable<Part> {
 
     // Private functions
     private void deleteAllColliders(){
-        collider.detachCollider();
+        collider.detach();
 
         for(Node node : attachments){
             if(node.next != null){

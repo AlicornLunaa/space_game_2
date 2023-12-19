@@ -35,7 +35,7 @@ public class InteriorComponent {
     // Functions
     public void assemble(){
         for(InteriorCell cell : cells){
-            cell.collider.detachCollider();
+            cell.collider.detach();
         }
 
         cells.clear();

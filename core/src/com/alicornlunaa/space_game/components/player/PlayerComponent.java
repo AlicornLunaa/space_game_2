@@ -1,5 +1,7 @@
 package com.alicornlunaa.space_game.components.player;
 
-public class PlayerComponent {
+import com.badlogic.ashley.core.Component;
+
+public class PlayerComponent implements Component {
     
 }

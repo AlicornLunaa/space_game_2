@@ -3,15 +3,17 @@ package com.alicornlunaa.selene_engine.phys;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.DelaunayTriangulator;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ShortArray;
 
 /** Collider JSON data format
@@ -27,20 +29,127 @@ import com.badlogic.gdx.utils.ShortArray;
  */
 public class Collider {
     // Static classes
-    public static class Shape {
+    public static abstract class Shape {
+        // Enums
+        protected enum ShapeType { POLYGON, CIRCLE };
+
+        // Variables
+        private ShapeType shapeType;
+        public boolean convex = true;
+        public boolean sensor = false;
+        public float friction = 0.2f;
+        public float restitution = 0.2f;
+        public float density = 1.0f;
+
+        // Constructor
+        private Shape(ShapeType type){
+            shapeType = type;
+        }
+
+        private Shape(Shape shape){
+            // Copy constructor
+            shapeType = shape.shapeType;
+            convex = shape.convex;
+            sensor = shape.sensor;
+            friction = shape.friction;
+            restitution = shape.restitution;
+            density = shape.density;
+        }
+
+        // Functions
+        public abstract Shape2D getShape();
+
+        public ShapeType getType(){
+            return shapeType;
+        }
+
+        protected JSONObject serialize(){
+            // Converts to JSON
+            JSONObject obj = new JSONObject();
+            obj.put("type", (shapeType == ShapeType.POLYGON) ? "polygon" : "circle");
+            obj.put("convex", convex);
+            obj.put("sensor", sensor);
+            obj.put("friction", friction);
+            obj.put("restitution", restitution);
+            obj.put("density", density);
+            return obj;
+        }
+
+        protected static Shape unserialize(JSONObject obj){
+            Shape shape;
+
+            switch(obj.optString("type", "polygon")){
+                case "polygon":
+                    PolygonShape polyShape = new PolygonShape();
+
+                    JSONArray vertexData = obj.getJSONArray("vertices");
+                    for(int i = 0; i < vertexData.length(); i += 2){
+                        float x = vertexData.getFloat(i);
+                        float y = vertexData.getFloat(i + 1);
+                        polyShape.vertices.add(new Vector2(x, y));
+                    }
+        
+                    JSONArray indexData = obj.getJSONArray("indices");
+                    for(int i = 0; i < indexData.length(); i++){
+                        polyShape.indices.add(indexData.getInt(i));
+                    }
+                    
+                    shape = polyShape;
+                    break;
+
+                case "circle":
+                    CircleShape circShape = new CircleShape();
+
+                    circShape.x = obj.optFloat("x", 0.f);
+                    circShape.y = obj.optFloat("y", 0.f);
+                    circShape.radius = obj.optFloat("radius", 1.f);
+
+                    shape = circShape;
+                    break;
+
+                default:
+                    return null;
+            }
+
+            shape.convex = obj.optBoolean("convex", true);
+            shape.sensor = obj.optBoolean("sensor", false);
+            shape.friction = obj.optFloat("friction", 0.2f);
+            shape.restitution = obj.optFloat("restitution", 0.0f);
+            shape.density = obj.optFloat("density", 0.0f);
+
+            return shape;
+        }
+    }
+
+    public static class PolygonShape extends Shape {
         // Variables
         private Array<Vector2> vertices = new Array<>();
         private Array<Integer> indices = new Array<>();
-        private Polygon polygon = new Polygon();
-        private boolean convex = true;
-        private boolean sensor = false;
-        private float friction = 0.2f;
-        private float restitution = 0.0f;
-        private float density = 0.0f;
 
-        // Private functions
-        private void updatePolygon(){
+        // Constructor
+        public PolygonShape(){
+            // Default constructor
+            super(ShapeType.POLYGON);
+        }
+
+        public PolygonShape(PolygonShape shape){
+            // Copy constructor
+            super(shape);
+
+            for(Vector2 v : shape.vertices){
+                vertices.add(v.cpy());
+            }
+
+            for(int i : shape.indices){
+                indices.add(i);
+            }
+        }
+
+        // Functions
+        @Override
+        public Polygon getShape(){
             float rawVertices[] = new float[vertices.size * 2];
+            Polygon polygon = new Polygon();
 
             for(int i = 0; i < vertices.size; i++){
                 Vector2 v = vertices.get(i);
@@ -50,71 +159,65 @@ public class Collider {
 
             if(rawVertices.length >= 6)
                 polygon.setVertices(rawVertices);
+
+            return polygon;
         }
 
-        // Constructor
-        private Shape(){}
-
-        private Shape(Shape s){
-            // Copy constructor
-            for(Vector2 v : s.vertices){
-                vertices.add(v.cpy());
+        @Override
+        protected JSONObject serialize(){
+            JSONArray vertexData = new JSONArray();
+            for(Vector2 v : vertices){
+                vertexData.put(v.x);
+                vertexData.put(v.y);
             }
 
-            for(int i : s.indices){
-                indices.add(i);
+            JSONArray indexData = new JSONArray();
+            for(int i : indices){
+                indexData.put(i);
             }
 
-            polygon = new Polygon(s.polygon.getVertices());
-            convex = s.convex;
-            sensor = s.sensor;
-            friction = s.friction;
-            restitution = s.restitution;
-            density = s.density;
+            JSONObject obj = super.serialize();
+            obj.put("vertices", vertexData);
+            obj.put("indices", indexData);
+            return obj;
         }
 
-        // Getters & Setters
-        public Polygon getPolygon(){ return polygon; }
-        public boolean getConvex(){ return convex; }
-        public boolean getSensor(){ return sensor; }
-        public float getFriction(){ return friction; }
-        public float getRestitution(){ return restitution; }
-        public float getDensity(){ return density; }
 
-        public void setConvex(boolean c){ convex = c; }
-        public void setSensor(boolean s){ sensor = s; }
-        public void setFriction(float f){ friction = f; }
-        public void setRestitution(float r){ restitution = r; }
-        public void setDensity(float d){ density = d; }
-
-        // Functions
         public int addVertex(Vector2 vertex){
             vertices.add(vertex.cpy());
-            updatePolygon();
+            simplify();
             return vertices.size - 1;
         }
     
         public void removeVertex(Vector2 vertex){
             vertices.removeValue(vertex, false);
-            updatePolygon();
+            simplify();
         }
     
-        public Vector2 getVertex(int vertex){ return vertices.get(vertex); }
-    
-        public int getVertexCount(){ return vertices.size; }
+        public Vector2 getVertex(int vertexID){
+            return vertices.get(vertexID);
+        }
         
-        public int getIndex(int i){ return indices.get(i); }
-
-        public int getIndexCount(){ return indices.size; }
-
-        public void simplify(){
-            if(!convex){
-                triangulate();
-            } else {
-                giftwrap();
-            }
-            updatePolygon();
+        public int getVertexCount(){
+            return vertices.size;
         }
+        
+        public int getIndex(int i){
+            return indices.get(i);
+        }
+
+        public int getIndexCount(){
+            return indices.size;
+        }
+    
+        public void simplify(){
+            if(convex){
+                giftwrap();
+            } else {
+                triangulate();
+            }
+        }
+
 
         private int orientation(Vector2 p, Vector2 q, Vector2 r){
             float val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
@@ -175,99 +278,141 @@ public class Collider {
                 indices.add((int)res.get(i));
             }
         }
+    }
 
-        private JSONObject serialize(){
-            /** Returns JSON collider defined above */
-            JSONObject obj = new JSONObject();
-            obj.put("convex", convex);
-            obj.put("sensor", sensor);
-            obj.put("friction", friction);
-            obj.put("restitution", restitution);
-            obj.put("density", density);
+    public static class CircleShape extends Shape {
+        // Variables
+        private float x = 0.f;
+        private float y = 0.f;
+        private float radius = 1.f;
 
-            simplify();
+        // Constructors
+        public CircleShape(){
+            // Default constructor
+            super(ShapeType.CIRCLE);
+        }
 
-            JSONArray vertexData = new JSONArray();
-            for(Vector2 v : vertices){
-                vertexData.put(v.x);
-                vertexData.put(v.y);
-            }
-            obj.put("vertices", vertexData);
+        public CircleShape(CircleShape shape){
+            // Copy constructor
+            super(shape);
+            radius = shape.radius;
+        }
 
-            JSONArray indexData = new JSONArray();
-            for(int i : indices){
-                indexData.put(i);
-            }
-            obj.put("indices", indexData);
+        // Functions
+        @Override
+        public Circle getShape(){
+            Circle circle = new Circle();
+            circle.set(x, y, radius);
+            return circle;
+        }
 
+        @Override
+        protected JSONObject serialize(){
+            JSONObject obj = super.serialize();
+            obj.put("x", x);
+            obj.put("y", y);
+            obj.put("radius", radius);
             return obj;
         }
 
-        private static Shape unserialize(JSONObject obj){
-            Shape s = new Shape();
-            s.convex = obj.optBoolean("convex", true);
-            s.sensor = obj.optBoolean("sensor", false);
-            s.friction = obj.optFloat("friction", 0.2f);
-            s.restitution = obj.optFloat("restitution", 0.0f);
-            s.density = obj.optFloat("density", 0.0f);
 
-            JSONArray vertexData = obj.getJSONArray("vertices");
-            for(int i = 0; i < vertexData.length(); i += 2){
-                float x = vertexData.getFloat(i);
-                float y = vertexData.getFloat(i + 1);
-                s.vertices.add(new Vector2(x, y));
-            }
-            s.updatePolygon();
+        public void setPosition(float x, float y){
+            this.x = x;
+            this.y = y;
+        }
 
-            JSONArray indexData = obj.getJSONArray("indices");
-            for(int i = 0; i < indexData.length(); i++){
-                s.indices.add(indexData.getInt(i));
-            }
+        public Vector2 getPosition(){
+            return new Vector2(x, y);
+        }
 
-            return s;
+        public void setRadius(float rad){
+            radius = rad;
+        }
+
+        public float getRadius(){
+            return radius;
         }
     }
+
 
     // Variables
     private Array<Shape> shapes = new Array<>();
     private Array<Fixture> fixtures = new Array<>();
+    private @Null Body bodyRef = null;
+    
     private Vector2 position = new Vector2();
     private Vector2 scale = new Vector2(1, 1);
     private float rotation = 0.0f;
-    private Body bodyRef;
+
 
     // Constructors
-    public Collider(){}
+    public Collider(){} // Default constructor
 
     public Collider(JSONArray arr){
-        for(int i = 0; i < arr.length(); i++){
-            Shape s = Shape.unserialize(arr.getJSONObject(i));
-            shapes.add(s);
-        }
+        // JSON constructor
+        for(int i = 0; i < arr.length(); i++)
+            shapes.add(Shape.unserialize(arr.getJSONObject(i)));
     }
 
-    public Collider(Collider c){
+    public Collider(Collider collider){
         // Copy constructor
-        for(Shape s : c.shapes){
-            shapes.add(new Shape(s));
+        for(Shape shape : collider.shapes){
+            if(shape instanceof PolygonShape){
+                shapes.add(new PolygonShape((PolygonShape)shape));
+            } else if(shape instanceof CircleShape){
+                shapes.add(new CircleShape((CircleShape)shape));
+            }
         }
 
-        position = c.position.cpy();
-        scale = c.scale.cpy();
-        rotation = c.rotation;
+        position = collider.position.cpy();
+        scale = collider.scale.cpy();
+        rotation = collider.rotation;
     }
+
 
     // Getters & setters
-    public Vector2 getPosition() { return position; }
-    public void setPosition(Vector2 position) { this.position = position; }
-    public Vector2 getScale() { return scale; }
-    public void setScale(float x, float y) { this.scale.set(x, y); }
-    public void setScale(float scale) { this.scale.set(scale, scale); }
-    public float getRotation() { return rotation; }
-    public void setRotation(float rotation) { this.rotation = rotation; }
+    public void setPosition(Vector2 position) {
+        this.position.set(position);
+    }
+
+    public Vector2 getPosition() {
+        return position;
+    }
+
+    public void setScale(float x, float y) {
+        this.scale.set(x, y);
+    }
+
+    public void setScale(float scale) {
+        this.scale.set(scale, scale);
+    }
+
+    public Vector2 getScale() {
+        return scale;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public Collider setFixture(float friction, float restitution, float density, boolean sensor){
+        for(Shape shape : shapes){
+            shape.density = density;
+            shape.friction = friction;
+            shape.restitution = restitution;
+            shape.sensor = sensor;
+        }
+
+        return this;
+    }
+
 
     // Physics functions
-    public void detachCollider(){
+    public void detach(){
         // Remove existing body
         if(bodyRef != null){
             for(Fixture f : fixtures){
@@ -281,42 +426,63 @@ public class Collider {
         bodyRef = null;
     }
 
-    public Body attachCollider(Body b){
-        // Remove existing body
-        detachCollider();
-
+    public Body attach(Body b){
+        if(bodyRef != null)
+            // Remove existing body
+            detach();
+            
         // Attach to new body
         Matrix3 trans = new Matrix3().translate(position).rotate(rotation).scale(scale);
         bodyRef = b;
 
-        for(int i = 0; i < this.getShapeCount(); i++){
+        for(int i = 0; i < getShapeCount(); i++){
             // Each shape must be attached
-            Shape shape = this.getShape(i);
-            Vector2[] vertexData = new Vector2[shape.getIndexCount()];
+            Shape shape = getShape(i);
 
-            for(int j = 0; j < shape.getIndexCount(); j++){
-                Vector2 v = shape.getVertex(shape.getIndex(j));
-                vertexData[j] = v.cpy().mul(trans);
+            if(shape instanceof PolygonShape){
+                PolygonShape polygonShape = (PolygonShape)shape;
+                Vector2[] vertexData = new Vector2[polygonShape.getIndexCount()];
+
+                for(int j = 0; j < polygonShape.getIndexCount(); j++){
+                    int index = polygonShape.getIndex(j);
+                    Vector2 v = polygonShape.getVertex(index);
+                    vertexData[j] = v.cpy().mul(trans);
+                }
+
+                com.badlogic.gdx.physics.box2d.PolygonShape physShape = new com.badlogic.gdx.physics.box2d.PolygonShape();
+                physShape.set(vertexData);
+                
+                FixtureDef def = new FixtureDef();
+                def.shape = physShape;
+                def.friction = shape.friction;
+                def.restitution = shape.restitution;
+                def.density = shape.density;
+                def.isSensor = shape.sensor;
+                fixtures.add(b.createFixture(def));
+
+                physShape.dispose();
+            } else if(shape instanceof CircleShape){
+                CircleShape circleShape = (CircleShape)shape;
+                com.badlogic.gdx.physics.box2d.CircleShape physShape = new com.badlogic.gdx.physics.box2d.CircleShape();
+                physShape.setPosition(new Vector2(circleShape.x, circleShape.y));
+                physShape.setRadius(circleShape.radius);
+                
+                FixtureDef def = new FixtureDef();
+                def.shape = physShape;
+                def.friction = shape.friction;
+                def.restitution = shape.restitution;
+                def.density = shape.density;
+                def.isSensor = shape.sensor;
+                fixtures.add(b.createFixture(def));
+
+                physShape.dispose();
             }
-
-            PolygonShape physShape = new PolygonShape();
-            physShape.set(vertexData);
-            
-            FixtureDef def = new FixtureDef();
-            def.shape = physShape;
-            def.friction = shape.getFriction();
-            def.restitution = shape.getDensity();
-            def.density = shape.getDensity();
-            def.isSensor = shape.getSensor();
-            fixtures.add(b.createFixture(def));
-
-            physShape.dispose();
         }
 
         return b;
     }
 
-    public void reattach(){ attachCollider(bodyRef); }
+    public void reattach(){ attach(bodyRef); }
 
     // Shape functions
     public boolean contains(Vector2 p){
@@ -325,7 +491,7 @@ public class Collider {
         Vector2 point = p.cpy().mul(trans.inv());
 
         for(Shape s : shapes){
-            if(s.getPolygon().contains(point)){
+            if(s.getShape().contains(point)){
                 return true;
             }
         }
@@ -333,24 +499,33 @@ public class Collider {
         return false;
     }
 
-    public Shape addShape(){
-        shapes.add(new Shape());
-        return shapes.peek();
+    public PolygonShape addPolygon(){
+        PolygonShape polygonShape = new PolygonShape();
+        shapes.add(polygonShape);
+        return polygonShape;
+    }
+    
+    public CircleShape addCircle(){
+        CircleShape circleShape = new CircleShape();
+        shapes.add(circleShape);
+        return circleShape;
     }
 
-    public void removeShape(int i){ shapes.removeIndex(i); }
-
-    public Shape getShape(int i){ return shapes.get(i); }
-
-    public int getShapeCount(){ return shapes.size; }
-
-    public void simplifyShapes(){
-        for(Shape s : shapes){
-            s.simplify();
-        }
+    public void removeShape(int i){
+        shapes.removeIndex(i);
     }
 
-    public void clear(){ shapes.clear(); }
+    public Shape getShape(int i){
+        return shapes.get(i);
+    }
+
+    public int getShapeCount(){
+        return shapes.size;
+    }
+
+    public void clear(){
+        shapes.clear();
+    }
 
     public JSONArray serialize(){
         /** Returns an array of JSON colliders */
@@ -369,7 +544,7 @@ public class Collider {
         c.position.set(x, y);
         c.rotation = rotation;
 
-        Shape s = c.addShape();
+        PolygonShape s = c.addPolygon();
         s.addVertex(new Vector2(w * -1.f, h * -1.f));
         s.addVertex(new Vector2(w * 1.f, h * -1.f));
         s.addVertex(new Vector2(w * 1.f, h * 1.f));
@@ -378,27 +553,25 @@ public class Collider {
         s.friction = 1.f;
         s.restitution = 0.5f;
         s.sensor = false;
+        s.convex = true;
 
-        c.simplifyShapes();
         return c;
     }
     
-    public static Collider circle(float x, float y, float radius, float rotation){
+    public static Collider circle(float x, float y, float radius){
         Collider c = new Collider();
         c.position.set(x, y);
-        c.rotation = rotation;
 
-        Shape s = c.addShape();
-        s.addVertex(new Vector2(w * -1.f, h * -1.f));
-        s.addVertex(new Vector2(w * 1.f, h * -1.f));
-        s.addVertex(new Vector2(w * 1.f, h * 1.f));
-        s.addVertex(new Vector2(w * -1.f, h * 1.f));
+        CircleShape s = c.addCircle();
+        s.x = x;
+        s.y = y;
+        s.radius = radius;
         s.density = 1.f;
         s.friction = 1.f;
         s.restitution = 0.5f;
         s.sensor = false;
+        s.convex = true;
 
-        c.simplifyShapes();
         return c;
     }
 }

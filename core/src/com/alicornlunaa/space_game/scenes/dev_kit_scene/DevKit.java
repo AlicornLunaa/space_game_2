@@ -1,7 +1,6 @@
 package com.alicornlunaa.space_game.scenes.dev_kit_scene;
 
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
-import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
