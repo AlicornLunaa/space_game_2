@@ -9,12 +9,8 @@ import com.badlogic.ashley.core.Entity;
 
 public class ShipFactory {
     public static Entity createShip(float x, float y, float rotation){
-        TransformComponent transformComponent = new TransformComponent();
-        transformComponent.position.set(x, y);
-        transformComponent.rotation = rotation;
-
         Entity entity = new Entity();
-        entity.add(transformComponent);
+        entity.add(new TransformComponent(x, y, rotation));
         entity.add(new BodyComponent());
         entity.add(new ActorComponent());
         entity.add(new InteriorComponent());

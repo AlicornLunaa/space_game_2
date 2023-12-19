@@ -382,4 +382,23 @@ public class Collider {
         c.simplifyShapes();
         return c;
     }
+    
+    public static Collider circle(float x, float y, float radius, float rotation){
+        Collider c = new Collider();
+        c.position.set(x, y);
+        c.rotation = rotation;
+
+        Shape s = c.addShape();
+        s.addVertex(new Vector2(w * -1.f, h * -1.f));
+        s.addVertex(new Vector2(w * 1.f, h * -1.f));
+        s.addVertex(new Vector2(w * 1.f, h * 1.f));
+        s.addVertex(new Vector2(w * -1.f, h * 1.f));
+        s.density = 1.f;
+        s.friction = 1.f;
+        s.restitution = 0.5f;
+        s.sensor = false;
+
+        c.simplifyShapes();
+        return c;
+    }
 }

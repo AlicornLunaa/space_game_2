@@ -7,6 +7,12 @@ public class Constants {
     public static final int POSITION_ITERATIONS = 4;
     public static final int MAX_PREDICTION_STEPS = 2;
     public static final int CHUNK_LOAD_DISTANCE = 3;
+
+    // Player constraints
+    public static final float PLAYER_WIDTH = 0.2f;
+    public static final float PLAYER_HEIGHT = 0.4f;
+    public static final float PLAYER_MOVEMENT_SPEED = 6.f;
+    public static final float PLAYER_JUMP_FORCE = 60.f;
     
     // Scaling constants
     public static final float PPM = 128.0f;

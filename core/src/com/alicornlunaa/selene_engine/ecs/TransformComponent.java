@@ -12,6 +12,16 @@ public class TransformComponent implements Component {
     public Vector2 position = new Vector2();
     public float rotation = 0.0f;
 
+    // Constructors
+    public TransformComponent(){}
+
+    public TransformComponent(float x, float y, float rot){
+        this();
+        
+        position.set(x, y);
+        rotation = rot;
+    }
+
     // Functions
     public Matrix3 getMatrix(){
         Matrix3 matrix = new Matrix3();
