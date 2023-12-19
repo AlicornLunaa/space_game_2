@@ -52,14 +52,16 @@ public class RenderSystem extends EntitySystem {
 			}
 	
 			// Draw entity
-			batch.draw(
-				sprite.texture,
-				transform.position.x - offsetX, transform.position.y - offsetY,
-				offsetX, offsetY,
-				sprite.size.x, sprite.size.y,
-				1.f, 1.f,
-				(float)Math.toDegrees(transform.rotation)
-			);
+			if(sprite.texture != null){
+				batch.draw(
+					sprite.texture,
+					transform.position.x - offsetX, transform.position.y - offsetY,
+					offsetX, offsetY,
+					sprite.size.x, sprite.size.y,
+					1.f, 1.f,
+					(float)Math.toDegrees(transform.rotation)
+				);
+			}
         }
 
 		batch.end();

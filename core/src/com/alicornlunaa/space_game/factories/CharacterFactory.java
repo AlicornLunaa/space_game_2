@@ -1,11 +1,15 @@
 package com.alicornlunaa.space_game.factories;
 
+import com.alicornlunaa.selene_engine.ecs.AnimationComponent;
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.SpriteComponent;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
+import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.player.ControlComponent;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 
 public class CharacterFactory {
     public static Entity createCharacter(float x, float y, float rotation){
@@ -20,12 +24,14 @@ public class CharacterFactory {
         Entity entity = new Entity();
         entity.add(new TransformComponent(x, y, rotation));
         entity.add(bodyComp);
+        entity.add(new SpriteComponent(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT));
         return entity;
     }
 
     public static Entity createPlayer(float x, float y, float rotation){
         Entity entity = createCharacter(x, y, rotation);
         entity.add(new ControlComponent());
+        entity.add(new AnimationComponent(App.instance.atlas.findRegions("player/move_left"), 1 / 12.f, PlayMode.LOOP));
         return entity;
     }
 
