@@ -13,7 +13,8 @@ import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.factories.CharacterFactory;
 import com.alicornlunaa.space_game.factories.ShipFactory;
 import com.alicornlunaa.space_game.systems.PlayerSystem;
-import com.alicornlunaa.space_game.systems.ShipSystem;
+import com.alicornlunaa.space_game.systems.ShipPhysicsSystem;
+import com.alicornlunaa.space_game.systems.ShipRenderSystem;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -33,7 +34,8 @@ public class SpaceScene extends BaseScene {
         engine.addSystem(new CameraSystem());
         engine.addSystem(new AnimationSystem());
         engine.addSystem(new PlayerSystem());
-        engine.addSystem(new ShipSystem());
+        engine.addSystem(new ShipRenderSystem());
+        engine.addSystem(new ShipPhysicsSystem());
 
         // Init camera
         App.instance.camera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
