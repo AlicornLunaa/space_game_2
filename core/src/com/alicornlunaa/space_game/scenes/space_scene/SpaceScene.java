@@ -35,7 +35,9 @@ public class SpaceScene extends BaseScene {
         App.instance.camera.update();
 
         // Test entity
-        engine.addEntity(ShipFactory.createShip(0, 1, 0));
+        Entity shipEntity = ShipFactory.createShip(0, 1, 0);
+        engine.addEntity(shipEntity);
+        shipEntity.getComponent(BodyComponent.class).body.applyForceToCenter(0, -30, true);
         
         // Ground entity
         TransformComponent transform = new TransformComponent();
