@@ -24,12 +24,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class SpaceScene extends BaseScene {
     // Variables
     private Engine engine = new Engine();
-    private PhysicsSystem physics = new PhysicsSystem(Constants.PPM);
 
     // Constructor
     public SpaceScene() {
         // Initialize ashley
-        engine.addSystem(physics);
+        engine.addSystem(new PhysicsSystem(Constants.PPM));
         engine.addSystem(new RenderSystem());
         engine.addSystem(new CameraSystem());
         engine.addSystem(new AnimationSystem());
@@ -69,6 +68,5 @@ public class SpaceScene extends BaseScene {
     public void render(float delta) {
         super.render(delta);
         engine.update(delta);
-        App.instance.debug.render(physics.getWorld().getBox2DWorld(), App.instance.camera.combined);
     }
 }
