@@ -18,7 +18,9 @@ public class RenderSystem extends EntitySystem {
 	private SpriteBatch batch = App.instance.spriteBatch;
 
 	// Constructor
-	public RenderSystem() {}
+	public RenderSystem() {
+		super(3);
+	}
 
 	// Functions
     @Override

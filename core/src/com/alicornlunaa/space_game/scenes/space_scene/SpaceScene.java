@@ -2,6 +2,7 @@ package com.alicornlunaa.space_game.scenes.space_scene;
 
 import com.alicornlunaa.selene_engine.ecs.AnimationSystem;
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.CameraSystem;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.ecs.SpriteComponent;
@@ -29,7 +30,7 @@ public class SpaceScene extends BaseScene {
         // Initialize ashley
         engine.addSystem(physics);
         engine.addSystem(new RenderSystem());
-        // engine.addSystem(new CameraSystem());
+        engine.addSystem(new CameraSystem());
         engine.addSystem(new AnimationSystem());
         engine.addSystem(new PlayerSystem());
         engine.addSystem(new ShipSystem());

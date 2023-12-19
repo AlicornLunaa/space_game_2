@@ -25,7 +25,9 @@ public class PlayerSystem extends EntitySystem {
     private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
 
     // Constructor
-    public PlayerSystem(){}
+    public PlayerSystem(){
+        super(1);
+    }
 
     // Functions
     @Override

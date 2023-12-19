@@ -15,7 +15,9 @@ public class CameraSystem extends EntitySystem {
     private ComponentMapper<CameraComponent> cm = ComponentMapper.getFor(CameraComponent.class);
 
     // Constructor
-    public CameraSystem(){}
+    public CameraSystem(){
+        super(2);
+    }
 
     // Functions
     @Override
@@ -37,6 +39,7 @@ public class CameraSystem extends EntitySystem {
             
             if(cameraComponent.active && App.instance.camera != cameraComponent.camera){
                 App.instance.camera = cameraComponent.camera;
+                break;
             }
         }
     }

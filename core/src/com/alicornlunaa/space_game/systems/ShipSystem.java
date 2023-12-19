@@ -53,7 +53,9 @@ public class ShipSystem extends EntitySystem {
 	private SpriteBatch batch = App.instance.spriteBatch;
 
     // Constructor
-    public ShipSystem(){}
+    public ShipSystem(){
+        super(3);
+    }
 
     // Functions
     @Override

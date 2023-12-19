@@ -2,6 +2,7 @@ package com.alicornlunaa.space_game.factories;
 
 import com.alicornlunaa.selene_engine.ecs.AnimationComponent;
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.CameraComponent;
 import com.alicornlunaa.selene_engine.ecs.SpriteComponent;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
@@ -39,6 +40,7 @@ public class CharacterFactory {
         
         Entity entity = createCharacter(x, y, rotation);
         entity.add(new PlayerComponent());
+        entity.add(new CameraComponent(1280, 720));
         entity.add(animationComp);
         return entity;
     }

@@ -68,6 +68,7 @@ public class PhysicsSystem extends EntitySystem {
 
     // Constructor
     public PhysicsSystem(float physScale){
+        super(0);
         world = new PhysWorld(physScale);
     }
 
