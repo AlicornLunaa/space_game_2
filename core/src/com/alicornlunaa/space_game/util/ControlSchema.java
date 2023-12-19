@@ -74,9 +74,8 @@ public class ControlSchema {
     public static void fromFile(String filename){
         FileHandle file = Gdx.files.local(filename);
 
-        if(!file.exists()){
+        if(!file.exists())
             ControlSchema.save(filename);
-        }
 
         try {
             JSONObject obj = new JSONObject(file.readString());

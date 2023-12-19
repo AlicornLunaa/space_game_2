@@ -44,6 +44,7 @@ public class PlayerSystem extends EntitySystem {
             AnimationComponent animComp = am.get(entity);
 
             // Run raycasts
+            plyComp.onGround = false;
             bodyComp.world.getBox2DWorld().rayCast(
                 plyComp.jumpRaycast,
                 bodyComp.body.getWorldPoint(new Vector2(0, Constants.PLAYER_HEIGHT / -2)).cpy(),
@@ -72,7 +73,7 @@ public class PlayerSystem extends EntitySystem {
             // Apply forces
             if(plyComp.isNoclipping){
                 // Noclip physics
-                float speed = Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 1000 : 10;
+                float speed = Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 1000 : 10; 
 
                 bodyComp.body.setLinearVelocity(0, 0);
                 bodyComp.body.setFixedRotation(true);
@@ -98,7 +99,7 @@ public class PlayerSystem extends EntitySystem {
                 bodyComp.body.setFixedRotation(true);
 
                 if(plyComp.vertical != 0 || plyComp.horizontal != 0 && bodyComp.body.getLinearVelocity().len() < 5){
-                    bodyComp.body.applyLinearImpulse(new Vector2(plyComp.horizontal * Constants.PLAYER_MOVEMENT_SPEED, plyComp.vertical * Constants.PLAYER_MOVEMENT_SPEED).scl(deltaTime), bodyComp.body.getWorldCenter(), true);
+                    bodyComp.body.applyLinearImpulse(new Vector2(plyComp.horizontal * Constants.PLAYER_MOVEMENT_SPEED, (plyComp.onGround ? plyComp.vertical : 0) * Constants.PLAYER_MOVEMENT_SPEED).scl(deltaTime), bodyComp.body.getWorldCenter(), true);
                 }
             }
         }
