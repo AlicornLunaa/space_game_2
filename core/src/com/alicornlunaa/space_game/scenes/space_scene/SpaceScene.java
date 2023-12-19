@@ -11,6 +11,7 @@ import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.factories.CharacterFactory;
 import com.alicornlunaa.space_game.factories.ShipFactory;
+import com.alicornlunaa.space_game.systems.PlayerSystem;
 import com.alicornlunaa.space_game.systems.ShipSystem;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.Engine;
@@ -30,6 +31,7 @@ public class SpaceScene extends BaseScene {
         engine.addSystem(new RenderSystem());
         // engine.addSystem(new CameraSystem());
         engine.addSystem(new AnimationSystem());
+        engine.addSystem(new PlayerSystem());
         engine.addSystem(new ShipSystem());
 
         // Init camera

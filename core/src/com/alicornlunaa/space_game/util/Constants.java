@@ -11,8 +11,9 @@ public class Constants {
     // Player constraints
     public static final float PLAYER_WIDTH = 0.2f;
     public static final float PLAYER_HEIGHT = 0.4f;
-    public static final float PLAYER_MOVEMENT_SPEED = 6.f;
+    public static final float PLAYER_MOVEMENT_SPEED = 0.4f;
     public static final float PLAYER_JUMP_FORCE = 60.f;
+    public static final float PLAYER_ROLL_FORCE = 8.f;
     
     // Scaling constants
     public static final float PPM = 128.0f;

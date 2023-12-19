@@ -45,13 +45,6 @@ public class Player extends BaseEntity {
     public enum State { IDLE, MOVE_LEFT, MOVE_RIGHT, JUMP };
 
     // Variables
-    public TransformComponent transform = getComponent(TransformComponent.class);
-    public BodyComponent bodyComponent;
-
-    private float vertical = 0.0f;
-    private float horizontal = 0.0f;
-    private boolean grounded = false;
-    private boolean noclip = false;
 
     private @Null DriveableEntity vehicle = null;
     // private Vector3 cameraAngle = new Vector3(0, 1, 0);
@@ -60,23 +53,6 @@ public class Player extends BaseEntity {
     private float animationTimer = 0.f;
     private State animationState = State.IDLE;
     private HashMap<State, Animation<TextureRegion>> animations = new HashMap<>();
-
-    private static final float PLAYER_WIDTH = 0.2f;
-    private static final float PLAYER_HEIGHT = 0.4f;
-    private static final float MOVEMENT_SPEED = 6.f;
-    private static final float JUMP_FORCE = 60.f;
-
-    // Private functions
-    private Array<TextureRegion> getTextureRegions(String path){
-        Array<TextureRegion> out = new Array<>();
-        Array<AtlasRegion> arr = App.instance.atlas.findRegions(path);
-
-        for(AtlasRegion a : arr){
-            out.add(new TextureRegion(a));
-        }
-
-        return out;
-    }
 
     private void initializePhys(PhysWorld world, float x, float y){
         BodyDef def = new BodyDef();
