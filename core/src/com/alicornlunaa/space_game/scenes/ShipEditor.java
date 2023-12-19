@@ -4,9 +4,10 @@ import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.components.ship.ShipComponent;
 import com.alicornlunaa.space_game.components.ship.parts.Part;
 import com.alicornlunaa.space_game.components.ship.parts.Part.Node;
-import com.alicornlunaa.space_game.objects.ship.Ship;
+import com.alicornlunaa.space_game.systems.ShipRenderSystem;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
@@ -32,6 +33,7 @@ import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 
 public class ShipEditor extends BaseScene {
     // Interfaces
@@ -60,7 +62,7 @@ public class ShipEditor extends BaseScene {
 
     private Engine engine = new Engine();
     private PhysWorld world;
-    private Ship ship;
+    private ShipComponent ship;
     
     // Private functions
     private Part.Node closestNode(final Vector2 pos, Part part){
@@ -130,7 +132,7 @@ public class ShipEditor extends BaseScene {
                 public void changed(ChangeEvent e, Actor a){
                     // selectedPart = new Part(ship, game.partManager.get(selectedCategory, partID)); TODO: Fix
 
-                    // if(ship.getRootPart() == null){
+                    // if(ship.rootPart == null){
                     //     ship.setRootPart(selectedPart);
                     //     selectedPart = null;
                     // }
@@ -188,7 +190,7 @@ public class ShipEditor extends BaseScene {
             public void changed(ChangeEvent event, Actor actor){
                 // Save file to ./saves/ships/name.ship
                 if(nameField.getText().length() > 0){
-                    ship.load("./saves/ships/" + nameField.getText() + ".ship");
+                    ship = new ShipComponent("./saves/ships/" + nameField.getText() + ".ship");
                 }
             }
         });
@@ -235,12 +237,14 @@ public class ShipEditor extends BaseScene {
         editorStage.addActor(t);
 
         world = new PhysWorld(128);
-        ship = new Ship(game, world, 0, 0, 0);
-        // ship.getTransform().position.set(1280 / 2, 720 / 2);
+        ship = new ShipComponent();
+
+        Entity entity = new Entity();
+        entity.add(ship);
 
         engine.addSystem(new RenderSystem());
-        // registry.registerSystem(new EditorRenderSystem(game));
-        engine.addEntity(ship);
+        engine.addSystem(new ShipRenderSystem());
+        engine.addEntity(entity);
     }
 
     private void initializeControls(){
@@ -260,7 +264,7 @@ public class ShipEditor extends BaseScene {
                 if(button == Buttons.LEFT){
                     if(selectedPart != null){
                         // Trying to place something
-                        Part.Node node1 = ShipEditor.this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.getRootPart());
+                        Part.Node node1 = ShipEditor.this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.rootPart);
 
                         if(node1 != null){
                             // Attachment point exists, get the other side
@@ -283,13 +287,13 @@ public class ShipEditor extends BaseScene {
                         return true;
                     } else {
                         // Trying to pick something up?
-                        if(ship.getRootPart() == null) return false;
+                        if(ship.rootPart == null) return false;
 
-                        Part hoveredPart = ship.getRootPart().hit(editorCursorPos.cpy().sub(editorCenterPos));
+                        Part hoveredPart = ship.rootPart.hit(editorCursorPos.cpy().sub(editorCenterPos));
                         if(hoveredPart != null){
-                            if(hoveredPart == ship.getRootPart()){
+                            if(hoveredPart == ship.rootPart){
                                 // Delete part
-                                ship.setRootPart(null);
+                                ship.rootPart = null;
                             } else {
                                 Part.Node parentConnectingNode = hoveredPart.getParentNode();
                                 hoveredPart.deattach(parentConnectingNode);
@@ -397,7 +401,7 @@ public class ShipEditor extends BaseScene {
 
             // Draw snapped part or free
             boolean renderedPart = false;
-            Part.Node node1 = this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.getRootPart());
+            Part.Node node1 = this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.rootPart);
             if(node1 != null){
                 // Attachment point exists, get the other side
                 Vector2 nodePos1 = node1.part.getNodePosition(node1).cpy().add(editorCenterPos);
@@ -432,8 +436,8 @@ public class ShipEditor extends BaseScene {
 
             batch.end();
         } else {
-            if(ship.getRootPart() != null){
-                // Part hoveredPart = ship.getRootPart().hit(editorCursorPos.cpy().sub(editorCenterPos));
+            if(ship.rootPart != null){
+                // Part hoveredPart = ship.rootPart.hit(editorCursorPos.cpy().sub(editorCenterPos));
             }
         }
 
@@ -446,7 +450,7 @@ public class ShipEditor extends BaseScene {
             
             // Draw snapped part or free
             boolean renderedPart = false;
-            Part.Node node1 = this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.getRootPart());
+            Part.Node node1 = this.closestNode(editorCursorPos.cpy().sub(editorCenterPos), ship.rootPart);
             if(node1 != null){
                 // Attachment point exists, get the other side
                 Vector2 nodePos1 = node1.part.getNodePosition(node1).cpy().add(editorCenterPos);

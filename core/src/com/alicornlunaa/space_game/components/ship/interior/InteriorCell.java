@@ -1,4 +1,4 @@
-package com.alicornlunaa.space_game.objects.ship.interior;
+package com.alicornlunaa.space_game.components.ship.interior;
 
 import org.json.JSONArray;
 
@@ -8,16 +8,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 
 /** The interior is built of cells, cell size is in the part data in the JSON.
  * Allow the player to build interior walls and cosmetics inside
  */
 public class InteriorCell {
     // Variables
-    private final App game;
-    private final Body body;
-
     protected int x = 0;
     protected int y = 0;
     protected Collider collider;
@@ -32,25 +28,25 @@ public class InteriorCell {
         connections += (right ? 1 : 0);
 
         if(connections == 0){
-            texture = new TextureRegion(game.atlas.findRegion("interior/cell"));
+            texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell"));
             collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
         } else if(connections == 1){
             collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_one.json").readString()));
 
             if(left){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_one_horizontal"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_one_horizontal"));
                 texture.flip(true, false);
                 collider.setRotation(180);
             } else if(right){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_one_horizontal"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_one_horizontal"));
                 texture.flip(false, false);
                 collider.setRotation(0);
             } else if(up){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_one_vertical"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_one_vertical"));
                 texture.flip(false, true);
                 collider.setRotation(90);
             } else if(down){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_one_vertical"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_one_vertical"));
                 texture.flip(false, false);
                 collider.setRotation(270);
             }
@@ -58,7 +54,7 @@ public class InteriorCell {
             // Either corner or wall
             if((up || down) && (left || right)){
                 // Corner piece
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_corner"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_corner"));
                 collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_corner.json").readString()));
 
                 if(right && down){
@@ -79,10 +75,10 @@ public class InteriorCell {
                 collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_through.json").readString()));
 
                 if(left || right){
-                    texture = new TextureRegion(game.atlas.findRegion("interior/cell_through_horizontal"));
+                    texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_through_horizontal"));
                     collider.setRotation(0);
                 } else {
-                    texture = new TextureRegion(game.atlas.findRegion("interior/cell_through_vertical"));
+                    texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_through_vertical"));
                     collider.setRotation(90);
                 }
             }
@@ -91,43 +87,43 @@ public class InteriorCell {
             collider = new Collider(new JSONArray(Gdx.files.internal("colliders/interior/cell_wall.json").readString()));
 
             if(!up){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_wall_horizontal"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_wall_horizontal"));
                 texture.flip(false, false);
                 collider.setRotation(0);
             } else if(!down){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_wall_horizontal"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_wall_horizontal"));
                 texture.flip(false, true);
                 collider.setRotation(180);
             } else if(!left){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_wall_vertical"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_wall_vertical"));
                 texture.flip(false, false);
                 collider.setRotation(90);
             } else if(!right){
-                texture = new TextureRegion(game.atlas.findRegion("interior/cell_wall_vertical"));
+                texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_wall_vertical"));
                 texture.flip(true, false);
                 collider.setRotation(270);
             }
         } else if(connections == 4){
-            texture = new TextureRegion(game.atlas.findRegion("interior/cell_all"));
+            texture = new TextureRegion(App.instance.atlas.findRegion("interior/cell_all"));
             collider = new Collider();
         }
     
         collider.setScale(1);
         collider.setPosition(new Vector2(x * texture.getRegionWidth(), y * texture.getRegionHeight()));
-        collider.attach(body);
     }
     
     // Constructor
-    public InteriorCell(final App game, final Body body, int x, int y, boolean up, boolean down, boolean left, boolean right){
-        this.game = game;
-        this.body = body;
+    public InteriorCell(int x, int y, boolean up, boolean down, boolean left, boolean right){
         this.x = x;
         this.y = y;
-
         createShapes(up, down, left, right);
     }
 
     // Functions
+    public Collider getCollider(){ return collider; }
+    public int getX(){ return x; }
+    public int getY(){ return y; }
+
     public void updateConnections(boolean up, boolean down, boolean left, boolean right){
         collider.detach();
         createShapes(up, down, left, right);

@@ -10,6 +10,18 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Null;
 
+/* Entering the ship
+if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
+    Vector3 clickPosInWorld = game.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+    Vector2 position = new Vector2(clickPosInWorld.x, clickPosInWorld.y).sub(transform.position.cpy().scl(Constants.PPM)).add(bodyComponent.body.getLocalCenter().cpy().scl(Constants.PPM));
+                    
+    if(rootPart.contains(position)){
+        System.out.println("Drive");
+        drive(getDriver());
+    }
+}
+*/
+
 public class ShipComponent implements Component {
     // Variables
     public boolean rcs = false; // RCS thrusters
