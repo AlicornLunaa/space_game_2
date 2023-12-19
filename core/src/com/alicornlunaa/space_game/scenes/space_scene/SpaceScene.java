@@ -8,6 +8,8 @@ import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.factories.ShipFactory;
+import com.alicornlunaa.space_game.systems.ShipSystem;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -25,6 +27,7 @@ public class SpaceScene extends BaseScene {
         engine.addSystem(physics);
         engine.addSystem(new RenderSystem());
         // engine.addSystem(new CameraSystem());
+        engine.addSystem(new ShipSystem());
 
         // Init camera
         App.instance.camera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
@@ -32,21 +35,17 @@ public class SpaceScene extends BaseScene {
         App.instance.camera.update();
 
         // Test entity
-        Entity e = new Entity();
-        e.add(new TransformComponent());
-        e.add(new BodyComponent(Collider.box(0, 0, 0.5f, 0.5f, 0)));
-        e.add(new SpriteComponent(App.instance.atlas.findRegion("dev_texture"), 1, 1));
-        engine.addEntity(e);
+        engine.addEntity(ShipFactory.createShip(0, 1, 0));
         
         // Ground entity
         TransformComponent transform = new TransformComponent();
-        transform.position.set(0, -1.5f);
+        transform.position.set(0, -2.5f);
         transform.rotation = (float)Math.toRadians(5);
 
         BodyComponent bodyComponent = new BodyComponent(Collider.box(0, 0, 4.f, 0.5f, 0));
         bodyComponent.bodyDef.type = BodyType.StaticBody;
 
-        e = new Entity();
+        Entity e = new Entity();
         e.add(transform);
         e.add(bodyComponent);
         e.add(new SpriteComponent(App.instance.atlas.findRegion("dev_texture"), 8, 1));

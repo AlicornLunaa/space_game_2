@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.space_game.objects.ship.Ship;
+import com.alicornlunaa.space_game.components.ship.ShipComponent;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -51,7 +51,7 @@ public class Part implements Disposable,Comparable<Part> {
     }
 
     // Variables
-    protected Ship parent;
+    protected ShipComponent shipComponent;
     private TextureRegion texture;
     private Collider collider;
     private Array<Node> attachments = new Array<>();
@@ -69,8 +69,8 @@ public class Part implements Disposable,Comparable<Part> {
     private float rotation = 0;
 
     // Constructor
-    public Part(final App game, Ship parent, JSONObject data){
-        this.parent = parent;
+    public Part(ShipComponent shipComponent, JSONObject data){
+        this.shipComponent = shipComponent;
 
         type = data.optString("type", "STRUCTURAL");
         id = data.optString("id", "BSC_FUSELAGE");
@@ -79,7 +79,7 @@ public class Part implements Disposable,Comparable<Part> {
         interiorSize = data.optInt("interiorSize", 3);
         freeform = data.optBoolean("freeform", false);
 
-        texture = game.atlas.findRegion("parts/" + id.toLowerCase());
+        texture = App.instance.atlas.findRegion("parts/" + id.toLowerCase());
         collider = new Collider(new JSONArray(Gdx.files.internal("colliders/parts/" + id.toLowerCase() + ".json").readString()));
         
         for(int i = 0; i < data.getJSONArray("attachmentPoints").length(); i++){
@@ -149,17 +149,16 @@ public class Part implements Disposable,Comparable<Part> {
         return deattach(thisNode);
     }
     
-    public void setParent(Ship ship, Matrix4 trans){
+    public void setParent(ShipComponent shipComponent, BodyComponent bodyComponent, Matrix4 trans){
         Vector3 temp = new Vector3();
         trans.getTranslation(temp);
         pos.set(temp.x, temp.y);
 
-        BodyComponent bc = ship.getBody();
-        parent = ship;
+        this.shipComponent = shipComponent;
         collider.setScale((flipX ? -1 : 1) * partScale, (flipY ? -1 : 1) * partScale);
         collider.setPosition(pos.cpy());
         collider.setRotation(rotation * ((getFlipX() ^ getFlipY()) ? -1 : 1));
-        collider.attachCollider(bc.body);
+        bodyComponent.addCollider(collider);
 
         for(Node node : attachments){
             if(node.next != null){
@@ -170,7 +169,7 @@ public class Part implements Disposable,Comparable<Part> {
                 trans.rotate(0, 0, 1, -node.part.getRotation());
                 trans.translate(-node.next.point.x, -node.next.point.y, 0);
                 trans.scale(1.f / partScale, 1.f / partScale, 1);
-                node.next.part.setParent(ship, trans);
+                node.next.part.setParent(shipComponent, bodyComponent, trans);
                 trans.scale(partScale, partScale, 1);
                 trans.translate(node.next.point.x, node.next.point.y, 0);
                 trans.rotate(0, 0, 1, node.part.getRotation());
@@ -406,34 +405,34 @@ public class Part implements Disposable,Comparable<Part> {
         return obj;
     }
 
-    public static Part spawn(final App game, final Ship ship, String type, String id){
+    public static Part spawn(ShipComponent shipComponent, String type, String id){
         // Load part information from the json object
         switch(type){
             case "AERO":
-                return new Aero(game, ship, game.partManager.get(type, id));
+                return new Aero(shipComponent, App.instance.partManager.get(type, id));
                 
             case "STRUCTURAL":
-                return new Structural(game, ship, game.partManager.get(type, id));
+                return new Structural(shipComponent, App.instance.partManager.get(type, id));
                 
             case "THRUSTER":
-                return new Thruster(game, ship, game.partManager.get(type, id));
+                return new Thruster(shipComponent, App.instance.partManager.get(type, id));
                 
             case "RCSPORT":
-                return new RCSPort(game, ship, game.partManager.get(type, id));
+                return new RCSPort(shipComponent, App.instance.partManager.get(type, id));
 
             default:
                 return null;
         }
     }
 
-    public static Part unserialize(final App game, final Ship ship, JSONObject obj){
+    public static Part unserialize(ShipComponent shipComponent, JSONObject obj){
         String type = obj.getString("type");
         String id = obj.getString("id");
         float rotation = obj.getFloat("rotation");
         boolean flipX = obj.getBoolean("flipX");
         boolean flipY = obj.getBoolean("flipY");
 
-        Part newPart = Part.spawn(game, ship, type, id);
+        Part newPart = Part.spawn(shipComponent, type, id);
         newPart.rotation = rotation;
         newPart.flipX = flipX;
         newPart.flipY = flipY;
@@ -448,7 +447,7 @@ public class Part implements Disposable,Comparable<Part> {
                 JSONObject data = (JSONObject)rawData;
                 JSONObject nodeData = data.getJSONObject("nodeData");
                 int connectingIndex = data.getInt("connectingIndex");
-                newPart.attach(i, connectingIndex, unserialize(game, ship, nodeData));
+                newPart.attach(i, connectingIndex, unserialize(shipComponent, nodeData));
             }
         }
 

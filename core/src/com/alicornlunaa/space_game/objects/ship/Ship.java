@@ -10,7 +10,6 @@ import com.alicornlunaa.space_game.components.ship.parts.Part;
 import com.alicornlunaa.space_game.objects.ship.interior.InteriorComponent;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -65,16 +64,6 @@ public class Ship extends Entity {
         
         // bodyComponent.setWorld(world);
         // bodyComponent.body.setTransform(-1, 1, 0);
-    }
-
-    private void computeSAS(){
-        // Reduce angular velocity with controls
-        float angVel = 0;//bodyComponent.body.getAngularVelocity();
-        angVel = Math.min(Math.max(angVel * 2, -1), 1); // Clamp value
-
-        if(Math.abs(angVel) <= 0.005f) angVel = 0;
-
-        state.artifRoll = angVel;
     }
 
     // Constructor
@@ -220,14 +209,6 @@ public class Ship extends Entity {
     
     public void setRootPart(Part p){ this.rootPart = p; }
     public Part getRootPart(){ return rootPart; }
-    
-    public void assemble(){
-        if(rootPart != null)
-            rootPart.setParent(this, new Matrix4());
-
-        if(interior != null)
-            interior.assemble();
-    }
 
     public BodyComponent getBody(){
         // return bodyComponent;

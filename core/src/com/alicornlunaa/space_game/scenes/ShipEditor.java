@@ -128,12 +128,12 @@ public class ShipEditor extends BaseScene {
             btn.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent e, Actor a){
-                    selectedPart = new Part(game, ship, game.partManager.get(selectedCategory, partID));
+                    // selectedPart = new Part(ship, game.partManager.get(selectedCategory, partID)); TODO: Fix
 
-                    if(ship.getRootPart() == null){
-                        ship.setRootPart(selectedPart);
-                        selectedPart = null;
-                    }
+                    // if(ship.getRootPart() == null){
+                    //     ship.setRootPart(selectedPart);
+                    //     selectedPart = null;
+                    // }
                 }
             });
             parts.addActor(btn);
@@ -274,7 +274,7 @@ public class ShipEditor extends BaseScene {
                                 // Both exist, check dist
                                 if(nodePos1.dst(nodePos2) < snapDistance){
                                     node1.part.attach(node1, node2);
-                                    ship.assemble();
+                                    // ship.assemble(); TODO: Fix
                                 }
                             }
                         }

@@ -26,4 +26,15 @@ public class BodyComponent implements Component {
         this();
         colliders.add(collider);
     }
+
+    // Functions
+    public void addCollider(Collider collider){
+        // Keep track of active colliders
+        colliders.add(collider);
+
+        if(body != null){
+            // Attach immediately
+            collider.attachCollider(body);
+        }
+    }
 }
