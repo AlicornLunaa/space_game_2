@@ -24,11 +24,25 @@ public class PlayerComponent implements Component {
         }
     }
 
+    public static enum PlayerState {
+        // Enumerations
+        IDLE(0), MOVE_LEFT_GROUND(1), MOVE_RIGHT_GROUND(2), JUMPING(0);
+
+        // Variables
+        public final int animIndex;
+
+        // Constructor
+        private PlayerState(int index){
+            animIndex = index;
+        }
+    };
+
     // Variables
     public boolean enabled = true;
     public boolean inSpace = true;
     public boolean onGround = false;
     public boolean isNoclipping = false;
+    public PlayerState state = PlayerState.IDLE;
 
     public float vertical = 0.f;
     public float horizontal = 0.f;

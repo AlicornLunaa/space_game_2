@@ -32,7 +32,7 @@ public class AnimationSystem extends EntitySystem {
             SpriteComponent spriteComp = sm.get(entity);
             
             animationComp.stateTime += deltaTime;
-            spriteComp.texture = animationComp.animations.peek().getKeyFrame(animationComp.stateTime);
+            spriteComp.texture = animationComp.animations.get(animationComp.activeAnimation).getKeyFrame(animationComp.stateTime);
         }
     }
 }

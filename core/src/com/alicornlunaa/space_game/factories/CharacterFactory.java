@@ -34,6 +34,8 @@ public class CharacterFactory {
         // Create player character
         AnimationComponent animationComp = new AnimationComponent();
         animationComp.animations.add(new Animation<AtlasRegion>(1 / 12.f, App.instance.atlas.findRegions("player/idle"), PlayMode.LOOP));
+        animationComp.animations.add(new Animation<AtlasRegion>(1 / 12.f, App.instance.atlas.findRegions("player/move_left"), PlayMode.LOOP));
+        animationComp.animations.add(new Animation<AtlasRegion>(1 / 12.f, App.instance.atlas.findRegions("player/move_right"), PlayMode.LOOP));
         
         Entity entity = createCharacter(x, y, rotation);
         entity.add(new PlayerComponent());

@@ -4,6 +4,7 @@ import com.alicornlunaa.selene_engine.ecs.AnimationComponent;
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.space_game.components.player.PlayerComponent;
+import com.alicornlunaa.space_game.components.player.PlayerComponent.PlayerState;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.ControlSchema;
 import com.badlogic.ashley.core.ComponentMapper;
@@ -66,6 +67,12 @@ public class PlayerSystem extends EntitySystem {
 
             if(Gdx.input.isKeyJustPressed(ControlSchema.PLAYER_NOCLIP)) plyComp.isNoclipping = !plyComp.isNoclipping;
 
+            // Set animation
+            if(plyComp.state.animIndex != animComp.activeAnimation){
+                animComp.activeAnimation = plyComp.state.animIndex;
+                animComp.stateTime = 0.f;
+            }
+
             // Skip forces if the component is disabled. This will be used for controlling other things
             if(!plyComp.enabled)
                 continue;
@@ -81,6 +88,8 @@ public class PlayerSystem extends EntitySystem {
                 transform.position.x += plyComp.horizontal * speed * deltaTime;
                 transform.position.y += plyComp.vertical * speed * deltaTime;
                 transform.rotation += plyComp.roll * 3 * deltaTime;
+
+                plyComp.state = PlayerState.IDLE;
             } else if(plyComp.inSpace){
                 // Space physics
                 bodyComp.body.setFixedRotation(false);
@@ -94,6 +103,11 @@ public class PlayerSystem extends EntitySystem {
 
                 if(plyComp.roll != 0)
                     bodyComp.body.applyTorque(plyComp.roll * Constants.PLAYER_ROLL_FORCE * deltaTime, true);
+
+                // Get animation
+                if(plyComp.horizontal < 0) plyComp.state = PlayerState.MOVE_LEFT_GROUND;
+                else if(plyComp.horizontal > 0) plyComp.state = PlayerState.MOVE_RIGHT_GROUND;
+                else plyComp.state = PlayerState.IDLE;
             } else {
                 // Ground physics
                 bodyComp.body.setFixedRotation(true);
@@ -101,6 +115,12 @@ public class PlayerSystem extends EntitySystem {
                 if(plyComp.vertical != 0 || plyComp.horizontal != 0 && bodyComp.body.getLinearVelocity().len() < 5){
                     bodyComp.body.applyLinearImpulse(new Vector2(plyComp.horizontal * Constants.PLAYER_MOVEMENT_SPEED, (plyComp.onGround ? plyComp.vertical : 0) * Constants.PLAYER_MOVEMENT_SPEED).scl(deltaTime), bodyComp.body.getWorldCenter(), true);
                 }
+
+                // Get animation
+                if(plyComp.horizontal < 0) plyComp.state = PlayerState.MOVE_LEFT_GROUND;
+                else if(plyComp.horizontal > 0) plyComp.state = PlayerState.MOVE_RIGHT_GROUND;
+                else if(plyComp.vertical > 0) plyComp.state = PlayerState.JUMPING;
+                else plyComp.state = PlayerState.IDLE;
             }
         }
     }
