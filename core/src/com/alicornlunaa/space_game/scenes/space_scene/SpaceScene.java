@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.cell_simulation.Simulation;
 import com.alicornlunaa.space_game.factories.BasicFactory;
 import com.alicornlunaa.space_game.factories.CharacterFactory;
 import com.alicornlunaa.space_game.factories.ShipFactory;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 public class SpaceScene extends BaseScene {
     // Variables
     private Engine engine = new Engine();
+    private Simulation pixelSimulation = new Simulation(50, 50);
 
     // Constructor
     public SpaceScene() {
@@ -33,7 +35,7 @@ public class SpaceScene extends BaseScene {
 
         // Init camera
         App.instance.camera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
-        App.instance.camera.position.set(0, 0, 0);
+        App.instance.camera.position.set(1.5f, 1.5f, 0);
         App.instance.camera.update();
 
         // Test entities
@@ -46,6 +48,7 @@ public class SpaceScene extends BaseScene {
     @Override
     public void render(float delta) {
         super.render(delta);
-        engine.update(delta);
+        // engine.update(delta);
+        pixelSimulation.update(delta);
     }
 }
