@@ -6,7 +6,7 @@ import com.alicornlunaa.space_game.util.Constants;
 public class LiquidTile extends AbstractTile {
     // Variables
     public int spreadFactor = 1;
-    public float viscosity = 0.1f;
+    public float viscosity = 0.96f;
     public boolean renderFullBlock = false;
 
     // Constructor
@@ -33,12 +33,9 @@ public class LiquidTile extends AbstractTile {
         AbstractTile target = simulation.getTile(currX, currY - 1);
 
         if(simulation.inBounds(currX, currY - 1) && target == null){
-            // Create new liquid cell
-            LiquidTile tile = new LiquidTile(element);
-            tile.renderFullBlock = true;
-            tile.mass = 0.f;
-            target = tile;
-            simulation.tiles[simulation.getIndex(currX, currY - 1)] = tile;
+            // Liquid falling with gravity, viscosity does not matter
+            simulation.swap(currX, currY, currX, currY - 1);
+            return;
         }
 
         if(target != null && target.element == element && target.mass < target.element.density){
