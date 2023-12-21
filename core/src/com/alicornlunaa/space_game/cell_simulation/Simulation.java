@@ -4,11 +4,17 @@ import java.util.Stack;
 
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.cell_simulation.actions.AbstractAction;
+import com.alicornlunaa.space_game.cell_simulation.actions.CreateAction;
 import com.alicornlunaa.space_game.cell_simulation.tiles.AbstractTile;
+import com.alicornlunaa.space_game.cell_simulation.tiles.SolidTile;
 import com.alicornlunaa.space_game.util.Vector2i;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
@@ -28,6 +34,8 @@ public class Simulation {
         width = pixelWidth;
         height = pixelHeight;
         tiles = new AbstractTile[width * height];
+
+        actionStack.add(new CreateAction(new SolidTile(), 5, 15));
     }
 
     // Functions
@@ -83,16 +91,21 @@ public class Simulation {
         return null;
     }
 
+    public boolean inBounds(int x, int y){
+        return (x >= 0 && x < width && y >= 0 && y < height);
+    }
+
     public void update(float deltaTime){
         // Update every cell
         for(int i = 0; i < tiles.length; i++){
-            tiles[i].update(this);
+            if(tiles[i] == null) continue;
+            tiles[i].update(this, getX(i), getY(i));
         }
 
         // Commit every action
         while(!actionStack.empty()){
             AbstractAction action = actionStack.pop();
-            
+            action.commit(this);
         }
 
         // Draw everything
@@ -101,9 +114,23 @@ public class Simulation {
         batch.setAutoShapeType(true);
         batch.begin();
 
+        batch.set(ShapeType.Line);
         for(int i = 0; i < tiles.length; i++){
-            batch.set(ShapeType.Line);
+            batch.setColor(tiles[i] instanceof SolidTile ? Color.RED : Color.WHITE);
             batch.rect(getX(i) * tileSize, getY(i) * tileSize, tileSize, tileSize);
+        }
+
+        // Cursor
+        Vector3 v = App.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        v.set((int)(v.x / tileSize) * tileSize, (int)(v.y / tileSize) * tileSize, 0);
+
+        if(inBounds((int)(v.x / tileSize), (int)(v.y / tileSize))){
+            batch.setColor(Color.CYAN);
+            batch.rect(v.x, v.y, tileSize, tileSize);
+
+            if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
+                actionStack.add(new CreateAction(new SolidTile(), (int)(v.x / tileSize), (int)(v.y / tileSize)));
+            }
         }
 
         batch.end();
