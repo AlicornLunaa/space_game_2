@@ -11,6 +11,8 @@ public class SolidTile extends AbstractTile {
     // Functions
     @Override
     public void update(Simulation simulation, int currX, int currY){
+        super.update(simulation, currX, currY);
+        
         if(checkTileSwap(simulation, currX, currY, currX, currY - 1)) return;
         if(checkTileSwap(simulation, currX, currY, currX - 1, currY - 1)) return;
         if(checkTileSwap(simulation, currX, currY, currX + 1, currY - 1)) return;

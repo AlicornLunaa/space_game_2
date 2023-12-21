@@ -1,7 +1,6 @@
 package com.alicornlunaa.space_game.cell_simulation.tiles;
 
 import com.alicornlunaa.space_game.cell_simulation.Simulation;
-import com.alicornlunaa.space_game.cell_simulation.actions.SwapAction;
 
 public abstract class AbstractTile {
     // Enumerations
@@ -25,7 +24,7 @@ public abstract class AbstractTile {
         AbstractTile target = simulation.getTile(tx, ty);
 
         if(simulation.inBounds(tx, ty) && (target == null || target.state != State.SOLID)){
-            simulation.actionStack.add(new SwapAction(fx, fy, tx, ty));
+            simulation.swap(fx, fy, tx, ty);
             return true;
         }
 
@@ -34,5 +33,7 @@ public abstract class AbstractTile {
 
     public void update(Simulation simulation, int currX, int currY){
         // Basic functionality of every cell, like heat
+        AbstractTile current = simulation.getTile(currX, currY);
+        current.isUpdated = true;
     }
 }
