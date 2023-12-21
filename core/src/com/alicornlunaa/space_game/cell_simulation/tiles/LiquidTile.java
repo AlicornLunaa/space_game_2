@@ -6,7 +6,7 @@ import com.alicornlunaa.space_game.util.Constants;
 public class LiquidTile extends AbstractTile {
     // Variables
     public int spreadFactor = 1;
-    public float viscosity = 0.95f;
+    public float viscosity = 0.1f;
     public boolean renderFullBlock = false;
 
     // Constructor
@@ -50,9 +50,9 @@ public class LiquidTile extends AbstractTile {
 
         // Flow sideways
         AbstractTile left = simulation.getTile(currX - 1, currY);
-        AbstractTile right = simulation.getTile(currX - 1, currY);
+        AbstractTile right = simulation.getTile(currX + 1, currY);
+        float averageMass = mass;
         int numTiles = 1;
-        float totalMass = mass;
         
         if(simulation.inBounds(currX - 1, currY) && left == null){
             // Create new liquid cell
@@ -72,20 +72,22 @@ public class LiquidTile extends AbstractTile {
             simulation.tiles[simulation.getIndex(currX + 1, currY)] = tile;
         }
 
-        if(left != null && left instanceof LiquidTile && left.element == element){
-            totalMass += left.mass;
-            numTiles++;
+        boolean leftValid = left != null && left instanceof LiquidTile && left.element == element && left.mass < mass;
+        boolean rightValid = right != null && right instanceof LiquidTile && right.element == element && right.mass < mass;
+
+        if(leftValid){ numTiles++; averageMass += left.mass; };
+        if(rightValid){ numTiles++; averageMass += right.mass; }
+
+        if(numTiles > 1){
+            averageMass /= numTiles;
+            
+            float flowAmount = (mass - averageMass) * viscosity; // The amount to flow into other cells is the average minus the current cell
+            mass -= flowAmount;
+            flowAmount /= (numTiles - 1);
+            
+            if(leftValid) left.mass += flowAmount;
+            if(rightValid) right.mass += flowAmount;
+            return;
         }
-
-        if(right != null && right instanceof LiquidTile && right.element == element){
-            totalMass += right.mass;
-            numTiles++;
-        }
-
-        totalMass /= numTiles;
-
-        mass = totalMass;
-        if(left != null && left instanceof LiquidTile && left.element == element) left.mass = totalMass;
-        if(right != null && right instanceof LiquidTile && right.element == element) right.mass = totalMass;
     }
 }

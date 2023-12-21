@@ -146,8 +146,8 @@ public class Simulation {
 
             switch(tiles[i].state){
             case LIQUID:
-                AbstractTile t = tiles[i];
-                batch.rect(getX(i) * tileSize, getY(i) * tileSize, tileSize, tileSize * (t.mass / t.element.density));
+                LiquidTile t = (LiquidTile)tiles[i];
+                batch.rect(getX(i) * tileSize, getY(i) * tileSize, tileSize, t.renderFullBlock ? tileSize : tileSize * (t.mass / t.element.density));
                 break;
 
             default:
