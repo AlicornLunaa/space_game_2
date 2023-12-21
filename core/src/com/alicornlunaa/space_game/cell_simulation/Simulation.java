@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
@@ -32,7 +33,7 @@ public class Simulation {
     public Stack<AbstractAction> actionStack = new Stack<>();
     public AbstractTile tiles[];
     public float tileSize = 0.1f;
-    public Vector2i gravity = new Vector2i(0, -1);
+    public Vector2 gravity = new Vector2(0, -0.02f);
 
     // Constructor
     public Simulation(int pixelWidth, int pixelHeight){
@@ -127,7 +128,9 @@ public class Simulation {
                 }
             }
         }
+    }
 
+    public void render(){
         // Draw everything
         batch.setProjectionMatrix(App.instance.camera.combined);
         batch.setTransformMatrix(new Matrix4());
@@ -175,16 +178,16 @@ public class Simulation {
 
         // Controls
         if(Gdx.input.isKeyJustPressed(Keys.UP)){
-            gravity.y += 1;
+            gravity.y += 0.01f;
             System.out.println(gravity.x + " " + gravity.y);
         } else if(Gdx.input.isKeyJustPressed(Keys.DOWN)){
-            gravity.y -= 1;
+            gravity.y -= 0.01f;
             System.out.println(gravity.x + " " + gravity.y);
         } else if(Gdx.input.isKeyJustPressed(Keys.LEFT)){
-            gravity.x -= 1;
+            gravity.x -= 0.01f;
             System.out.println(gravity.x + " " + gravity.y);
         } else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)){
-            gravity.x += 1;
+            gravity.x += 0.01f;
             System.out.println(gravity.x + " " + gravity.y);
         }
 

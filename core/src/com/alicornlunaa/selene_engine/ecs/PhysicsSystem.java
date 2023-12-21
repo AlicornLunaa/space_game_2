@@ -3,6 +3,7 @@ package com.alicornlunaa.selene_engine.ecs;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.selene_engine.phys.PhysWorld;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.cell_simulation.Simulation;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -65,6 +66,7 @@ public class PhysicsSystem extends EntitySystem {
     private ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
 
     private PhysWorld world;
+    private Simulation pixelSimulation = new Simulation(50, 50);
     private float accumulator = 0.f;
 
     // Constructor
@@ -92,6 +94,7 @@ public class PhysicsSystem extends EntitySystem {
         while(accumulator >= Constants.TIME_STEP){
             accumulator -= Constants.TIME_STEP;
             world.update();
+            pixelSimulation.update(Constants.TIME_STEP);
         }
 
         // Update every entity
@@ -123,5 +126,8 @@ public class PhysicsSystem extends EntitySystem {
         // Render every hitbox
         if(Constants.DEBUG)
             App.instance.debug.render(world.getBox2DWorld(), App.instance.camera.combined);
+
+        // Render simulation
+        pixelSimulation.render();
     }
 }
