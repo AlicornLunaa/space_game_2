@@ -1,7 +1,18 @@
 package com.alicornlunaa.space_game.cell_simulation.tiles;
 
+import com.alicornlunaa.space_game.cell_simulation.Simulation;
+
 public class SolidTile extends AbstractTile {
-    public SolidTile() {
-        super(State.SOLID);
+    // Constructor
+    public SolidTile(Element element) {
+        super(element, State.SOLID);
+    }
+
+    // Functions
+    @Override
+    public void update(Simulation simulation, int currX, int currY){
+        if(checkTileSwap(simulation, currX, currY, currX, currY - 1)) return;
+        if(checkTileSwap(simulation, currX, currY, currX - 1, currY - 1)) return;
+        if(checkTileSwap(simulation, currX, currY, currX + 1, currY - 1)) return;
     }
 }

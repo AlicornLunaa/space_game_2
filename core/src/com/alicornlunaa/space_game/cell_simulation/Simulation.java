@@ -6,6 +6,8 @@ import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.cell_simulation.actions.AbstractAction;
 import com.alicornlunaa.space_game.cell_simulation.actions.CreateAction;
 import com.alicornlunaa.space_game.cell_simulation.tiles.AbstractTile;
+import com.alicornlunaa.space_game.cell_simulation.tiles.Element;
+import com.alicornlunaa.space_game.cell_simulation.tiles.LiquidTile;
 import com.alicornlunaa.space_game.cell_simulation.tiles.SolidTile;
 import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.gdx.Gdx;
@@ -34,12 +36,10 @@ public class Simulation {
         width = pixelWidth;
         height = pixelHeight;
         tiles = new AbstractTile[width * height];
-
-        actionStack.add(new CreateAction(new SolidTile(), 5, 15));
     }
 
     // Functions
-    private Array<Vector2i> getLine(int startX, int startY, int endX, int endY){
+    public static Array<Vector2i> getLine(int startX, int startY, int endX, int endY){
         Array<Vector2i> arr = new Array<>();
 
         int dx = Math.abs(endX - startX);
@@ -116,7 +116,7 @@ public class Simulation {
 
         batch.set(ShapeType.Line);
         for(int i = 0; i < tiles.length; i++){
-            batch.setColor(tiles[i] instanceof SolidTile ? Color.RED : Color.WHITE);
+            batch.setColor(tiles[i] instanceof SolidTile ? Color.RED : (tiles[i] instanceof LiquidTile ? Color.GREEN : Color.WHITE));
             batch.rect(getX(i) * tileSize, getY(i) * tileSize, tileSize, tileSize);
         }
 
@@ -128,8 +128,10 @@ public class Simulation {
             batch.setColor(Color.CYAN);
             batch.rect(v.x, v.y, tileSize, tileSize);
 
-            if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
-                actionStack.add(new CreateAction(new SolidTile(), (int)(v.x / tileSize), (int)(v.y / tileSize)));
+            if(Gdx.input.isButtonPressed(Buttons.LEFT)){
+                actionStack.add(new CreateAction(new LiquidTile(Element.SAND), (int)(v.x / tileSize), (int)(v.y / tileSize)));
+            } else if(Gdx.input.isButtonPressed(Buttons.RIGHT)){
+                actionStack.add(new CreateAction(new SolidTile(Element.SAND), (int)(v.x / tileSize), (int)(v.y / tileSize)));
             }
         }
 

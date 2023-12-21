@@ -8,17 +8,20 @@ public abstract class AbstractTile {
     public static enum State { SOLID, LIQUID, GAS, PLASMA };
 
     // Variables
+    public final Element element;
     public final State state;
     public float temperature = 0.f; // In Kelvin
     public float mass = 0.f; // In kilograms
+    public boolean isUpdated = false; // If this tile was updated this frame or not
 
     // Constructor
-    public AbstractTile(State state){
+    public AbstractTile(Element element, State state){
+        this.element = element;
         this.state = state;
     }
 
     // Functions
-    private boolean checkTile(Simulation simulation, int fx, int fy, int tx, int ty){
+    protected boolean checkTileSwap(Simulation simulation, int fx, int fy, int tx, int ty){
         AbstractTile target = simulation.getTile(tx, ty);
 
         if(simulation.inBounds(tx, ty) && (target == null || target.state != State.SOLID)){
@@ -31,8 +34,5 @@ public abstract class AbstractTile {
 
     public void update(Simulation simulation, int currX, int currY){
         // Basic functionality of every cell, like heat
-        if(checkTile(simulation, currX, currY, currX, currY - 1)) return;
-        if(checkTile(simulation, currX, currY, currX - 1, currY - 1)) return;
-        if(checkTile(simulation, currX, currY, currX + 1, currY - 1)) return;
     }
 }

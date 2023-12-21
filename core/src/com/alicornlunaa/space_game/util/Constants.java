@@ -7,6 +7,9 @@ public class Constants {
     public static final int POSITION_ITERATIONS = 4;
     public static final int MAX_PREDICTION_STEPS = 2;
     public static final int CHUNK_LOAD_DISTANCE = 3;
+    
+    // Simulation constants
+    public static final float MIN_FLUID_LEVEL = 0.01f;
 
     // Player constraints
     public static final float PLAYER_WIDTH = 0.2f;
