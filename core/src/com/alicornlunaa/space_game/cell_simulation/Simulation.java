@@ -32,6 +32,7 @@ public class Simulation {
     public Stack<AbstractAction> actionStack = new Stack<>();
     public AbstractTile tiles[];
     public float tileSize = 0.1f;
+    public Vector2i gravity = new Vector2i(0, -1);
 
     // Constructor
     public Simulation(int pixelWidth, int pixelHeight){
@@ -170,6 +171,21 @@ public class Simulation {
             } else if(Gdx.input.isButtonPressed(Buttons.RIGHT)){
                 tiles[getIndex((int)(v.x / tileSize), (int)(v.y / tileSize))] = new SolidTile(Element.SAND);
             }
+        }
+
+        // Controls
+        if(Gdx.input.isKeyJustPressed(Keys.UP)){
+            gravity.y += 1;
+            System.out.println(gravity.x + " " + gravity.y);
+        } else if(Gdx.input.isKeyJustPressed(Keys.DOWN)){
+            gravity.y -= 1;
+            System.out.println(gravity.x + " " + gravity.y);
+        } else if(Gdx.input.isKeyJustPressed(Keys.LEFT)){
+            gravity.x -= 1;
+            System.out.println(gravity.x + " " + gravity.y);
+        } else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)){
+            gravity.x += 1;
+            System.out.println(gravity.x + " " + gravity.y);
         }
 
         batch.end();

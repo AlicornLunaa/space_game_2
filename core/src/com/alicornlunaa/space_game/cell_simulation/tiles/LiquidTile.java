@@ -6,7 +6,7 @@ import com.alicornlunaa.space_game.util.Constants;
 public class LiquidTile extends AbstractTile {
     // Variables
     public int spreadFactor = 1;
-    public float viscosity = 0.96f;
+    public float viscosity = 0.975f;
     public boolean renderFullBlock = false;
 
     // Constructor
@@ -17,8 +17,8 @@ public class LiquidTile extends AbstractTile {
 
     // Functions
     @Override
-    public void update(Simulation simulation, int currX, int currY){
-        super.update(simulation, currX, currY);
+    public boolean update(Simulation simulation, int currX, int currY){
+        if(!super.update(simulation, currX, currY)) return false;
 
         // Rendering flags
         renderFullBlock = simulation.getTile(currX, currY + 1) instanceof LiquidTile;
@@ -26,7 +26,7 @@ public class LiquidTile extends AbstractTile {
         // Remove water with nothing in it
         if(mass <= Constants.MIN_FLUID_LEVEL){
             simulation.tiles[simulation.getIndex(currX, currY)] = null;
-            return;
+            return false;
         }
 
         // Simulate water flow down
@@ -35,14 +35,14 @@ public class LiquidTile extends AbstractTile {
         if(simulation.inBounds(currX, currY - 1) && target == null){
             // Liquid falling with gravity, viscosity does not matter
             simulation.swap(currX, currY, currX, currY - 1);
-            return;
+            return false;
         }
 
         if(target != null && target.element == element && target.mass < target.element.density){
             // Move higher to lower water
             target.mass += (viscosity * mass);
             mass -= (viscosity * mass);
-            return;
+            return false;
         }
 
         // Flow sideways
@@ -84,7 +84,9 @@ public class LiquidTile extends AbstractTile {
             
             if(leftValid) left.mass += flowAmount;
             if(rightValid) right.mass += flowAmount;
-            return;
+            return false;
         }
+
+        return true;
     }
 }

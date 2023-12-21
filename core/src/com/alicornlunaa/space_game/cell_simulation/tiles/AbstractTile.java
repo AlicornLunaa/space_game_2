@@ -20,20 +20,11 @@ public abstract class AbstractTile {
     }
 
     // Functions
-    protected boolean checkTileSwap(Simulation simulation, int fx, int fy, int tx, int ty){
-        AbstractTile target = simulation.getTile(tx, ty);
-
-        if(simulation.inBounds(tx, ty) && (target == null || target.state != State.SOLID)){
-            simulation.swap(fx, fy, tx, ty);
-            return true;
-        }
-
-        return false;
-    }
-
-    public void update(Simulation simulation, int currX, int currY){
+    public boolean update(Simulation simulation, int currX, int currY){
         // Basic functionality of every cell, like heat
         AbstractTile current = simulation.getTile(currX, currY);
         current.isUpdated = true;
+
+        return true; // Continue the update
     }
 }

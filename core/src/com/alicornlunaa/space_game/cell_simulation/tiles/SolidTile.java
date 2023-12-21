@@ -9,12 +9,25 @@ public class SolidTile extends AbstractTile {
     }
 
     // Functions
+    private boolean checkTileSwap(Simulation simulation, int fx, int fy, int tx, int ty){
+        AbstractTile target = simulation.getTile(tx, ty);
+
+        if(simulation.inBounds(tx, ty) && (target == null || target.state != State.SOLID)){
+            simulation.swap(fx, fy, tx, ty);
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
-    public void update(Simulation simulation, int currX, int currY){
-        super.update(simulation, currX, currY);
+    public boolean update(Simulation simulation, int currX, int currY){
+        if(!super.update(simulation, currX, currY)) return false;
         
-        if(checkTileSwap(simulation, currX, currY, currX, currY - 1)) return;
-        if(checkTileSwap(simulation, currX, currY, currX - 1, currY - 1)) return;
-        if(checkTileSwap(simulation, currX, currY, currX + 1, currY - 1)) return;
+        if(checkTileSwap(simulation, currX, currY, currX, currY - 1)) return false;
+        if(checkTileSwap(simulation, currX, currY, currX - 1, currY - 1)) return false;
+        if(checkTileSwap(simulation, currX, currY, currX + 1, currY - 1)) return false;
+
+        return true;
     }
 }
