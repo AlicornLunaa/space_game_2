@@ -77,6 +77,17 @@ public class Simulation {
         return arr;
     }
 
+    public static Vector2 getDown(Vector2 v){
+        float ang = v.cpy().nor().angleRad(new Vector2(0, -1));
+
+        if(ang < 0)
+            ang += Math.PI * 2;
+
+        float quarterPi = (float)(Math.PI / 4);
+        float normalized = (int)((ang + quarterPi / 2) / quarterPi) * quarterPi;
+        return new Vector2((float)Math.sin(normalized), -(float)Math.cos(normalized));
+    }
+
     public int getX(int index){
         return index % width;
     }

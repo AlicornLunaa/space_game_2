@@ -30,8 +30,8 @@ public abstract class AbstractTile {
         current.isUpdated = true;
         
         // Gravity rule
-        velocity.add(simulation.gravity);
-        floatingPosition.add(velocity);
+        // velocity.add(simulation.gravity);
+        // floatingPosition.add(velocity);
 
         if(Math.abs(floatingPosition.x) >= 1 || Math.abs(floatingPosition.y) >= 1){
             // Move based on velocity
