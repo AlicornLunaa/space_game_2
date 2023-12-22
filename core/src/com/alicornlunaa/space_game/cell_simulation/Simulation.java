@@ -35,6 +35,8 @@ public class Simulation {
     public float tileSize = 0.1f;
     public Vector2 gravity = new Vector2(0, -0.02f);
 
+    public int placeWidth = 0;
+
     // Constructor
     public Simulation(int pixelWidth, int pixelHeight){
         width = pixelWidth;
@@ -167,12 +169,16 @@ public class Simulation {
         if(inBounds((int)(v.x / tileSize), (int)(v.y / tileSize))){
             batch.set(ShapeType.Line);
             batch.setColor(Color.CYAN);
-            batch.rect(v.x, v.y, tileSize, tileSize);
+            batch.rect(v.x - tileSize * placeWidth, v.y - tileSize * placeWidth, tileSize * placeWidth * 2 + tileSize, tileSize * placeWidth * 2 + tileSize);
 
             if(Gdx.input.isButtonPressed(Buttons.LEFT)){
-                tiles[getIndex((int)(v.x / tileSize), (int)(v.y / tileSize))] = new LiquidTile(Element.WATER);
+                for(int x = -placeWidth; x < placeWidth + 1; x++) for(int y = -placeWidth; y < placeWidth + 1; y++){
+                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new LiquidTile(Element.WATER);
+                }
             } else if(Gdx.input.isButtonPressed(Buttons.RIGHT)){
-                tiles[getIndex((int)(v.x / tileSize), (int)(v.y / tileSize))] = new SolidTile(Element.SAND);
+                for(int x = -placeWidth; x < placeWidth + 1; x++) for(int y = -placeWidth; y < placeWidth + 1; y++){
+                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new SolidTile(Element.SAND);
+                }
             }
         }
 
@@ -189,6 +195,10 @@ public class Simulation {
         } else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)){
             gravity.x += 0.01f;
             System.out.println(gravity.x + " " + gravity.y);
+        } else if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)){
+            placeWidth++;
+        } else if(Gdx.input.isKeyJustPressed(Keys.CONTROL_LEFT)){
+            placeWidth = Math.max(placeWidth - 1, 0);
         }
 
         batch.end();

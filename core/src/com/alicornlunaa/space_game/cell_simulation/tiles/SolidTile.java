@@ -26,13 +26,13 @@ public class SolidTile extends AbstractTile {
         if(!super.update(simulation, currX, currY)) return false;
 
         // Get left and right directions
-        Vector2 down = simulation.gravity.cpy().nor();
-        Vector2 left = simulation.gravity.cpy().nor().rotate90(-1);
-        Vector2 right = simulation.gravity.cpy().nor().rotate90(1);
+        Vector2 down = velocity.cpy().nor();
+        Vector2 left = velocity.cpy().nor().rotate90(-1);
+        Vector2 right = velocity.cpy().nor().rotate90(1);
         
         if(checkTileSwap(simulation, currX, currY, (int)(currX + down.x), (int)(currY + down.y))) return false;
         if(checkTileSwap(simulation, currX, currY, (int)(currX + left.x + down.x), (int)(currY + left.y + down.y))) return false;
-        if(checkTileSwap(simulation, currX, currY, (int)(currX + right.x + down.x), (int)(currY + right.x + down.y))) return false;
+        if(checkTileSwap(simulation, currX, currY, (int)(currX + right.x + down.x), (int)(currY + right.y + down.y))) return false;
 
         return true;
     }
