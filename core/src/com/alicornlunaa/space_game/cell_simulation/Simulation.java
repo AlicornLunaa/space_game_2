@@ -6,6 +6,7 @@ import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.cell_simulation.actions.AbstractAction;
 import com.alicornlunaa.space_game.cell_simulation.tiles.AbstractTile;
 import com.alicornlunaa.space_game.cell_simulation.tiles.Element;
+import com.alicornlunaa.space_game.cell_simulation.tiles.GasTile;
 import com.alicornlunaa.space_game.cell_simulation.tiles.LiquidTile;
 import com.alicornlunaa.space_game.cell_simulation.tiles.SolidTile;
 import com.alicornlunaa.space_game.util.Vector2i;
@@ -36,6 +37,8 @@ public class Simulation {
     public Vector2 gravity = new Vector2(0, -0.02f);
 
     public int placeWidth = 0;
+    public int selectedElementNum = 0;
+    public Element selectedElement = Element.SAND;
 
     // Constructor
     public Simulation(int pixelWidth, int pixelHeight){
@@ -184,11 +187,15 @@ public class Simulation {
 
             if(Gdx.input.isButtonPressed(Buttons.LEFT)){
                 for(int x = -placeWidth; x < placeWidth + 1; x++) for(int y = -placeWidth; y < placeWidth + 1; y++){
-                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new LiquidTile(Element.WATER);
+                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new SolidTile(selectedElement);
                 }
             } else if(Gdx.input.isButtonPressed(Buttons.RIGHT)){
                 for(int x = -placeWidth; x < placeWidth + 1; x++) for(int y = -placeWidth; y < placeWidth + 1; y++){
-                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new SolidTile(Element.SAND);
+                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new LiquidTile(selectedElement);
+                }
+            } else if(Gdx.input.isButtonPressed(Buttons.MIDDLE)){
+                for(int x = -placeWidth; x < placeWidth + 1; x++) for(int y = -placeWidth; y < placeWidth + 1; y++){
+                    tiles[getIndex((int)(v.x / tileSize) + x, (int)(v.y / tileSize) + y)] = new GasTile(selectedElement);
                 }
             }
         }
@@ -210,8 +217,44 @@ public class Simulation {
             placeWidth++;
         } else if(Gdx.input.isKeyJustPressed(Keys.CONTROL_LEFT)){
             placeWidth = Math.max(placeWidth - 1, 0);
+        } else if(Gdx.input.isKeyJustPressed(Keys.SHIFT_RIGHT)){
+            selectedElementNum++;
+            if(selectedElementNum > 5) selectedElementNum = 0;
+            System.out.println(selectElement());
+        } else if(Gdx.input.isKeyJustPressed(Keys.CONTROL_RIGHT)){
+            selectedElementNum--;
+            if(selectedElementNum < 0) selectedElementNum = 5;
+            System.out.println(selectElement());
         }
 
         batch.end();
+    }
+
+    private String selectElement(){
+        switch(selectedElementNum){
+            default:
+                selectedElement = Element.SAND;
+                return "SAND";
+            
+            case 1:
+                selectedElement = Element.STONE;
+                return "STONE";
+
+            case 2:
+                selectedElement = Element.WATER;
+                return "WATER";
+            
+            case 3:
+                selectedElement = Element.ETHANOL;
+                return "ETHANOL";
+            
+            case 4:
+                selectedElement = Element.OXYGEN;
+                return "OXYGEN";
+            
+            case 5:
+                selectedElement = Element.CARBON_DIOXIDE;
+                return "CARBON DIOXIDE";
+        }
     }
 }
