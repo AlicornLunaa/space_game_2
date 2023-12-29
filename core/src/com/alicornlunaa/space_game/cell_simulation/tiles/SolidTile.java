@@ -37,9 +37,11 @@ public class SolidTile extends AbstractTile {
         Vector2 left = down.cpy().rotate90(-1);
         Vector2 right = down.cpy().rotate90(1);
         
-        if(checkTileSwap(simulation, currX, currY, (int)(currX + down.x), (int)(currY + down.y))) return false;
-        if(checkTileSwap(simulation, currX, currY, (int)(currX + left.x + down.x), (int)(currY + left.y + down.y))) return false;
-        if(checkTileSwap(simulation, currX, currY, (int)(currX + right.x + down.x), (int)(currY + right.y + down.y))) return false;
+        if(element.falling){
+            if(checkTileSwap(simulation, currX, currY, (int)(currX + down.x), (int)(currY + down.y))) return false;
+            if(checkTileSwap(simulation, currX, currY, (int)(currX + left.x + down.x), (int)(currY + left.y + down.y))) return false;
+            if(checkTileSwap(simulation, currX, currY, (int)(currX + right.x + down.x), (int)(currY + right.y + down.y))) return false;
+        }
 
         return true;
     }

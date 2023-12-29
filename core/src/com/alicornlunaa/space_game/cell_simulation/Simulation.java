@@ -1,9 +1,6 @@
 package com.alicornlunaa.space_game.cell_simulation;
 
-import java.util.Stack;
-
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.space_game.cell_simulation.actions.AbstractAction;
 import com.alicornlunaa.space_game.cell_simulation.tiles.AbstractTile;
 import com.alicornlunaa.space_game.cell_simulation.tiles.Element;
 import com.alicornlunaa.space_game.cell_simulation.tiles.GasTile;
@@ -31,7 +28,6 @@ public class Simulation {
     private boolean paused = false;
 
     public final int width, height;
-    public Stack<AbstractAction> actionStack = new Stack<>();
     public AbstractTile tiles[];
     public float tileSize = 0.1f;
     public Vector2 gravity = new Vector2(0, -0.02f);
