@@ -239,10 +239,10 @@ public class Part implements Disposable,Comparable<Part> {
         return null;
     }
 
-    public void tick(float delta){
+    public void tick(float delta, ShipComponent shipComponent, BodyComponent bodyComponent){
         for(Node node : attachments){
             if(node.next != null){
-                node.next.part.tick(delta);
+                node.next.part.tick(delta, shipComponent, bodyComponent);
             }
         }
     }

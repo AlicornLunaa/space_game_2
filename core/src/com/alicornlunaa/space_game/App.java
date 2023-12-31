@@ -7,6 +7,7 @@ import com.alicornlunaa.space_game.scenes.LoadingScene;
 import com.alicornlunaa.space_game.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.space_game.util.ControlSchema;
 import com.alicornlunaa.space_game.util.PartManager;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -32,8 +33,8 @@ public class App extends Game {
 	public Skin skin;
 
 	public LoadingScene loadingScene;
-	// public GameplayScene gameScene;
 	public OrthographicCamera camera;
+	public Entity playerEntity;
 
 	public boolean loaded = false;
 	

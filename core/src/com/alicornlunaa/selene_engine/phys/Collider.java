@@ -31,7 +31,7 @@ public class Collider {
     // Static classes
     public static abstract class Shape {
         // Enums
-        protected enum ShapeType { POLYGON, CIRCLE };
+        protected enum ShapeType { POLYGON, CIRCLE, EDGE };
 
         // Variables
         private ShapeType shapeType;
@@ -334,6 +334,70 @@ public class Collider {
         }
     }
 
+    public static class EdgeShape extends Shape {
+        // Variables
+        private Vector2 start = new Vector2();
+        private Vector2 end = new Vector2();
+
+        // Constructor
+        public EdgeShape(){
+            // Default constructor
+            super(ShapeType.EDGE);
+        }
+
+        public EdgeShape(EdgeShape shape){
+            // Copy constructor
+            super(shape);
+            start.set(shape.start);
+            end.set(shape.end);
+        }
+
+        // Functions
+        @Override
+        public Polygon getShape(){
+            float rawVertices[] = new float[4];
+            Polygon polygon = new Polygon();
+
+            rawVertices[0] = start.x;
+            rawVertices[1] = start.y;
+            rawVertices[2] = end.x;
+            rawVertices[3] = end.y;
+
+            polygon.setVertices(rawVertices);
+            return polygon;
+        }
+
+        @Override
+        protected JSONObject serialize(){
+            JSONArray vertexData = new JSONArray();
+            vertexData.put(start.x);
+            vertexData.put(start.y);
+            vertexData.put(end.x);
+            vertexData.put(end.y);
+
+            JSONObject obj = super.serialize();
+            obj.put("vertices", vertexData);
+            return obj;
+        }
+
+
+        public void setStartVertex(Vector2 vertex){
+            start.set(vertex);
+        }
+
+        public void setEndVertex(Vector2 vertex){
+            end.set(vertex);
+        }
+    
+        public Vector2 getStartVertex(){
+            return start;
+        }
+    
+        public Vector2 getEndVertex(){
+            return end;
+        }
+    }
+
 
     // Variables
     private Array<Shape> shapes = new Array<>();
@@ -361,6 +425,8 @@ public class Collider {
                 shapes.add(new PolygonShape((PolygonShape)shape));
             } else if(shape instanceof CircleShape){
                 shapes.add(new CircleShape((CircleShape)shape));
+            } else if(shape instanceof EdgeShape){
+                shapes.add(new EdgeShape((EdgeShape)shape));
             }
         }
 
@@ -466,6 +532,20 @@ public class Collider {
                 com.badlogic.gdx.physics.box2d.CircleShape physShape = new com.badlogic.gdx.physics.box2d.CircleShape();
                 physShape.setPosition(new Vector2(circleShape.x, circleShape.y));
                 physShape.setRadius(circleShape.radius);
+                
+                FixtureDef def = new FixtureDef();
+                def.shape = physShape;
+                def.friction = shape.friction;
+                def.restitution = shape.restitution;
+                def.density = shape.density;
+                def.isSensor = shape.sensor;
+                fixtures.add(b.createFixture(def));
+
+                physShape.dispose();
+            } else if(shape instanceof EdgeShape){
+                EdgeShape edgeShape = (EdgeShape)shape;
+                com.badlogic.gdx.physics.box2d.EdgeShape physShape = new com.badlogic.gdx.physics.box2d.EdgeShape();
+                physShape.set(edgeShape.start, edgeShape.end);
                 
                 FixtureDef def = new FixtureDef();
                 def.shape = physShape;

@@ -4,5 +4,10 @@ import com.badlogic.ashley.core.Component;
 
 public class ControlComponent implements Component {
     // Variables
-    public boolean inSpace = true;
+    public PlayerComponent playerComponent;
+
+    // Constructor
+    public ControlComponent(PlayerComponent playerComponent){
+        this.playerComponent = playerComponent;
+    }
 }

@@ -37,8 +37,9 @@ public class SpaceScene extends BaseScene {
         App.instance.camera.update();
 
         // Test entities
+        App.instance.playerEntity = CharacterFactory.createPlayer(4, 0, 0);
+        engine.addEntity(App.instance.playerEntity);
         engine.addEntity(ShipFactory.createShip(0, 1, 0));
-        engine.addEntity(CharacterFactory.createPlayer(4, 0, 0));
         engine.addEntity(BasicFactory.createStaticBox(0.f, -2.5f, 8.f, 0.5f, (float)Math.toRadians(5)));
     }
 

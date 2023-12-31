@@ -85,7 +85,7 @@ public class ShipPhysicsSystem extends EntitySystem {
             shipComp.artifRoll = angVel;
 
             // Update everything
-            shipComp.rootPart.tick(deltaTime);
+            shipComp.rootPart.tick(deltaTime, shipComp, bodyComp);
         }
 
         // Finish render
