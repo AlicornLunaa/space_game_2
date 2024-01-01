@@ -4,6 +4,7 @@ import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
 import com.alicornlunaa.space_game.grid.tiles.SolidTile;
@@ -50,6 +51,8 @@ public class GridEditor extends BaseScene {
         super();
         initInterface();
         initControls();
+
+        testGrid.setTile(0, 0, new CustomTile(0, 0, 0));
 
         inputs.addProcessor(0, mInterface);
         previousScreen = App.instance.getScreen();
