@@ -142,6 +142,10 @@ public class GridEditor extends BaseScene {
                     case Buttons.LEFT:
                         testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, currentCell.x, currentCell.y));
                         return true;
+                        
+                    case Buttons.RIGHT:
+                        testGrid.removeTile(currentCell.x, currentCell.y);
+                        return true;
 
                     case Buttons.MIDDLE:
                         panningVector = new Vector2(screenX, screenY);
