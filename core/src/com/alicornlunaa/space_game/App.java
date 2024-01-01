@@ -3,8 +3,8 @@ package com.alicornlunaa.space_game;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
+import com.alicornlunaa.space_game.scenes.GridEditor;
 import com.alicornlunaa.space_game.scenes.LoadingScene;
-import com.alicornlunaa.space_game.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.space_game.util.ControlSchema;
 import com.alicornlunaa.space_game.util.PartManager;
 import com.badlogic.ashley.core.Entity;
@@ -118,8 +118,8 @@ public class App extends Game {
 				// gameScene = new GameplayScene(this);
 				// gameScene.init();
 				// this.setScreen(gameScene);
-				// this.setScreen(new ShipEditor(this));
-				this.setScreen(new SpaceScene());
+				this.setScreen(new GridEditor());
+				// this.setScreen(new SpaceScene());
 			} else {
 				// Loading is not complete, update progress bar
 				loadingScene.progressBar.setValue(manager.getProgress());

@@ -1,6 +1,5 @@
 package com.alicornlunaa.selene_engine.scenes;
 
-import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
@@ -13,9 +12,8 @@ public abstract class BaseScene implements IScene {
 
     // Functions
     @Override
-    public void render(float delta) {
+    public void render(float deltaTime) {
         ScreenUtils.clear(backgroundColor);
-        App.instance.vfxManager.update(delta);
     }
 
     @Override

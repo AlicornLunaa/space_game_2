@@ -1,4 +1,4 @@
-package com.alicornlunaa.space_game.cell_simulation.tiles;
+package com.alicornlunaa.space_game.grid.tiles;
 
 import com.badlogic.gdx.graphics.Color;
 
@@ -6,6 +6,7 @@ public enum Element {
     // Enumerations
     SAND(1602, 1773.15f, 2503.15f, 1500, true, Color.YELLOW),
     STONE(2800, 1000.f, 2503.15f, 15000, false, Color.GRAY),
+    STEEL(7850, 1370.f, 2900.15f, 15000, false, Color.DARK_GRAY),
     WATER(1000, 273.15f, 373.15f, 1273.15f, false, Color.BLUE),
     ETHANOL(789, 159.15f, 351.15f, 1500.f, false, Color.WHITE),
     OXYGEN(1, 55, 90, 15000, false, Color.CYAN),
