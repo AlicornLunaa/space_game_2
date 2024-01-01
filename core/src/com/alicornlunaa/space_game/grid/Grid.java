@@ -138,6 +138,9 @@ public class Grid {
         if(isRegionOccupied(x, y, tile.rotation, tile.width, tile.height))
             return false;
 
+        tile.x = x;
+        tile.y = y;
+
         for(int w = 0; w < tile.width; w++){
             for(int h = 0; h < tile.height; h++){
                 switch(tile.rotation){
@@ -171,8 +174,8 @@ public class Grid {
         AbstractTile tile = getTile(x, y);
         Chunk chunk;
 
-        x = tile.x;
-        y = tile.y;
+        if(tile == null)
+            return;
 
         for(int w = 0; w < tile.width; w++){
             for(int h = 0; h < tile.height; h++){

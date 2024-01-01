@@ -1,5 +1,6 @@
 package com.alicornlunaa.space_game.scenes;
 
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
@@ -12,11 +13,13 @@ import com.alicornlunaa.space_game.grid.tiles.TileElement;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
@@ -39,9 +42,10 @@ public class GridEditor extends BaseScene {
     private @Null Screen previousScreen = null;
     private Engine engine = new Engine();
     private Stage mInterface;
-
+    
     private OrthographicCamera editorCamera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
     private ShapeRenderer batch = App.instance.shapeRenderer;
+    private Batch spriteBatch = App.instance.spriteBatch;
     private Vector2 panningVector = null;
     private Vector2i currentCell = new Vector2i();
     private Grid testGrid = new Grid();
@@ -140,7 +144,7 @@ public class GridEditor extends BaseScene {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 switch(button){
                     case Buttons.LEFT:
-                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, currentCell.x, currentCell.y));
+                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, currentCell.x, currentCell.y, App.instance.atlas.findRegion("tiles/steel"), Collider.box(0, 0, Constants.TILE_SIZE, Constants.TILE_SIZE, 0)));
                         return true;
                         
                     case Buttons.RIGHT:
@@ -222,23 +226,6 @@ public class GridEditor extends BaseScene {
             );
         }
 
-        // Ship
-        batch.set(ShapeType.Filled);
-        testGrid.iterate(new GridIterator() {
-            @Override
-            public void iterate(AbstractTile tile) {
-                if(tile instanceof TileElement) batch.setColor(((TileElement)tile).element.color);
-                else batch.setColor(Color.MAGENTA);
-
-                batch.rect(
-                    tile.x * Constants.TILE_SIZE,
-                    tile.y * Constants.TILE_SIZE,
-                    Constants.TILE_SIZE,
-                    Constants.TILE_SIZE
-                );
-            }
-        });
-
         // Cursor
         int placeWidth = 0;
         batch.set(ShapeType.Line);
@@ -251,6 +238,21 @@ public class GridEditor extends BaseScene {
         );
 
         batch.end();
+
+        
+        spriteBatch.setProjectionMatrix(editorCamera.combined);
+        spriteBatch.setTransformMatrix(new Matrix4());
+        spriteBatch.begin();
+
+        testGrid.iterate(new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
+            }
+        });
+
+        spriteBatch.end();
+
 
         mInterface.act();
         mInterface.draw();

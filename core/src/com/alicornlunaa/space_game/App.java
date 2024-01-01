@@ -3,6 +3,7 @@ package com.alicornlunaa.space_game;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
+import com.alicornlunaa.space_game.grid.TileManager;
 import com.alicornlunaa.space_game.scenes.GridEditor;
 import com.alicornlunaa.space_game.scenes.LoadingScene;
 import com.alicornlunaa.space_game.util.ControlSchema;
@@ -29,6 +30,7 @@ public class App extends Game {
 	// Variables
 	public Assets manager;
 	public PartManager partManager = new PartManager();
+	public TileManager tileManager = new TileManager();
 	public VfxManager vfxManager = new VfxManager();
 	public Skin skin;
 
