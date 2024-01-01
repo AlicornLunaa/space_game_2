@@ -5,6 +5,7 @@ public abstract class AbstractTile {
     public final String tileID;
     public final int width, height;
     public int x, y, rotation;
+    public boolean updatedThisTick = false;
 
     // Constructor
     public AbstractTile(String tileID, int x, int y, int rotation, int width, int height){

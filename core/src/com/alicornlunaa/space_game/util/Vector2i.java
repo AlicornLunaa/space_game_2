@@ -14,9 +14,22 @@ public class Vector2i implements Comparable<Vector2i> {
     }
 
     // Functions
-    public void set(int x, int y){
+    public Vector2i set(int x, int y){
         this.x = x;
         this.y = y;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == this)
+            return true;
+
+        if(o instanceof Vector2i)
+            return false;
+
+        Vector2i v = (Vector2i)o;
+        return v.x == x && v.y == y;
     }
 
     @Override

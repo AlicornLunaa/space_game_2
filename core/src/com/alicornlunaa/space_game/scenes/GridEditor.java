@@ -3,6 +3,11 @@ package com.alicornlunaa.space_game.scenes;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
+import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
+import com.alicornlunaa.space_game.grid.tiles.Element;
+import com.alicornlunaa.space_game.grid.tiles.SolidTile;
+import com.alicornlunaa.space_game.grid.tiles.TileElement;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.ashley.core.Engine;
@@ -130,9 +135,14 @@ public class GridEditor extends BaseScene {
 
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                if(button == Buttons.MIDDLE){
-                    panningVector = new Vector2(screenX, screenY);
-                    return true;
+                switch(button){
+                    case Buttons.LEFT:
+                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, currentCell.x, currentCell.y));
+                        return true;
+
+                    case Buttons.MIDDLE:
+                        panningVector = new Vector2(screenX, screenY);
+                        return true;
                 }
 
                 return false;
@@ -187,20 +197,45 @@ public class GridEditor extends BaseScene {
     public void render(float delta) {
         super.render(delta);
         engine.update(delta);
-        mInterface.act();
-        mInterface.draw();
 
         batch.setProjectionMatrix(editorCamera.combined);
         batch.setTransformMatrix(new Matrix4());
         batch.setAutoShapeType(true);
         batch.begin();
 
-        batch.circle(0, 0, 1, 50);
+        // Grid
+        batch.set(ShapeType.Line);
+        for(int x = -20; x <= 20; x++) for(int y = -15; y <= 15; y++){
+            batch.setColor((x == 0 && y == 0) ? Color.WHITE : Color.LIGHT_GRAY);
+            batch.rect(
+                x * Constants.TILE_SIZE,
+                y * Constants.TILE_SIZE,
+                Constants.TILE_SIZE,
+                Constants.TILE_SIZE
+            );
+        }
+
+        // Ship
+        batch.set(ShapeType.Filled);
+        testGrid.iterate(new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                if(tile instanceof TileElement) batch.setColor(((TileElement)tile).element.color);
+                else batch.setColor(Color.MAGENTA);
+
+                batch.rect(
+                    tile.x * Constants.TILE_SIZE,
+                    tile.y * Constants.TILE_SIZE,
+                    Constants.TILE_SIZE,
+                    Constants.TILE_SIZE
+                );
+            }
+        });
 
         // Cursor
         int placeWidth = 0;
         batch.set(ShapeType.Line);
-        batch.setColor(Color.CYAN);
+        batch.setColor(testGrid.isOccupied(currentCell.x, currentCell.y) ? Color.RED : Color.CYAN);
         batch.rect(
             currentCell.x * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
             currentCell.y * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
@@ -209,6 +244,9 @@ public class GridEditor extends BaseScene {
         );
 
         batch.end();
+
+        mInterface.act();
+        mInterface.draw();
     }
 
     @Override
