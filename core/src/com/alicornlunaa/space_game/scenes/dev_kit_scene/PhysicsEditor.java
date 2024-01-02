@@ -52,7 +52,7 @@ public class PhysicsEditor extends VisTable {
     // Static variables
     private static ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    // Inner classes
+    // Static classes
     private static class Cursor extends Actor {
         // Functions
         @Override

@@ -9,7 +9,6 @@ import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
 import com.alicornlunaa.space_game.grid.tiles.SolidTile;
-import com.alicornlunaa.space_game.grid.tiles.TileElement;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.ashley.core.Engine;
@@ -56,7 +55,7 @@ public class GridEditor extends BaseScene {
         initInterface();
         initControls();
 
-        testGrid.setTile(0, 0, new CustomTile(0, 0, 0));
+        testGrid.setTile(0, 0, new CustomTile(1));
 
         inputs.addProcessor(0, mInterface);
         previousScreen = App.instance.getScreen();
@@ -144,7 +143,7 @@ public class GridEditor extends BaseScene {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 switch(button){
                     case Buttons.LEFT:
-                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, currentCell.x, currentCell.y, App.instance.atlas.findRegion("tiles/steel"), Collider.box(0, 0, Constants.TILE_SIZE, Constants.TILE_SIZE, 0)));
+                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, App.instance.atlas.findRegion("tiles/steel"), Collider.box(0, 0, Constants.TILE_SIZE, Constants.TILE_SIZE, 0)));
                         return true;
                         
                     case Buttons.RIGHT:

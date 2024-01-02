@@ -8,7 +8,7 @@ public class SolidTile extends TileElement {
     public boolean movable = false;
 
     // Constructor
-    public SolidTile(Element element, int x, int y, TextureRegion texture, Collider collider) {
-        super(element, State.SOLID, x, y, texture, collider);
+    public SolidTile(Element element, TextureRegion texture, Collider collider) {
+        super(element, State.SOLID, texture, collider);
     }
 }

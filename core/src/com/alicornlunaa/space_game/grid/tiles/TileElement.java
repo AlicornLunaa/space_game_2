@@ -1,10 +1,8 @@
 package com.alicornlunaa.space_game.grid.tiles;
 
 import com.alicornlunaa.selene_engine.phys.Collider;
+import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.util.Constants;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -29,8 +27,8 @@ public class TileElement extends AbstractTile {
     public Vector2 velocity = new Vector2();
 
     // Constructor
-    public TileElement(Element element, State state, int x, int y, TextureRegion texture, Collider collider){
-        super("element_" + element, x, y, 0, 1, 1);
+    public TileElement(Element element, State state, TextureRegion texture, Collider collider){
+        super("element_" + element, 0, 1, 1);
         this.element = element;
         this.state = state;
     }
@@ -49,23 +47,15 @@ public class TileElement extends AbstractTile {
     private TextureRegion getTexture(){
         switch(shape){
             default:
-                if(squareTexture == null){
-                    Pixmap textureData = new Pixmap(1, 1, Format.RGBA8888);
-                    textureData.setColor(1, 1, 1, 1);
-                    textureData.fill();
-                    squareTexture = new TextureRegion(new Texture(textureData));
-                }
+                if(squareTexture == null)
+                    squareTexture = App.instance.atlas.findRegion("tiles/steel");
         
                 return squareTexture;
 
                 
             case SLOPE:
-                if(slopeTexture == null){
-                    Pixmap textureData = new Pixmap(1, 1, Format.RGBA8888);
-                    textureData.setColor(1, 1, 1, 1);
-                    textureData.fill();
-                    slopeTexture = new TextureRegion(new Texture(textureData));
-                }
+                if(slopeTexture == null)
+                    slopeTexture = App.instance.atlas.findRegion("tiles/steel_slope");
         
                 return slopeTexture;
         }

@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 public abstract class TileEntity extends AbstractTile {
     // Constructor
-    public TileEntity(String tileID, int x, int y, int rotation, int width, int height) {
-        super("te_" + tileID, x, y, rotation, width, height);
+    public TileEntity(String tileID, int rotation, int width, int height) {
+        super("te_" + tileID, rotation, width, height);
     }
 
     // Functions

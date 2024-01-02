@@ -10,8 +10,8 @@ public class LiquidTile extends TileElement {
     public boolean renderFullBlock = false;
 
     // Constructor
-    public LiquidTile(Element element, int x, int y, TextureRegion texture, Collider collider) {
-        super(element, State.LIQUID, x, y, texture, collider);
+    public LiquidTile(Element element, TextureRegion texture, Collider collider) {
+        super(element, State.LIQUID, texture, collider);
         mass = element.density;
     }
 }
