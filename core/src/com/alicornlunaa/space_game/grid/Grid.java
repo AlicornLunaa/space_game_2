@@ -2,9 +2,14 @@ package com.alicornlunaa.space_game.grid;
 
 import java.util.HashMap;
 
+import com.alicornlunaa.selene_engine.ecs.BodyComponent;
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
+import com.alicornlunaa.space_game.grid.tiles.TileElement;
+import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Null;
 
 // Storage class for tiles
@@ -227,6 +232,34 @@ public class Grid {
                     continue;
 
                 iter.iterate(tile);
+            }
+        }
+    }
+
+    public void assemble(BodyComponent bodyComponent){
+        // Build the colliders onto the body component listed
+        Vector2 v = new Vector2();
+        bodyComponent.clearColliders();
+
+        for (Chunk chunk : chunks.values()) {
+            for(AbstractTile tile : chunk.tileMap){
+                Collider collider = null;
+
+                if(tile == null)
+                    continue;
+
+                if(tile instanceof TileElement)
+                    collider = new Collider(((TileElement)tile).shape.collider);
+
+                if(tile instanceof TileEntity && ((TileEntity)tile).collider != null)
+                    collider = new Collider(((TileEntity)tile).collider);
+                    
+                if(collider == null)
+                    continue;
+
+                collider.setPosition(v.set(tile.x * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f, tile.y * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f));
+                collider.setRotation(tile.rotation * -90);
+                bodyComponent.addCollider(collider);
             }
         }
     }

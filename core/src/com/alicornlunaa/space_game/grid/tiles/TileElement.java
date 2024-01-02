@@ -11,7 +11,19 @@ import com.badlogic.gdx.utils.Null;
 public class TileElement extends AbstractTile {
     // Enumerations
     public static enum State { SOLID, LIQUID, GAS, PLASMA };
-    public static enum Shape { SQUARE, SLOPE };
+    public static enum Shape {
+        // Enumerations
+        SQUARE(Collider.box(0, 0, Constants.TILE_SIZE / 2.f, Constants.TILE_SIZE / 2.f, 0)),
+        SLOPE(Collider.triangle(0, 0, Constants.TILE_SIZE / 2.f, Constants.TILE_SIZE / 2.f, 0));
+
+        // Variables
+        public final Collider collider;
+
+        // Constructor
+        private Shape(Collider collider){
+            this.collider = new Collider(collider);
+        }
+    };
     
     // Static variables
     public static @Null TextureRegion squareTexture;
@@ -27,8 +39,8 @@ public class TileElement extends AbstractTile {
     public Vector2 velocity = new Vector2();
 
     // Constructor
-    public TileElement(Element element, State state, TextureRegion texture, Collider collider){
-        super("element_" + element, 0, 1, 1);
+    public TileElement(Element element, State state, TextureRegion texture){
+        super("element_" + element, 1, 1, 0);
         this.element = element;
         this.state = state;
     }
@@ -74,7 +86,7 @@ public class TileElement extends AbstractTile {
             Constants.TILE_SIZE,
             1,
             1,
-            rotation * 90
+            rotation * -90
         );
     }
 

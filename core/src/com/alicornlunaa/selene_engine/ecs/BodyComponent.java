@@ -18,8 +18,12 @@ public class BodyComponent implements Component {
     public Array<Collider> colliders = new Array<>();
 
     // Constructor
+    public BodyComponent(boolean dynamic){
+        bodyDef.type = dynamic ? BodyType.DynamicBody : BodyType.StaticBody;
+    }
+
     public BodyComponent(){
-        bodyDef.type = BodyType.DynamicBody;
+        this(true);
     }
     
     public BodyComponent(Collider collider){
@@ -36,5 +40,17 @@ public class BodyComponent implements Component {
             // Attach immediately
             collider.attach(body);
         }
+    }
+    
+    public void clearColliders(){
+        // Remove all colliders from active body
+        if(body != null){
+            // Attach immediately
+            for(Collider c : colliders){
+                c.detach();
+            }
+        }
+
+        colliders.clear();
     }
 }

@@ -13,7 +13,7 @@ public abstract class AbstractTile {
     public boolean updatedThisTick = false;
 
     // Constructor
-    public AbstractTile(String tileID, int rotation, int width, int height){
+    public AbstractTile(String tileID, int width, int height, int rotation){
         this.tileID = tileID;
         this.width = width;
         this.height = height;

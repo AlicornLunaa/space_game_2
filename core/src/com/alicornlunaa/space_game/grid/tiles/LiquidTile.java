@@ -1,6 +1,5 @@
 package com.alicornlunaa.space_game.grid.tiles;
 
-import com.alicornlunaa.selene_engine.phys.Collider;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class LiquidTile extends TileElement {
@@ -10,8 +9,8 @@ public class LiquidTile extends TileElement {
     public boolean renderFullBlock = false;
 
     // Constructor
-    public LiquidTile(Element element, TextureRegion texture, Collider collider) {
-        super(element, State.LIQUID, texture, collider);
+    public LiquidTile(Element element, TextureRegion texture) {
+        super(element, State.LIQUID, texture);
         mass = element.density;
     }
 }

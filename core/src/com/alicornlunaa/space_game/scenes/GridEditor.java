@@ -1,6 +1,8 @@
 package com.alicornlunaa.space_game.scenes;
 
-import com.alicornlunaa.selene_engine.phys.Collider;
+import com.alicornlunaa.selene_engine.ecs.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
+import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
@@ -12,10 +14,12 @@ import com.alicornlunaa.space_game.grid.tiles.SolidTile;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -41,6 +45,8 @@ public class GridEditor extends BaseScene {
     private @Null Screen previousScreen = null;
     private Engine engine = new Engine();
     private Stage mInterface;
+
+    private Entity gridEntity = new Entity();
     
     private OrthographicCamera editorCamera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
     private ShapeRenderer batch = App.instance.shapeRenderer;
@@ -54,11 +60,17 @@ public class GridEditor extends BaseScene {
         super();
         initInterface();
         initControls();
+        initEngine();
 
-        testGrid.setTile(0, 0, new CustomTile(1));
+        gridEntity.add(new TransformComponent());
+        gridEntity.add(new BodyComponent());
+        testGrid.setTile(0, 0, new CustomTile(0));
+        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
+        engine.addEntity(gridEntity);
 
         inputs.addProcessor(0, mInterface);
         previousScreen = App.instance.getScreen();
+        App.instance.camera = editorCamera;
     }
 
     // Functions
@@ -143,7 +155,7 @@ public class GridEditor extends BaseScene {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 switch(button){
                     case Buttons.LEFT:
-                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, App.instance.atlas.findRegion("tiles/steel"), Collider.box(0, 0, Constants.TILE_SIZE, Constants.TILE_SIZE, 0)));
+                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, App.instance.atlas.findRegion("tiles/steel")));
                         return true;
                         
                     case Buttons.RIGHT:
@@ -182,6 +194,15 @@ public class GridEditor extends BaseScene {
 
             @Override
             public boolean keyDown(int keycode) {
+                switch (keycode) {
+                    case Keys.SHIFT_LEFT:
+                        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
+                        break;
+                
+                    default:
+                        break;
+                }
+
                 return false;
             }
 
@@ -203,6 +224,10 @@ public class GridEditor extends BaseScene {
         });
     }
     
+    private void initEngine(){
+        engine.addSystem(new PhysicsSystem(Constants.PPM));
+    }
+
     @Override
     public void render(float delta) {
         super.render(delta);
@@ -214,16 +239,16 @@ public class GridEditor extends BaseScene {
         batch.begin();
 
         // Grid
-        batch.set(ShapeType.Line);
-        for(int x = -20; x <= 20; x++) for(int y = -15; y <= 15; y++){
-            batch.setColor((x == 0 && y == 0) ? Color.WHITE : Color.LIGHT_GRAY);
-            batch.rect(
-                x * Constants.TILE_SIZE,
-                y * Constants.TILE_SIZE,
-                Constants.TILE_SIZE,
-                Constants.TILE_SIZE
-            );
-        }
+        // batch.set(ShapeType.Line);
+        // for(int x = -20; x <= 20; x++) for(int y = -15; y <= 15; y++){
+        //     batch.setColor((x == 0 && y == 0) ? Color.WHITE : Color.LIGHT_GRAY);
+        //     batch.rect(
+        //         x * Constants.TILE_SIZE,
+        //         y * Constants.TILE_SIZE,
+        //         Constants.TILE_SIZE,
+        //         Constants.TILE_SIZE
+        //     );
+        // }
 
         // Cursor
         int placeWidth = 0;

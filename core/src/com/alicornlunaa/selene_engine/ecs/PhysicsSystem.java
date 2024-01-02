@@ -121,7 +121,7 @@ public class PhysicsSystem extends EntitySystem {
         }
 
         // Render every hitbox
-        if(Constants.DEBUG)
+        if(Constants.DEBUG && App.instance.camera != null)
             App.instance.debug.render(world.getBox2DWorld(), App.instance.camera.combined);
     }
 }

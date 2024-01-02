@@ -136,7 +136,6 @@ public class App extends Game {
 		loadingScene.dispose();
 		manager.dispose();
 		VisUI.dispose();
-
 		App.instance = null;
 	}
 }

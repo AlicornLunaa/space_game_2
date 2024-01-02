@@ -1,5 +1,6 @@
 package com.alicornlunaa.space_game.grid.entities;
 
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -12,7 +13,9 @@ public class CustomTile extends TileEntity {
     private TextureRegion texture;
 
     public CustomTile(int rotation) {
-        super("custom", rotation, 4, 2);
+        super("custom", 4, 2, rotation);
+
+        collider = Collider.box(0, 0, 4 * Constants.TILE_SIZE / 2.f, 2 * Constants.TILE_SIZE / 2.f, 0);
 
         Pixmap textureData = new Pixmap(1, 1, Format.RGBA8888);
         textureData.setColor(0, 1, 0, 1);
@@ -23,7 +26,7 @@ public class CustomTile extends TileEntity {
     
     @Override
     public void render(Batch batch, float deltaTime){
-        batch.setColor(1, 1, 1, 1);
+        batch.setColor(1, 1, 1, 0.01f);
         batch.draw(
             texture,
             x * Constants.TILE_SIZE,

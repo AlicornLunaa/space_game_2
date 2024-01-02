@@ -590,6 +590,12 @@ public class Collider {
         shapes.add(circleShape);
         return circleShape;
     }
+    
+    public EdgeShape addEdgeShape(){
+        EdgeShape edgeShape = new EdgeShape();
+        shapes.add(edgeShape);
+        return edgeShape;
+    }
 
     public void removeShape(int i){
         shapes.removeIndex(i);
@@ -646,6 +652,24 @@ public class Collider {
         s.x = x;
         s.y = y;
         s.radius = radius;
+        s.density = 1.f;
+        s.friction = 1.f;
+        s.restitution = 0.5f;
+        s.sensor = false;
+        s.convex = true;
+
+        return c;
+    }
+    
+    public static Collider triangle(float x, float y, float w, float h, float rotation){
+        Collider c = new Collider();
+        c.position.set(x, y);
+        c.rotation = rotation;
+
+        PolygonShape s = c.addPolygon();
+        s.addVertex(new Vector2(w * -1.f, h * -1.f));
+        s.addVertex(new Vector2(w * 1.f, h * -1.f));
+        s.addVertex(new Vector2(w * -1.f, h * 1.f));
         s.density = 1.f;
         s.friction = 1.f;
         s.restitution = 0.5f;
