@@ -155,11 +155,13 @@ public class GridEditor extends BaseScene {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 switch(button){
                     case Buttons.LEFT:
-                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL, App.instance.atlas.findRegion("tiles/steel")));
+                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL));
+                        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         return true;
                         
                     case Buttons.RIGHT:
                         testGrid.removeTile(currentCell.x, currentCell.y);
+                        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         return true;
 
                     case Buttons.MIDDLE:
@@ -196,7 +198,6 @@ public class GridEditor extends BaseScene {
             public boolean keyDown(int keycode) {
                 switch (keycode) {
                     case Keys.SHIFT_LEFT:
-                        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         break;
                 
                     default:

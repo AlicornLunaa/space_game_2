@@ -24,10 +24,6 @@ public class TileElement extends AbstractTile {
             this.collider = new Collider(collider);
         }
     };
-    
-    // Static variables
-    public static @Null TextureRegion squareTexture;
-    public static @Null TextureRegion slopeTexture;
 
     // Variables
     public final Element element;
@@ -38,8 +34,11 @@ public class TileElement extends AbstractTile {
     public Vector2 floatingPosition = new Vector2(0.5f, 0.5f); // Keeps the decimals of the current position to allow small movements
     public Vector2 velocity = new Vector2();
 
+    public @Null TextureRegion squareTexture;
+    public @Null TextureRegion slopeTexture;
+
     // Constructor
-    public TileElement(Element element, State state, TextureRegion texture){
+    public TileElement(Element element, State state){
         super("element_" + element, 1, 1, 0);
         this.element = element;
         this.state = state;
@@ -60,14 +59,14 @@ public class TileElement extends AbstractTile {
         switch(shape){
             default:
                 if(squareTexture == null)
-                    squareTexture = App.instance.atlas.findRegion("tiles/steel");
+                    squareTexture = App.instance.atlas.findRegion(element.textureName);
         
                 return squareTexture;
 
                 
             case SLOPE:
                 if(slopeTexture == null)
-                    slopeTexture = App.instance.atlas.findRegion("tiles/steel_slope");
+                    slopeTexture = App.instance.atlas.findRegion(element.textureName + "_slope");
         
                 return slopeTexture;
         }

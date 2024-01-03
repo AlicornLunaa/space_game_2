@@ -1,7 +1,5 @@
 package com.alicornlunaa.space_game.grid.tiles;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
 public class LiquidTile extends TileElement {
     // Variables
     public int spreadFactor = 1;
@@ -9,8 +7,8 @@ public class LiquidTile extends TileElement {
     public boolean renderFullBlock = false;
 
     // Constructor
-    public LiquidTile(Element element, TextureRegion texture) {
-        super(element, State.LIQUID, texture);
+    public LiquidTile(Element element) {
+        super(element, State.LIQUID);
         mass = element.density;
     }
 }

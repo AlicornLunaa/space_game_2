@@ -30,7 +30,7 @@ public class App extends Game {
 	// Variables
 	public Assets manager;
 	public PartManager partManager = new PartManager();
-	public TileManager tileManager = new TileManager();
+	public TileManager tileManager;
 	public VfxManager vfxManager = new VfxManager();
 	public Skin skin;
 
@@ -100,6 +100,7 @@ public class App extends Game {
 
 				atlas = manager.get("textures_packed/textures.atlas", TextureAtlas.class);
 				particleAtlas = manager.get("particles_packed/particles.atlas", TextureAtlas.class);
+				tileManager = new TileManager();
 				loaded = true;
 				Gdx.app.log("Asset Manager", "Loaded");
 
@@ -111,7 +112,6 @@ public class App extends Game {
 				// Biome.register("Mountains", Color.GRAY, 0.0f, 0.0f, 0.5f, 40, 0.8f);
 				// Biome.register("Ocean", Color.BLUE, 0.0f, 0.0f, 0.0f, 1, 0.05f);
 				// Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
-				Gdx.app.log("Biome Manager", "Loaded");
 
 				// Initialize VisUI for development screens
 				VisUI.load();

@@ -2,12 +2,9 @@ package com.alicornlunaa.space_game.grid;
 
 import java.util.HashMap;
 
-import com.alicornlunaa.selene_engine.phys.Collider;
-import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
 import com.alicornlunaa.space_game.grid.tiles.SolidTile;
-import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.gdx.utils.Array;
 
 public class TileManager {
@@ -27,13 +24,15 @@ public class TileManager {
         }
     };
 
+    // TODO: Try a placable inner class that holds the element or function to spawn tile entity?
+
     // Variables
     private HashMap<TileCategory, Array<AbstractTile>> parts = new HashMap<>();
 
     // Constructor
     public TileManager(){
         // Register construction parts
-        // register(TileCategory.CONSTRUCTION, new SolidTile(Element.STEEL, 0, 0, App.instance.atlas.findRegion("tiles/steel"), Collider.box(0, 0, Constants.TILE_SIZE, Constants.TILE_SIZE, 0)));
+        register(TileCategory.CONSTRUCTION, new SolidTile(Element.STEEL));
     }
 
     // Functions
