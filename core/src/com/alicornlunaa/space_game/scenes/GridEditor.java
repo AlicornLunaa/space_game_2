@@ -64,7 +64,7 @@ public class GridEditor extends BaseScene {
 
         gridEntity.add(new TransformComponent());
         gridEntity.add(new BodyComponent());
-        testGrid.setTile(0, 0, new CustomTile(0));
+        testGrid.setTile(1, 0, new CustomTile(1));
         testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
         engine.addEntity(gridEntity);
 

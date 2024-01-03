@@ -258,6 +258,7 @@ public class Grid {
                     continue;
 
                 collider.setPosition(v.set(tile.x * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f, tile.y * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f));
+                collider.setOrigin(v.set(Constants.TILE_SIZE * (tile.width - 1) / 2.f, Constants.TILE_SIZE * (tile.height - 1) / 2.f));
                 collider.setRotation(tile.rotation * -90);
                 bodyComponent.addCollider(collider);
             }

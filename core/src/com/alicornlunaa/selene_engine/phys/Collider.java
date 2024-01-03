@@ -398,16 +398,15 @@ public class Collider {
         }
     }
 
-
     // Variables
     private Array<Shape> shapes = new Array<>();
     private Array<Fixture> fixtures = new Array<>();
     private @Null Body bodyRef = null;
     
-    private Vector2 position = new Vector2();
+    private Vector2 position = new Vector2(0, 0);
+    private Vector2 origin = new Vector2(0, 0);
     private Vector2 scale = new Vector2(1, 1);
     private float rotation = 0.0f;
-
 
     // Constructors
     public Collider(){} // Default constructor
@@ -431,10 +430,10 @@ public class Collider {
         }
 
         position = collider.position.cpy();
+        origin = collider.origin.cpy();
         scale = collider.scale.cpy();
         rotation = collider.rotation;
     }
-
 
     // Getters & setters
     public void setPosition(Vector2 position) {
@@ -443,6 +442,14 @@ public class Collider {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public void setOrigin(Vector2 origin) {
+        this.origin.set(origin);
+    }
+
+    public Vector2 getOrigin() {
+        return origin;
     }
 
     public void setScale(float x, float y) {
@@ -476,8 +483,11 @@ public class Collider {
         return this;
     }
 
-
     // Physics functions
+    private Matrix3 getMatrix(){
+        return new Matrix3().translate(position).rotate(rotation).translate(origin).scale(scale);
+    }
+
     public void detach(){
         // Remove existing body
         if(bodyRef != null){
@@ -498,7 +508,7 @@ public class Collider {
             detach();
             
         // Attach to new body
-        Matrix3 trans = new Matrix3().translate(position).rotate(rotation).scale(scale);
+        Matrix3 trans = getMatrix();
         bodyRef = b;
 
         for(int i = 0; i < getShapeCount(); i++){
