@@ -8,7 +8,6 @@ import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.TileElement;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
-import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Null;
 
@@ -62,8 +61,7 @@ public class Grid {
     }
 
     // Variables
-    private HashMap<Vector2i, Chunk> chunks = new HashMap<>();
-    private Vector2i selection = new Vector2i();
+    private HashMap<String, Chunk> chunks = new HashMap<>();
     
     // Constructor
     public Grid(){
@@ -73,11 +71,11 @@ public class Grid {
     private Chunk newChunkFromWorld(int x, int y){
         int chunkX = Math.floorDiv(x, Constants.CHUNK_SIZE);
         int chunkY = Math.floorDiv(y, Constants.CHUNK_SIZE);
-        Chunk chunk = chunks.get(selection.set(chunkX, chunkY));
+        Chunk chunk = chunks.get(chunkX + ":" + chunkY);
 
         if(chunk == null){
             chunk = new Chunk(chunkX, chunkY);
-            chunks.put(selection, chunk);
+            chunks.put(chunkX + ":" + chunkY, chunk);
         }
 
         return chunk;
@@ -86,16 +84,16 @@ public class Grid {
     private @Null Chunk getChunkFromWorld(int x, int y){
         int chunkX = Math.floorDiv(x, Constants.CHUNK_SIZE);
         int chunkY = Math.floorDiv(y, Constants.CHUNK_SIZE);
-        return chunks.get(selection.set(chunkX, chunkY));
+        return chunks.get(chunkX + ":" + chunkY);
     }
 
     private void pruneChunkFromWorld(int x, int y){
         int chunkX = Math.floorDiv(x, Constants.CHUNK_SIZE);
         int chunkY = Math.floorDiv(y, Constants.CHUNK_SIZE);
-        Chunk chunk = chunks.get(selection.set(chunkX, chunkY));
+        Chunk chunk = chunks.get(chunkX + ":" + chunkY);
 
         if(chunk != null && chunk.getTileCount() <= 0){
-            chunks.remove(selection.set(chunkX, chunkY));
+            chunks.remove(chunkX + ":" + chunkY);
         }
     }
 

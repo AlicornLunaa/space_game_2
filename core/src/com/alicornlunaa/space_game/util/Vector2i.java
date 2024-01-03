@@ -20,12 +20,16 @@ public class Vector2i implements Comparable<Vector2i> {
         return this;
     }
 
+    public Vector2i cpy(){
+        return new Vector2i(x, y);
+    }
+
     @Override
     public boolean equals(Object o){
         if(o == this)
             return true;
 
-        if(o instanceof Vector2i)
+        if(!(o instanceof Vector2i))
             return false;
 
         Vector2i v = (Vector2i)o;
