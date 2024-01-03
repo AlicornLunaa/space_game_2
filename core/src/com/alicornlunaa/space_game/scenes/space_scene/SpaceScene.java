@@ -8,7 +8,9 @@ import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.factories.BasicFactory;
 import com.alicornlunaa.space_game.factories.CharacterFactory;
-import com.alicornlunaa.space_game.factories.ShipFactory;
+import com.alicornlunaa.space_game.factories.GridFactory;
+import com.alicornlunaa.space_game.systems.GridPhysicsSystem;
+import com.alicornlunaa.space_game.systems.GridRenderSystem;
 import com.alicornlunaa.space_game.systems.PlayerSystem;
 import com.alicornlunaa.space_game.systems.ShipPhysicsSystem;
 import com.alicornlunaa.space_game.systems.ShipRenderSystem;
@@ -30,6 +32,8 @@ public class SpaceScene extends BaseScene {
         engine.addSystem(new PlayerSystem());
         engine.addSystem(new ShipRenderSystem());
         engine.addSystem(new ShipPhysicsSystem());
+        engine.addSystem(new GridRenderSystem());
+        engine.addSystem(new GridPhysicsSystem());
 
         // Init camera
         App.instance.camera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
@@ -39,7 +43,8 @@ public class SpaceScene extends BaseScene {
         // Test entities
         App.instance.playerEntity = CharacterFactory.createPlayer(4, 0, 0);
         engine.addEntity(App.instance.playerEntity);
-        engine.addEntity(ShipFactory.createShip(0, 1, 0));
+        engine.addEntity(GridFactory.createShip(0, 1, 0));
+        engine.addEntity(GridFactory.createGrid(2, 1, 0));
         engine.addEntity(BasicFactory.createStaticBox(0.f, -2.5f, 8.f, 0.5f, (float)Math.toRadians(5)));
     }
 

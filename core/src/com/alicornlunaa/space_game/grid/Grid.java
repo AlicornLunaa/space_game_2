@@ -9,6 +9,7 @@ import com.alicornlunaa.space_game.grid.tiles.TileElement;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
 // Storage class for tiles
@@ -62,6 +63,7 @@ public class Grid {
 
     // Variables
     private HashMap<String, Chunk> chunks = new HashMap<>();
+    private Array<Collider> colliders = new Array<>();
     
     // Constructor
     public Grid(){
@@ -234,8 +236,19 @@ public class Grid {
         }
     }
 
+    public void disassemble(){
+        // Build the colliders onto the body component listed
+        for(Collider collider : colliders){
+            collider.detach();
+        }
+
+        colliders.clear();
+    }
+
     public void assemble(BodyComponent bodyComponent){
         // Build the colliders onto the body component listed
+        disassemble();
+        
         Vector2 v = new Vector2();
         bodyComponent.clearColliders();
 
@@ -258,6 +271,7 @@ public class Grid {
                 collider.setPosition(v.set(tile.x * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f, tile.y * Constants.TILE_SIZE + Constants.TILE_SIZE / 2.f));
                 collider.setOrigin(v.set(Constants.TILE_SIZE * (tile.width - 1) / 2.f, Constants.TILE_SIZE * (tile.height - 1) / 2.f));
                 collider.setRotation(tile.rotation * -90);
+                colliders.add(collider);
                 bodyComponent.addCollider(collider);
             }
         }

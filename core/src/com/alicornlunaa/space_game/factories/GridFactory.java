@@ -8,7 +8,7 @@ import com.alicornlunaa.space_game.components.ship.InteriorComponent;
 import com.alicornlunaa.space_game.components.ship.ShipComponent;
 import com.badlogic.ashley.core.Entity;
 
-public class ShipFactory {
+public class GridFactory {
     public static Entity createShip(float x, float y, float rotation){
         Entity entity = new Entity();
         entity.add(new TransformComponent(x, y, rotation));
@@ -24,7 +24,7 @@ public class ShipFactory {
         entity.add(new TransformComponent(x, y, rotation));
         entity.add(new BodyComponent());
         entity.add(new ActorComponent());
-        entity.add(new GridComponent("./saves/grids/test.grid"));
+        entity.add(new GridComponent());
         return entity;
     }
 }

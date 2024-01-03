@@ -15,6 +15,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -48,6 +49,7 @@ public class ShipRenderSystem extends EntitySystem {
 
 		batch.setProjectionMatrix(App.instance.camera.combined);
 		batch.setTransformMatrix(renderMatrix);
+        batch.setColor(Color.WHITE);
 		batch.begin();
 
         // Update every entity

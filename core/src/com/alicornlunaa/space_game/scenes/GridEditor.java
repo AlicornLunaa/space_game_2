@@ -65,6 +65,18 @@ public class GridEditor extends BaseScene {
         gridEntity.add(new TransformComponent());
         gridEntity.add(new BodyComponent());
         testGrid.setTile(1, 0, new CustomTile(1));
+        testGrid.setTile(0, 1, new SolidTile(Element.STEEL));
+        testGrid.setTile(0, 0, new SolidTile(Element.STEEL));
+        testGrid.setTile(0, -1, new SolidTile(Element.STEEL));
+        testGrid.setTile(0, -2, new SolidTile(Element.STEEL));
+        testGrid.setTile(0, -3, new SolidTile(Element.STEEL));
+        testGrid.setTile(0, -4, new SolidTile(Element.STEEL));
+        testGrid.setTile(3, 1, new SolidTile(Element.STEEL));
+        testGrid.setTile(3, 0, new SolidTile(Element.STEEL));
+        testGrid.setTile(3, -1, new SolidTile(Element.STEEL));
+        testGrid.setTile(3, -2, new SolidTile(Element.STEEL));
+        testGrid.setTile(3, -3, new SolidTile(Element.STEEL));
+        testGrid.setTile(3, -4, new SolidTile(Element.STEEL));
         testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
         engine.addEntity(gridEntity);
 
