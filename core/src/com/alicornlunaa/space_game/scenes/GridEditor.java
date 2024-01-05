@@ -49,7 +49,6 @@ public class GridEditor extends BaseScene {
     private Stage mInterface;
 
     private Entity gridEntity = new Entity();
-    private TileCategory selectedGategory = TileCategory.CONSTRUCTION;
     
     private OrthographicCamera editorCamera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
     private ShapeRenderer batch = App.instance.shapeRenderer;
@@ -57,6 +56,10 @@ public class GridEditor extends BaseScene {
     private Vector2 panningVector = null;
     private Vector2i currentCell = new Vector2i();
     private Grid testGrid = new Grid();
+
+    private VerticalGroup partsGroup;
+    private TileCategory selectedGategory = TileCategory.CONSTRUCTION;
+    private @Null PickableTile selectedTile = null;
 
     // Constructor
     public GridEditor(){
@@ -89,6 +92,25 @@ public class GridEditor extends BaseScene {
     }
 
     // Functions
+    private void selectCategory(TileCategory category){
+        selectedGategory = category;
+        partsGroup.clear();
+
+        for(final PickableTile tile : App.instance.tileManager.getTilesInCategory(category)){
+            // TextureRegionDrawable texture = new TextureRegionDrawable(game.atlas.findRegion("parts/" + partID.toLowerCase()));
+            // texture.setMinSize(64 * ((float)texture.getRegion().getRegionWidth() / (float)texture.getRegion().getRegionHeight()), 64);
+
+            TextButton btn = new TextButton(tile.tile.tileID, App.instance.skin);
+            btn.addListener(new ChangeListener(){
+                @Override
+                public void changed(ChangeEvent e, Actor a){
+                    selectedTile = tile;
+                }
+            });
+            partsGroup.addActor(btn);
+        }
+    }
+
     private void initInterface(){
         // Create the gui
         Skin skin = App.instance.skin;
@@ -150,9 +172,9 @@ public class GridEditor extends BaseScene {
         Table partsTbl = new Table(skin);
 
         VerticalGroup categories = new VerticalGroup();
-        final VerticalGroup parts = new VerticalGroup();
+        partsGroup = new VerticalGroup();
         partsTbl.add(categories).expand().fill();
-        partsTbl.add(parts).expand().fill();
+        partsTbl.add(partsGroup).expand().fill();
 
         // Split pane creation
         VisSplitPane splitPane = new VisSplitPane(partsTbl, new Table(), false);
@@ -167,29 +189,7 @@ public class GridEditor extends BaseScene {
             btn.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    selectedGategory = entry;
-                    
-                    // TODO: Convert to function
-                    parts.clear();
-
-                    for(final PickableTile tile : App.instance.tileManager.getTilesInCategory(entry)){
-                        // TextureRegionDrawable texture = new TextureRegionDrawable(game.atlas.findRegion("parts/" + partID.toLowerCase()));
-                        // texture.setMinSize(64 * ((float)texture.getRegion().getRegionWidth() / (float)texture.getRegion().getRegionHeight()), 64);
-
-                        TextButton btn = new TextButton("Hello world", App.instance.skin);
-                        btn.addListener(new ChangeListener(){
-                            @Override
-                            public void changed(ChangeEvent e, Actor a){
-                                // selectedPart = new Part(ship, game.partManager.get(selectedCategory, partID)); TODO: Fix
-
-                                // if(ship.rootPart == null){
-                                //     ship.setRootPart(selectedPart);
-                                //     selectedPart = null;
-                                // }
-                            }
-                        });
-                        parts.addActor(btn);
-                    }
+                    selectCategory(entry);
                 }
             });
 
@@ -205,8 +205,10 @@ public class GridEditor extends BaseScene {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 switch(button){
                     case Buttons.LEFT:
-                        testGrid.setTile(currentCell.x, currentCell.y, new SolidTile(Element.STEEL));
-                        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
+                        if(selectedTile != null){
+                            testGrid.setTile(currentCell.x, currentCell.y, selectedTile.spawn());
+                            testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
+                        }
                         return true;
                         
                     case Buttons.RIGHT:
@@ -247,7 +249,9 @@ public class GridEditor extends BaseScene {
             @Override
             public boolean keyDown(int keycode) {
                 switch (keycode) {
-                    case Keys.SHIFT_LEFT:
+                    case Keys.R:
+                        if(selectedTile != null)
+                            selectedTile.tile.rotation = Math.floorMod(selectedTile.tile.rotation + (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -1 : 1), 4);
                         break;
                 
                     default:
@@ -289,28 +293,18 @@ public class GridEditor extends BaseScene {
         batch.setAutoShapeType(true);
         batch.begin();
 
-        // Grid
-        // batch.set(ShapeType.Line);
-        // for(int x = -20; x <= 20; x++) for(int y = -15; y <= 15; y++){
-        //     batch.setColor((x == 0 && y == 0) ? Color.WHITE : Color.LIGHT_GRAY);
-        //     batch.rect(
-        //         x * Constants.TILE_SIZE,
-        //         y * Constants.TILE_SIZE,
-        //         Constants.TILE_SIZE,
-        //         Constants.TILE_SIZE
-        //     );
-        // }
-
         // Cursor
-        int placeWidth = 0;
-        batch.set(ShapeType.Line);
-        batch.setColor(testGrid.isOccupied(currentCell.x, currentCell.y) ? Color.RED : Color.CYAN);
-        batch.rect(
-            currentCell.x * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
-            currentCell.y * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
-            Constants.TILE_SIZE * placeWidth * 2 + Constants.TILE_SIZE,
-            Constants.TILE_SIZE * placeWidth * 2 + Constants.TILE_SIZE
-        );
+        if(selectedTile != null){
+            int placeWidth = 0;
+            batch.set(ShapeType.Line);
+            batch.setColor(testGrid.isOccupied(currentCell.x, currentCell.y) ? Color.RED : Color.CYAN);
+            batch.rect(
+                currentCell.x * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
+                currentCell.y * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
+                Constants.TILE_SIZE * placeWidth * 2 + Constants.TILE_SIZE,
+                Constants.TILE_SIZE * placeWidth * 2 + Constants.TILE_SIZE
+            );
+        }
 
         batch.end();
 
@@ -325,6 +319,12 @@ public class GridEditor extends BaseScene {
                 tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
             }
         });
+
+        if(selectedTile != null){
+            selectedTile.tile.x = currentCell.x;
+            selectedTile.tile.y = currentCell.y;
+            selectedTile.tile.render(spriteBatch, delta);
+        }
 
         spriteBatch.end();
 

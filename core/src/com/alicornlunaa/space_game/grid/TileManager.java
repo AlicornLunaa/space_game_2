@@ -2,6 +2,8 @@ package com.alicornlunaa.space_game.grid;
 
 import java.util.HashMap;
 
+import com.alicornlunaa.space_game.grid.TileManager.PickableTile.TileSpawner;
+import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
 import com.alicornlunaa.space_game.grid.tiles.GasTile;
@@ -33,11 +35,11 @@ public class TileManager {
     public static class PickableTile {
         // Interface
         public static interface TileSpawner {
-            AbstractTile spawn();
+            AbstractTile spawn(AbstractTile template);
         }
 
         // Variables
-        public final TileSpawner spawnFunc;
+        private final TileSpawner spawnFunc;
         public final AbstractTile tile;
 
         // Constructor
@@ -45,20 +47,31 @@ public class TileManager {
             // Tile element default spawner
             this.spawnFunc = new TileSpawner() {
                 @Override
-                public AbstractTile spawn() {
+                public AbstractTile spawn(AbstractTile template) {
+                    AbstractTile newTile;
+
                     switch(tile.state){
                     case SOLID:
-                        return new SolidTile(tile.element);
+                        newTile = new SolidTile(tile.element);
+                        newTile.rotation = template.rotation;
+                        break;
                         
                     case LIQUID:
-                        return new LiquidTile(tile.element);
+                        newTile = new LiquidTile(tile.element);
+                        newTile.rotation = template.rotation;
+                        break;
                     
                     case GAS:
-                        return new GasTile(tile.element);
+                        newTile = new GasTile(tile.element);
+                        newTile.rotation = template.rotation;
+                        break;
                         
                     default:
-                        return null;
+                        newTile = null;
+                        break;
                     }
+
+                    return newTile;
                 }
             };
 
@@ -70,6 +83,11 @@ public class TileManager {
             this.spawnFunc = spawnFunc;
             this.tile = tile;
         }
+
+        // Functions
+        public AbstractTile spawn(){
+            return spawnFunc.spawn(tile);
+        }
     };
 
     // Variables
@@ -79,8 +97,14 @@ public class TileManager {
     public TileManager(){
         // Register construction parts
         register(TileCategory.CONSTRUCTION, new PickableTile(new SolidTile(Element.STEEL)));
-        register(TileCategory.THRUSTERS, new PickableTile(new SolidTile(Element.STEEL)));
-        register(TileCategory.CONTROL, new PickableTile(new SolidTile(Element.STEEL)));
+        register(TileCategory.THRUSTERS, new PickableTile(new SolidTile(Element.WATER)));
+        register(TileCategory.CONTROL, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.CONTROL, new PickableTile(new CustomTile(0), new TileSpawner() {
+            @Override
+            public AbstractTile spawn(AbstractTile template) {
+                return new CustomTile(template.rotation);
+            }
+        }));
     }
 
     // Functions
