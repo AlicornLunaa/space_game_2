@@ -7,6 +7,8 @@ import com.alicornlunaa.selene_engine.scenes.BaseScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.TileManager.PickableTile;
+import com.alicornlunaa.space_game.grid.TileManager.TileCategory;
 import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
@@ -47,6 +49,7 @@ public class GridEditor extends BaseScene {
     private Stage mInterface;
 
     private Entity gridEntity = new Entity();
+    private TileCategory selectedGategory = TileCategory.CONSTRUCTION;
     
     private OrthographicCamera editorCamera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
     private ShapeRenderer batch = App.instance.shapeRenderer;
@@ -147,16 +150,51 @@ public class GridEditor extends BaseScene {
         Table partsTbl = new Table(skin);
 
         VerticalGroup categories = new VerticalGroup();
-        VerticalGroup parts = new VerticalGroup();
+        final VerticalGroup parts = new VerticalGroup();
         partsTbl.add(categories).expand().fill();
         partsTbl.add(parts).expand().fill();
-        // populateCategories();
 
         // Split pane creation
         VisSplitPane splitPane = new VisSplitPane(partsTbl, new Table(), false);
         splitPane.setName("editor_pane");
         splitPane.setSplitAmount(0.3f);
         root.add(splitPane).expand().fill().row();
+
+        // Populate parts
+        for(final TileCategory entry : App.instance.tileManager.getTileMap().keySet()){
+            TextButton btn = new TextButton(entry.name, skin);
+
+            btn.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    selectedGategory = entry;
+                    
+                    // TODO: Convert to function
+                    parts.clear();
+
+                    for(final PickableTile tile : App.instance.tileManager.getTilesInCategory(entry)){
+                        // TextureRegionDrawable texture = new TextureRegionDrawable(game.atlas.findRegion("parts/" + partID.toLowerCase()));
+                        // texture.setMinSize(64 * ((float)texture.getRegion().getRegionWidth() / (float)texture.getRegion().getRegionHeight()), 64);
+
+                        TextButton btn = new TextButton("Hello world", App.instance.skin);
+                        btn.addListener(new ChangeListener(){
+                            @Override
+                            public void changed(ChangeEvent e, Actor a){
+                                // selectedPart = new Part(ship, game.partManager.get(selectedCategory, partID)); TODO: Fix
+
+                                // if(ship.rootPart == null){
+                                //     ship.setRootPart(selectedPart);
+                                //     selectedPart = null;
+                                // }
+                            }
+                        });
+                        parts.addActor(btn);
+                    }
+                }
+            });
+
+            categories.addActor(btn);
+        }
     }
 
     private void initControls(){
