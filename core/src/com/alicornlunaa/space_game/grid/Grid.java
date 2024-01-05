@@ -37,7 +37,7 @@ public class Grid {
         }
 
         public boolean isOccupied(int x, int y){
-            return occupancyMap[y * Constants.CHUNK_SIZE + x];
+            return occupancyMap[y * Constants.CHUNK_SIZE + x] == true;
         }
 
         public void setTile(int x, int y, AbstractTile tile){
@@ -118,18 +118,22 @@ public class Grid {
                     default:
                         if(isOccupied(x + w, y + h))
                             return true;
+                        break;
 
                     case 1:
                         if(isOccupied(x + h, y - w))
                             return true;
+                        break;
 
                     case 2:
                         if(isOccupied(x - w, y - h))
                             return true;
+                        break;
                             
                     case 3:
                         if(isOccupied(x - h, y + w))
                             return true;
+                        break;
                 }
             }
         }
@@ -181,6 +185,9 @@ public class Grid {
 
         if(tile == null)
             return;
+
+        x = tile.x;
+        y = tile.y;
 
         for(int w = 0; w < tile.width; w++){
             for(int h = 0; h < tile.height; h++){

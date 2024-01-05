@@ -26,7 +26,6 @@ public class CustomTile extends TileEntity {
     
     @Override
     public void render(Batch batch, float deltaTime){
-        batch.setColor(1, 1, 1, 0.9f);
         batch.draw(
             texture,
             x * Constants.TILE_SIZE,

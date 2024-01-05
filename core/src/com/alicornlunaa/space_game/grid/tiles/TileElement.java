@@ -74,7 +74,6 @@ public class TileElement extends AbstractTile {
     }
 
     public void render(Batch batch, float deltaTime){
-        batch.setColor(element.color);
         batch.draw(
             getTexture(),
             x * Constants.TILE_SIZE,

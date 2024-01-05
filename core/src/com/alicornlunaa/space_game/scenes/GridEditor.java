@@ -297,7 +297,7 @@ public class GridEditor extends BaseScene {
         if(selectedTile != null){
             int placeWidth = 0;
             batch.set(ShapeType.Line);
-            batch.setColor(testGrid.isOccupied(currentCell.x, currentCell.y) ? Color.RED : Color.CYAN);
+            batch.setColor(testGrid.isRegionOccupied(currentCell.x, currentCell.y, 0, selectedTile.tile.width, selectedTile.tile.height) ? Color.RED : Color.CYAN);
             batch.rect(
                 currentCell.x * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
                 currentCell.y * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
@@ -316,11 +316,13 @@ public class GridEditor extends BaseScene {
         testGrid.iterate(new GridIterator() {
             @Override
             public void iterate(AbstractTile tile) {
+                spriteBatch.setColor(1, 1, 1, 1);
                 tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
             }
         });
 
         if(selectedTile != null){
+            spriteBatch.setColor(1, 1, 1, 0.2f);
             selectedTile.tile.x = currentCell.x;
             selectedTile.tile.y = currentCell.y;
             selectedTile.tile.render(spriteBatch, delta);
