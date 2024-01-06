@@ -118,8 +118,8 @@ public class App extends Game {
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame");
 
-				// this.setScreen(new GridEditor());
 				this.setScreen(new SpaceScene());
+				// this.setScreen(new GridEditor());
 			} else {
 				// Loading is not complete, update progress bar
 				loadingScene.progressBar.setValue(manager.getProgress());

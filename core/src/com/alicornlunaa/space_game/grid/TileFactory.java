@@ -3,6 +3,7 @@ package com.alicornlunaa.space_game.grid;
 import org.json.JSONObject;
 
 import com.alicornlunaa.space_game.grid.entities.CustomTile;
+import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
 import com.alicornlunaa.space_game.grid.tiles.GasTile;
@@ -115,6 +116,12 @@ public class TileFactory {
                 case "tile_ent_custom":
                     CustomTile customTile = new CustomTile(obj.getInt("rotation"));
                     tile = customTile;
+                    break;
+                    
+                case "tile_ent_thruster":
+                    ThrusterTile thrusterTile = new ThrusterTile(obj.getInt("rotation"));
+                    thrusterTile.collider.setScale(1 / 64.f);
+                    tile = thrusterTile;
                     break;
 
                 default:

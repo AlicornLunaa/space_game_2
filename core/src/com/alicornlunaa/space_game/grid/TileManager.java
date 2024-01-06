@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.space_game.grid.TileManager.PickableTile.TileSpawner;
 import com.alicornlunaa.space_game.grid.entities.CustomTile;
+import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
 import com.alicornlunaa.space_game.grid.tiles.GasTile;
@@ -98,6 +99,12 @@ public class TileManager {
         // Register construction parts
         register(TileCategory.CONSTRUCTION, new PickableTile(new SolidTile(Element.STEEL)));
         register(TileCategory.THRUSTERS, new PickableTile(new SolidTile(Element.WATER)));
+        register(TileCategory.THRUSTERS, new PickableTile(new ThrusterTile(0), new TileSpawner() {
+            @Override
+            public AbstractTile spawn(AbstractTile template) {
+                return new ThrusterTile(template.rotation);
+            }
+        }));
         register(TileCategory.CONTROL, new PickableTile(new SolidTile(Element.SAND)));
         register(TileCategory.CONTROL, new PickableTile(new CustomTile(0), new TileSpawner() {
             @Override
