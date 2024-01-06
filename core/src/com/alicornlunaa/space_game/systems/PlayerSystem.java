@@ -79,6 +79,9 @@ public class PlayerSystem extends EntitySystem {
             if(!plyComp.enabled)
                 continue;
 
+            // Set their collisions based on noclip
+            bodyComp.body.setActive(!plyComp.isNoclipping);
+
             // Apply forces
             if(plyComp.isNoclipping){
                 // Noclip physics

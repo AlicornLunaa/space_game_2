@@ -1,5 +1,7 @@
 package com.alicornlunaa.space_game.grid.tiles;
 
+import org.json.JSONObject;
+
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.util.Constants;
@@ -39,7 +41,7 @@ public class TileElement extends AbstractTile {
 
     // Constructor
     public TileElement(Element element, State state){
-        super("element_" + element, 1, 1, 0);
+        super(("element_" + element).toLowerCase(), 1, 1, 0);
         this.element = element;
         this.state = state;
     }
@@ -89,5 +91,20 @@ public class TileElement extends AbstractTile {
     }
 
     public void update(float deltaTime){
+    }
+
+    @Override
+    public JSONObject serialize(){
+        JSONObject obj = super.serialize();
+        obj.put("element", element.toString().toLowerCase());
+        obj.put("state", state.toString().toLowerCase());
+        obj.put("shape", shape.toString().toLowerCase());
+        obj.put("temperature", temperature);
+        obj.put("mass", mass);
+        obj.put("floating_position_x", floatingPosition.x);
+        obj.put("floating_position_y", floatingPosition.y);
+        obj.put("velocity_x", velocity.x);
+        obj.put("velocity_y", velocity.y);
+        return obj;
     }
 }

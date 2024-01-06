@@ -1,10 +1,17 @@
 package com.alicornlunaa.space_game.grid.tiles;
 
+import org.json.JSONObject;
+
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 public abstract class AbstractTile {
     // Enumerations
     public static enum Direction { NORTH, EAST, SOUTH, WEST };
+
+    // Interfaces
+    protected static interface TileDeserializer {
+        AbstractTile parse(JSONObject obj);
+    }
     
     // Variables
     public final String tileID;
@@ -34,4 +41,13 @@ public abstract class AbstractTile {
     // Functions
     public abstract void render(Batch batch, float deltaTime);
     public abstract void update(float deltaTime);
+    
+    public JSONObject serialize(){
+        JSONObject obj = new JSONObject();
+        obj.put("tile_id", tileID);
+        obj.put("x_pos", x);
+        obj.put("y_pos", y);
+        obj.put("rotation", rotation);
+        return obj;
+    }
 }

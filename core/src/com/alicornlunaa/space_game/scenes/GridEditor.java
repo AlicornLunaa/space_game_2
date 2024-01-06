@@ -1,5 +1,7 @@
 package com.alicornlunaa.space_game.scenes;
 
+import org.json.JSONObject;
+
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
@@ -22,6 +24,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -139,6 +142,10 @@ public class GridEditor extends BaseScene {
             public void changed(ChangeEvent event, Actor actor){
                 // Save file to ./saves/ships/name.ship
                 if(nameTextField.getText().length() > 0){
+                    testGrid.gridName = nameTextField.getText();
+
+                    FileHandle handle = Gdx.files.local("./saves/grids/" + nameTextField.getText() + ".grid");
+                    handle.writeString(testGrid.serialize().toString(1), false);
                 }
             }
         });
@@ -153,6 +160,8 @@ public class GridEditor extends BaseScene {
             public void changed(ChangeEvent event, Actor actor){
                 // Save file to ./saves/ships/name.ship
                 if(nameTextField.getText().length() > 0){
+                    testGrid = Grid.unserialize(new JSONObject(Gdx.files.local("./saves/grids/" + nameTextField.getText() + ".grid").readString()));
+                    testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                 }
             }
         });

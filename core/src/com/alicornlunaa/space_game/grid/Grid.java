@@ -2,6 +2,9 @@ package com.alicornlunaa.space_game.grid;
 
 import java.util.HashMap;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
@@ -64,6 +67,8 @@ public class Grid {
     // Variables
     private HashMap<String, Chunk> chunks = new HashMap<>();
     private Array<Collider> colliders = new Array<>();
+
+    public String gridName = "unnamed_grid";
     
     // Constructor
     public Grid(){
@@ -282,5 +287,39 @@ public class Grid {
                 bodyComponent.addCollider(collider);
             }
         }
+    }
+
+    public JSONObject serialize(){
+        final JSONArray arr = new JSONArray();
+
+        iterate(new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                arr.put(tile.serialize());
+            }
+        });
+        
+        JSONObject obj = new JSONObject();
+        obj.put("grid_name", gridName);
+        obj.put("tiles", arr);
+        return obj;
+    }
+
+    public static Grid unserialize(JSONObject obj){
+        try {
+            JSONArray tiles = obj.getJSONArray("tiles");
+            Grid grid = new Grid();
+
+            for(int i = 0; i < tiles.length(); i++){
+                AbstractTile tile = TileFactory.unserialize(tiles.getJSONObject(i));
+                grid.setTile(tile.x, tile.y, tile);
+            }
+            
+            return grid;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 }

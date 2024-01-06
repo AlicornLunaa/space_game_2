@@ -11,7 +11,7 @@ public abstract class TileEntity extends AbstractTile {
 
     // Constructor
     public TileEntity(String tileID, int width, int height, int rotation) {
-        super("te_" + tileID, width, height, rotation);
+        super("tile_ent_" + tileID, width, height, rotation);
     }
 
     // Functions
