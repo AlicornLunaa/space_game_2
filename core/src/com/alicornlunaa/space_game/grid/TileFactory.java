@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import com.alicornlunaa.space_game.grid.entities.ControlSeatTile;
 import com.alicornlunaa.space_game.grid.entities.DoorTile;
+import com.alicornlunaa.space_game.grid.entities.RcsPortTile;
 import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
@@ -123,6 +124,11 @@ public class TileFactory {
                     ThrusterTile thrusterTile = new ThrusterTile(obj.getInt("rotation"));
                     thrusterTile.collider.setScale(1 / 64.f);
                     tile = thrusterTile;
+                    break;
+
+                case "tile_ent_rcs_port":
+                    RcsPortTile rcsPortTile = new RcsPortTile(obj.getInt("rotation"));
+                    tile = rcsPortTile;
                     break;
                 
                 case "tile_ent_controlseat":

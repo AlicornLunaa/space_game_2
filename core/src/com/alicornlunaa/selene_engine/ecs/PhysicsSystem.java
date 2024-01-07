@@ -87,6 +87,10 @@ public class PhysicsSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime){
+        // Render every hitbox
+        if(Constants.DEBUG && App.instance.camera != null)
+            App.instance.debug.render(world.getBox2DWorld(), App.instance.camera.combined);
+            
         // Fixed timestep for world
         accumulator += Math.min(deltaTime, 0.25f);
         while(accumulator >= Constants.TIME_STEP){
@@ -119,9 +123,5 @@ public class PhysicsSystem extends EntitySystem {
             transform.dp.set(transform.position);
             transform.dr = transform.rotation;
         }
-
-        // Render every hitbox
-        if(Constants.DEBUG && App.instance.camera != null)
-            App.instance.debug.render(world.getBox2DWorld(), App.instance.camera.combined);
     }
 }

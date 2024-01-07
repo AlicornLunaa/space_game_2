@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ShortArray;
 
+// TODO: Add more advanced functionality such as being able to disable the fixtures temporarily
+
 /** Collider JSON data format
  * {
  *   vertices: [ float list containing vectors ],

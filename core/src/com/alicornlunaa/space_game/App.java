@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.space_game.grid.TileManager;
+import com.alicornlunaa.space_game.scenes.GridEditor;
 import com.alicornlunaa.space_game.scenes.LoadingScene;
 import com.alicornlunaa.space_game.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.space_game.util.ControlSchema;
@@ -127,7 +128,7 @@ public class App extends Game {
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame");
 
 				this.setScreen(new SpaceScene());
-				// this.setScreen(new GridEditor());
+				this.setScreen(new GridEditor());
 			} else {
 				// Loading is not complete, update progress bar
 				loadingScene.progressBar.setValue(manager.getProgress());

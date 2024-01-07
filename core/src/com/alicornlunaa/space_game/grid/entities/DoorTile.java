@@ -18,7 +18,7 @@ public class DoorTile extends TileEntity {
 
     // Constructor
     public DoorTile(int rotation) {
-        super("door", 1, 2, rotation);
+        super("door", 1, 3, rotation);
         textures = new Animation<>(1.f / 12.f, App.instance.atlas.findRegions("parts/door"));
         textures.setPlayMode(PlayMode.REVERSED);
     }
