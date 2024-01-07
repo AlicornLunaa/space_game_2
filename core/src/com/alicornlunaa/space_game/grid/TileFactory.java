@@ -3,7 +3,7 @@ package com.alicornlunaa.space_game.grid;
 import org.json.JSONObject;
 
 import com.alicornlunaa.space_game.grid.entities.ControlSeatTile;
-import com.alicornlunaa.space_game.grid.entities.CustomTile;
+import com.alicornlunaa.space_game.grid.entities.DoorTile;
 import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
@@ -114,9 +114,9 @@ public class TileFactory {
             tile = getTileElement(obj);
         } else {
             switch(tileID){
-                case "tile_ent_custom":
-                    CustomTile customTile = new CustomTile(obj.getInt("rotation"));
-                    tile = customTile;
+                case "tile_ent_door":
+                    DoorTile doorTile = new DoorTile(obj.getInt("rotation"));
+                    tile = doorTile;
                     break;
                     
                 case "tile_ent_thruster":

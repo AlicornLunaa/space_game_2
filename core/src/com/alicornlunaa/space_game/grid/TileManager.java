@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.alicornlunaa.space_game.grid.TileManager.PickableTile.TileSpawner;
 import com.alicornlunaa.space_game.grid.entities.ControlSeatTile;
-import com.alicornlunaa.space_game.grid.entities.CustomTile;
+import com.alicornlunaa.space_game.grid.entities.DoorTile;
 import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.Element;
@@ -107,10 +107,10 @@ public class TileManager {
             }
         }));
         register(TileCategory.CONTROL, new PickableTile(new SolidTile(Element.SAND)));
-        register(TileCategory.CONTROL, new PickableTile(new CustomTile(0), new TileSpawner() {
+        register(TileCategory.CONTROL, new PickableTile(new DoorTile(0), new TileSpawner() {
             @Override
             public AbstractTile spawn(AbstractTile template) {
-                return new CustomTile(template.rotation);
+                return new DoorTile(template.rotation);
             }
         }));
         register(TileCategory.CONTROL, new PickableTile(new ControlSeatTile(0), new TileSpawner() {

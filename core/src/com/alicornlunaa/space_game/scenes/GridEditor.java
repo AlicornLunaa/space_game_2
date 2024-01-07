@@ -11,10 +11,7 @@ import com.alicornlunaa.space_game.grid.Grid;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
 import com.alicornlunaa.space_game.grid.TileManager.PickableTile;
 import com.alicornlunaa.space_game.grid.TileManager.TileCategory;
-import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
-import com.alicornlunaa.space_game.grid.tiles.Element;
-import com.alicornlunaa.space_game.grid.tiles.SolidTile;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
 import com.badlogic.ashley.core.Engine;
@@ -73,19 +70,6 @@ public class GridEditor extends BaseScene {
 
         gridEntity.add(new TransformComponent());
         gridEntity.add(new BodyComponent());
-        testGrid.setTile(1, 0, new CustomTile(1));
-        testGrid.setTile(0, 1, new SolidTile(Element.STEEL));
-        testGrid.setTile(0, 0, new SolidTile(Element.STEEL));
-        testGrid.setTile(0, -1, new SolidTile(Element.STEEL));
-        testGrid.setTile(0, -2, new SolidTile(Element.STEEL));
-        testGrid.setTile(0, -3, new SolidTile(Element.STEEL));
-        testGrid.setTile(0, -4, new SolidTile(Element.STEEL));
-        testGrid.setTile(3, 1, new SolidTile(Element.STEEL));
-        testGrid.setTile(3, 0, new SolidTile(Element.STEEL));
-        testGrid.setTile(3, -1, new SolidTile(Element.STEEL));
-        testGrid.setTile(3, -2, new SolidTile(Element.STEEL));
-        testGrid.setTile(3, -3, new SolidTile(Element.STEEL));
-        testGrid.setTile(3, -4, new SolidTile(Element.STEEL));
         testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
         engine.addEntity(gridEntity);
 
@@ -129,7 +113,7 @@ public class GridEditor extends BaseScene {
         Table topBarTbl = new Table();
         root.add(topBarTbl).expandX().fillX().row();
 
-        TextField nameTextField = new TextField("Ship Name Here", skin);
+        TextField nameTextField = new TextField("unnamed_grid", skin);
         nameTextField.setName("ship_name");
         topBarTbl.add(nameTextField).expand().fill().left().pad(10, 10, 10, 300);
 
