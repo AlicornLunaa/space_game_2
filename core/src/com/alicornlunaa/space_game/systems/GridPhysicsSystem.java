@@ -43,7 +43,6 @@ public class GridPhysicsSystem extends EntitySystem {
 
     // Variables
     private ImmutableArray<Entity> entities;
-    private ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<GridComponent> gm = ComponentMapper.getFor(GridComponent.class);
 	private SpriteBatch batch = App.instance.spriteBatch;
 
@@ -71,14 +70,13 @@ public class GridPhysicsSystem extends EntitySystem {
         // Update every entity
         for(int i = 0; i < entities.size(); i++){
             // Get entity info
-            Entity entity = entities.get(i);
-            BodyComponent bodyComp = bm.get(entity);
+            final Entity entity = entities.get(i);
             GridComponent gridComp = gm.get(entity);
 
             gridComp.grid.iterate(new GridIterator() {
                 @Override
                 public void iterate(AbstractTile tile) {
-                    tile.update(deltaTime);
+                    tile.update(entity, deltaTime);
                 }
             });
         }

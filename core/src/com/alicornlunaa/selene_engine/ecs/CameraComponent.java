@@ -9,8 +9,13 @@ public class CameraComponent implements Component {
     public OrthographicCamera camera;
     public boolean active = true;
 
-    // Constructor
-    public CameraComponent(int width, int height){
+    // Constructors
+    public CameraComponent(int width, int height, boolean enabled){
         camera = new OrthographicCamera(width / Constants.PPM, height / Constants.PPM);
+        active = enabled;
+    }
+
+    public CameraComponent(int width, int height){
+        this(width, height, true);
     }
 }

@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.util.Constants;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -90,7 +91,7 @@ public class TileElement extends AbstractTile {
         );
     }
 
-    public void update(float deltaTime){
+    public void update(Entity entity, float deltaTime){
     }
 
     @Override

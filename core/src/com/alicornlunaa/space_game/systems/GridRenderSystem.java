@@ -16,12 +16,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
@@ -33,17 +28,9 @@ public class GridRenderSystem extends EntitySystem {
     private ComponentMapper<GridComponent> gm = ComponentMapper.getFor(GridComponent.class);
 	private SpriteBatch batch = App.instance.spriteBatch;
 
-    private TextureRegion texture;
-
     // Constructor
     public GridRenderSystem(){
         super(3);
-
-        Pixmap data = new Pixmap(1, 1, Format.RGBA8888);
-        data.setColor(Color.WHITE);
-        data.fill();
-        texture = new TextureRegion(new Texture(data));
-        data.dispose();
     }
 
     // Functions
@@ -53,7 +40,7 @@ public class GridRenderSystem extends EntitySystem {
     }
 
     @Override
-    public void update(float deltaTime){
+    public void update(final float deltaTime){
         // Start render
         Matrix4 renderMatrix = new Matrix4();
 
@@ -72,49 +59,6 @@ public class GridRenderSystem extends EntitySystem {
             // Get matrix for the body
             renderMatrix.set(transform.getMatrix());
             renderMatrix.translate(-bodyComp.body.getLocalCenter().x, -bodyComp.body.getLocalCenter().y, 0);
-            
-            // Check for ship input such as clicking on the ship
-            // if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
-            //     Vector3 clickPosInWorld = App.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            //     Vector2 position = new Vector2(clickPosInWorld.x, clickPosInWorld.y).sub(transform.position).add(bodyComp.body.getLocalCenter());
-                
-            //     if(shipComp.rootPart.contains(position)){
-            //         // Drive the ship
-            //         PlayerComponent playerComp = pm.get(App.instance.playerEntity);
-            //         CameraComponent cameraComp = cm.get(App.instance.playerEntity);
-            //         shipComp.controlEnabled = !shipComp.controlEnabled;
-            //         playerComp.enabled = !shipComp.controlEnabled;
-            //         cameraComp.active = !shipComp.controlEnabled;
-
-            //         if(!shipComp.controlEnabled){
-            //             entity.remove(CameraComponent.class);
-            //         } else {
-            //             entity.add(new CameraComponent(1280, 720));
-            //         }
-            //     }
-            // }
-
-            // if(shipComp.controlEnabled){
-            //     if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_UP)) shipComp.vertical = 1;
-            //     else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_DOWN)) shipComp.vertical = -1;
-            //     else shipComp.vertical = 0;
-                
-            //     if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_LEFT)) shipComp.horizontal = -1;
-            //     else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_TRANSLATE_RIGHT)) shipComp.horizontal = 1;
-            //     else shipComp.horizontal = 0;
-                
-            //     if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_LEFT)) shipComp.roll = 1;
-            //     else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_ROLL_RIGHT)) shipComp.roll = -1;
-            //     else shipComp.roll = 0;
-                
-            //     if(Gdx.input.isKeyPressed(ControlSchema.SHIP_INCREASE_THROTTLE)) shipComp.throttle = Math.min(shipComp.throttle + 1, 100);
-            //     else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_DECREASE_THROTTLE)) shipComp.throttle = Math.max(shipComp.throttle - 1, 0);
-            //     else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_FULL_THROTTLE)) shipComp.throttle = 100;
-            //     else if(Gdx.input.isKeyPressed(ControlSchema.SHIP_NO_THROTTLE)) shipComp.throttle = 0;
-
-            //     if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_RCS)) shipComp.rcs = !shipComp.rcs;
-            //     if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_SAS)) shipComp.sas = !shipComp.sas;
-            // }
 
             // Get just clicked for tile entities
             boolean justLeftClicked = Gdx.input.isButtonJustPressed(Buttons.LEFT);
@@ -132,7 +76,7 @@ public class GridRenderSystem extends EntitySystem {
                 AbstractTile tile = gridComp.grid.getTile((int)clickPos.x, (int)clickPos.y);
 
                 if(tile != null && tile instanceof TileEntity)
-                    ((TileEntity)tile).click(buttonClicked);
+                    ((TileEntity)tile).click(entity, App.instance.playerEntity, buttonClicked);
             }
 
             // Render the grid
@@ -141,7 +85,7 @@ public class GridRenderSystem extends EntitySystem {
             gridComp.grid.iterate(new GridIterator() {
                 @Override
                 public void iterate(AbstractTile tile) {
-                    tile.render(batch, Gdx.graphics.getDeltaTime());
+                    tile.render(batch, deltaTime);
                 }
             });
         }

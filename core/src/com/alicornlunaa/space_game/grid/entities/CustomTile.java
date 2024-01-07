@@ -3,6 +3,7 @@ package com.alicornlunaa.space_game.grid.entities;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -41,6 +42,6 @@ public class CustomTile extends TileEntity {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(Entity entity, float deltaTime) {
     }
 }

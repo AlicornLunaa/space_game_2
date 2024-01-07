@@ -2,10 +2,11 @@ package com.alicornlunaa.selene_engine.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public abstract class BaseScene implements IScene {
+public abstract class BaseScene implements Screen {
     // Variables
     protected Color backgroundColor = new Color(0, 0, 0, 1);
     protected InputMultiplexer inputs = new InputMultiplexer();

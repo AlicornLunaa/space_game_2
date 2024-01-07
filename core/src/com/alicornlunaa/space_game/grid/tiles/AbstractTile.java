@@ -2,6 +2,7 @@ package com.alicornlunaa.space_game.grid.tiles;
 
 import org.json.JSONObject;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 public abstract class AbstractTile {
@@ -40,7 +41,7 @@ public abstract class AbstractTile {
 
     // Functions
     public abstract void render(Batch batch, float deltaTime);
-    public abstract void update(float deltaTime);
+    public abstract void update(Entity entity, float deltaTime);
     
     public JSONObject serialize(){
         JSONObject obj = new JSONObject();

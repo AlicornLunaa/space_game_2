@@ -1,10 +1,10 @@
 package com.alicornlunaa.space_game;
 
+import com.alicornlunaa.selene_engine.scenes.GameScene;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
 import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.space_game.grid.TileManager;
-import com.alicornlunaa.space_game.scenes.GridEditor;
 import com.alicornlunaa.space_game.scenes.LoadingScene;
 import com.alicornlunaa.space_game.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.space_game.util.ControlSchema;
@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Null;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 
@@ -48,6 +49,13 @@ public class App extends Game {
 	public Box2DDebugRenderer debug;
 
 	// Functions
+	public @Null GameScene getScene(){
+		if(getScreen() instanceof GameScene)
+			return (GameScene)getScreen();
+
+		return null;
+	}
+
 	@Override
 	public void create(){
 		// Load files and settings
