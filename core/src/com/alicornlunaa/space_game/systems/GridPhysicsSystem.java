@@ -4,6 +4,8 @@ import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.ship.GridComponent;
+import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -58,7 +60,7 @@ public class GridPhysicsSystem extends EntitySystem {
     }
 
     @Override
-    public void update(float deltaTime){
+    public void update(final float deltaTime){
         // Start render
         Matrix4 renderMatrix = new Matrix4();
 
@@ -72,6 +74,13 @@ public class GridPhysicsSystem extends EntitySystem {
             Entity entity = entities.get(i);
             BodyComponent bodyComp = bm.get(entity);
             GridComponent gridComp = gm.get(entity);
+
+            gridComp.grid.iterate(new GridIterator() {
+                @Override
+                public void iterate(AbstractTile tile) {
+                    tile.update(deltaTime);
+                }
+            });
         }
 
         // Finish render

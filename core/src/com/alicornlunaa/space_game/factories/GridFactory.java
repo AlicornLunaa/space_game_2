@@ -24,7 +24,7 @@ public class GridFactory {
         entity.add(new TransformComponent(x, y, rotation));
         entity.add(new BodyComponent());
         entity.add(new ActorComponent());
-        entity.add(new GridComponent());
+        entity.add(new GridComponent("./saves/grids/unnamed_grid.grid"));
         return entity;
     }
 }

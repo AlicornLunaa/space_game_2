@@ -3,6 +3,7 @@ package com.alicornlunaa.space_game.grid;
 import java.util.HashMap;
 
 import com.alicornlunaa.space_game.grid.TileManager.PickableTile.TileSpawner;
+import com.alicornlunaa.space_game.grid.entities.ControlSeatTile;
 import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
@@ -110,6 +111,12 @@ public class TileManager {
             @Override
             public AbstractTile spawn(AbstractTile template) {
                 return new CustomTile(template.rotation);
+            }
+        }));
+        register(TileCategory.CONTROL, new PickableTile(new ControlSeatTile(0), new TileSpawner() {
+            @Override
+            public AbstractTile spawn(AbstractTile template) {
+                return new ControlSeatTile(template.rotation);
             }
         }));
     }

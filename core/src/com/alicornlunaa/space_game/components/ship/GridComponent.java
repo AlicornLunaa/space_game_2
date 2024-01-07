@@ -14,9 +14,7 @@ public class GridComponent implements Component {
     public Grid grid = new Grid();
 
     // Constructor
-    public GridComponent(){
-        grid = Grid.unserialize(new JSONObject(Gdx.files.local("./saves/grids/unnamed_grid.grid").readString()));
-    }
+    public GridComponent(){}
 
     public GridComponent(String path){
         this();
@@ -26,6 +24,7 @@ public class GridComponent implements Component {
             // Read filedata
             FileHandle file = Gdx.files.local(path);
             JSONObject data = new JSONObject(file.readString());
+            grid = Grid.unserialize(data);
         } catch (GdxRuntimeException|JSONException e){
             System.out.println("Error reading ship");
             e.printStackTrace();

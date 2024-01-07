@@ -2,6 +2,7 @@ package com.alicornlunaa.space_game.grid;
 
 import org.json.JSONObject;
 
+import com.alicornlunaa.space_game.grid.entities.ControlSeatTile;
 import com.alicornlunaa.space_game.grid.entities.CustomTile;
 import com.alicornlunaa.space_game.grid.entities.ThrusterTile;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
@@ -122,6 +123,11 @@ public class TileFactory {
                     ThrusterTile thrusterTile = new ThrusterTile(obj.getInt("rotation"));
                     thrusterTile.collider.setScale(1 / 64.f);
                     tile = thrusterTile;
+                    break;
+                
+                case "tile_ent_controlseat":
+                    ControlSeatTile controlSeatTile = new ControlSeatTile(obj.getInt("rotation"));
+                    tile = controlSeatTile;
                     break;
 
                 default:

@@ -6,6 +6,8 @@ import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.ship.GridComponent;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
+import com.alicornlunaa.space_game.grid.tiles.TileEntity;
+import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -13,8 +15,15 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 public class GridRenderSystem extends EntitySystem {
     // Variables
@@ -24,9 +33,17 @@ public class GridRenderSystem extends EntitySystem {
     private ComponentMapper<GridComponent> gm = ComponentMapper.getFor(GridComponent.class);
 	private SpriteBatch batch = App.instance.spriteBatch;
 
+    private TextureRegion texture;
+
     // Constructor
     public GridRenderSystem(){
         super(3);
+
+        Pixmap data = new Pixmap(1, 1, Format.RGBA8888);
+        data.setColor(Color.WHITE);
+        data.fill();
+        texture = new TextureRegion(new Texture(data));
+        data.dispose();
     }
 
     // Functions
@@ -51,6 +68,10 @@ public class GridRenderSystem extends EntitySystem {
             TransformComponent transform = tm.get(entity);
             BodyComponent bodyComp = bm.get(entity);
             GridComponent gridComp = gm.get(entity);
+
+            // Get matrix for the body
+            renderMatrix.set(transform.getMatrix());
+            renderMatrix.translate(-bodyComp.body.getLocalCenter().x, -bodyComp.body.getLocalCenter().y, 0);
             
             // Check for ship input such as clicking on the ship
             // if(Gdx.input.isButtonJustPressed(Buttons.LEFT)){
@@ -95,9 +116,26 @@ public class GridRenderSystem extends EntitySystem {
             //     if(Gdx.input.isKeyJustPressed(ControlSchema.SHIP_TOGGLE_SAS)) shipComp.sas = !shipComp.sas;
             // }
 
-            // Render the root part
-            renderMatrix.set(transform.getMatrix());
-            renderMatrix.translate(-bodyComp.body.getLocalCenter().x, -bodyComp.body.getLocalCenter().y, 0);
+            // Get just clicked for tile entities
+            boolean justLeftClicked = Gdx.input.isButtonJustPressed(Buttons.LEFT);
+            boolean justRightClicked = Gdx.input.isButtonJustPressed(Buttons.RIGHT);
+            boolean justMiddleClicked = Gdx.input.isButtonJustPressed(Buttons.MIDDLE);
+            int buttonClicked = justLeftClicked ? 0 : (justRightClicked ? 1 : (justMiddleClicked ? 2 : -1));
+
+            if(buttonClicked > -1){
+                // Get tile touched
+                Vector3 clickPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+                clickPos.set(App.instance.camera.unproject(clickPos));
+                clickPos.mul(renderMatrix.cpy().inv());
+                clickPos.set((int)(clickPos.x / Constants.TILE_SIZE - (clickPos.x < 0 ? 1 : 0)), (int)(clickPos.y / Constants.TILE_SIZE - (clickPos.y < 0 ? 1 : 0)), 0);
+
+                AbstractTile tile = gridComp.grid.getTile((int)clickPos.x, (int)clickPos.y);
+
+                if(tile != null && tile instanceof TileEntity)
+                    ((TileEntity)tile).click(buttonClicked);
+            }
+
+            // Render the grid
             batch.setTransformMatrix(renderMatrix);
 
             gridComp.grid.iterate(new GridIterator() {

@@ -1,7 +1,6 @@
 package com.alicornlunaa.space_game.grid.tiles;
 
 import com.alicornlunaa.selene_engine.phys.Collider;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Null;
 
@@ -21,7 +20,5 @@ public abstract class TileEntity extends AbstractTile {
     @Override
     public void update(float deltaTime){}
 
-    public boolean click(Buttons button){
-        return false;
-    }
+    public boolean click(int button){ return false; }
 }
