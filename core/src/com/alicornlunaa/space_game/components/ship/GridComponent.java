@@ -1,8 +1,5 @@
 package com.alicornlunaa.space_game.components.ship;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.alicornlunaa.space_game.grid.Grid;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.Gdx;
@@ -23,9 +20,8 @@ public class GridComponent implements Component {
         try {
             // Read filedata
             FileHandle file = Gdx.files.local(path);
-            JSONObject data = new JSONObject(file.readString());
-            grid = Grid.unserialize(data);
-        } catch (GdxRuntimeException|JSONException e){
+            grid = Grid.unserialize(file.readBytes());
+        } catch (GdxRuntimeException e){
             System.out.println("Error reading ship");
             e.printStackTrace();
         }

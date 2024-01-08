@@ -289,7 +289,7 @@ public class Grid {
         }
     }
 
-    public JSONObject serialize(){
+    public byte[] serialize(){
         final JSONArray arr = new JSONArray();
 
         iterate(new GridIterator() {
@@ -302,11 +302,13 @@ public class Grid {
         JSONObject obj = new JSONObject();
         obj.put("grid_name", gridName);
         obj.put("tiles", arr);
-        return obj;
+
+        return obj.toString().getBytes();
     }
 
-    public static Grid unserialize(JSONObject obj){
+    public static Grid unserialize(byte[] data){
         try {
+            JSONObject obj = new JSONObject(new String(data));
             JSONArray tiles = obj.getJSONArray("tiles");
             Grid grid = new Grid();
 

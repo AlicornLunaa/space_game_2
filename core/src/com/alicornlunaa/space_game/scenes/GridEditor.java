@@ -1,7 +1,5 @@
 package com.alicornlunaa.space_game.scenes;
 
-import org.json.JSONObject;
-
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
@@ -129,7 +127,7 @@ public class GridEditor extends BaseScene {
                     testGrid.gridName = nameTextField.getText();
 
                     FileHandle handle = Gdx.files.local("./saves/grids/" + nameTextField.getText() + ".grid");
-                    handle.writeString(testGrid.serialize().toString(1), false);
+                    handle.writeBytes(testGrid.serialize(), false);
                 }
             }
         });
@@ -144,7 +142,7 @@ public class GridEditor extends BaseScene {
             public void changed(ChangeEvent event, Actor actor){
                 // Save file to ./saves/ships/name.ship
                 if(nameTextField.getText().length() > 0){
-                    testGrid = Grid.unserialize(new JSONObject(Gdx.files.local("./saves/grids/" + nameTextField.getText() + ".grid").readString()));
+                    testGrid = Grid.unserialize(Gdx.files.local("./saves/grids/" + nameTextField.getText() + ".grid").readBytes());
                     testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                 }
             }
