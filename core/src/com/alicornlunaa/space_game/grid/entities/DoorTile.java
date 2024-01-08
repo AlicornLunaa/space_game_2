@@ -1,5 +1,6 @@
 package com.alicornlunaa.space_game.grid.entities;
 
+import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
@@ -19,8 +20,10 @@ public class DoorTile extends TileEntity {
     // Constructor
     public DoorTile(int rotation) {
         super("door", 1, 3, rotation);
+        collider = Collider.box(0, 0, Constants.TILE_SIZE * 0.25f, Constants.TILE_SIZE * 1.5f, 0);
         textures = new Animation<>(1.f / 12.f, App.instance.atlas.findRegions("parts/door"));
         textures.setPlayMode(PlayMode.REVERSED);
+        animationTimer = textures.getAnimationDuration();
     }
     
     // Functions
@@ -28,12 +31,14 @@ public class DoorTile extends TileEntity {
         open = true;
         animationTimer = 0.f;
         textures.setPlayMode(PlayMode.NORMAL);
+        collider.setEnabled(false);
     }
 
     private void closeDoor(){
         open = false;
         animationTimer = 0.f;
         textures.setPlayMode(PlayMode.REVERSED);
+        collider.setEnabled(true);
     }
 
     @Override

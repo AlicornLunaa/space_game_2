@@ -16,8 +16,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ShortArray;
 
-// TODO: Add more advanced functionality such as being able to disable the fixtures temporarily
-
 /** Collider JSON data format
  * {
  *   vertices: [ float list containing vectors ],
@@ -410,6 +408,8 @@ public class Collider {
     private Vector2 scale = new Vector2(1, 1);
     private float rotation = 0.0f;
 
+    private boolean enabled = true;
+
     // Constructors
     public Collider(){} // Default constructor
 
@@ -438,43 +438,35 @@ public class Collider {
     }
 
     // Getters & setters
-    public void setPosition(Vector2 position) {
-        this.position.set(position);
+    public Vector2 getPosition() { return position; }
+    public void setPosition(Vector2 pos) { position.set(pos); reattach(); }
+
+    public Vector2 getOrigin() { return origin; }
+    public void setOrigin(Vector2 o) { origin.set(o); reattach(); }
+
+    public Vector2 getScale() { return scale; }
+    public void setScale(float x, float y) { scale.set(x, y); reattach(); }
+    public void setScale(float s) { scale.set(s, s); reattach(); }
+
+    public float getRotation() { return rotation; }
+    public void setRotation(float rot) { rotation = rot; reattach(); }
+
+    public boolean isEnabled(){ return enabled; }
+    public void setEnabled(boolean en){
+        Body temp = bodyRef;
+        enabled = en;
+
+        if(bodyRef != null){
+            if(en){
+                attach(bodyRef);
+            } else {
+                detach();
+                bodyRef = temp;
+            }
+        }
     }
 
-    public Vector2 getPosition() {
-        return position;
-    }
-
-    public void setOrigin(Vector2 origin) {
-        this.origin.set(origin);
-    }
-
-    public Vector2 getOrigin() {
-        return origin;
-    }
-
-    public void setScale(float x, float y) {
-        this.scale.set(x, y);
-    }
-
-    public void setScale(float scale) {
-        this.scale.set(scale, scale);
-    }
-
-    public Vector2 getScale() {
-        return scale;
-    }
-
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
-    }
-
-    public float getRotation() {
-        return rotation;
-    }
-
-    public Collider setFixture(float friction, float restitution, float density, boolean sensor){
+    public Collider setAllFixtures(float friction, float restitution, float density, boolean sensor){
         for(Shape shape : shapes){
             shape.density = density;
             shape.friction = friction;
@@ -486,9 +478,7 @@ public class Collider {
     }
 
     // Physics functions
-    private Matrix3 getMatrix(){
-        return new Matrix3().translate(position).rotate(rotation).translate(origin).scale(scale);
-    }
+    private Matrix3 getMatrix(){ return new Matrix3().translate(position).rotate(rotation).translate(origin).scale(scale); }
 
     public void detach(){
         // Remove existing body
@@ -505,13 +495,19 @@ public class Collider {
     }
 
     public Body attach(Body b){
+        // Remove existing body
         if(bodyRef != null)
-            // Remove existing body
             detach();
+
+        // Save reference immediately
+        bodyRef = b;
+
+        // Skip if collider is disabled
+        if(!enabled)
+            return b;
             
         // Attach to new body
         Matrix3 trans = getMatrix();
-        bodyRef = b;
 
         for(int i = 0; i < getShapeCount(); i++){
             // Each shape must be attached
@@ -574,7 +570,10 @@ public class Collider {
         return b;
     }
 
-    public void reattach(){ attach(bodyRef); }
+    public void reattach(){
+        if(bodyRef != null)
+            attach(bodyRef);
+    }
 
     // Shape functions
     public boolean contains(Vector2 p){

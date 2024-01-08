@@ -6,6 +6,7 @@ import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.RenderSystem;
 import com.alicornlunaa.selene_engine.scenes.GameScene;
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.factories.BasicFactory;
 import com.alicornlunaa.space_game.factories.CharacterFactory;
 import com.alicornlunaa.space_game.factories.GridFactory;
 import com.alicornlunaa.space_game.systems.GridPhysicsSystem;
@@ -41,6 +42,7 @@ public class SpaceScene extends GameScene {
         App.instance.playerEntity = CharacterFactory.createPlayer(4, 0, 0);
         engine.addEntity(App.instance.playerEntity);
         engine.addEntity(GridFactory.createGrid(2, 1, 0));
+        engine.addEntity(BasicFactory.createBox(0.1f, 0.1f, 0.2f, 0.2f, 0));
     }
 
     // Functions

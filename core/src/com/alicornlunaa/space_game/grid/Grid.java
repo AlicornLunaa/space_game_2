@@ -275,7 +275,7 @@ public class Grid {
                     collider = new Collider(((TileElement)tile).shape.collider);
 
                 if(tile instanceof TileEntity && ((TileEntity)tile).collider != null)
-                    collider = new Collider(((TileEntity)tile).collider);
+                    collider = ((TileEntity)tile).collider;
                     
                 if(collider == null)
                     continue;
