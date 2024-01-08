@@ -15,11 +15,9 @@ import com.badlogic.gdx.utils.Array;
 import com.ray3k.stripe.FreeTypeSkinLoader;
 
 public class Assets extends AssetManager {
-
     // Inner classes
     @SuppressWarnings("all")
     public static class ShaderAssetLoader extends SynchronousAssetLoader<ShaderProgram, ShaderAssetLoader.ShaderParameters> {
-
         private static final String VERTEX_SHADER_FILE = "/vertex.vert";
         private static final String FRAGMENT_SHADER_FILE = "/fragment.frag";
 
@@ -44,12 +42,10 @@ public class Assets extends AssetManager {
         }
 
         public static class ShaderParameters extends AssetLoaderParameters<ShaderProgram> {}
-
     }
 
     @SuppressWarnings("all")
     public static class ParticleAssetLoader extends SynchronousAssetLoader<ParticleEffectPool, ParticleAssetLoader.ParticleParameters> {
-
         public ParticleAssetLoader(FileHandleResolver resolver){
             super(resolver);
         }
@@ -69,7 +65,25 @@ public class Assets extends AssetManager {
         }
 
         public static class ParticleParameters extends AssetLoaderParameters<ParticleEffectPool> {}
+    }
 
+    @SuppressWarnings("all")
+    public static class AsepriteAssetLoader extends SynchronousAssetLoader<AsepriteSheet, AsepriteAssetLoader.AsepriteParameters> {
+        public AsepriteAssetLoader(FileHandleResolver resolver){
+            super(resolver);
+        }
+
+        @Override
+        public AsepriteSheet load(AssetManager assetManager, String fileName, FileHandle file, AsepriteParameters parameter){
+            return new AsepriteSheet(file);
+        }
+
+        @Override
+        public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, AsepriteParameters parameter) {
+            return null;
+        }
+
+        public static class AsepriteParameters extends AssetLoaderParameters<AsepriteSheet> {}
     }
 
     public static interface ILoader {
@@ -90,6 +104,7 @@ public class Assets extends AssetManager {
         setLoader(Skin.class, new FreeTypeSkinLoader(getFileHandleResolver()));
         setLoader(ShaderProgram.class, new ShaderAssetLoader(getFileHandleResolver()));
         setLoader(ParticleEffectPool.class, new ParticleAssetLoader(getFileHandleResolver()));
+        setLoader(AsepriteSheet.class, new AsepriteAssetLoader(getFileHandleResolver()));
 
         // Load skin
         load("skins/spacecadet/spacecadet.json", Skin.class);
@@ -112,5 +127,4 @@ public class Assets extends AssetManager {
         loader.loadAssets(this);
         finishLoading();
     }
-    
 }

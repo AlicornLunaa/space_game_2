@@ -20,9 +20,15 @@ public class TileManager {
     // Static classes
     public static enum TileCategory {
         // Enumerations
-        CONSTRUCTION("Construction", "Basic parts for constructing the majority of the ship."),
-        THRUSTERS("Thrusters", "Tiles which can move the ship in a direction."),
-        CONTROL("Control", "Tiles which can orient the ship.");
+        AERO("Aerodynamics", "These have a great effect on the way air flows around the ship."),
+        CARGO("Cargo", "These can be used to store stuff securely."),
+        DATA_UTILITIES("Data Utilities", "These can be used to collect data on the environment."),
+        ENVIRONMENT("Environment Control", "These can be used to change the environment to your will."),
+        NUCLEAR("Nuclear", "big power :)"),
+        RCS_PORTS("Rcs Ports", "These can be used to rotate and orient the ship in space."),
+        ENERGY("Energy", "These can be used to store or create energy."),
+        STRUCTURAL("Structural", "These can be used to construct the basic ship."),
+        THRUSTER("Thrusters", "These can be used to move the ship fast.");
         
         // Variables
         public final String name;
@@ -99,28 +105,38 @@ public class TileManager {
     // Constructor
     public TileManager(){
         // Register construction parts
-        register(TileCategory.CONSTRUCTION, new PickableTile(new SolidTile(Element.STEEL)));
-        register(TileCategory.THRUSTERS, new PickableTile(new SolidTile(Element.WATER)));
-        register(TileCategory.THRUSTERS, new PickableTile(new ThrusterTile(0), new TileSpawner() {
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.STEEL)));
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.WATER)));
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.SAND)));
+        
+        register(TileCategory.AERO, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.CARGO, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.DATA_UTILITIES, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.NUCLEAR, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.ENERGY, new PickableTile(new SolidTile(Element.SAND)));
+
+        register(TileCategory.THRUSTER, new PickableTile(new ThrusterTile(0), new TileSpawner() {
             @Override
             public AbstractTile spawn(AbstractTile template) {
                 return new ThrusterTile(template.rotation);
             }
         }));
-        register(TileCategory.CONTROL, new PickableTile(new SolidTile(Element.SAND)));
-        register(TileCategory.CONTROL, new PickableTile(new DoorTile(0), new TileSpawner() {
+
+        register(TileCategory.ENVIRONMENT, new PickableTile(new DoorTile(0), new TileSpawner() {
             @Override
             public AbstractTile spawn(AbstractTile template) {
                 return new DoorTile(template.rotation);
             }
         }));
-        register(TileCategory.CONTROL, new PickableTile(new ControlSeatTile(0), new TileSpawner() {
+
+        register(TileCategory.ENVIRONMENT, new PickableTile(new ControlSeatTile(0), new TileSpawner() {
             @Override
             public AbstractTile spawn(AbstractTile template) {
                 return new ControlSeatTile(template.rotation);
             }
         }));
-        register(TileCategory.CONTROL, new PickableTile(new RcsPortTile(0), new TileSpawner() {
+
+        register(TileCategory.RCS_PORTS, new PickableTile(new RcsPortTile(0), new TileSpawner() {
             @Override
             public AbstractTile spawn(AbstractTile template) {
                 return new RcsPortTile(template.rotation);

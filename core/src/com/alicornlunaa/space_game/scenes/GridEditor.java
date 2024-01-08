@@ -4,6 +4,7 @@ import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
+import com.alicornlunaa.selene_engine.util.asset_manager.AsepriteSheet;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
@@ -22,6 +23,9 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -30,12 +34,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
@@ -55,13 +62,17 @@ public class GridEditor extends BaseScene {
     private Vector2i currentCell = new Vector2i();
     private Grid testGrid = new Grid();
 
+    private Texture topBarBackground;
+    private Texture partsBackground;
+    private AsepriteSheet categoryIcons;
     private VerticalGroup partsGroup;
-    private TileCategory selectedGategory = TileCategory.CONSTRUCTION;
+    private TileCategory selectedGategory = TileCategory.STRUCTURAL;
     private @Null PickableTile selectedTile = null;
 
     // Constructor
     public GridEditor(){
         super();
+        initTextures();
         initInterface();
         initControls();
         initEngine();
@@ -96,6 +107,19 @@ public class GridEditor extends BaseScene {
         }
     }
 
+    private void initTextures(){
+        Pixmap data = new Pixmap(1, 1, Format.RGBA8888);
+        data.setColor(0.2f, 0.2f, 0.2f, 1.f);
+        data.fill();
+        topBarBackground = new Texture(data);
+
+        data.setColor(0.1f, 0.1f, 0.1f, 1.f);
+        data.fill();
+        partsBackground = new Texture(data);
+
+        categoryIcons = App.instance.manager.get("textures/ui/categories.json", AsepriteSheet.class);
+    }
+
     private void initInterface(){
         // Create the gui
         Skin skin = App.instance.skin;
@@ -109,6 +133,7 @@ public class GridEditor extends BaseScene {
 
         // Top bar controls
         Table topBarTbl = new Table();
+        topBarTbl.setBackground(new TextureRegionDrawable(topBarBackground));
         root.add(topBarTbl).expandX().fillX().row();
 
         TextField nameTextField = new TextField("unnamed_grid", skin);
@@ -149,22 +174,24 @@ public class GridEditor extends BaseScene {
         });
         topBarTbl.add(loadBtn).right().pad(10);
 
-        TextButton quitBtn = new TextButton("Quit", skin);
-        quitBtn.setColor(Color.RED);
+        ImageButton quitBtn = new ImageButton(new TextureRegionDrawable(App.instance.atlas.findRegion("ui/exit")));
         quitBtn.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
                 App.instance.setScreen(previousScreen);
             }
         });
-        topBarTbl.add(quitBtn).right().pad(10);
+        topBarTbl.add(quitBtn).right().pad(10).width(64).height(64);
 
         // Parts tab
         Table partsTbl = new Table(skin);
+        partsTbl.setBackground(new TextureRegionDrawable(partsBackground));
 
         VerticalGroup categories = new VerticalGroup();
+        ScrollPane categoriesScroll = new ScrollPane(categories);
+        partsTbl.add(categoriesScroll).fill().width(64);
+
         partsGroup = new VerticalGroup();
-        partsTbl.add(categories).expand().fill();
         partsTbl.add(partsGroup).expand().fill();
 
         // Split pane creation
@@ -173,9 +200,9 @@ public class GridEditor extends BaseScene {
         splitPane.setSplitAmount(0.3f);
         root.add(splitPane).expand().fill().row();
 
-        // Populate parts
+        // Populate categories
         for(final TileCategory entry : App.instance.tileManager.getTileMap().keySet()){
-            TextButton btn = new TextButton(entry.name, skin);
+            ImageButton btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion(entry.toString().toLowerCase())));
 
             btn.addListener(new ChangeListener() {
                 @Override
@@ -186,6 +213,11 @@ public class GridEditor extends BaseScene {
 
             categories.addActor(btn);
         }
+        
+        ImageButton btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion("structural")));
+        categories.addActor(btn);
+        btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion("structural")));
+        categories.addActor(btn);
     }
 
     private void initControls(){
@@ -243,6 +275,10 @@ public class GridEditor extends BaseScene {
                     case Keys.R:
                         if(selectedTile != null)
                             selectedTile.tile.rotation = Math.floorMod(selectedTile.tile.rotation + (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -1 : 1), 4);
+                        break;
+
+                    case Keys.F5:
+                        App.instance.setScreen(new GridEditor());
                         break;
                 
                     default:
