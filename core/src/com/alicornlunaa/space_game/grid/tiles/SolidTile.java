@@ -5,7 +5,7 @@ public class SolidTile extends TileElement {
     public boolean movable = false;
 
     // Constructor
-    public SolidTile(Element element) {
-        super(element, State.SOLID);
+    public SolidTile(Element element, Shape shape) {
+        super(element, State.SOLID, shape);
     }
 }

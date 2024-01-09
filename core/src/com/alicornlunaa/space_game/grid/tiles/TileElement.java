@@ -41,16 +41,18 @@ public class TileElement extends AbstractTile {
     public @Null TextureRegion slopeTexture;
 
     // Constructor
-    public TileElement(Element element, State state){
+    public TileElement(Element element, State state, Shape shape){
         super(("element_" + element).toLowerCase(), 1, 1, 0);
         this.element = element;
         this.state = state;
+        this.shape = shape;
     }
 
     public TileElement(TileElement other){
         super(other);
         this.element = other.element;
         this.state = other.state;
+        this.shape = other.shape;
         this.temperature = other.temperature;
         this.mass = other.mass;
         this.floatingPosition = other.floatingPosition.cpy();

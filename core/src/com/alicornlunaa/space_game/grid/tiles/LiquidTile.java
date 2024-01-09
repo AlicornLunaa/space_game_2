@@ -7,8 +7,8 @@ public class LiquidTile extends TileElement {
     public boolean renderFullBlock = false;
 
     // Constructor
-    public LiquidTile(Element element) {
-        super(element, State.LIQUID);
+    public LiquidTile(Element element, Shape shape) {
+        super(element, State.LIQUID, shape);
         mass = element.density;
     }
 }

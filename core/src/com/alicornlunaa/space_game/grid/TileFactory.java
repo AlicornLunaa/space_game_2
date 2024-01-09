@@ -84,20 +84,19 @@ public class TileFactory {
 
         switch(state){
             case GAS:
-                tile = new GasTile(element);
+                tile = new GasTile(element, shape);
                 break;
             case LIQUID:
-                tile = new LiquidTile(element);
+                tile = new LiquidTile(element, shape);
                 break;
             case SOLID:
-                tile = new SolidTile(element);
+                tile = new SolidTile(element, shape);
                 break;
             default:
                 break;
         }
 
         if(tile != null){
-            tile.shape = shape;
             tile.temperature = obj.getFloat("temperature");
             tile.mass = obj.getFloat("mass");
             tile.floatingPosition.set(obj.getFloat("floating_position_x"), obj.getFloat("floating_position_y"));

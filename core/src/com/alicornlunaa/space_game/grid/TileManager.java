@@ -14,6 +14,7 @@ import com.alicornlunaa.space_game.grid.tiles.LiquidTile;
 import com.alicornlunaa.space_game.grid.tiles.SolidTile;
 import com.alicornlunaa.space_game.grid.tiles.TileElement;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
+import com.alicornlunaa.space_game.grid.tiles.TileElement.Shape;
 import com.badlogic.gdx.utils.Array;
 
 public class TileManager {
@@ -61,18 +62,21 @@ public class TileManager {
 
                     switch(tile.state){
                     case SOLID:
-                        newTile = new SolidTile(tile.element);
+                        newTile = new SolidTile(tile.element, tile.shape);
                         newTile.rotation = template.rotation;
+                        ((TileElement)newTile).shape = ((TileElement)newTile).shape;
                         break;
                         
                     case LIQUID:
-                        newTile = new LiquidTile(tile.element);
+                        newTile = new LiquidTile(tile.element, tile.shape);
                         newTile.rotation = template.rotation;
+                        ((TileElement)newTile).shape = ((TileElement)newTile).shape;
                         break;
                     
                     case GAS:
-                        newTile = new GasTile(tile.element);
+                        newTile = new GasTile(tile.element, tile.shape);
                         newTile.rotation = template.rotation;
+                        ((TileElement)newTile).shape = ((TileElement)newTile).shape;
                         break;
                         
                     default:
@@ -105,15 +109,16 @@ public class TileManager {
     // Constructor
     public TileManager(){
         // Register construction parts
-        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.STEEL)));
-        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.WATER)));
-        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.STEEL, Shape.SQUARE)));
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.STEEL, Shape.SLOPE)));
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.WATER, Shape.SQUARE)));
+        register(TileCategory.STRUCTURAL, new PickableTile(new SolidTile(Element.SAND, Shape.SQUARE)));
         
-        register(TileCategory.AERO, new PickableTile(new SolidTile(Element.SAND)));
-        register(TileCategory.CARGO, new PickableTile(new SolidTile(Element.SAND)));
-        register(TileCategory.DATA_UTILITIES, new PickableTile(new SolidTile(Element.SAND)));
-        register(TileCategory.NUCLEAR, new PickableTile(new SolidTile(Element.SAND)));
-        register(TileCategory.ENERGY, new PickableTile(new SolidTile(Element.SAND)));
+        register(TileCategory.AERO, new PickableTile(new SolidTile(Element.SAND, Shape.SQUARE)));
+        register(TileCategory.CARGO, new PickableTile(new SolidTile(Element.SAND, Shape.SQUARE)));
+        register(TileCategory.DATA_UTILITIES, new PickableTile(new SolidTile(Element.SAND, Shape.SQUARE)));
+        register(TileCategory.NUCLEAR, new PickableTile(new SolidTile(Element.SAND, Shape.SQUARE)));
+        register(TileCategory.ENERGY, new PickableTile(new SolidTile(Element.SAND, Shape.SQUARE)));
 
         register(TileCategory.THRUSTER, new PickableTile(new ThrusterTile(0), new TileSpawner() {
             @Override
