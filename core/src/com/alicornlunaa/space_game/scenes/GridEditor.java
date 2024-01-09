@@ -4,6 +4,7 @@ import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.scenes.BaseScene;
+import com.alicornlunaa.selene_engine.util.AutoScrollPane;
 import com.alicornlunaa.selene_engine.util.asset_manager.AsepriteSheet;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
@@ -13,6 +14,7 @@ import com.alicornlunaa.space_game.grid.TileManager.TileCategory;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.util.Constants;
 import com.alicornlunaa.space_game.util.Vector2i;
+import com.alicornlunaa.space_game.widgets.HoverLabel;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
@@ -35,7 +37,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -43,6 +44,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
@@ -188,7 +190,7 @@ public class GridEditor extends BaseScene {
         partsTbl.setBackground(new TextureRegionDrawable(partsBackground));
 
         VerticalGroup categories = new VerticalGroup();
-        ScrollPane categoriesScroll = new ScrollPane(categories);
+        AutoScrollPane categoriesScroll = new AutoScrollPane(categories);
         partsTbl.add(categoriesScroll).fill().width(64);
 
         partsGroup = new VerticalGroup();
@@ -203,7 +205,10 @@ public class GridEditor extends BaseScene {
         // Populate categories
         for(final TileCategory entry : App.instance.tileManager.getTileMap().keySet()){
             ImageButton btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion(entry.toString().toLowerCase())));
+            HoverLabel lbl = new HoverLabel(btn, entry.name + "\n" + entry.description, skin, 0.5f);
 
+            lbl.setAlignment(Align.bottomLeft);
+            lbl.setFontScale(0.7f);
             btn.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -212,12 +217,8 @@ public class GridEditor extends BaseScene {
             });
 
             categories.addActor(btn);
+            mInterface.addActor(lbl);
         }
-        
-        ImageButton btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion("structural")));
-        categories.addActor(btn);
-        btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion("structural")));
-        categories.addActor(btn);
     }
 
     private void initControls(){
