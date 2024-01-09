@@ -56,6 +56,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
@@ -440,7 +441,14 @@ public class GridEditor extends BaseScene {
         root.add(splitPane).expand().fill().row();
 
         // Populate categories
-        for(final TileCategory entry : App.instance.tileManager.getTileMap().keySet()){
+        Array<TileCategory> tileCategoriesSorted = new Array<>();
+
+        for(TileCategory entry : App.instance.tileManager.getTileMap().keySet())
+            tileCategoriesSorted.addAll(entry);
+
+        tileCategoriesSorted.sort();
+
+        for(final TileCategory entry : tileCategoriesSorted){
             ImageButton btn = new ImageButton(new TextureRegionDrawable(categoryIcons.getRegion(entry.toString().toLowerCase())));
             HoverLabel lbl = new HoverLabel(btn, entry.name + "\n" + entry.description, skin, 0.5f);
 
@@ -489,9 +497,8 @@ public class GridEditor extends BaseScene {
                                 int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
                                 testGrid.setTile(mirrorX, mirrorY, selectedTile.spawn());
                             }
-
-                            testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         }
+
                         return true;
                         
                     case Buttons.RIGHT:
@@ -516,7 +523,6 @@ public class GridEditor extends BaseScene {
                             testGrid.removeTile(mirrorX, mirrorY);
                         }
 
-                        testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         return true;
 
                     case Buttons.MIDDLE:
@@ -555,6 +561,10 @@ public class GridEditor extends BaseScene {
                     case Keys.R:
                         if(selectedTile != null)
                             selectedTile.tile.rotation = Math.floorMod(selectedTile.tile.rotation + (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -1 : 1), 4);
+                        break;
+
+                    case Keys.C:
+                        testGrid.center();
                         break;
 
                     case Keys.LEFT:

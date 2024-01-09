@@ -289,9 +289,55 @@ public class Grid {
         }
     }
 
+    public void clear(){
+        disassemble();
+        chunks.clear();
+    }
+
+    public void center(){
+        // Take the average position of everything and center it
+        Array<AbstractTile> tiles = new Array<>();
+        int tileCount = 0;
+        int avgX = 0;
+        int avgY = 0;
+        
+        for(Chunk chunk : chunks.values()) {
+            for(AbstractTile tile : chunk.tileMap){
+                if(tile == null)
+                    continue;
+
+                tile.updatedThisTick = false;
+            }
+        }
+
+        for(Chunk chunk : chunks.values()) {
+            for(AbstractTile tile : chunk.tileMap){
+                if(tile == null || tile.updatedThisTick)
+                    continue;
+
+                tile.updatedThisTick = true;
+                tileCount++;
+                avgX += tile.x;
+                avgY += tile.y;
+                tiles.add(tile);
+            }
+        }
+
+        avgX /= tileCount;
+        avgY /= tileCount;
+
+        // Clear the tiles and remake the ship
+        clear();
+
+        for(AbstractTile tile : tiles){
+            setTile(tile.x - avgX, tile.y - avgY, tile);
+        }
+    }
+
     public byte[] serialize(){
         final JSONArray arr = new JSONArray();
 
+        center();
         iterate(new GridIterator() {
             @Override
             public void iterate(AbstractTile tile) {
