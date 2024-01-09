@@ -143,8 +143,8 @@ public class GridEditor extends BaseScene {
     private Vector2 panningVector = null;
     private @Null PickableTile selectedTile = null;
 
-    private float horizAxis = 0;
-    private float vertAxis = 0;
+    private float horizAxis = 0.5f;
+    private float vertAxis = 0.5f;
     private boolean horizSymmetry = false;
     private boolean vertSymmetry = false;
 
@@ -382,12 +382,52 @@ public class GridEditor extends BaseScene {
                     case Buttons.LEFT:
                         if(selectedTile != null){
                             testGrid.setTile(currentCell.x, currentCell.y, selectedTile.spawn());
+
+                            if(horizSymmetry){
+                                // Mirror horizontally
+                                int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
+                                testGrid.setTile(mirrorX, currentCell.y, selectedTile.spawn());
+                            }
+
+                            if(vertSymmetry){
+                                // Mirror horizontally
+                                int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
+                                testGrid.setTile(currentCell.x, mirrorY, selectedTile.spawn());
+                            }
+
+                            if(horizSymmetry && vertSymmetry){
+                                // Mirror horizontally
+                                int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
+                                int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
+                                testGrid.setTile(mirrorX, mirrorY, selectedTile.spawn());
+                            }
+
                             testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         }
                         return true;
                         
                     case Buttons.RIGHT:
                         testGrid.removeTile(currentCell.x, currentCell.y);
+
+                        if(horizSymmetry){
+                            // Mirror horizontally
+                            int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
+                            testGrid.removeTile(mirrorX, currentCell.y);
+                        }
+
+                        if(vertSymmetry){
+                            // Mirror horizontally
+                            int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
+                            testGrid.removeTile(currentCell.x, mirrorY);
+                        }
+
+                        if(horizSymmetry && vertSymmetry){
+                            // Mirror horizontally
+                            int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
+                            int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
+                            testGrid.removeTile(mirrorX, mirrorY);
+                        }
+
                         testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
                         return true;
 
@@ -473,23 +513,23 @@ public class GridEditor extends BaseScene {
         batch.begin();
 
         // Symmetry line rendering
+        batch.setColor(Color.LIGHT_GRAY);
+
         if(vertSymmetry){
             batch.set(ShapeType.Line);
-            batch.setColor(Color.LIGHT_GRAY);
 
             for(int i = (int)(-40 * editorCamera.zoom); i < (int)(40 * editorCamera.zoom); i++){
                 if(i % 2 == 0) continue;
-                batch.line(i * 0.1f, vertAxis, i * 0.1f + 0.1f, vertAxis);
+                batch.line(i * 0.1f, vertAxis * Constants.TILE_SIZE, i * 0.1f + 0.1f, vertAxis * Constants.TILE_SIZE);
             }
         }
 
         if(horizSymmetry){
             batch.set(ShapeType.Line);
-            batch.setColor(Color.LIGHT_GRAY);
 
             for(int i = (int)(-40 * editorCamera.zoom); i < (int)(40 * editorCamera.zoom); i++){
                 if(i % 2 == 0) continue;
-                batch.line(horizAxis, i * 0.1f, horizAxis, i * 0.1f + 0.1f);
+                batch.line(horizAxis * Constants.TILE_SIZE, i * 0.1f, horizAxis * Constants.TILE_SIZE, i * 0.1f + 0.1f);
             }
         }
 
