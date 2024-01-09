@@ -57,7 +57,12 @@ public class HoverLabel extends Label {
             if(timeHovered > hoverTimeToAppear){
                 pos.set(getStage().screenToStageCoordinates(pos.set(Gdx.input.getX(), Gdx.input.getY())));
                 super.draw(batch, parentAlpha);
-                super.setPosition(pos.x + 16, pos.y - getHeight());
+
+                if(pos.x > getStage().getWidth() - getWidth()){
+                    super.setPosition(pos.x - 16 - getWidth(), pos.y - getHeight());
+                } else {
+                    super.setPosition(pos.x + 16, pos.y - getHeight());
+                }
             }
         }
 	}

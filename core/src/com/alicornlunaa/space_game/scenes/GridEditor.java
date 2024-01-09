@@ -161,7 +161,6 @@ public class GridEditor extends BaseScene {
 
     private Table partsGroup;
     private Group partHoverLabels = new Group();
-    private ButtonGroup<ImageButton> layerButtonGroup;
 
     // Constructor
     public GridEditor(){
@@ -216,6 +215,11 @@ public class GridEditor extends BaseScene {
         }
     }
 
+    private void loadShip(FileHandle handle){
+        testGrid = Grid.unserialize(handle.readBytes());
+        ((TextField)mInterface.getRoot().findActor("ship_name")).setText(handle.nameWithoutExtension());
+    }
+
     private void openLoadDialog(){
         Skin skin = App.instance.manager.get("skins/default/uiskin.json", Skin.class);
         FileHandle handle = Gdx.files.local("./saves/grids/");
@@ -231,8 +235,7 @@ public class GridEditor extends BaseScene {
                 if(dialog.getUserObject() == null) return;
 
                 FileHandle handle = ((FileHandle)(((Table)dialog.getUserObject()).getUserObject()));
-                testGrid = Grid.unserialize(handle.readBytes());
-                ((TextField)mInterface.getRoot().findActor("ship_name")).setText(handle.nameWithoutExtension());
+                loadShip(handle);
             }
         });
 
@@ -263,6 +266,13 @@ public class GridEditor extends BaseScene {
             shipData.addListener(new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    if(dialog.getUserObject() == shipData){
+                        // Entry double clicked, load it
+                        loadShip(h);
+                        mInterface.getRoot().removeActor(dialog);
+                        return;
+                    }
+
                     dialog.setUserObject(shipData);
                     shipData.setBackground(new TextureRegionDrawable(selectedBackground));
                     loadBtn.setTouchable(Touchable.enabled);
@@ -382,17 +392,20 @@ public class GridEditor extends BaseScene {
         ImageButtonStyle bottomLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer")), new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer_down")), null, null, null);
         ImageButton bottomLayerBtn = new ImageButton(bottomLayerStyle);
         layerGroup.addActor(bottomLayerBtn);
+        mInterface.addActor(new HoverLabel(bottomLayerBtn, "Back Wall", skin, 1.f));
 
         ImageButtonStyle middleLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("middle_layer")), new TextureRegionDrawable(buttonIcons.getRegion("middle_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("middle_layer_down")), null, null, null);
         ImageButton middleLayerBtn = new ImageButton(middleLayerStyle);
         middleLayerBtn.setChecked(true);
         layerGroup.addActor(middleLayerBtn);
+        mInterface.addActor(new HoverLabel(middleLayerBtn, "Walls/Outlines/Tiles", skin, 1.f));
 
         ImageButtonStyle topLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("top_layer")), new TextureRegionDrawable(buttonIcons.getRegion("top_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("top_layer_down")), null, null, null);
         ImageButton topLayerBtn = new ImageButton(topLayerStyle);
         layerGroup.addActor(topLayerBtn);
+        mInterface.addActor(new HoverLabel(topLayerBtn, "Front Wall", skin, 1.f));
 
-        layerButtonGroup = new ButtonGroup<>(bottomLayerBtn, middleLayerBtn, topLayerBtn);
+        new ButtonGroup<>(bottomLayerBtn, middleLayerBtn, topLayerBtn);
         
         VerticalGroup symmetryGroup = new VerticalGroup();
         editorTbl.row().expand().right().top().pad(10);
@@ -407,6 +420,7 @@ public class GridEditor extends BaseScene {
             }
         });
         symmetryGroup.addActor(vertSymmBtn);
+        mInterface.addActor(new HoverLabel(vertSymmBtn, "Vertical symmetry", skin, 1.f));
 
         ImageButtonStyle horiSymmStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("horizontal_symmetry")), new TextureRegionDrawable(buttonIcons.getRegion("horizontal_symmetry_down")), new TextureRegionDrawable(buttonIcons.getRegion("horizontal_symmetry_down")), null, null, null);
         ImageButton horiSymmBtn = new ImageButton(horiSymmStyle);
@@ -417,6 +431,7 @@ public class GridEditor extends BaseScene {
             }
         });
         symmetryGroup.addActor(horiSymmBtn);
+        mInterface.addActor(new HoverLabel(horiSymmBtn, "Horizontal symmetry", skin, 1.f));
 
         // Split pane creation
         VisSplitPane splitPane = new VisSplitPane(partsTbl, editorTbl, false);
