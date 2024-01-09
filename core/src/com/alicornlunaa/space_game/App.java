@@ -8,6 +8,7 @@ import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.space_game.grid.TileManager;
 import com.alicornlunaa.space_game.scenes.GridEditor;
 import com.alicornlunaa.space_game.scenes.LoadingScene;
+import com.alicornlunaa.space_game.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.space_game.util.ControlSchema;
 import com.alicornlunaa.space_game.util.PartManager;
 import com.badlogic.ashley.core.Entity;
@@ -116,20 +117,11 @@ public class App extends Game {
 				loaded = true;
 				Gdx.app.log("Asset Manager", "Loaded");
 
-				// Load all biomes
-				// Biome.register("Desert", Color.YELLOW, 0.5f, 0.0f, 0.2f, 100, 0.2f);
-				// Biome.register("Forest", Color.GREEN, 0.4f, 0.4f, 0.2f, 40, 0.8f);
-				// Biome.register("Grassland", Color.LIME, 0.3f, 0.5f, 0.2f, 40, 0.8f);
-				// Biome.register("Jungle", Color.OLIVE, 0.62f, 0.5f, 0.3f, 40, 0.8f);
-				// Biome.register("Mountains", Color.GRAY, 0.0f, 0.0f, 0.5f, 40, 0.8f);
-				// Biome.register("Ocean", Color.BLUE, 0.0f, 0.0f, 0.0f, 1, 0.05f);
-				// Biome.register("Tundra", Color.CYAN, 0.0f, 0.0f, 0.2f, 1, 0.05f);
-
 				// Initialize VisUI for development screens
 				VisUI.load();
 				FileChooser.setDefaultPrefsName("com.alicornlunaa.spacegame");
 
-				// this.setScreen(new SpaceScene());
+				this.setScreen(new SpaceScene());
 				this.setScreen(new GridEditor());
 			} else {
 				// Loading is not complete, update progress bar

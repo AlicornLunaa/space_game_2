@@ -676,6 +676,28 @@ public class GridEditor extends BaseScene {
             selectedTile.tile.x = currentCell.x;
             selectedTile.tile.y = currentCell.y;
             selectedTile.tile.render(spriteBatch, delta);
+
+            if(vertSymmetry){
+                int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
+                selectedTile.tile.x = currentCell.x;
+                selectedTile.tile.y = mirrorY;
+                selectedTile.tile.render(spriteBatch, delta);
+            }
+    
+            if(horizSymmetry){
+                int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
+                selectedTile.tile.x = mirrorX;
+                selectedTile.tile.y = currentCell.y;
+                selectedTile.tile.render(spriteBatch, delta);
+            }
+    
+            if(vertSymmetry && horizSymmetry){
+                int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
+                int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
+                selectedTile.tile.x = mirrorX;
+                selectedTile.tile.y = mirrorY;
+                selectedTile.tile.render(spriteBatch, delta);
+            }
         }
 
         spriteBatch.end();
