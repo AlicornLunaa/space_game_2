@@ -1,5 +1,7 @@
 package com.alicornlunaa.space_game.scenes;
 
+import java.sql.Date;
+
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
@@ -38,8 +40,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -150,6 +155,7 @@ public class GridEditor extends BaseScene {
 
     private Texture topBarBackground;
     private Texture partsBackground;
+    private Texture selectedBackground;
     private AsepriteSheet categoryIcons;
     private AsepriteSheet buttonIcons;
 
@@ -210,6 +216,73 @@ public class GridEditor extends BaseScene {
         }
     }
 
+    private void openLoadDialog(){
+        Skin skin = App.instance.manager.get("skins/default/uiskin.json", Skin.class);
+        FileHandle handle = Gdx.files.local("./saves/grids/");
+
+        final Dialog dialog = new Dialog("Load Ship", skin);
+        dialog.setWidth(512);
+        dialog.setHeight(480);
+
+        final TextButton loadBtn = new TextButton("Load", skin);
+        loadBtn.setTouchable(Touchable.disabled);
+        loadBtn.addListener(new ClickListener(){
+            public void clicked(InputEvent event, float x, float y) {
+                if(dialog.getUserObject() == null) return;
+
+                FileHandle handle = ((FileHandle)(((Table)dialog.getUserObject()).getUserObject()));
+                testGrid = Grid.unserialize(handle.readBytes());
+                ((TextField)mInterface.getRoot().findActor("ship_name")).setText(handle.nameWithoutExtension());
+            }
+        });
+
+        Table content = dialog.getContentTable();
+        VerticalGroup shipList = new VerticalGroup().left().fill().expand();
+        AutoScrollPane scrollPane = new AutoScrollPane(shipList);
+        content.add(scrollPane).fill().expand().left();
+
+        scrollPane.setScrollingDisabled(true, false);
+
+        for(final FileHandle h : handle.list(".grid")){
+            final Table shipData = new Table();
+            shipData.setUserObject(h);
+            shipData.row().fillX().expandX().left();
+            
+            TextField nameField = new TextField(h.name(), skin);
+            TextButton deleteBtn = new TextButton("Delete", skin);
+
+            deleteBtn.addListener(new ClickListener(){
+                public void clicked(InputEvent event, float x, float y) {
+                    if(h.delete()){
+                        shipData.remove();
+                    }
+                }
+            });
+
+            nameField.setDisabled(true);
+            shipData.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    dialog.setUserObject(shipData);
+                    shipData.setBackground(new TextureRegionDrawable(selectedBackground));
+                    loadBtn.setTouchable(Touchable.enabled);
+                }
+            });
+
+            shipData.add(nameField);
+            shipData.add(new Label(new Date(h.lastModified()).toString(), skin));
+            shipData.add(deleteBtn);
+            shipList.addActor(shipData);
+        }
+
+        dialog.getButtonTable().right();
+        dialog.button(loadBtn).right();
+        dialog.button(new TextButton("Cancel", skin)).right();
+
+        mInterface.addActor(dialog);
+        dialog.setPosition(mInterface.getWidth() / 2, mInterface.getHeight() / 2, Align.center);
+    }
+
     private void initTextures(){
         Pixmap data = new Pixmap(1, 1, Format.RGBA8888);
         data.setColor(0.2f, 0.2f, 0.2f, 1.f);
@@ -219,6 +292,12 @@ public class GridEditor extends BaseScene {
         data.setColor(0.1f, 0.1f, 0.1f, 1.f);
         data.fill();
         partsBackground = new Texture(data);
+
+        data.setColor(0.9f, 0.9f, 0.9f, 1.f);
+        data.fill();
+        selectedBackground = new Texture(data);
+
+        data.dispose();
 
         categoryIcons = App.instance.manager.get("textures/ui/categories.json", AsepriteSheet.class);
         buttonIcons = App.instance.manager.get("textures/ui/buttons.json", AsepriteSheet.class);
@@ -265,15 +344,9 @@ public class GridEditor extends BaseScene {
         TextButton loadBtn = new TextButton("Load", skin);
         loadBtn.setColor(Color.BLUE);
         loadBtn.addListener(new ChangeListener(){
-            TextField nameTextField = mInterface.getRoot().findActor("ship_name");
-            
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                // Save file to ./saves/ships/name.ship
-                if(nameTextField.getText().length() > 0){
-                    testGrid = Grid.unserialize(Gdx.files.local("./saves/grids/" + nameTextField.getText() + ".grid").readBytes());
-                    testGrid.assemble(gridEntity.getComponent(BodyComponent.class));
-                }
+                openLoadDialog();
             }
         });
         topBarTbl.add(loadBtn).right().pad(10);

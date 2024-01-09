@@ -12,10 +12,12 @@ public class AutoScrollPane extends ScrollPane {
 
         addListener(new InputListener() {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                if(getStage() == null) return;
                 getStage().setScrollFocus(AutoScrollPane.this);
             }
 
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                if(getStage() == null) return;
                 getStage().setScrollFocus(null);
             }
         });
