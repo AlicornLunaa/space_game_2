@@ -35,6 +35,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -43,33 +44,106 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 
 public class GridEditor extends BaseScene {
+    // Inner classes
+    private static class DrawableTile implements Drawable {
+        // Variables
+        private final PickableTile tile;
+        private Matrix4 matrix = new Matrix4();
+
+        // Constructor
+        public DrawableTile(PickableTile tile){
+            this.tile = tile;
+        }
+
+        // Functions
+        @Override
+        public void draw(Batch batch, float x, float y, float width, float height) {
+            float aspect = 1.f / Math.max(tile.tile.width, tile.tile.height);
+            int beforeX = tile.tile.x;
+            int beforeY = tile.tile.y;
+            int beforeR = tile.tile.rotation;
+
+            matrix.idt();
+            matrix.translate(x + width, y, 0);
+            matrix.scl(1 / Constants.TILE_SIZE * width);
+            matrix.scl(aspect, aspect, 1);
+
+            batch.setTransformMatrix(matrix);
+            tile.tile.x = 0;
+            tile.tile.y = 0;
+            tile.tile.rotation = 0;
+            tile.tile.render(batch, 0);
+            tile.tile.x = beforeX;
+            tile.tile.y = beforeY;
+            tile.tile.rotation = beforeR;
+        }
+
+        @Override
+        public float getLeftWidth() { return 0; }
+
+        @Override
+        public void setLeftWidth(float leftWidth) {  }
+
+        @Override
+        public float getRightWidth() { return 0;  }
+
+        @Override
+        public void setRightWidth(float rightWidth) {  }
+
+        @Override
+        public float getTopHeight() { return 0;  }
+
+        @Override
+        public void setTopHeight(float topHeight) {  }
+
+        @Override
+        public float getBottomHeight() { return 0;  }
+
+        @Override
+        public void setBottomHeight(float bottomHeight) {  }
+
+        @Override
+        public float getMinWidth() { return 64.f; }
+
+        @Override
+        public void setMinWidth(float minWidth) {  }
+
+        @Override
+        public float getMinHeight() { return 64.f;  }
+
+        @Override
+        public void setMinHeight(float minHeight) {  }
+    };
+
     // Variables
     private @Null Screen previousScreen = null;
     private Engine engine = new Engine();
     private Stage mInterface;
 
     private Entity gridEntity = new Entity();
+    private Grid testGrid = new Grid();
     
     private OrthographicCamera editorCamera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
     private ShapeRenderer batch = App.instance.shapeRenderer;
     private Batch spriteBatch = App.instance.spriteBatch;
     private Vector2 panningVector = null;
     private Vector2i currentCell = new Vector2i();
-    private Grid testGrid = new Grid();
 
     private Texture topBarBackground;
     private Texture partsBackground;
     private AsepriteSheet categoryIcons;
-    private VerticalGroup partsGroup;
-    private TileCategory selectedGategory = TileCategory.STRUCTURAL;
+    private Table partsGroup;
     private @Null PickableTile selectedTile = null;
+    private Group partHoverLabels = new Group();
 
     // Constructor
     public GridEditor(){
@@ -91,21 +165,36 @@ public class GridEditor extends BaseScene {
 
     // Functions
     private void selectCategory(TileCategory category){
-        selectedGategory = category;
+        for(Actor actor : partHoverLabels.getChildren()){
+            if(actor instanceof HoverLabel){
+                ((HoverLabel)actor).detach();
+            }
+        }
+        
+        partHoverLabels.clear();
         partsGroup.clear();
+        int index = 0;
 
         for(final PickableTile tile : App.instance.tileManager.getTilesInCategory(category)){
-            // TextureRegionDrawable texture = new TextureRegionDrawable(game.atlas.findRegion("parts/" + partID.toLowerCase()));
-            // texture.setMinSize(64 * ((float)texture.getRegion().getRegionWidth() / (float)texture.getRegion().getRegionHeight()), 64);
-
-            TextButton btn = new TextButton(tile.tile.tileID, App.instance.skin);
+            ImageButton btn = new ImageButton(new DrawableTile(tile));
+            HoverLabel lbl = new HoverLabel(btn, tile.tile.tileID, App.instance.skin, 1.f);
+            
+            lbl.setAlignment(Align.bottomLeft);
+            lbl.setFontScale(0.7f);
             btn.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent e, Actor a){
                     selectedTile = tile;
                 }
             });
-            partsGroup.addActor(btn);
+
+            if(index % 2 == 0)
+                partsGroup.row().pad(10).expandX();
+
+            partsGroup.add(btn);
+            partHoverLabels.addActor(lbl);
+
+            index++;
         }
     }
 
@@ -190,11 +279,12 @@ public class GridEditor extends BaseScene {
         partsTbl.setBackground(new TextureRegionDrawable(partsBackground));
 
         VerticalGroup categories = new VerticalGroup();
-        AutoScrollPane categoriesScroll = new AutoScrollPane(categories);
-        partsTbl.add(categoriesScroll).fill().width(64);
+        partsTbl.add(new AutoScrollPane(categories)).fill().width(64);
 
-        partsGroup = new VerticalGroup();
-        partsTbl.add(partsGroup).expand().fill();
+        partsGroup = new Table();
+        partsGroup.align(Align.top);
+        partsTbl.add(new AutoScrollPane(partsGroup)).expand().fill().top();
+        mInterface.addActor(partHoverLabels);
 
         // Split pane creation
         VisSplitPane splitPane = new VisSplitPane(partsTbl, new Table(), false);
@@ -219,6 +309,8 @@ public class GridEditor extends BaseScene {
             categories.addActor(btn);
             mInterface.addActor(lbl);
         }
+
+        selectCategory(TileCategory.ENERGY);
     }
 
     private void initControls(){

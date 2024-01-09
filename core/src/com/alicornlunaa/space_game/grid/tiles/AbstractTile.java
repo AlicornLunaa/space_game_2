@@ -8,11 +8,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 public abstract class AbstractTile {
     // Enumerations
     public static enum Direction { NORTH, EAST, SOUTH, WEST };
-
-    // Interfaces
-    protected static interface TileDeserializer {
-        AbstractTile parse(JSONObject obj);
-    }
     
     // Variables
     public final String tileID;
