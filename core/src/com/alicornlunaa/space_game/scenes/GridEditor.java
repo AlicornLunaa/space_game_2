@@ -421,7 +421,7 @@ public class GridEditor extends BaseScene {
         // Split pane creation
         VisSplitPane splitPane = new VisSplitPane(partsTbl, editorTbl, false);
         splitPane.setName("editor_pane");
-        splitPane.setSplitAmount(0.3f);
+        splitPane.setSplitAmount(0.25f);
         root.add(splitPane).expand().fill().row();
 
         // Populate categories
@@ -542,8 +542,20 @@ public class GridEditor extends BaseScene {
                             selectedTile.tile.rotation = Math.floorMod(selectedTile.tile.rotation + (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ? -1 : 1), 4);
                         break;
 
-                    case Keys.F5:
-                        App.instance.setScreen(new GridEditor());
+                    case Keys.LEFT:
+                        horizAxis -= 0.5f;
+                        break;
+                        
+                    case Keys.RIGHT:
+                        horizAxis += 0.5f;
+                        break;
+                    
+                    case Keys.UP:
+                        vertAxis += 0.5f;
+                        break;
+                        
+                    case Keys.DOWN:
+                        vertAxis -= 0.5f;
                         break;
                 
                     default:
