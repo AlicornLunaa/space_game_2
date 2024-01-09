@@ -36,18 +36,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
@@ -135,15 +138,24 @@ public class GridEditor extends BaseScene {
     private OrthographicCamera editorCamera = new OrthographicCamera(1280 / Constants.PPM, 720 / Constants.PPM);
     private ShapeRenderer batch = App.instance.shapeRenderer;
     private Batch spriteBatch = App.instance.spriteBatch;
-    private Vector2 panningVector = null;
+
     private Vector2i currentCell = new Vector2i();
+    private Vector2 panningVector = null;
+    private @Null PickableTile selectedTile = null;
+
+    private float horizAxis = 0;
+    private float vertAxis = 0;
+    private boolean horizSymmetry = false;
+    private boolean vertSymmetry = false;
 
     private Texture topBarBackground;
     private Texture partsBackground;
     private AsepriteSheet categoryIcons;
+    private AsepriteSheet buttonIcons;
+
     private Table partsGroup;
-    private @Null PickableTile selectedTile = null;
     private Group partHoverLabels = new Group();
+    private ButtonGroup<ImageButton> layerButtonGroup;
 
     // Constructor
     public GridEditor(){
@@ -209,6 +221,7 @@ public class GridEditor extends BaseScene {
         partsBackground = new Texture(data);
 
         categoryIcons = App.instance.manager.get("textures/ui/categories.json", AsepriteSheet.class);
+        buttonIcons = App.instance.manager.get("textures/ui/buttons.json", AsepriteSheet.class);
     }
 
     private void initInterface(){
@@ -286,8 +299,54 @@ public class GridEditor extends BaseScene {
         partsTbl.add(new AutoScrollPane(partsGroup)).expand().fill().top();
         mInterface.addActor(partHoverLabels);
 
+        // Editor controls
+        Table editorTbl = new Table();
+        editorTbl.row().expandX().right().top().pad(10);
+
+        VerticalGroup layerGroup = new VerticalGroup();
+        editorTbl.add(layerGroup);
+
+        ImageButtonStyle bottomLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer")), new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer_down")), null, null, null);
+        ImageButton bottomLayerBtn = new ImageButton(bottomLayerStyle);
+        layerGroup.addActor(bottomLayerBtn);
+
+        ImageButtonStyle middleLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("middle_layer")), new TextureRegionDrawable(buttonIcons.getRegion("middle_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("middle_layer_down")), null, null, null);
+        ImageButton middleLayerBtn = new ImageButton(middleLayerStyle);
+        middleLayerBtn.setChecked(true);
+        layerGroup.addActor(middleLayerBtn);
+
+        ImageButtonStyle topLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("top_layer")), new TextureRegionDrawable(buttonIcons.getRegion("top_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("top_layer_down")), null, null, null);
+        ImageButton topLayerBtn = new ImageButton(topLayerStyle);
+        layerGroup.addActor(topLayerBtn);
+
+        layerButtonGroup = new ButtonGroup<>(bottomLayerBtn, middleLayerBtn, topLayerBtn);
+        
+        VerticalGroup symmetryGroup = new VerticalGroup();
+        editorTbl.row().expand().right().top().pad(10);
+        editorTbl.add(symmetryGroup);
+
+        ImageButtonStyle vertSymmStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("vertical_symmetry")), new TextureRegionDrawable(buttonIcons.getRegion("vertical_symmetry_down")), new TextureRegionDrawable(buttonIcons.getRegion("vertical_symmetry_down")), null, null, null);
+        ImageButton vertSymmBtn = new ImageButton(vertSymmStyle);
+        vertSymmBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                vertSymmetry = ((ImageButton)event.getListenerActor()).isChecked();
+            }
+        });
+        symmetryGroup.addActor(vertSymmBtn);
+
+        ImageButtonStyle horiSymmStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("horizontal_symmetry")), new TextureRegionDrawable(buttonIcons.getRegion("horizontal_symmetry_down")), new TextureRegionDrawable(buttonIcons.getRegion("horizontal_symmetry_down")), null, null, null);
+        ImageButton horiSymmBtn = new ImageButton(horiSymmStyle);
+        horiSymmBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                horizSymmetry = ((ImageButton)event.getListenerActor()).isChecked();
+            }
+        });
+        symmetryGroup.addActor(horiSymmBtn);
+
         // Split pane creation
-        VisSplitPane splitPane = new VisSplitPane(partsTbl, new Table(), false);
+        VisSplitPane splitPane = new VisSplitPane(partsTbl, editorTbl, false);
         splitPane.setName("editor_pane");
         splitPane.setSplitAmount(0.3f);
         root.add(splitPane).expand().fill().row();
@@ -412,6 +471,27 @@ public class GridEditor extends BaseScene {
         batch.setTransformMatrix(new Matrix4());
         batch.setAutoShapeType(true);
         batch.begin();
+
+        // Symmetry line rendering
+        if(vertSymmetry){
+            batch.set(ShapeType.Line);
+            batch.setColor(Color.LIGHT_GRAY);
+
+            for(int i = (int)(-40 * editorCamera.zoom); i < (int)(40 * editorCamera.zoom); i++){
+                if(i % 2 == 0) continue;
+                batch.line(i * 0.1f, vertAxis, i * 0.1f + 0.1f, vertAxis);
+            }
+        }
+
+        if(horizSymmetry){
+            batch.set(ShapeType.Line);
+            batch.setColor(Color.LIGHT_GRAY);
+
+            for(int i = (int)(-40 * editorCamera.zoom); i < (int)(40 * editorCamera.zoom); i++){
+                if(i % 2 == 0) continue;
+                batch.line(horizAxis, i * 0.1f, horizAxis, i * 0.1f + 0.1f);
+            }
+        }
 
         // Cursor
         if(selectedTile != null){

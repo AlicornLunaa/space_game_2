@@ -80,6 +80,7 @@ public class App extends Game {
 				manager.load("textures/test_image.png", Texture.class);
 				manager.load("textures/dev_texture.png", Texture.class);
 				manager.load("textures/ui/categories.json", AsepriteSheet.class);
+				manager.load("textures/ui/buttons.json", AsepriteSheet.class);
 			}
 		});
 		skin = manager.get("skins/spacecadet/spacecadet.json");
