@@ -9,6 +9,7 @@ import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.factories.BasicFactory;
 import com.alicornlunaa.space_game.factories.CharacterFactory;
 import com.alicornlunaa.space_game.factories.GridFactory;
+import com.alicornlunaa.space_game.systems.GridBottomRenderSystem;
 import com.alicornlunaa.space_game.systems.GridPhysicsSystem;
 import com.alicornlunaa.space_game.systems.GridRenderSystem;
 import com.alicornlunaa.space_game.systems.PlayerSystem;
@@ -30,6 +31,7 @@ public class SpaceScene extends GameScene {
         engine.addSystem(new AnimationSystem());
         engine.addSystem(new PlayerSystem());
         engine.addSystem(new GridRenderSystem());
+        engine.addSystem(new GridBottomRenderSystem());
         engine.addSystem(new GridPhysicsSystem());
         engine.addSystem(new ShipSystem());
 

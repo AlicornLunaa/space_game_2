@@ -83,13 +83,6 @@ public class GridRenderSystem extends EntitySystem {
             // Render the grid
             batch.setTransformMatrix(renderMatrix);
 
-            gridComp.grid.iterate(Layer.BOTTOM, new GridIterator() {
-                @Override
-                public void iterate(AbstractTile tile) {
-                    tile.render(batch, deltaTime);
-                }
-            });
-
             gridComp.grid.iterate(Layer.MIDDLE, new GridIterator() {
                 @Override
                 public void iterate(AbstractTile tile) {
