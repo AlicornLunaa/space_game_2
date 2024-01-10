@@ -155,6 +155,7 @@ public class GridEditor extends BaseScene {
     private float vertAxis = 0.5f;
     private boolean horizSymmetry = false;
     private boolean vertSymmetry = false;
+    private boolean layerSymmetry = false;
 
     private Texture topBarBackground;
     private Texture partsBackground;
@@ -453,6 +454,17 @@ public class GridEditor extends BaseScene {
         });
         symmetryGroup.addActor(horiSymmBtn);
         mInterface.addActor(new HoverLabel(horiSymmBtn, "Horizontal symmetry", skin, 1.f));
+        
+        ImageButtonStyle layerSymmStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("layer_symmetry")), new TextureRegionDrawable(buttonIcons.getRegion("layer_symmetry_down")), new TextureRegionDrawable(buttonIcons.getRegion("layer_symmetry_down")), null, null, null);
+        ImageButton layerSymmBtn = new ImageButton(layerSymmStyle);
+        layerSymmBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                layerSymmetry = ((ImageButton)event.getListenerActor()).isChecked();
+            }
+        });
+        symmetryGroup.addActor(layerSymmBtn);
+        mInterface.addActor(new HoverLabel(layerSymmBtn, "Layer symmetry", skin, 1.f));
 
         // Split pane creation
         VisSplitPane splitPane = new VisSplitPane(partsTbl, editorTbl, false);
@@ -499,16 +511,25 @@ public class GridEditor extends BaseScene {
                         if(selectedTile != null){
                             testGrid.setTile(currentCell.x, currentCell.y, selectedTile.spawn(), selectedLayer);
 
+                            if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                testGrid.setTile(currentCell.x, currentCell.y, selectedTile.spawn(), (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
+
                             if(horizSymmetry){
                                 // Mirror horizontally
                                 int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
                                 testGrid.setTile(mirrorX, currentCell.y, selectedTile.spawn(), selectedLayer);
+
+                                if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                    testGrid.setTile(mirrorX, currentCell.y, selectedTile.spawn(), (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
                             }
 
                             if(vertSymmetry){
                                 // Mirror horizontally
                                 int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
                                 testGrid.setTile(currentCell.x, mirrorY, selectedTile.spawn(), selectedLayer);
+                                
+                                if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                    testGrid.setTile(currentCell.x, mirrorY, selectedTile.spawn(), (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
                             }
 
                             if(horizSymmetry && vertSymmetry){
@@ -516,6 +537,10 @@ public class GridEditor extends BaseScene {
                                 int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
                                 int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
                                 testGrid.setTile(mirrorX, mirrorY, selectedTile.spawn(), selectedLayer);
+                                
+
+                                if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                    testGrid.setTile(mirrorX, mirrorY, selectedTile.spawn(), (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
                             }
                         }
 
@@ -523,17 +548,26 @@ public class GridEditor extends BaseScene {
                         
                     case Buttons.RIGHT:
                         testGrid.removeTile(currentCell.x, currentCell.y, selectedLayer);
+                        
+                        if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                            testGrid.removeTile(currentCell.x, currentCell.y, (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
 
                         if(horizSymmetry){
                             // Mirror horizontally
                             int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
                             testGrid.removeTile(mirrorX, currentCell.y, selectedLayer);
+                        
+                            if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                testGrid.removeTile(mirrorX, currentCell.y, (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
                         }
 
                         if(vertSymmetry){
                             // Mirror horizontally
                             int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
                             testGrid.removeTile(currentCell.x, mirrorY, selectedLayer);
+                        
+                            if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                testGrid.removeTile(currentCell.x, mirrorY, (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
                         }
 
                         if(horizSymmetry && vertSymmetry){
@@ -541,6 +575,9 @@ public class GridEditor extends BaseScene {
                             int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
                             int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
                             testGrid.removeTile(mirrorX, mirrorY, selectedLayer);
+                        
+                            if(layerSymmetry && (selectedLayer == Layer.BOTTOM || selectedLayer == Layer.TOP))
+                                testGrid.removeTile(mirrorX, mirrorY, (selectedLayer == Layer.TOP) ? Layer.BOTTOM : Layer.TOP);
                         }
 
                         return true;
@@ -585,6 +622,10 @@ public class GridEditor extends BaseScene {
 
                     case Keys.C:
                         testGrid.center();
+                        break;
+
+                    case Keys.F:
+                        testGrid.drawTop = !testGrid.drawTop;
                         break;
 
                     case Keys.LEFT:
@@ -686,7 +727,7 @@ public class GridEditor extends BaseScene {
         testGrid.iterate(Layer.BOTTOM, new GridIterator() {
             @Override
             public void iterate(AbstractTile tile) {
-                spriteBatch.setColor(1, 1, 1, 1);
+                spriteBatch.setColor(0.5f, 0.5f, 0.5f, 1);
                 tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
             }
         });
@@ -699,13 +740,14 @@ public class GridEditor extends BaseScene {
             }
         });
 
-        testGrid.iterate(Layer.TOP, new GridIterator() {
-            @Override
-            public void iterate(AbstractTile tile) {
-                spriteBatch.setColor(1, 1, 1, 1);
-                tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
-            }
-        });
+        if(testGrid.drawTop)
+            testGrid.iterate(Layer.TOP, new GridIterator() {
+                @Override
+                public void iterate(AbstractTile tile) {
+                    spriteBatch.setColor(1, 1, 1, 1);
+                    tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
+                }
+            });
 
         if(selectedTile != null){
             spriteBatch.setColor(1, 1, 1, 0.2f);

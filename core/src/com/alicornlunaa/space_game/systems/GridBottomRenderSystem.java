@@ -56,6 +56,7 @@ public class GridBottomRenderSystem extends EntitySystem {
             renderMatrix.set(transform.getMatrix());
             renderMatrix.translate(-bodyComp.body.getLocalCenter().x, -bodyComp.body.getLocalCenter().y, 0);
             batch.setTransformMatrix(renderMatrix);
+            batch.setColor(0.5f, 0.5f, 0.5f, 1);
 
             // Render the grid
             gridComp.grid.iterate(Layer.BOTTOM, new GridIterator() {

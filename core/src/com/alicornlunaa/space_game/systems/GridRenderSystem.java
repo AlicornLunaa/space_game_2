@@ -90,12 +90,13 @@ public class GridRenderSystem extends EntitySystem {
                 }
             });
 
-            gridComp.grid.iterate(Layer.TOP, new GridIterator() {
-                @Override
-                public void iterate(AbstractTile tile) {
-                    tile.render(batch, deltaTime);
-                }
-            });
+            if(gridComp.grid.drawTop)
+                gridComp.grid.iterate(Layer.TOP, new GridIterator() {
+                    @Override
+                    public void iterate(AbstractTile tile) {
+                        tile.render(batch, deltaTime);
+                    }
+                });
         }
 
         // Finish render

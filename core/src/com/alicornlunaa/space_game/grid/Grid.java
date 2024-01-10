@@ -125,6 +125,7 @@ public class Grid {
     private Array<Collider> colliders = new Array<>();
 
     public String gridName = "unnamed_grid";
+    public boolean drawTop = true;
     
     // Constructor
     public Grid(){
