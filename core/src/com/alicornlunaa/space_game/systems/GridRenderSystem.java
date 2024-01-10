@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.ship.GridComponent;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.Grid.Layer;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.alicornlunaa.space_game.grid.tiles.TileEntity;
 import com.alicornlunaa.space_game.util.Constants;
@@ -73,7 +74,7 @@ public class GridRenderSystem extends EntitySystem {
                 clickPos.mul(renderMatrix.cpy().inv());
                 clickPos.set((int)(clickPos.x / Constants.TILE_SIZE - (clickPos.x < 0 ? 1 : 0)), (int)(clickPos.y / Constants.TILE_SIZE - (clickPos.y < 0 ? 1 : 0)), 0);
 
-                AbstractTile tile = gridComp.grid.getTile((int)clickPos.x, (int)clickPos.y);
+                AbstractTile tile = gridComp.grid.getTile((int)clickPos.x, (int)clickPos.y, Layer.MIDDLE);
 
                 if(tile != null && tile instanceof TileEntity)
                     ((TileEntity)tile).click(entity, App.instance.playerEntity, buttonClicked);
@@ -82,7 +83,21 @@ public class GridRenderSystem extends EntitySystem {
             // Render the grid
             batch.setTransformMatrix(renderMatrix);
 
-            gridComp.grid.iterate(new GridIterator() {
+            gridComp.grid.iterate(Layer.BOTTOM, new GridIterator() {
+                @Override
+                public void iterate(AbstractTile tile) {
+                    tile.render(batch, deltaTime);
+                }
+            });
+
+            gridComp.grid.iterate(Layer.MIDDLE, new GridIterator() {
+                @Override
+                public void iterate(AbstractTile tile) {
+                    tile.render(batch, deltaTime);
+                }
+            });
+
+            gridComp.grid.iterate(Layer.TOP, new GridIterator() {
                 @Override
                 public void iterate(AbstractTile tile) {
                     tile.render(batch, deltaTime);

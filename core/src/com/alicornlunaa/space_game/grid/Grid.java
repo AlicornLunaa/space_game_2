@@ -18,12 +18,16 @@ import com.badlogic.gdx.utils.Null;
 // Storage class for tiles
 public class Grid {
     // Static classes
+    public static enum Layer { BOTTOM, MIDDLE, TOP };
+
     @SuppressWarnings("unused")
     private static class Chunk {
         // Variables
         public final int chunkX, chunkY; // World position of chunks
         private boolean[] occupancyMap; // Whether or not the current tile is occupied
         private AbstractTile[] tileMap; // Actual tiles being stored
+        private TileElement[] bottomLayer; // Back wall
+        private TileElement[] topLayer; // Front wall
         private int tileCount = 0;
 
         // Constructor
@@ -32,6 +36,8 @@ public class Grid {
             this.chunkY = chunkY;
             occupancyMap = new boolean[Constants.CHUNK_SIZE * Constants.CHUNK_SIZE];
             tileMap = new AbstractTile[Constants.CHUNK_SIZE * Constants.CHUNK_SIZE];
+            bottomLayer = new TileElement[Constants.CHUNK_SIZE * Constants.CHUNK_SIZE];
+            topLayer = new TileElement[Constants.CHUNK_SIZE * Constants.CHUNK_SIZE];
         }
 
         // Functions
@@ -39,24 +45,74 @@ public class Grid {
             return tileCount;
         }
 
-        public boolean isOccupied(int x, int y){
-            return occupancyMap[y * Constants.CHUNK_SIZE + x] == true;
+        public boolean isOccupied(int x, int y, Layer layer){
+            switch(layer){
+                case BOTTOM:
+                    return bottomLayer[y * Constants.CHUNK_SIZE + x] != null;
+
+                case MIDDLE:
+                    return occupancyMap[y * Constants.CHUNK_SIZE + x] == true;
+
+                case TOP:
+                    return topLayer[y * Constants.CHUNK_SIZE + x] != null;
+
+                default:
+                    return false;
+            }
         }
 
-        public void setTile(int x, int y, AbstractTile tile){
-            occupancyMap[y * Constants.CHUNK_SIZE + x] = true;
-            tileMap[y * Constants.CHUNK_SIZE + x] = tile;
-            tileCount++;
+        public void setTile(int x, int y, AbstractTile tile, Layer layer){
+            switch(layer){
+                case BOTTOM:
+                    if(tile instanceof TileElement)
+                        bottomLayer[y * Constants.CHUNK_SIZE + x] = (TileElement)tile;
+                    break;
+
+                case MIDDLE:
+                    occupancyMap[y * Constants.CHUNK_SIZE + x] = true;
+                    tileMap[y * Constants.CHUNK_SIZE + x] = tile;
+                    tileCount++;
+                    break;
+
+                case TOP:
+                    if(tile instanceof TileElement)
+                        topLayer[y * Constants.CHUNK_SIZE + x] = (TileElement)tile;
+                    break;
+            }
         }
 
-        public void removeTile(int x, int y){
-            occupancyMap[y * Constants.CHUNK_SIZE + x] = false;
-            tileMap[y * Constants.CHUNK_SIZE + x] = null;
-            tileCount--;
+        public void removeTile(int x, int y, Layer layer){
+            switch(layer){
+                case BOTTOM:
+                    bottomLayer[y * Constants.CHUNK_SIZE + x] = null;
+                    break;
+
+                case MIDDLE:
+                    occupancyMap[y * Constants.CHUNK_SIZE + x] = false;
+                    tileMap[y * Constants.CHUNK_SIZE + x] = null;
+                    tileCount--;
+                    break;
+
+                case TOP:
+                    topLayer[y * Constants.CHUNK_SIZE + x] = null;
+                    break;
+            }
         }
 
-        public @Null AbstractTile getTile(int x, int y){
-            return tileMap[y * Constants.CHUNK_SIZE + x];
+        public @Null AbstractTile getTile(int x, int y, Layer layer){
+            switch(layer){
+                case BOTTOM:
+                    return bottomLayer[y * Constants.CHUNK_SIZE + x];
+
+                case MIDDLE:
+                    return tileMap[y * Constants.CHUNK_SIZE + x];
+
+                case TOP:
+                    return topLayer[y * Constants.CHUNK_SIZE + x];
+
+                default:
+                    return null;
+            }
         }
     };
 
@@ -104,39 +160,40 @@ public class Grid {
         }
     }
 
-    public boolean isOccupied(int x, int y){
+    public boolean isOccupied(int x, int y, Layer layer){
         Chunk chunk = getChunkFromWorld(x, y);
 
         if(chunk != null)
             return chunk.isOccupied(
                 Math.floorMod(x, Constants.CHUNK_SIZE),
-                Math.floorMod(y, Constants.CHUNK_SIZE)
+                Math.floorMod(y, Constants.CHUNK_SIZE),
+                layer
             );
 
         return false;
     }
 
-    public boolean isRegionOccupied(int x, int y, int rotation, int width, int height){
+    public boolean isRegionOccupied(int x, int y, int rotation, int width, int height, Layer layer){
         for(int w = 0; w < width; w++){
             for(int h = 0; h < height; h++){
                 switch(rotation){
                     default:
-                        if(isOccupied(x + w, y + h))
+                        if(isOccupied(x + w, y + h, layer))
                             return true;
                         break;
 
                     case 1:
-                        if(isOccupied(x + h, y - w))
+                        if(isOccupied(x + h, y - w, layer))
                             return true;
                         break;
 
                     case 2:
-                        if(isOccupied(x - w, y - h))
+                        if(isOccupied(x - w, y - h, layer))
                             return true;
                         break;
                             
                     case 3:
-                        if(isOccupied(x - h, y + w))
+                        if(isOccupied(x - h, y + w, layer))
                             return true;
                         break;
                 }
@@ -146,10 +203,10 @@ public class Grid {
         return false;
     }
 
-    public boolean setTile(int x, int y, AbstractTile tile){
+    public boolean setTile(int x, int y, AbstractTile tile, Layer layer){
         Chunk chunk;
 
-        if(isRegionOccupied(x, y, tile.rotation, tile.width, tile.height))
+        if(isRegionOccupied(x, y, tile.rotation, tile.width, tile.height, layer))
             return false;
 
         tile.x = x;
@@ -160,22 +217,22 @@ public class Grid {
                 switch(tile.rotation){
                     default:
                         chunk = newChunkFromWorld(x + w, y + h);
-                        chunk.setTile(Math.floorMod(x + w, Constants.CHUNK_SIZE), Math.floorMod(y + h, Constants.CHUNK_SIZE), tile);
+                        chunk.setTile(Math.floorMod(x + w, Constants.CHUNK_SIZE), Math.floorMod(y + h, Constants.CHUNK_SIZE), tile, layer);
                         break;
 
                     case 1:
                         chunk = newChunkFromWorld(x + h, y - w);
-                        chunk.setTile(Math.floorMod(x + h, Constants.CHUNK_SIZE), Math.floorMod(y - w, Constants.CHUNK_SIZE), tile);
+                        chunk.setTile(Math.floorMod(x + h, Constants.CHUNK_SIZE), Math.floorMod(y - w, Constants.CHUNK_SIZE), tile, layer);
                         break;
 
                     case 2:
                         chunk = newChunkFromWorld(x - w, y - h);
-                        chunk.setTile(Math.floorMod(x - w, Constants.CHUNK_SIZE), Math.floorMod(y - h, Constants.CHUNK_SIZE), tile);
+                        chunk.setTile(Math.floorMod(x - w, Constants.CHUNK_SIZE), Math.floorMod(y - h, Constants.CHUNK_SIZE), tile, layer);
                         break;
                             
                     case 3:
                         chunk = newChunkFromWorld(x - h, y + w);
-                        chunk.setTile(Math.floorMod(x - h, Constants.CHUNK_SIZE), Math.floorMod(y + w, Constants.CHUNK_SIZE), tile);
+                        chunk.setTile(Math.floorMod(x - h, Constants.CHUNK_SIZE), Math.floorMod(y + w, Constants.CHUNK_SIZE), tile, layer);
                         break;
                 }
             }
@@ -184,8 +241,8 @@ public class Grid {
         return true;
     }
 
-    public void removeTile(int x, int y){
-        AbstractTile tile = getTile(x, y);
+    public void removeTile(int x, int y, Layer layer){
+        AbstractTile tile = getTile(x, y, layer);
         Chunk chunk;
 
         if(tile == null)
@@ -199,25 +256,25 @@ public class Grid {
                 switch(tile.rotation){
                     default:
                         chunk = newChunkFromWorld(x + w, y + h);
-                        chunk.removeTile(Math.floorMod(x + w, Constants.CHUNK_SIZE), Math.floorMod(y + h, Constants.CHUNK_SIZE));
+                        chunk.removeTile(Math.floorMod(x + w, Constants.CHUNK_SIZE), Math.floorMod(y + h, Constants.CHUNK_SIZE), layer);
                         pruneChunkFromWorld(x + w, y + h);
                         break;
 
                     case 1:
                         chunk = newChunkFromWorld(x + h, y - w);
-                        chunk.removeTile(Math.floorMod(x + h, Constants.CHUNK_SIZE), Math.floorMod(y - w, Constants.CHUNK_SIZE));
+                        chunk.removeTile(Math.floorMod(x + h, Constants.CHUNK_SIZE), Math.floorMod(y - w, Constants.CHUNK_SIZE), layer);
                         pruneChunkFromWorld(x + h, y - w);
                         break;
 
                     case 2:
                         chunk = newChunkFromWorld(x - w, y - h);
-                        chunk.removeTile(Math.floorMod(x - w, Constants.CHUNK_SIZE), Math.floorMod(y - h, Constants.CHUNK_SIZE));
+                        chunk.removeTile(Math.floorMod(x - w, Constants.CHUNK_SIZE), Math.floorMod(y - h, Constants.CHUNK_SIZE), layer);
                         pruneChunkFromWorld(x - w, y - h);
                         break;
                             
                     case 3:
                         chunk = newChunkFromWorld(x - h, y + w);
-                        chunk.removeTile(Math.floorMod(x - h, Constants.CHUNK_SIZE), Math.floorMod(y + w, Constants.CHUNK_SIZE));
+                        chunk.removeTile(Math.floorMod(x - h, Constants.CHUNK_SIZE), Math.floorMod(y + w, Constants.CHUNK_SIZE), layer);
                         pruneChunkFromWorld(x - h, y + w);
                         break;
                 }
@@ -225,21 +282,38 @@ public class Grid {
         }
     }
 
-    public @Null AbstractTile getTile(int x, int y){
+    public @Null AbstractTile getTile(int x, int y, Layer layer){
         Chunk chunk = getChunkFromWorld(x, y);
 
         if(chunk != null)
             return chunk.getTile(
                 Math.floorMod(x, Constants.CHUNK_SIZE),
-                Math.floorMod(y, Constants.CHUNK_SIZE)
+                Math.floorMod(y, Constants.CHUNK_SIZE),
+                layer
             );
 
         return null;
     }
 
-    public void iterate(GridIterator iter){
+    public void iterate(Layer layer, GridIterator iter){
+        AbstractTile[] layerArray;
+
         for (Chunk chunk : chunks.values()) {
-            for(AbstractTile tile : chunk.tileMap){
+            switch(layer){
+                case BOTTOM:
+                    layerArray = chunk.bottomLayer;
+                    break;
+    
+                case TOP:
+                    layerArray = chunk.topLayer;
+                    break;
+    
+                default:
+                    layerArray = chunk.tileMap;
+                    break;
+            }
+
+            for(AbstractTile tile : layerArray){
                 if(tile == null)
                     continue;
 
@@ -296,13 +370,29 @@ public class Grid {
 
     public void center(){
         // Take the average position of everything and center it
-        Array<AbstractTile> tiles = new Array<>();
+        Array<AbstractTile> bottomLayer = new Array<>();
+        Array<AbstractTile> middleLayer = new Array<>();
+        Array<AbstractTile> topLayer = new Array<>();
         int tileCount = 0;
         int avgX = 0;
         int avgY = 0;
         
         for(Chunk chunk : chunks.values()) {
+            for(AbstractTile tile : chunk.bottomLayer){
+                if(tile == null)
+                    continue;
+
+                tile.updatedThisTick = false;
+            }
+            
             for(AbstractTile tile : chunk.tileMap){
+                if(tile == null)
+                    continue;
+
+                tile.updatedThisTick = false;
+            }
+
+            for(AbstractTile tile : chunk.topLayer){
                 if(tile == null)
                     continue;
 
@@ -311,6 +401,17 @@ public class Grid {
         }
 
         for(Chunk chunk : chunks.values()) {
+            for(AbstractTile tile : chunk.bottomLayer){
+                if(tile == null || tile.updatedThisTick)
+                    continue;
+
+                tile.updatedThisTick = true;
+                tileCount++;
+                avgX += tile.x;
+                avgY += tile.y;
+                bottomLayer.add(tile);
+            }
+
             for(AbstractTile tile : chunk.tileMap){
                 if(tile == null || tile.updatedThisTick)
                     continue;
@@ -319,7 +420,18 @@ public class Grid {
                 tileCount++;
                 avgX += tile.x;
                 avgY += tile.y;
-                tiles.add(tile);
+                middleLayer.add(tile);
+            }
+
+            for(AbstractTile tile : chunk.topLayer){
+                if(tile == null || tile.updatedThisTick)
+                    continue;
+
+                tile.updatedThisTick = true;
+                tileCount++;
+                avgX += tile.x;
+                avgY += tile.y;
+                topLayer.add(tile);
             }
         }
 
@@ -329,25 +441,51 @@ public class Grid {
         // Clear the tiles and remake the ship
         clear();
 
-        for(AbstractTile tile : tiles){
-            setTile(tile.x - avgX, tile.y - avgY, tile);
+        for(AbstractTile tile : bottomLayer){
+            setTile(tile.x - avgX, tile.y - avgY, tile, Layer.BOTTOM);
+        }
+        
+        for(AbstractTile tile : middleLayer){
+            setTile(tile.x - avgX, tile.y - avgY, tile, Layer.MIDDLE);
+        }
+
+        for(AbstractTile tile : topLayer){
+            setTile(tile.x - avgX, tile.y - avgY, tile, Layer.TOP);
         }
     }
 
     public byte[] serialize(){
-        final JSONArray arr = new JSONArray();
-
+        final JSONArray bottomLayer = new JSONArray();
+        final JSONArray middleLayer = new JSONArray();
+        final JSONArray topLayer = new JSONArray();
         center();
-        iterate(new GridIterator() {
+
+        iterate(Layer.BOTTOM, new GridIterator() {
             @Override
             public void iterate(AbstractTile tile) {
-                arr.put(tile.serialize());
+                bottomLayer.put(tile.serialize());
+            }
+        });
+
+        iterate(Layer.MIDDLE, new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                middleLayer.put(tile.serialize());
+            }
+        });
+
+        iterate(Layer.TOP, new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                topLayer.put(tile.serialize());
             }
         });
         
         JSONObject obj = new JSONObject();
         obj.put("grid_name", gridName);
-        obj.put("tiles", arr);
+        obj.put("bottom_tiles", bottomLayer);
+        obj.put("tiles", middleLayer);
+        obj.put("top_tiles", topLayer);
 
         return obj.toString().getBytes();
     }
@@ -355,12 +493,24 @@ public class Grid {
     public static Grid unserialize(byte[] data){
         try {
             JSONObject obj = new JSONObject(new String(data));
-            JSONArray tiles = obj.getJSONArray("tiles");
+            JSONArray bottomLayer = obj.getJSONArray("bottom_tiles");
+            JSONArray middleLayer = obj.getJSONArray("tiles");
+            JSONArray topLayer = obj.getJSONArray("top_tiles");
             Grid grid = new Grid();
 
-            for(int i = 0; i < tiles.length(); i++){
-                AbstractTile tile = TileFactory.unserialize(tiles.getJSONObject(i));
-                grid.setTile(tile.x, tile.y, tile);
+            for(int i = 0; i < bottomLayer.length(); i++){
+                AbstractTile tile = TileFactory.unserialize(bottomLayer.getJSONObject(i));
+                grid.setTile(tile.x, tile.y, tile, Layer.BOTTOM);
+            }
+
+            for(int i = 0; i < middleLayer.length(); i++){
+                AbstractTile tile = TileFactory.unserialize(middleLayer.getJSONObject(i));
+                grid.setTile(tile.x, tile.y, tile, Layer.MIDDLE);
+            }
+
+            for(int i = 0; i < topLayer.length(); i++){
+                AbstractTile tile = TileFactory.unserialize(topLayer.getJSONObject(i));
+                grid.setTile(tile.x, tile.y, tile, Layer.TOP);
             }
             
             return grid;

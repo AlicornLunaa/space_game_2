@@ -11,6 +11,7 @@ import com.alicornlunaa.selene_engine.util.asset_manager.AsepriteSheet;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.grid.Grid;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.Grid.Layer;
 import com.alicornlunaa.space_game.grid.TileManager.PickableTile;
 import com.alicornlunaa.space_game.grid.TileManager.TileCategory;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
@@ -147,6 +148,7 @@ public class GridEditor extends BaseScene {
 
     private Vector2i currentCell = new Vector2i();
     private Vector2 panningVector = null;
+    private Layer selectedLayer = Layer.MIDDLE;
     private @Null PickableTile selectedTile = null;
 
     private float horizAxis = 0.5f;
@@ -392,17 +394,35 @@ public class GridEditor extends BaseScene {
 
         ImageButtonStyle bottomLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer")), new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("bottom_layer_down")), null, null, null);
         ImageButton bottomLayerBtn = new ImageButton(bottomLayerStyle);
+        bottomLayerBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectedLayer = Layer.BOTTOM;
+            }
+        });
         layerGroup.addActor(bottomLayerBtn);
         mInterface.addActor(new HoverLabel(bottomLayerBtn, "Back Wall", skin, 1.f));
 
         ImageButtonStyle middleLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("middle_layer")), new TextureRegionDrawable(buttonIcons.getRegion("middle_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("middle_layer_down")), null, null, null);
         ImageButton middleLayerBtn = new ImageButton(middleLayerStyle);
+        middleLayerBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectedLayer = Layer.MIDDLE;
+            }
+        });
         middleLayerBtn.setChecked(true);
         layerGroup.addActor(middleLayerBtn);
         mInterface.addActor(new HoverLabel(middleLayerBtn, "Walls/Outlines/Tiles", skin, 1.f));
 
         ImageButtonStyle topLayerStyle = new ImageButtonStyle(new TextureRegionDrawable(buttonIcons.getRegion("top_layer")), new TextureRegionDrawable(buttonIcons.getRegion("top_layer_down")), new TextureRegionDrawable(buttonIcons.getRegion("top_layer_down")), null, null, null);
         ImageButton topLayerBtn = new ImageButton(topLayerStyle);
+        topLayerBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectedLayer = Layer.TOP;
+            }
+        });
         layerGroup.addActor(topLayerBtn);
         mInterface.addActor(new HoverLabel(topLayerBtn, "Front Wall", skin, 1.f));
 
@@ -477,50 +497,50 @@ public class GridEditor extends BaseScene {
                 switch(button){
                     case Buttons.LEFT:
                         if(selectedTile != null){
-                            testGrid.setTile(currentCell.x, currentCell.y, selectedTile.spawn());
+                            testGrid.setTile(currentCell.x, currentCell.y, selectedTile.spawn(), selectedLayer);
 
                             if(horizSymmetry){
                                 // Mirror horizontally
                                 int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
-                                testGrid.setTile(mirrorX, currentCell.y, selectedTile.spawn());
+                                testGrid.setTile(mirrorX, currentCell.y, selectedTile.spawn(), selectedLayer);
                             }
 
                             if(vertSymmetry){
                                 // Mirror horizontally
                                 int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
-                                testGrid.setTile(currentCell.x, mirrorY, selectedTile.spawn());
+                                testGrid.setTile(currentCell.x, mirrorY, selectedTile.spawn(), selectedLayer);
                             }
 
                             if(horizSymmetry && vertSymmetry){
                                 // Mirror horizontally
                                 int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
                                 int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
-                                testGrid.setTile(mirrorX, mirrorY, selectedTile.spawn());
+                                testGrid.setTile(mirrorX, mirrorY, selectedTile.spawn(), selectedLayer);
                             }
                         }
 
                         return true;
                         
                     case Buttons.RIGHT:
-                        testGrid.removeTile(currentCell.x, currentCell.y);
+                        testGrid.removeTile(currentCell.x, currentCell.y, selectedLayer);
 
                         if(horizSymmetry){
                             // Mirror horizontally
                             int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
-                            testGrid.removeTile(mirrorX, currentCell.y);
+                            testGrid.removeTile(mirrorX, currentCell.y, selectedLayer);
                         }
 
                         if(vertSymmetry){
                             // Mirror horizontally
                             int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
-                            testGrid.removeTile(currentCell.x, mirrorY);
+                            testGrid.removeTile(currentCell.x, mirrorY, selectedLayer);
                         }
 
                         if(horizSymmetry && vertSymmetry){
                             // Mirror horizontally
                             int mirrorX = (int)((currentCell.x - horizAxis) * -1 + horizAxis) - 1;
                             int mirrorY = (int)((currentCell.y - vertAxis) * -1 + vertAxis) - 1;
-                            testGrid.removeTile(mirrorX, mirrorY);
+                            testGrid.removeTile(mirrorX, mirrorY, selectedLayer);
                         }
 
                         return true;
@@ -647,7 +667,7 @@ public class GridEditor extends BaseScene {
         if(selectedTile != null){
             int placeWidth = 0;
             batch.set(ShapeType.Line);
-            batch.setColor(testGrid.isRegionOccupied(currentCell.x, currentCell.y, 0, selectedTile.tile.width, selectedTile.tile.height) ? Color.RED : Color.CYAN);
+            batch.setColor(testGrid.isRegionOccupied(currentCell.x, currentCell.y, 0, selectedTile.tile.width, selectedTile.tile.height, selectedLayer) ? Color.RED : Color.CYAN);
             batch.rect(
                 currentCell.x * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
                 currentCell.y * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
@@ -663,7 +683,23 @@ public class GridEditor extends BaseScene {
         spriteBatch.setTransformMatrix(new Matrix4());
         spriteBatch.begin();
 
-        testGrid.iterate(new GridIterator() {
+        testGrid.iterate(Layer.BOTTOM, new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                spriteBatch.setColor(1, 1, 1, 1);
+                tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
+            }
+        });
+
+        testGrid.iterate(Layer.MIDDLE, new GridIterator() {
+            @Override
+            public void iterate(AbstractTile tile) {
+                spriteBatch.setColor(1, 1, 1, 1);
+                tile.render(spriteBatch, Gdx.graphics.getDeltaTime());
+            }
+        });
+
+        testGrid.iterate(Layer.TOP, new GridIterator() {
             @Override
             public void iterate(AbstractTile tile) {
                 spriteBatch.setColor(1, 1, 1, 1);
@@ -701,7 +737,6 @@ public class GridEditor extends BaseScene {
         }
 
         spriteBatch.end();
-
 
         mInterface.act();
         mInterface.draw();

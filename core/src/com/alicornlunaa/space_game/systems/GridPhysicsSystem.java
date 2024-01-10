@@ -5,6 +5,7 @@ import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.ship.GridComponent;
 import com.alicornlunaa.space_game.grid.Grid.GridIterator;
+import com.alicornlunaa.space_game.grid.Grid.Layer;
 import com.alicornlunaa.space_game.grid.tiles.AbstractTile;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -73,7 +74,7 @@ public class GridPhysicsSystem extends EntitySystem {
             final Entity entity = entities.get(i);
             GridComponent gridComp = gm.get(entity);
 
-            gridComp.grid.iterate(new GridIterator() {
+            gridComp.grid.iterate(Layer.MIDDLE, new GridIterator() {
                 @Override
                 public void iterate(AbstractTile tile) {
                     tile.update(entity, deltaTime);
