@@ -3,6 +3,7 @@ package com.alicornlunaa.space_game.grid.entities;
 import org.json.JSONArray;
 
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
+import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.phys.Collider;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.ship.ShipComponent;
@@ -13,9 +14,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 
 public class ThrusterTile extends TileEntity {
     // Variables
+    private ComponentMapper<TransformComponent> transMapper = ComponentMapper.getFor(TransformComponent.class);
     private ComponentMapper<BodyComponent> bodyMapper = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<ShipComponent> shipMapper = ComponentMapper.getFor(ShipComponent.class);
     private TextureRegion texture;
@@ -47,11 +50,13 @@ public class ThrusterTile extends TileEntity {
 
     @Override
     public void update(Entity entity, float deltaTime) {
-        ShipComponent shipComp = shipMapper.get(entity);
+        TransformComponent transform = transMapper.get(entity);
         BodyComponent bodyComp = bodyMapper.get(entity);
+        ShipComponent shipComp = shipMapper.get(entity);
 
         if(shipComp != null && bodyComp != null){
-            bodyComp.body.applyForceToCenter(0, shipComp.throttle, true);
+            Vector2 forward = new Vector2(-(float)Math.sin(transform.rotation + rotation * -Math.PI / 2), (float)Math.cos(transform.rotation + rotation * -Math.PI / 2));
+            bodyComp.body.applyForceToCenter(forward.x * shipComp.throttle * 0.1f, forward.y * shipComp.throttle * 0.1f, true);
         }
     }
 }

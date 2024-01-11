@@ -1,9 +1,11 @@
 package com.alicornlunaa.space_game.scenes.space_scene;
 
 import com.alicornlunaa.selene_engine.ecs.AnimationSystem;
+import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.CameraSystem;
 import com.alicornlunaa.selene_engine.ecs.PhysicsSystem;
 import com.alicornlunaa.selene_engine.ecs.RenderSystem;
+import com.alicornlunaa.selene_engine.ecs.TransformComponent;
 import com.alicornlunaa.selene_engine.scenes.GameScene;
 import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.factories.BasicFactory;
@@ -17,9 +19,14 @@ import com.alicornlunaa.space_game.systems.ShipSystem;
 import com.alicornlunaa.space_game.util.Constants;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 public class SpaceScene extends GameScene {
     // Variables
+    private Label infoLbl;
+    private TransformComponent plyTransComp;
+    private BodyComponent plyBodyComp;
 
     // Constructor
     public SpaceScene() {
@@ -45,11 +52,32 @@ public class SpaceScene extends GameScene {
         engine.addEntity(App.instance.playerEntity);
         engine.addEntity(GridFactory.createGrid(2, 1, 0));
         engine.addEntity(BasicFactory.createBox(0.1f, 0.1f, 0.2f, 0.2f, 0));
+
+        // Create debug interface
+        plyTransComp = App.instance.playerEntity.getComponent(TransformComponent.class);
+        plyBodyComp = App.instance.playerEntity.getComponent(BodyComponent.class);
+
+        Table debugInterface = new Table();
+        debugInterface.row().expand();
+        debugInterface.setFillParent(true);
+
+        infoLbl = new Label("Null", App.instance.skin);
+        debugInterface.add(infoLbl).pad(10).left().top();
+
+        getInterface().addActor(debugInterface);
     }
 
     // Functions
     @Override
     public void render(float delta) {
         super.render(delta);
+
+        String txt = "Frame time: ";
+        txt += delta;
+        txt += "\nPosition: ";
+        txt += plyTransComp.position.toString();
+        txt += "\nVelocity: ";
+        txt += plyBodyComp.body == null ? "(null, null)" : plyBodyComp.body.getLinearVelocity().toString();
+        infoLbl.setText(txt);
     }
 }
