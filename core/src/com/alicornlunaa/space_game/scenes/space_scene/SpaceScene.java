@@ -70,13 +70,16 @@ public class SpaceScene extends GameScene {
         debugInterface.add(infoLbl).pad(10).left().top();
 
         getInterface().addActor(debugInterface);
-        getInterface().addActor(console);
     }
 
     // Functions
     @Override
     public void render(float delta) {
         super.render(delta);
+
+        if(App.instance.inputs.isKeyJustPressed("CONSOLE")){
+            getInterface().addActor(console);
+        }
 
         String txt = "Frame time: ";
         txt += delta;

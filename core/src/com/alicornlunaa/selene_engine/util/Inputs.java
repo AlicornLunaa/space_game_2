@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
@@ -27,7 +28,7 @@ public class Inputs extends InputAdapter {
         this();
 
         for(String key : obj.keySet()){
-            bind(key, obj.getInt(key));
+            bind(key, Keys.valueOf(obj.getString(key)));
         }
     }
 
@@ -105,7 +106,7 @@ public class Inputs extends InputAdapter {
 
         for(Entry<Integer, Array<String>> bind : binds.entrySet()){
             for(String s : bind.getValue()){
-                obj.put(s, bind.getKey());
+                obj.put(s, Keys.toString(bind.getKey()));
             }
         }
 
@@ -123,7 +124,7 @@ public class Inputs extends InputAdapter {
         JSONObject obj = new JSONObject(file.readString());
 
         for(String key : obj.keySet()){
-            bind(key, obj.getInt(key));
+            bind(key, Keys.valueOf(obj.getString(key)));
         }
     }
 }
