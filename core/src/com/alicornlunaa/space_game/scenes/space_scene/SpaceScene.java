@@ -17,6 +17,7 @@ import com.alicornlunaa.space_game.systems.GridRenderSystem;
 import com.alicornlunaa.space_game.systems.PlayerSystem;
 import com.alicornlunaa.space_game.systems.ShipSystem;
 import com.alicornlunaa.space_game.util.Constants;
+import com.alicornlunaa.space_game.widgets.ConsoleWidget;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,6 +28,7 @@ public class SpaceScene extends GameScene {
     private Label infoLbl;
     private TransformComponent plyTransComp;
     private BodyComponent plyBodyComp;
+    private ConsoleWidget console = new ConsoleWidget();
 
     // Constructor
     public SpaceScene() {
@@ -65,6 +67,7 @@ public class SpaceScene extends GameScene {
         debugInterface.add(infoLbl).pad(10).left().top();
 
         getInterface().addActor(debugInterface);
+        getInterface().addActor(console);
     }
 
     // Functions

@@ -14,6 +14,7 @@ public abstract class GameScene extends BaseScene {
         // Initialize stuff
         engine = new Engine();
         userInterface = new Stage(new ScreenViewport());
+        inputs.addProcessor(userInterface);
     }
 
     // Functions

@@ -1,7 +1,5 @@
 package com.alicornlunaa.space_game.widgets;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -15,10 +13,7 @@ import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 
 public class ConsoleWidget extends VisWindow {
-
     // Variables
-    private final InputProcessor oldInput;
-
     private VisScrollPane historyScroll;
     private VerticalGroup history;
     private VisTextField commandBar;
@@ -46,7 +41,6 @@ public class ConsoleWidget extends VisWindow {
     // Constructor
     public ConsoleWidget(){
         super("Console", true);
-        this.oldInput = Gdx.input.getInputProcessor();
         setSize(640, 360);
         closeOnEscape();
         addCloseButton();
@@ -78,12 +72,4 @@ public class ConsoleWidget extends VisWindow {
             }
         });
     }
-
-    // Functions
-    @Override
-    public boolean remove(){
-        Gdx.input.setInputProcessor(oldInput);
-        return super.remove();
-    }
-    
 }

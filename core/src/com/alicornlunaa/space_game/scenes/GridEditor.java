@@ -708,7 +708,7 @@ public class GridEditor extends BaseScene {
         if(selectedTile != null){
             int placeWidth = 0;
             batch.set(ShapeType.Line);
-            batch.setColor(testGrid.isRegionOccupied(currentCell.x, currentCell.y, 0, selectedTile.tile.width, selectedTile.tile.height, selectedLayer) ? Color.RED : Color.CYAN);
+            batch.setColor(testGrid.isRegionOccupied(currentCell.x, currentCell.y, selectedTile.tile.rotation, selectedTile.tile.width, selectedTile.tile.height, selectedLayer) ? Color.RED : Color.CYAN);
             batch.rect(
                 currentCell.x * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,
                 currentCell.y * Constants.TILE_SIZE - Constants.TILE_SIZE * placeWidth,

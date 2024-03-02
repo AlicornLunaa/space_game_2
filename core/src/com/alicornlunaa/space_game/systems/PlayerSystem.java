@@ -55,6 +55,7 @@ public class PlayerSystem extends EntitySystem {
             );
             
             // Handle keyboard controls
+            // TODO: Convert this to an input event system
             if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)) plyComp.vertical = 1;
             else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)) plyComp.vertical = -1;
             else plyComp.vertical = 0;
