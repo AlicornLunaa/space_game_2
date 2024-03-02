@@ -49,6 +49,9 @@ public class SpaceScene extends GameScene {
         App.instance.camera.position.set(1.5f, 2.5f, 0);
         App.instance.camera.update();
 
+        // Init controls
+        inputs.addProcessor(App.instance.inputs);
+
         // Test entities
         App.instance.playerEntity = CharacterFactory.createPlayer(4, 0, 0);
         engine.addEntity(App.instance.playerEntity);

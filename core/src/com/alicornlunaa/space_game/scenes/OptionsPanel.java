@@ -3,7 +3,7 @@ package com.alicornlunaa.space_game.scenes;
 import java.util.ArrayList;
 
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
-import com.alicornlunaa.space_game.util.ControlSchema;
+import com.alicornlunaa.space_game.App;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,7 +26,7 @@ public class OptionsPanel extends Stage {
         oldProcessor = Gdx.input.getInputProcessor();
         Gdx.input.setInputProcessor(this);
 
-        float scale = ControlSchema.GUI_SCALE;
+        float scale = 1;
         ui = new Table();
         ui.setFillParent(true);
         ui.setDebug(true);
@@ -37,7 +37,7 @@ public class OptionsPanel extends Stage {
         saveButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                ControlSchema.save("spacegame_controls.json");
+                Gdx.files.local("./saves/settings/spacegame_controls.json").writeString(App.instance.inputs.serialize().toString(1), false);
                 stages.get(stages.size() - 1).dispose();
                 stages.remove(stages.size() - 1);
             }
@@ -50,7 +50,7 @@ public class OptionsPanel extends Stage {
         applyButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor){
-                ControlSchema.save("spacegame_controls.json");
+                Gdx.files.local("./saves/settings/spacegame_controls.json").writeString(App.instance.inputs.serialize().toString(1), false);
             }
         });
         this.addActor(applyButton);

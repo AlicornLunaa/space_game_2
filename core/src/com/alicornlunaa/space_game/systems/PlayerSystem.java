@@ -3,17 +3,17 @@ package com.alicornlunaa.space_game.systems;
 import com.alicornlunaa.selene_engine.ecs.AnimationComponent;
 import com.alicornlunaa.selene_engine.ecs.BodyComponent;
 import com.alicornlunaa.selene_engine.ecs.TransformComponent;
+import com.alicornlunaa.selene_engine.util.Inputs;
+import com.alicornlunaa.space_game.App;
 import com.alicornlunaa.space_game.components.player.PlayerComponent;
 import com.alicornlunaa.space_game.components.player.PlayerComponent.PlayerState;
 import com.alicornlunaa.space_game.util.Constants;
-import com.alicornlunaa.space_game.util.ControlSchema;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class PlayerSystem extends EntitySystem {
@@ -23,6 +23,8 @@ public class PlayerSystem extends EntitySystem {
     private ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<PlayerComponent> pm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
+
+    private Inputs inputs = App.instance.inputs;
 
     // Constructor
     public PlayerSystem(){
@@ -55,20 +57,19 @@ public class PlayerSystem extends EntitySystem {
             );
             
             // Handle keyboard controls
-            // TODO: Convert this to an input event system
-            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_UP)) plyComp.vertical = 1;
-            else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_DOWN)) plyComp.vertical = -1;
+            if(inputs.isKeyPressed("PLAYER_UP")) plyComp.vertical = 1;
+            else if(inputs.isKeyPressed("PLAYER_DOWN")) plyComp.vertical = -1;
             else plyComp.vertical = 0;
             
-            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_LEFT)) plyComp.horizontal = -1;
-            else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_RIGHT)) plyComp.horizontal = 1;
+            if(inputs.isKeyPressed("PLAYER_LEFT")) plyComp.horizontal = -1;
+            else if(inputs.isKeyPressed("PLAYER_RIGHT")) plyComp.horizontal = 1;
             else plyComp.horizontal = 0;
             
-            if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_ROLL_LEFT)) plyComp.roll = 1;
-            else if(Gdx.input.isKeyPressed(ControlSchema.PLAYER_ROLL_RIGHT)) plyComp.roll = -1;
+            if(inputs.isKeyPressed("PLAYER_ROLL_LEFT")) plyComp.roll = 1;
+            else if(inputs.isKeyPressed("PLAYER_ROLL_RIGHT")) plyComp.roll = -1;
             else plyComp.roll = 0;
 
-            if(Gdx.input.isKeyJustPressed(ControlSchema.PLAYER_NOCLIP)) plyComp.isNoclipping = !plyComp.isNoclipping;
+            if(inputs.isKeyJustPressed("PLAYER_NOCLIP")) plyComp.isNoclipping = !plyComp.isNoclipping;
 
             // Set animation
             if(plyComp.state.animIndex != animComp.activeAnimation){
@@ -86,7 +87,7 @@ public class PlayerSystem extends EntitySystem {
             // Apply forces
             if(plyComp.isNoclipping){
                 // Noclip physics
-                float speed = Gdx.input.isKeyPressed(ControlSchema.PLAYER_SPRINT) ? 1000 : 10; 
+                float speed = inputs.isKeyPressed("PLAYER_SPRINT") ? 1000 : 10; 
 
                 bodyComp.body.setLinearVelocity(0, 0);
                 bodyComp.body.setFixedRotation(true);

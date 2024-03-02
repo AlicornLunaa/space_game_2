@@ -1,7 +1,6 @@
 package com.alicornlunaa.space_game.scenes;
 
 import com.alicornlunaa.space_game.App;
-import com.alicornlunaa.space_game.util.ControlSchema;
 import com.alicornlunaa.space_game.util.HexColor;
 import com.alicornlunaa.space_game.widgets.ColorWidget;
 import com.badlogic.gdx.Gdx;
@@ -91,7 +90,7 @@ public class PauseScene implements Screen {
         stage.addListener(new InputListener(){
             @Override
             public boolean keyDown(InputEvent event, int keycode){
-                if(keycode == ControlSchema.PAUSE_GAME){
+                if(keycode == App.instance.inputs.getKeyBind("PAUSE_GAME")){
                     game.setScreen(previousScreen);
                     return true;
                 }

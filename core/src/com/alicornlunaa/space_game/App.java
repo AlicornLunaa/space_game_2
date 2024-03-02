@@ -1,6 +1,7 @@
 package com.alicornlunaa.space_game;
 
 import com.alicornlunaa.selene_engine.scenes.GameScene;
+import com.alicornlunaa.selene_engine.util.Inputs;
 import com.alicornlunaa.selene_engine.util.asset_manager.AsepriteSheet;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets;
 import com.alicornlunaa.selene_engine.util.asset_manager.Assets.ILoader;
@@ -8,7 +9,6 @@ import com.alicornlunaa.selene_engine.vfx.VfxManager;
 import com.alicornlunaa.space_game.grid.TileManager;
 import com.alicornlunaa.space_game.scenes.LoadingScene;
 import com.alicornlunaa.space_game.scenes.space_scene.SpaceScene;
-import com.alicornlunaa.space_game.util.ControlSchema;
 import com.alicornlunaa.space_game.util.PartManager;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Game;
@@ -37,6 +37,7 @@ public class App extends Game {
 	public VfxManager vfxManager = new VfxManager();
 	public Skin skin;
 
+	public Inputs inputs = new Inputs();
 	public LoadingScene loadingScene;
 	public OrthographicCamera camera;
 	public Entity playerEntity;
@@ -60,8 +61,6 @@ public class App extends Game {
 	@Override
 	public void create(){
 		// Load files and settings
-		ControlSchema.fromFile("./saves/settings/controls.json");
-
 		manager = new Assets(new ILoader() {
 			@Override
 			public void loadAssets(Assets manager) {
@@ -89,6 +88,8 @@ public class App extends Game {
 		partManager.load("parts/structural.json");
 		partManager.load("parts/thrusters.json");
 		partManager.load("parts/rcsport.json");
+
+		inputs.load(Gdx.files.local("./saves/settings/controls.json"));
 
 		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
