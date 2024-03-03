@@ -13,6 +13,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Null;
 
 public class ControlSeatTile extends TileEntity {
@@ -76,13 +77,17 @@ public class ControlSeatTile extends TileEntity {
                     BodyComponent interactorBodyComp = bodyMapper.get(driver);
 
                     if(entityTransform != null && interactorTransform != null){
+                        Vector2 localExitPos = new Vector2(x * Constants.TILE_SIZE - Constants.TILE_SIZE, y * Constants.TILE_SIZE + Constants.TILE_SIZE);
+                        localExitPos.rotateRad(entityTransform.rotation);
+
                         interactorTransform.position.set(entityTransform.position);
+                        interactorTransform.position.add(localExitPos);
                         interactorTransform.rotation = entityTransform.rotation;
                     }
 
-                    if(entityBodyComp != null && interactorBodyComp != null && entityBodyComp.body != null && interactorBodyComp.body != null){
-                        interactorBodyComp.body.setLinearVelocity(entityBodyComp.body.getLinearVelocity());
-                        interactorBodyComp.body.setAngularVelocity(entityBodyComp.body.getAngularVelocity());
+                    if(entityBodyComp != null && interactorBodyComp != null && entityBodyComp.body != null){
+                        interactorBodyComp.bodyDef.linearVelocity.set(entityBodyComp.body.getLinearVelocity());
+                        interactorBodyComp.bodyDef.angularVelocity = entityBodyComp.body.getAngularVelocity();
                     }
 
                     scene.getEngine().addEntity(driver);
