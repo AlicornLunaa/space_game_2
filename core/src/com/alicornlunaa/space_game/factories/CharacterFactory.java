@@ -19,10 +19,15 @@ public class CharacterFactory {
         // Create default character
         float radius = Constants.PLAYER_WIDTH / 2.f - Constants.HITBOX_LINEUP_FACTOR;
 
+        Collider playerCollider = Collider.box(0, 0, radius, Constants.PLAYER_HEIGHT / 2.f - radius, 0);
+        playerCollider.addCircle().setPosition(0, Constants.PLAYER_HEIGHT / 2.f - radius).setRadius(radius);
+        playerCollider.addCircle().setPosition(0, Constants.PLAYER_HEIGHT / -2.f + radius).setRadius(radius);
+        playerCollider.setAllFixtures(0.1f, 0.05f, 1.4f, false);
+        playerCollider.setCategory((short)0x0002);
+        playerCollider.setMask((short)-1);
+
         BodyComponent bodyComp = new BodyComponent();
-        bodyComp.addCollider(Collider.box(0, 0, radius, Constants.PLAYER_HEIGHT / 2.f - radius, 0).setAllFixtures(0.1f, 0.05f, 1.4f, false));
-        bodyComp.addCollider(Collider.circle(0, Constants.PLAYER_HEIGHT / 2.f - radius, radius).setAllFixtures(0.1f, 0.05f, 1.4f, false));
-        bodyComp.addCollider(Collider.circle(0, Constants.PLAYER_HEIGHT / -2.f + radius, radius).setAllFixtures(0.1f, 0.05f, 1.4f, false));
+        bodyComp.addCollider(playerCollider);
 
         Entity entity = new Entity();
         entity.add(new SpriteComponent(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT));

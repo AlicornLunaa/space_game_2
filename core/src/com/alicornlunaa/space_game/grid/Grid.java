@@ -128,8 +128,7 @@ public class Grid {
     public boolean drawTop = true;
     
     // Constructor
-    public Grid(){
-    }
+    public Grid(){}
 
     // Functions
     private Chunk newChunkFromWorld(int x, int y){

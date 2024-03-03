@@ -218,7 +218,6 @@ public class Collider {
             }
         }
 
-
         private int orientation(Vector2 p, Vector2 q, Vector2 r){
             float val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
             if (val == 0) return 0;
@@ -316,17 +315,19 @@ public class Collider {
         }
 
 
-        public void setPosition(float x, float y){
+        public CircleShape setPosition(float x, float y){
             this.x = x;
             this.y = y;
+            return this;
         }
 
         public Vector2 getPosition(){
             return new Vector2(x, y);
         }
 
-        public void setRadius(float rad){
+        public CircleShape setRadius(float rad){
             radius = rad;
+            return this;
         }
 
         public float getRadius(){
@@ -408,6 +409,9 @@ public class Collider {
     private Vector2 scale = new Vector2(1, 1);
     private float rotation = 0.0f;
 
+    private short category = 0x0001;
+    private short mask = -1;
+
     private boolean enabled = true;
 
     // Constructors
@@ -435,6 +439,8 @@ public class Collider {
         origin = collider.origin.cpy();
         scale = collider.scale.cpy();
         rotation = collider.rotation;
+        category = collider.category;
+        mask = collider.mask;
     }
 
     // Getters & setters
@@ -465,6 +471,9 @@ public class Collider {
             }
         }
     }
+
+    public Collider setCategory(short c){ category = c; reattach(); return this; }
+    public Collider setMask(short m){ mask = m; reattach(); return this; }
 
     public Collider setAllFixtures(float friction, float restitution, float density, boolean sensor){
         for(Shape shape : shapes){
@@ -527,6 +536,8 @@ public class Collider {
                 physShape.set(vertexData);
                 
                 FixtureDef def = new FixtureDef();
+                def.filter.categoryBits = category;
+                def.filter.maskBits = mask;
                 def.shape = physShape;
                 def.friction = shape.friction;
                 def.restitution = shape.restitution;
@@ -542,6 +553,8 @@ public class Collider {
                 physShape.setRadius(circleShape.radius);
                 
                 FixtureDef def = new FixtureDef();
+                def.filter.categoryBits = category;
+                def.filter.maskBits = mask;
                 def.shape = physShape;
                 def.friction = shape.friction;
                 def.restitution = shape.restitution;
@@ -556,6 +569,8 @@ public class Collider {
                 physShape.set(edgeShape.start, edgeShape.end);
                 
                 FixtureDef def = new FixtureDef();
+                def.filter.categoryBits = category;
+                def.filter.maskBits = mask;
                 def.shape = physShape;
                 def.friction = shape.friction;
                 def.restitution = shape.restitution;
