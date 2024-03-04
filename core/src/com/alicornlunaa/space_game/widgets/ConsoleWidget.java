@@ -1,6 +1,7 @@
 package com.alicornlunaa.space_game.widgets;
 
 import com.alicornlunaa.space_game.App;
+import com.alicornlunaa.space_game.scenes.GridEditor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,17 +23,11 @@ public class ConsoleWidget extends VisWindow {
     
     // Private functions
     private void handleCmd(String cmd){
-        // String[] args = cmd.split("\\s+");
+        String[] args = cmd.split("\\s+");
         
-        // if(args[0].equals("loadship")){
-        //     game.gameScene.ship.load(args[1]);
-        // } else if(args[0].equals("settimewarp")){
-        //     game.gameScene.universe.setTimewarp(Float.parseFloat(args[1]));
-        // } else if(args[0].equals("devkit")){
-        //     game.setScreen(new DevKit(game));
-        // } else if(args[0].equals("save")){
-        //     SaveManager.save(game, "dev_world");
-        // }
+        if(args[0].equals("grid_editor")){
+            App.instance.setScreen(new GridEditor());
+        }
 
         commandBar.setText("");
         history.addActor(new VisLabel(cmd));

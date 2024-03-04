@@ -28,7 +28,7 @@ public class Constants {
     public static final float HITBOX_LINEUP_FACTOR = 0.02f;
 
     // Math constants
-    public static final float GRAVITY_CONSTANT = 1.f;
+    public static final float GRAVITY_CONSTANT = 10.f;
     public static final float DRAG_COEFFICIENT = 0.004f;
     public static final float FPI = (float)Math.PI;
     
