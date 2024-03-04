@@ -22,7 +22,12 @@ public class Inputs extends InputAdapter {
     public HashMap<String, Boolean> keys = new HashMap<>();
 
     // Constructor
-    public Inputs(){}
+    public Inputs(){
+        // Load defaults
+        for(int i = 0; i < DefaultControls.names.length; i++){
+            bind(DefaultControls.names[i], DefaultControls.keys[i]);
+        }
+    }
 
     public Inputs(JSONObject obj){
         this();
@@ -56,8 +61,10 @@ public class Inputs extends InputAdapter {
 	}
 
     public void bind(String name, int keyCode){
-        if(keys.containsKey(name))
-            return;
+        if(keys.containsKey(name)){
+            // Override the key
+            unbind(name);
+        }
 
         if(binds.containsKey(keyCode)){
             binds.get(keyCode).add(name);
@@ -116,10 +123,6 @@ public class Inputs extends InputAdapter {
     public void load(FileHandle file){
         if(file == null)
             return;
-
-        keys.clear();
-        aliases.clear();
-        binds.clear();
 
         JSONObject obj = new JSONObject(file.readString());
 

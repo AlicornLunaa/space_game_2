@@ -381,6 +381,10 @@ public class Collider {
             return obj;
         }
 
+        public void set(float x1, float y1, float x2, float y2){
+            start.set(x1, y1);
+            end.set(x2, y2);
+        }
 
         public void setStartVertex(Vector2 vertex){
             start.set(vertex);

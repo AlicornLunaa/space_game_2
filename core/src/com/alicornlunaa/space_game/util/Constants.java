@@ -7,6 +7,11 @@ public class Constants {
     public static final int POSITION_ITERATIONS = 4;
     public static final int MAX_PREDICTION_STEPS = 2;
     public static final int CHUNK_LOAD_DISTANCE = 3;
+
+    public static final short GRID_COLLISION_CATEGORY_A =  0b0000000000000001;
+    public static final short GRID_COLLISION_CATEGORY_B =  0b0000000000001000;
+    public static final short TERRAIN_COLLISION_CATEGORY = 0b0000000000000010;
+    public static final short PLAYER_COLLISION_CATEGORY =  0b0000000000000100;
     
     // Simulation constants
     public static final float MIN_FLUID_LEVEL = 0.01f;
