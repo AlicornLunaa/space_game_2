@@ -1,9 +1,9 @@
 # Space Game 2
-Recreation of a side project in java using a real  
+Recreation of an unfinished side project in java using a real  
 physics engine instead of making my own.
+Buggy mess right now, I only work on it sometimes
 
 This is to help me relearn java for my class.
-
 https://trello.com/b/iWLwNVqD/spacegame-todo
 
 ### Theory for ship construction
@@ -14,51 +14,10 @@ part will have to be told which attachment point is being used as well.
 ### How the simulation works and different terminology
 - The Universe class holds all the solar systems, planets, moons, and entities. It has Box2D world where an entity will be stored when it has no nearby gravitational parent, this is equivalent to deep space. This class handles transfers between the different Box2D worlds.
 - OrbitUtils contains different helper functions such as coordinate conversions to system-space to universe-space. Universe-space should be avoided because it is prone to floating point precision errors with large systems.
-  
-### Save file structure
-- saves/settings
-- saves/universes
-    - saves/universes/(world_name)
-        - saves/universes/(world_name)/planets/(planet_id)/
-            - saves/universes/(world_name)/planets/(planet_id)/level.dat
-                - chunk_width
-                - chunk_height
-                - atmos_radius
-                - atmos_density
-                - atmos_composition
-                - atmos_percentages
-                - seed
-                - loaded_chunks
-                    - x
-                    - y
-                - /data/
-                    - chunk-x-y.dat
-                        - tiles
-        - saves/universes/(world_name)/ships/(ship_name).ship
-        - saves/universes/(world_name)/simulation.dat
-            - entities
-                - classname
-                - x
-                - y
-                - vx
-                - vy
-                - physworld_id
-                - celestial_id
-        - saves/universes/(world_name)/player.dat
-            - x
-            - y
-            - vx
-            - vy
-            - physworld_id
-            - celestial_id
 
-### Creation procedure:
-1. Create simulation
-2. Create universe
-3. Load planets
-    - Load world, parent, position, and velocity
-4. Load entities
-    - Load position and world from files
-5. Load player
-    - Load position and world from files
-6. Start scene
+### Controls
+- Will be set in the future using some sort of management class, for now its hardcoded.
+    * WASD standard movement
+    * M for orbital map
+    * Shift throttle up and ctrl throttle down
+    * Buttons on screen to drive ship

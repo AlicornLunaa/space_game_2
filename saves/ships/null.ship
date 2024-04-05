@@ -1,0 +1,74 @@
+{"assembly": [
+  {
+    "rotation": 0,
+    "x": 0,
+    "y": 0,
+    "id": "MED_CMD_POD",
+    "flipX": false,
+    "type": "AERO",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": 0,
+    "y": -15.5,
+    "id": "BSC_FUSELAGE",
+    "flipX": false,
+    "type": "STRUCTURAL",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": 0,
+    "y": -31.5,
+    "id": "BSC_FUSELAGE",
+    "flipX": false,
+    "type": "STRUCTURAL",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": 0,
+    "y": -47.5,
+    "id": "BSC_THRUSTER",
+    "flipX": false,
+    "type": "THRUSTER",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": -8.5,
+    "y": -15.5,
+    "id": "BSC_RCS_PORT",
+    "flipX": false,
+    "type": "RCSPORT",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": -8.5,
+    "y": -31.5,
+    "id": "BSC_RCS_PORT",
+    "flipX": false,
+    "type": "RCSPORT",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": 8.5,
+    "y": -15.5,
+    "id": "BSC_RCS_PORT",
+    "flipX": true,
+    "type": "RCSPORT",
+    "flipY": false
+  },
+  {
+    "rotation": 0,
+    "x": 8.5,
+    "y": -31.5,
+    "id": "BSC_RCS_PORT",
+    "flipX": true,
+    "type": "RCSPORT",
+    "flipY": false
+  }
+]}

@@ -8,6 +8,7 @@ import com.alicornlunaa.spacegame.objects.planet.Planet;
 import com.alicornlunaa.spacegame.objects.simulation.Star;
 import com.alicornlunaa.spacegame.objects.simulation.Universe;
 import com.alicornlunaa.spacegame.objects.simulation.orbits.OrbitUtils;
+import com.alicornlunaa.spacegame.scenes.editor_scene.EditorScene;
 import com.alicornlunaa.spacegame.scenes.space_scene.SpaceScene;
 import com.alicornlunaa.spacegame.scenes.transitions.LoadingScene;
 import com.alicornlunaa.spacegame.util.Assets;
@@ -70,9 +71,9 @@ public class App extends Game {
         OrbitUtils.createOrbit(universe, universe.getCelestial(4));
         OrbitUtils.createOrbit(universe, universe.getCelestial(5));
 
-		// player = new Player(this, -50, 0);
-		// universe.addEntity(player);
-		// OrbitUtils.createOrbit(universe, player);
+		player = new Player(this, -50, 0);
+		universe.addEntity(player);
+		OrbitUtils.createOrbit(universe, player);
 	}
 	
 	// Functions
@@ -132,7 +133,7 @@ public class App extends Game {
 
 				// Start new scene
 				initializeUniverse();
-				SaveManager.load(this, "dev_world");
+				// SaveManager.load(this, "dev_world");
 				spaceScene = new SpaceScene(this);
 				OrbitUtils.createOrbit(universe, spaceScene.getContent().ship);
 
@@ -149,6 +150,7 @@ public class App extends Game {
 				// this.setScreen(new TestScreen(this));
 				// this.setScreen(new OrbitTest(this));
 				// this.setScreen(new PlanetEditor(this));
+				// this.setScreen(new EditorScene(this));
 			} else {
 				// Loading is not complete, update progress bar
 				((LoadingScene)this.getScreen()).progressBar.setValue(manager.getProgress());
