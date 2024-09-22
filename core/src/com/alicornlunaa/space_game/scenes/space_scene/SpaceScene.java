@@ -72,6 +72,7 @@ public class SpaceScene extends GameScene {
         // Gravity test
         App.instance.playerEntity.add(new TrackedEntityComponent(Color.CYAN));
         App.instance.playerEntity.add(new GravityComponent());
+        engine.getEntities().get(1).add(new GravityComponent());
         engine.getEntities().get(3).add(new GravityComponent());
 
         // Create debug interface

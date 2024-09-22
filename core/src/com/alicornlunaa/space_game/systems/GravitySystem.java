@@ -49,7 +49,7 @@ public class GravitySystem extends EntitySystem {
                 continue;
 
             // Update gravity for entity
-            bodyComp.body.applyForceToCenter(calculateGravity(transform, bodyComp, gravityComp), false);
+            bodyComp.body.applyForceToCenter(calculateGravity(transform, bodyComp, gravityComp).scl(deltaTime), true);
         }
     }
 

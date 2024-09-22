@@ -18,9 +18,7 @@ public abstract class BaseScene implements Screen {
     }
 
     @Override
-    public void show() {
-        Gdx.input.setInputProcessor(inputs);
-    }
+    public void show() { Gdx.input.setInputProcessor(inputs); }
 
     @Override
     public void hide() {}
